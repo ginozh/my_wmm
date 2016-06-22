@@ -22,6 +22,8 @@ dir="/c/QtProjects";
 #dir="/c/QtProjects/qtmovie";ffmpeg -i $dir/lovechina1.mp3 -framerate 1 -i "$dir/jpg/img%3d.jpg" -vf drawtext="enable='gte(t,3)':fontfile=/c/Windows/fonts/simsun.ttc: fontcolor=white: fontsize=60: textfile=text.txt:reload=1:y=h-line_h-10:x=(W/tw)*n"  $dir/output.avi
 # ok
 #dir="/c/QtProjects/qtmovie";ffmpeg -i $dir/lovechina1.mp3 -framerate 1 -i "$dir/jpg/img%3d.jpg" -vf subtitles=subtitle.srt  $dir/output.avi
+# ok
+# ffmpeg -i subtitle.srt subtitle.ass
 dir="/c/QtProjects/qtmovie";ffmpeg -i $dir/lovechina1.mp3 -framerate 1 -i "$dir/jpg/img%3d.jpg" -vf ass=subtitle.ass  $dir/output.avi
 
 #dir="/c/QtProjects/qtmovie";ffmpeg -i output.avi -i $dir/sub.ass -vf ass=sub.ass   $dir/out.avi
