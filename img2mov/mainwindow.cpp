@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "elementsedit.h"
 #include <QAction>
 #include <QApplication>
 #include <QFileDialog>
@@ -16,8 +17,10 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , m_treeView(new QTreeView)
-    , m_detailsText(new QTextEdit)
+    //, m_treeView(new QTreeView)
+    //, m_detailsText(new QTextEdit)
+    , m_player(new VideoPlayer)
+    , m_elementsEdit(new ElementsEdit)
 {
     setWindowTitle(tr("img to movie"));
 
@@ -33,9 +36,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     QSplitter *centralSplitter = new QSplitter;
     setCentralWidget(centralSplitter);
-    m_treeView = new QTreeView;
+    //m_treeView = new QTreeView;
 
-    centralSplitter->addWidget(m_treeView);
-    m_detailsText->setReadOnly(true);
-    centralSplitter->addWidget(m_detailsText);
+    //centralSplitter->addWidget(m_treeView);
+    centralSplitter->addWidget(m_player);
+    /*const QRect availableGeometry = QApplication::desktop()->availableGeometry(m_player);
+    m_player->resize(availableGeometry.width() / 6, availableGeometry.height() / 4);
+    m_player->show();*/
+    //m_detailsText->setReadOnly(true);
+    centralSplitter->addWidget(m_elementsEdit);
 }

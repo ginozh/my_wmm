@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "videoplayer.h"
+#include "elementsedit.h"
 QT_FORWARD_DECLARE_CLASS(QAction)
 QT_FORWARD_DECLARE_CLASS(QTextEdit)
 QT_FORWARD_DECLARE_CLASS(QTreeView)
@@ -14,6 +16,8 @@ public:
 private:
     QTreeView *m_treeView;
     QTextEdit *m_detailsText;
+    VideoPlayer *m_player;
+    ElementsEdit *m_elementsEdit;
 };
 
 #endif // MAINWINDOW_H
