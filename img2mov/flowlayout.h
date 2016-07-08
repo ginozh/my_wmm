@@ -58,8 +58,10 @@
 class FlowLayout : public QLayout
 {
 public:
-    explicit FlowLayout(QWidget *parent, int margin = -1, int hSpacing = -1, int vSpacing = -1);
-    explicit FlowLayout(int margin = -1, int hSpacing = -1, int vSpacing = -1);
+    //explicit FlowLayout(QWidget *parent, int margin = -1, int hSpacing = -1, int vSpacing = -1);
+    //explicit FlowLayout(int margin = -1, int hSpacing = -1, int vSpacing = -1);
+    explicit FlowLayout(QWidget *parent, int margin = 0, int hSpacing = 0, int vSpacing = 0);
+    explicit FlowLayout(int margin = 0, int hSpacing = 0, int vSpacing = 0);
     ~FlowLayout();
 
     void addItem(QLayoutItem *item) Q_DECL_OVERRIDE;

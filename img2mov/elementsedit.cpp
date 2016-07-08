@@ -50,19 +50,28 @@
 
 #include <QPushButton>
 
-#include "flowlayout.h"
 #include "elementsedit.h"
+#include "element.h"
 //! [1]
 ElementsEdit::ElementsEdit()
+  : m_flowLayout(new FlowLayout(this))
 {
-    FlowLayout *flowLayout = new FlowLayout;
-
-    flowLayout->addWidget(new QPushButton(tr("Short")));
-    flowLayout->addWidget(new QPushButton(tr("Longer")));
-    flowLayout->addWidget(new QPushButton(tr("Different text")));
-    flowLayout->addWidget(new QPushButton(tr("More text")));
-    flowLayout->addWidget(new QPushButton(tr("Even longer button text")));
-    setLayout(flowLayout);
+#if 0
+    m_flowLayout->addWidget(new QPushButton(tr("Short")));
+    m_flowLayout->addWidget(new QPushButton(tr("Longer")));
+    m_flowLayout->addWidget(new QPushButton(tr("Different text")));
+    m_flowLayout->addWidget(new QPushButton(tr("More text")));
+    m_flowLayout->addWidget(new QPushButton(tr("Even longer button text")));
+#endif
+    //m_flowLayout->setSpacing(0);
+    //m_flowLayout->setMargin(0);
+    //m_flowLayout->setContentsMargins(0,0,0,0);
+    m_flowLayout->addWidget(new Element());
+    m_flowLayout->addWidget(new Element());
+    m_flowLayout->addWidget(new Element());
+    m_flowLayout->addWidget(new Element());
+    m_flowLayout->addWidget(new Element());
+    setLayout(m_flowLayout);
 
     setWindowTitle(tr("Flow Layout"));
 }

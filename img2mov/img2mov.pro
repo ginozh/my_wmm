@@ -1,6 +1,6 @@
 TARGET = img2mov
 TEMPLATE = app
-QT += widgets
+QT += widgets multimedia multimediawidgets
 CONFIG -= app_bundle
 CONFIG += c++11
 
@@ -29,11 +29,17 @@ SOURCES += main.cpp \
     ffmpeg_filter.c \
     ffmpeg_opt.c \
     cmdutils.c \
-    ffmpeg_dxva2.c
+    ffmpeg_dxva2.c \
+    videoplayer.cpp \
+    flowlayout.cpp \
+    elementsedit.cpp
 
 HEADERS  += mainwindow.h \
     ffmpeg.h \
     cmdutils.h \
     cmdutils_common_opts.h \
     config.h \
-    stable.h
+    stable.h \
+    videoplayer.h \
+    flowlayout.h \
+    elementsedit.h

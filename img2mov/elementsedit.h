@@ -52,6 +52,7 @@
 #define ELEMENTSEDIT_H
 
 #include <QWidget>
+#include "flowlayout.h"
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -63,6 +64,8 @@ class ElementsEdit : public QWidget
 
 public:
     ElementsEdit();
+private:
+    FlowLayout *m_flowLayout;
 };
 //! [0]
 
