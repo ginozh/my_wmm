@@ -17,6 +17,10 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 public:
     explicit MainWindow(QWidget *parent = nullptr);
+#if 0
+private slots:
+    void load();
+#endif
 private:
     QTreeView *m_treeView;
     QTextEdit *m_detailsText;

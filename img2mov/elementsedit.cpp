@@ -1,6 +1,8 @@
 #include <QPushButton>
 #include <QPalette>
 #include <QScrollBar>
+#include <QFileDialog>
+#include <QStandardPaths>
 
 #include "elementsedit.h"
 #include "element.h"
@@ -21,11 +23,13 @@ ElementsEdit::ElementsEdit(QWidget *parent)
     //m_flowLayout->setMargin(0);
     //m_flowLayout->setContentsMargins(0,0,0,0);
 #if 1
+    /*
     m_flowLayout->addWidget(new Element());
     m_flowLayout->addWidget(new Element());
     m_flowLayout->addWidget(new Element());
     m_flowLayout->addWidget(new Element());
     m_flowLayout->addWidget(new Element());
+    */
     setLayout(m_flowLayout);
 #else
     QVBoxLayout *layout    = new QVBoxLayout(this);
@@ -49,3 +53,24 @@ ElementsEdit::ElementsEdit(QWidget *parent)
     setWindowTitle(tr("Flow Layout"));
 }
 //! [1]
+void ElementsEdit::load()
+{
+    //qtconcurrent/imagescaling
+    QStringList files = QFileDialog::getOpenFileNames(this, tr("Select Images"),
+            /*QDir::currentPath()*/QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
+            "*.jpg *.png");
+    if (files.count() == 0)
+        return;
+    for (int i = 0; i < files.count(); ++i) {
+        m_flowLayout->addWidget(new Element(this, files[i]));
+    }
+
+    /*if (!m_canvas->loadImage(fileName))
+        QMessageBox::information(this, "Error Opening Picture",
+                                 "Could not open picture");
+                                 */
+}
+void ElementsEdit::handleContextMenuRequested(const QPoint &pos)
+{
+    load();
+}

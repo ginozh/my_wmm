@@ -13,7 +13,7 @@ class Element : public QWidget
     Q_OBJECT
 
 public:
-    Element();
+    Element(QWidget *parent = 0, const QString& image=tr(""));
 private:
     QVBoxLayout *m_elementLayout;
 };

@@ -14,6 +14,7 @@
 #include <QTreeView>
 
 #include <QFileInfo>
+#include <QStandardPaths>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -24,11 +25,14 @@ MainWindow::MainWindow(QWidget *parent)
 {
     setWindowTitle(tr("img to movie"));
 
+    //widgets/widgets/tablet
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
 
+    fileMenu->addAction(tr("&Open..."), m_elementsEdit, &ElementsEdit::load, QKeySequence::Open);
 
     QAction *exitAction = fileMenu->addAction(tr("E&xit"), qApp, &QApplication::closeAllWindows);
     exitAction->setShortcuts(QKeySequence::Quit);
+
 
     QMenu *findMenu = menuBar()->addMenu(tr("&Edit"));
 
@@ -55,3 +59,21 @@ MainWindow::MainWindow(QWidget *parent)
     centralSplitter->addWidget(m_elementsEdit);
 #endif
 }
+#if 0
+void MainWindow::load()
+{
+    //qtconcurrent/imagescaling
+    QStringList files = QFileDialog::getOpenFileNames(this, tr("Select Images"),
+            /*QDir::currentPath()*/QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
+            "*.jpg *.png");
+    if (files.count() == 0)
+        return;
+    for (int i = 0; i < files.count(); ++i) {
+    }
+
+    /*if (!m_canvas->loadImage(fileName))
+        QMessageBox::information(this, "Error Opening Picture",
+                                 "Could not open picture");
+                                 */
+}
+#endif

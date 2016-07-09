@@ -1,9 +1,10 @@
 #include "image.h"
 #include <QMessageBox>
 #include <QMenu>
-
-Image::Image(const QString& path)
-    : m_pixMap(new QPixmap())
+class ElementsEdit;
+Image::Image(QWidget *parent,const QString& path)
+    : QLabel(parent)
+    , m_pixMap(new QPixmap())
 {
     setScaledContents(true);
     if(!path.isEmpty())
@@ -17,14 +18,17 @@ Image::Image(const QString& path)
         setPixmap(*m_pixMap);
     }
     setContextMenuPolicy(Qt::DefaultContextMenu);
-    //connect(this, &QLabel::customContextMenuRequested, this, &TabWidget::handleContextMenuRequested);
+    //webenginewidgets/simplebrowser/tabwidget.cpp
+    //setContextMenuPolicy(Qt::CustomContextMenu);
+    //connect(this, &QLabel::customContextMenuRequested, parent()->parent(), &ElementsEdit::handleContextMenuRequested);
 }
 void Image::contextMenuEvent(QContextMenuEvent * event)
 {
     //connect(tree, SIGNAL(customContextMenuRequested(QPoint)), this,    SLOT(customContextMenuRequested(QPoint)));
     //QMessageBox::information(this,tr("right button"),tr("right"));
     QMenu menu;
-    menu.addAction(tr("Open"), this, SLOT(open()));
+    //menu.addAction(tr("Open"), this, SLOT(open()));
+    menu.addAction(tr("Open"), parentWidget()->parentWidget(), SLOT(load())  );
     menu.exec(QCursor::pos());
 }
 #if 0
@@ -36,3 +40,6 @@ void Image::mousePressEvent(QMouseEvent *event)
     }
 }
 #endif
+void Image::open()
+{
+}

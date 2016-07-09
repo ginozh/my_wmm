@@ -10,7 +10,7 @@ class Image : public QLabel
     Q_OBJECT
 
 public:
-    Image(const QString& path=tr(""));
+    Image(QWidget *parent=0, const QString& path=tr(""));
 protected:
     void contextMenuEvent(QContextMenuEvent * event) Q_DECL_OVERRIDE;
 #if 0
@@ -19,6 +19,8 @@ protected:
 private slots:
     void handleContextMenuRequested(const QPoint &pos);
 #endif
+private slots:
+    void open();
 private:
     QPixmap *m_pixMap;
 };

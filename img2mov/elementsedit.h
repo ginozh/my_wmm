@@ -66,6 +66,9 @@ class ElementsEdit : public QWidget
 
 public:
     ElementsEdit(QWidget *parent = 0);
+public slots:
+    void load();
+    void handleContextMenuRequested(const QPoint &pos);
 private:
     FlowLayout *m_flowLayout;
 };
