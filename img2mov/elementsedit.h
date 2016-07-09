@@ -52,6 +52,7 @@
 #define ELEMENTSEDIT_H
 
 #include <QWidget>
+#include <QScrollArea>
 #include "flowlayout.h"
 
 QT_BEGIN_NAMESPACE
@@ -59,11 +60,12 @@ class QLabel;
 QT_END_NAMESPACE
 //! [0]
 class ElementsEdit : public QWidget
+//class ElementsEdit : public QScrollArea
 {
     Q_OBJECT
 
 public:
-    ElementsEdit();
+    ElementsEdit(QWidget *parent = 0);
 private:
     FlowLayout *m_flowLayout;
 };

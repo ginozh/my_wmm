@@ -32,7 +32,9 @@ SOURCES += main.cpp \
     ffmpeg_dxva2.c \
     videoplayer.cpp \
     flowlayout.cpp \
-    elementsedit.cpp
+    elementsedit.cpp \
+    element.cpp \
+    image.cpp
 
 HEADERS  += mainwindow.h \
     ffmpeg.h \
@@ -42,4 +44,6 @@ HEADERS  += mainwindow.h \
     stable.h \
     videoplayer.h \
     flowlayout.h \
-    elementsedit.h
+    elementsedit.h \
+    element.h \
+    image.h
