@@ -20,12 +20,24 @@ ElementsEdit::ElementsEdit(QWidget *parent)
     //m_flowLayout->setSpacing(0);
     //m_flowLayout->setMargin(0);
     //m_flowLayout->setContentsMargins(0,0,0,0);
+#if 1
     m_flowLayout->addWidget(new Element());
     m_flowLayout->addWidget(new Element());
     m_flowLayout->addWidget(new Element());
     m_flowLayout->addWidget(new Element());
     m_flowLayout->addWidget(new Element());
     setLayout(m_flowLayout);
+#else
+    QVBoxLayout *layout    = new QVBoxLayout(this);
+    layout->addWidget(new Element());
+    layout->addWidget(new Element());
+    layout->addWidget(new Element());
+    layout->addWidget(new Element());
+    layout->addWidget(new Element());
+    setLayout(layout);
+#endif
+
+
 #if 0
     setVisible(true);
     //adjustScrollBar(scrollArea->horizontalScrollBar(), factor);

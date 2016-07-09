@@ -5,9 +5,15 @@
 Image::Image(const QString& path)
     : m_pixMap(new QPixmap())
 {
+    setScaledContents(true);
     if(!path.isEmpty())
     {
         m_pixMap->load(path);
+        QPixmap& image=*m_pixMap;
+        const QSize maximumSize(200, 200); // Reduce in case someone has large photo images.
+        if (image.size().width() > maximumSize.width() || image.height() > maximumSize.height())
+            image = image.scaled(maximumSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
         setPixmap(*m_pixMap);
     }
     setContextMenuPolicy(Qt::DefaultContextMenu);

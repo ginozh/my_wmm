@@ -52,9 +52,11 @@
 #define FLOWLAYOUT_H
 
 #include <QLayout>
+#include <QHBoxLayout>
 #include <QRect>
 #include <QStyle>
 //! [0]
+//class FlowLayout : public QHBoxLayout
 class FlowLayout : public QLayout
 {
 public:

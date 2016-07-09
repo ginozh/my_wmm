@@ -44,8 +44,14 @@ MainWindow::MainWindow(QWidget *parent)
     m_player->resize(availableGeometry.width() / 6, availableGeometry.height() / 4);
     m_player->show();*/
     //m_detailsText->setReadOnly(true);
+#if 1
     m_scrollArea = new QScrollArea;
+    m_scrollArea->setBackgroundRole(QPalette::Dark);
+    m_scrollArea->setMinimumWidth(500);
+    m_scrollArea->setWidgetResizable (true);
     m_scrollArea->setWidget(m_elementsEdit);
-    //centralSplitter->addWidget(m_elementsEdit);
     centralSplitter->addWidget(m_scrollArea);
+#else
+    centralSplitter->addWidget(m_elementsEdit);
+#endif
 }
