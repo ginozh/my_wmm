@@ -41,36 +41,46 @@
 #include "videoplayer.h"
 
 #include <QtWidgets>
-#include <qvideowidget.h>
-#include <qvideosurfaceformat.h>
+#include <QVideoSurfaceFormat>
+#include <QGraphicsVideoItem>
 
 VideoPlayer::VideoPlayer(QWidget *parent)
     : QWidget(parent)
     , mediaPlayer(0, QMediaPlayer::VideoSurface)
+    , videoItem(0)
     , playButton(0)
     , positionSlider(0)
-    , errorLabel(0)
 {
-    QVideoWidget *videoWidget = new QVideoWidget;
+    videoItem = new QGraphicsVideoItem;
+    videoItem->setSize(QSizeF(640, 480));
+
+    QGraphicsScene *scene = new QGraphicsScene(this);
+    QGraphicsView *graphicsView = new QGraphicsView(scene);
+
+    scene->addItem(videoItem);
+
+    QSlider *rotateSlider = new QSlider(Qt::Horizontal);
+    rotateSlider->setRange(-180,  180);
+    rotateSlider->setValue(0);
+
+    connect(rotateSlider, SIGNAL(valueChanged(int)),
+            this, SLOT(rotateVideo(int)));
 
     QAbstractButton *openButton = new QPushButton(tr("Open..."));
-    connect(openButton, &QAbstractButton::clicked, this, &VideoPlayer::openFile);
+    connect(openButton, SIGNAL(clicked()), this, SLOT(openFile()));
 
     playButton = new QPushButton;
     playButton->setEnabled(false);
     playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 
-    connect(playButton, &QAbstractButton::clicked,
-            this, &VideoPlayer::play);
+    connect(playButton, SIGNAL(clicked()),
+            this, SLOT(play()));
 
     positionSlider = new QSlider(Qt::Horizontal);
     positionSlider->setRange(0, 0);
 
-    connect(positionSlider, &QAbstractSlider::sliderMoved,
-            this, &VideoPlayer::setPosition);
-
-    errorLabel = new QLabel;
-    errorLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
+    connect(positionSlider, SIGNAL(sliderMoved(int)),
+            this, SLOT(setPosition(int)));
 
     QBoxLayout *controlLayout = new QHBoxLayout;
     controlLayout->setMargin(0);
@@ -79,45 +89,33 @@ VideoPlayer::VideoPlayer(QWidget *parent)
     controlLayout->addWidget(positionSlider);
 
     QBoxLayout *layout = new QVBoxLayout;
-    layout->addWidget(videoWidget);
+    layout->addWidget(graphicsView);
+    layout->addWidget(rotateSlider);
     layout->addLayout(controlLayout);
-    layout->addWidget(errorLabel);
 
     setLayout(layout);
 
-    mediaPlayer.setVideoOutput(videoWidget);
-    connect(&mediaPlayer, &QMediaPlayer::stateChanged,
-            this, &VideoPlayer::mediaStateChanged);
-    connect(&mediaPlayer, &QMediaPlayer::positionChanged, this, &VideoPlayer::positionChanged);
-    connect(&mediaPlayer, &QMediaPlayer::durationChanged, this, &VideoPlayer::durationChanged);
-    typedef void (QMediaPlayer::*ErrorSignal)(QMediaPlayer::Error);
-    connect(&mediaPlayer, static_cast<ErrorSignal>(&QMediaPlayer::error),
-            this, &VideoPlayer::handleError);
+    mediaPlayer.setVideoOutput(videoItem);
+    connect(&mediaPlayer, SIGNAL(stateChanged(QMediaPlayer::State)),
+            this, SLOT(mediaStateChanged(QMediaPlayer::State)));
+    connect(&mediaPlayer, SIGNAL(positionChanged(qint64)), this, SLOT(positionChanged(qint64)));
+    connect(&mediaPlayer, SIGNAL(durationChanged(qint64)), this, SLOT(durationChanged(qint64)));
 }
 
 VideoPlayer::~VideoPlayer()
 {
 }
 
+
 void VideoPlayer::openFile()
 {
-    QFileDialog fileDialog(this);
-    fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
-    fileDialog.setWindowTitle(tr("Open Movie"));
-    QStringList supportedMimeTypes = mediaPlayer.supportedMimeTypes();
-    if (!supportedMimeTypes.isEmpty())
-        fileDialog.setMimeTypeFilters(supportedMimeTypes);
-    fileDialog.setDirectory(QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).value(0, QDir::homePath()));
-    if (fileDialog.exec() == QDialog::Accepted)
-        setUrl(fileDialog.selectedUrls().constFirst());
-}
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Movie"),QDir::homePath());
 
-void VideoPlayer::setUrl(const QUrl &url)
-{
-    errorLabel->setText(QString());
-    setWindowFilePath(url.isLocalFile() ? url.toLocalFile() : QString());
-    mediaPlayer.setMedia(url);
-    playButton->setEnabled(true);
+    if (!fileName.isEmpty()) {
+        mediaPlayer.setMedia(QUrl::fromLocalFile(fileName));
+
+        playButton->setEnabled(true);
+    }
 }
 
 void VideoPlayer::play()
@@ -159,14 +157,11 @@ void VideoPlayer::setPosition(int position)
     mediaPlayer.setPosition(position);
 }
 
-void VideoPlayer::handleError()
+
+void VideoPlayer::rotateVideo(int angle)
 {
-    playButton->setEnabled(false);
-    const QString errorString = mediaPlayer.errorString();
-    QString message = "Error: ";
-    if (errorString.isEmpty())
-        message += " #" + QString::number(int(mediaPlayer.error()));
-    else
-        message += errorString;
-    errorLabel->setText(message);
+    //rotate around the center of video element
+    qreal x = videoItem->boundingRect().width() / 2.0;
+    qreal y = videoItem->boundingRect().height() / 2.0;
+    videoItem->setTransform(QTransform().translate(x, y).rotate(angle).translate(-x, -y));
 }

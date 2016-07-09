@@ -41,26 +41,25 @@
 #ifndef VIDEOPLAYER_H
 #define VIDEOPLAYER_H
 
-#include <qmediaplayer.h>
-
-#include <QtGui/QMovie>
-#include <QtWidgets/QWidget>
+#include <QMediaPlayer>
+#include <QMovie>
+#include <QWidget>
 
 QT_BEGIN_NAMESPACE
 class QAbstractButton;
 class QSlider;
-class QLabel;
-class QUrl;
+class QGraphicsVideoItem;
 QT_END_NAMESPACE
 
 class VideoPlayer : public QWidget
 {
     Q_OBJECT
+
 public:
     VideoPlayer(QWidget *parent = 0);
     ~VideoPlayer();
 
-    void setUrl(const QUrl &url);
+    QSize sizeHint() const { return QSize(800, 600); }
 
 public slots:
     void openFile();
@@ -71,13 +70,14 @@ private slots:
     void positionChanged(qint64 position);
     void durationChanged(qint64 duration);
     void setPosition(int position);
-    void handleError();
+    void rotateVideo(int angle);
 
 private:
     QMediaPlayer mediaPlayer;
+    QGraphicsVideoItem *videoItem;
     QAbstractButton *playButton;
     QSlider *positionSlider;
-    QLabel *errorLabel;
 };
 
 #endif
+
