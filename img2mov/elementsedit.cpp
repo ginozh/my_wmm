@@ -65,8 +65,8 @@ void ElementsEdit::load()
     int idx = -1;
     if((idx=m_flowLayout->indexOf(currWidget))>=0)
         idx++;
-    QString qstring = QString(tr("index is %1")).arg(idx);
-    QMessageBox::information(this, "Error Opening Picture", qstring);
+    //QString qstring = QString(tr("index is %1")).arg(idx);
+    //QMessageBox::information(this, "Error Opening Picture", qstring);
     //qtconcurrent/imagescaling
     QStringList files = QFileDialog::getOpenFileNames(this, tr("Select Images"),
             /*QDir::currentPath()*/QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
@@ -76,6 +76,8 @@ void ElementsEdit::load()
     for (int i = 0; i < files.count(); ++i) {
         //m_flowLayout->addWidget(new Element(this, files[i]));
         m_flowLayout->insertWidget(idx, new Element(this, files[i]));
+        if(idx>=0)
+            idx++;
         //m_flowLayout->addWidget(new Element(this, files[i]), 1, 1);
     }
 
