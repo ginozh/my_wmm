@@ -30,6 +30,10 @@ ElementsEdit::ElementsEdit(QWidget *parent)
     m_flowLayout->addWidget(new Element());
     m_flowLayout->addWidget(new Element());
     */
+    //test
+    m_flowLayout->addWidget(new Element(this, tr("C:\\QtProjects\\qtmovie\\jpg\\img001.jpg")));
+    m_flowLayout->addWidget(new Element(this, tr("C:\\QtProjects\\qtmovie\\jpg\\img002.jpg")));
+    m_flowLayout->addWidget(new Element(this, tr("C:\\QtProjects\\qtmovie\\jpg\\img003.jpg")));
     setLayout(m_flowLayout);
 #else
     QVBoxLayout *layout    = new QVBoxLayout(this);
@@ -62,7 +66,9 @@ void ElementsEdit::load()
     if (files.count() == 0)
         return;
     for (int i = 0; i < files.count(); ++i) {
-        m_flowLayout->addWidget(new Element(this, files[i]));
+        //m_flowLayout->addWidget(new Element(this, files[i]));
+        m_flowLayout->insertWidget(0, new Element(this, files[i]));
+        //m_flowLayout->addWidget(new Element(this, files[i]), 1, 1);
     }
 
     /*if (!m_canvas->loadImage(fileName))
