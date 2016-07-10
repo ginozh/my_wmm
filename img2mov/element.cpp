@@ -15,6 +15,7 @@ Element::Element(QWidget *parent, const QString& qsImage)
         Image *pimage = new Image(this, qsImage);
         //webenginewidgets/simplebrowser/tabwidget.cpp
         m_elementLayout->addWidget(pimage);
+        connect(this, SIGNAL(insertImage()), parentWidget(), SLOT(load()) );
 #if 0
         pimage->setContextMenuPolicy(Qt::CustomContextMenu);
         connect(pimage, SIGNAL(customContextMenuRequested(QPoint)), parentWidget(), SLOT(handleContextMenuRequested(QPoint)) );
@@ -25,4 +26,8 @@ Element::Element(QWidget *parent, const QString& qsImage)
     m_elementLayout->addWidget(new QPushButton(tr("")));
     m_elementLayout->addWidget(new QLabel(tr("input text")));
     setLayout(m_elementLayout);
+}
+void Element::insert()
+{
+    emit insertImage();
 }

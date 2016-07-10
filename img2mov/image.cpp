@@ -28,7 +28,8 @@ void Image::contextMenuEvent(QContextMenuEvent * event)
     //QMessageBox::information(this,tr("right button"),tr("right"));
     QMenu menu;
     //menu.addAction(tr("Open"), this, SLOT(open()));
-    menu.addAction(tr("Add images"), parentWidget()->parentWidget(), SLOT(load())  );
+    //menu.addAction(tr("Add images"), parentWidget()->parentWidget(), SLOT(load())  );
+    menu.addAction(tr("Add images"), parentWidget(), SLOT(insert())  );
     menu.exec(QCursor::pos());
 }
 #if 0

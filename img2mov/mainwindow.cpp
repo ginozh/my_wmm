@@ -28,13 +28,14 @@ MainWindow::MainWindow(QWidget *parent)
     //widgets/widgets/tablet
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
 
-    fileMenu->addAction(tr("&Open..."), m_elementsEdit, &ElementsEdit::load, QKeySequence::Open);
+    //fileMenu->addAction(tr("&Open..."), m_elementsEdit, &ElementsEdit::load, QKeySequence::Open);
+    fileMenu->addAction(tr("&Open..."), m_elementsEdit, SLOT(load()), QKeySequence::Open);
 
     QAction *exitAction = fileMenu->addAction(tr("E&xit"), qApp, &QApplication::closeAllWindows);
     exitAction->setShortcuts(QKeySequence::Quit);
 
 
-    QMenu *findMenu = menuBar()->addMenu(tr("&Edit"));
+    //QMenu *findMenu = menuBar()->addMenu(tr("&Edit"));
 
     menuBar()->addMenu(tr("&About"))->addAction(tr("&About Qt"), qApp, &QApplication::aboutQt);
 

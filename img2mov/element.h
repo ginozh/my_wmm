@@ -14,6 +14,10 @@ class Element : public QWidget
 
 public:
     Element(QWidget *parent = 0, const QString& image=tr(""));
+signals:
+    void insertImage();
+public slots:
+    void insert();
 private:
     QVBoxLayout *m_elementLayout;
 };

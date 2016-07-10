@@ -3,6 +3,7 @@
 #include <QScrollBar>
 #include <QFileDialog>
 #include <QStandardPaths>
+#include <QMessageBox>
 
 #include "elementsedit.h"
 #include "element.h"
@@ -59,6 +60,13 @@ ElementsEdit::ElementsEdit(QWidget *parent)
 //! [1]
 void ElementsEdit::load()
 {
+    QWidget *currWidget = qobject_cast<QWidget *>(sender());
+    //只有image过来的insert事件，它的父类(element)才会是m_flowLayout的元素
+    int idx = -1;
+    if((idx=m_flowLayout->indexOf(currWidget))>=0)
+        idx++;
+    QString qstring = QString(tr("index is %1")).arg(idx);
+    QMessageBox::information(this, "Error Opening Picture", qstring);
     //qtconcurrent/imagescaling
     QStringList files = QFileDialog::getOpenFileNames(this, tr("Select Images"),
             /*QDir::currentPath()*/QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
@@ -67,7 +75,7 @@ void ElementsEdit::load()
         return;
     for (int i = 0; i < files.count(); ++i) {
         //m_flowLayout->addWidget(new Element(this, files[i]));
-        m_flowLayout->insertWidget(0, new Element(this, files[i]));
+        m_flowLayout->insertWidget(idx, new Element(this, files[i]));
         //m_flowLayout->addWidget(new Element(this, files[i]), 1, 1);
     }
 
@@ -76,7 +84,13 @@ void ElementsEdit::load()
                                  "Could not open picture");
                                  */
 }
+#if 0
 void ElementsEdit::handleContextMenuRequested(const QPoint &pos)
 {
+    //sender indexOf
+    QWidget *currWidget = qobject_cast<QWidget *>(sender());
+    int idx = m_flowLayout->indexOf(currWidget);
+    QString qstring = QString(tr("handleContextMenuRequested index is %1")).arg(idx);
     load();
 }
+#endif

@@ -177,7 +177,7 @@ void FlowLayout::insertWidget(int index, QWidget *widget)
 	//if (!d->checkWidget(widget))
 //		return;
 	addChildWidget(widget);
-	if (index < 0 || insert > itemList.count())                                // append
+	if (index < 0 || index > itemList.count())                                // append
 		index = itemList.count();
 	//QWidgetItem *b = QLayoutPrivate::createWidgetItem(this, widget);
     QWidgetItem *b = new QWidgetItem(widget);
