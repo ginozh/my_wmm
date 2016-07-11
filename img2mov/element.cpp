@@ -6,6 +6,7 @@
 Element::Element(QWidget *parent, const QString& qsImage)
     : QWidget(parent)
     , m_elementLayout(new QVBoxLayout(this))
+    , m_qsImageName(qsImage)
 {
     m_elementLayout->setSpacing(0);
     m_elementLayout->setMargin(0);

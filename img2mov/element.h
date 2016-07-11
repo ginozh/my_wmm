@@ -14,12 +14,14 @@ class Element : public QWidget
 
 public:
     Element(QWidget *parent = 0, const QString& image=tr(""));
+    const QString& getImageName(){return m_qsImageName;}
 signals:
     void insertImage();
 public slots:
     void insert();
 private:
     QVBoxLayout *m_elementLayout;
+    QString m_qsImageName;
 };
 //! [0]
 
