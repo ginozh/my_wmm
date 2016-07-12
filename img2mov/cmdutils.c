@@ -113,9 +113,21 @@ void register_exit(void (*cb)(int ret))
 {
     program_exit = cb;
 }
-
+//#include <execinfo.h>
 void exit_program(int ret)
 {
+#if 0
+    int size = 16;  
+    void * array[16];  
+    int stack_num = backtrace(array, size);  
+    char ** stacktrace = backtrace_symbols(array, stack_num);  
+    for (int i = 0; i < stack_num; ++i)  
+    {  
+        printf("%s\n", stacktrace[i]);  
+    }  
+    free(stacktrace);  
+#endif
+    return; //storm
     if (program_exit)
         program_exit(ret);
 
@@ -231,6 +243,7 @@ static void prepare_app_arguments(int *argc_ptr, char ***argv_ptr)
     char *argstr_flat;
     wchar_t **argv_w;
     int i, buffsize = 0, offset = 0;
+return ;
 
     if (win32_argv_utf8) {
         *argc_ptr = win32_argc;

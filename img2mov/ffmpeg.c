@@ -4261,12 +4261,12 @@ static int64_t getmaxrss(void)
 static void log_callback_null(void *ptr, int level, const char *fmt, va_list vl)
 {
 }
-#if 0
-int main(int argc, char **argv)
+
+int qt_ffmpeg(int argc, char **argv)
 {
     int ret;
     int64_t ti;
-
+    int idx;
     register_exit(ffmpeg_cleanup);
 
     setvbuf(stderr,NULL,_IONBF,0); /* win32 runtime needs this */
@@ -4280,6 +4280,10 @@ int main(int argc, char **argv)
         argc--;
         argv++;
     }
+    for(idx=0; idx<argc; idx++) {
+        av_log(NULL, AV_LOG_WARNING, " ==%s==", argv[idx]);
+    }
+    av_log(NULL, AV_LOG_WARNING, "\n");
 
     avcodec_register_all();
 #if CONFIG_AVDEVICE
@@ -4300,7 +4304,7 @@ int main(int argc, char **argv)
 
     if (nb_output_files <= 0 && nb_input_files == 0) {
         show_usage();
-        av_log(NULL, AV_LOG_WARNING, "Use -h to get full help or, even better, run 'man %s'\n", program_name);
+        av_log(NULL, AV_LOG_WARNING, "Use -h to get full help or, even better, run 'man %s'. nb_output_files: %d nb_input_files: %d\n", program_name, nb_output_files, nb_input_files);
         exit_program(1);
     }
 
@@ -4324,10 +4328,10 @@ int main(int argc, char **argv)
     }
     av_log(NULL, AV_LOG_DEBUG, "%"PRIu64" frames successfully decoded, %"PRIu64" decoding errors\n",
            decode_error_stat[0], decode_error_stat[1]);
+    return 0; //storm //will core
     if ((decode_error_stat[0] + decode_error_stat[1]) * max_error_rate < decode_error_stat[1])
         exit_program(69);
 
     exit_program(received_nb_signals ? 255 : main_return_code);
     return main_return_code;
 }
-#endif

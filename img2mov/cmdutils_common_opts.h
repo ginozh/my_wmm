@@ -32,5 +32,4 @@
       "list sources of the input device", "device" },
     { "sinks"      , OPT_EXIT | HAS_ARG, { .func_arg = show_sinks },
       "list sinks of the output device", "device" },
-
 #endif

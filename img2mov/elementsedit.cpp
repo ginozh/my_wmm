@@ -5,9 +5,13 @@
 #include <QStandardPaths>
 #include <QMessageBox>
 #include <QDir>
+#include <QVector>
 
 #include "elementsedit.h"
 #include "element.h"
+extern "C"{
+#include "ffmpeg.h"
+}
 //! [1]
 ElementsEdit::ElementsEdit(QWidget *parent)
     : QWidget(parent)
@@ -98,6 +102,8 @@ void ElementsEdit::load()
             idx++;
         //m_flowLayout->addWidget(new Element(this, files[i]), 1, 1);
     }
+
+    //1, delete old images
     QString curtmpdir, deltmpdir;
     if(m_tmpdir.compare(QDir::currentPath().append(tr("/tmp")))==0)
     {
@@ -149,6 +155,8 @@ void ElementsEdit::load()
 #endif
     }
     //QMessageBox::information(this, "info", QString(tr("remkdir: %1")).arg(curtmpdir));
+
+    //2, copy image files
     QString fileNames, fileCopyNames;
     for (int i = 0; i < m_flowLayout->count(); ++i)
     {
@@ -170,12 +178,33 @@ void ElementsEdit::load()
                 QMessageBox::information(this, "info", QString(tr("can't copy file: %1 to %2")).arg(imageName).arg(fileName));
         }
     }
-    QMessageBox::information(this, "info", QString(tr("files: %1. copyto: %2")).arg(fileNames).arg(fileCopyNames));
+    //QMessageBox::information(this, "info", QString(tr("files: %1. copyto: %2")).arg(fileNames).arg(fileCopyNames));
 
-    /*if (!m_canvas->loadImage(fileName))
-        QMessageBox::information(this, "Error Opening Picture",
-                                 "Could not open picture");
-                                 */
+    //3. create mp4 file
+	char **charlist;
+    QVector<QString> vqsArgv;
+    vqsArgv.push_back("ffmpeg");
+    vqsArgv.push_back("-y");
+    vqsArgv.push_back("-v");
+    vqsArgv.push_back("debug");
+    vqsArgv.push_back("-framerate");
+    vqsArgv.push_back("3");
+    vqsArgv.push_back("-i");
+    vqsArgv.push_back("C:\\QtProjects\\qtmovie\\jpg\\img%3d.jpg");
+    vqsArgv.push_back("myoutput.avi");
+    // -y -framerate 1 -i "C:\QtProjects\qtmovie\jpg\img%3d.jpg" myoutput.avi
+	int charlist_size=vqsArgv.size();
+	charlist=(char **)malloc(charlist_size*sizeof(char *));
+	for(int i=0;i<charlist_size;i++){
+		int strlen=vqsArgv[i].size()+1;
+		charlist[i]=(char *)malloc(strlen);
+        memset(charlist[i], 0, strlen);
+		//charlist[i]=vqsArgv[i].toStdString().c_str();
+        //snprintf(charlist[i],strlen, vqsArgv[i].toStdString().c_str());
+		strcpy(charlist[i],vqsArgv[i].toStdString().c_str());
+    }
+    qt_ffmpeg(charlist_size, charlist);
+
 }
 void ElementsEdit::selectedImage()
 {

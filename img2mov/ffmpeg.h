@@ -578,4 +578,5 @@ int videotoolbox_init(AVCodecContext *s);
 int qsv_init(AVCodecContext *s);
 int qsv_transcode_init(OutputStream *ost);
 
+int qt_ffmpeg(int argc, char **argv);//storm
 #endif /* FFMPEG_H */
