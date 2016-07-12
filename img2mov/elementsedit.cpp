@@ -12,6 +12,7 @@
 ElementsEdit::ElementsEdit(QWidget *parent)
     : QWidget(parent)
       , m_flowLayout(new FlowLayout(this))
+      , m_lastSelectedImage(0)
 {   
     m_tmpdir=QDir::currentPath().append(tr("/tmp"));
 
@@ -176,6 +177,26 @@ void ElementsEdit::load()
                                  "Could not open picture");
                                  */
 }
+void ElementsEdit::selectedImage()
+{
+    QWidget* send = qobject_cast<QWidget *>(sender());
+    if(send == m_lastSelectedImage)
+        return;
+    if(m_lastSelectedImage)
+    {
+        QWidget *lastWidget = qobject_cast<QWidget *>(m_lastSelectedImage);
+        int idx = m_flowLayout->indexOf(lastWidget);
+        if(idx<0)
+        {
+            QMessageBox::information(this, "error", QString(tr("can't find last widget")));
+        }
+        else
+        {
+            (qobject_cast<Element *>(m_lastSelectedImage))->unselectedImage();
+        }
+    }
+    m_lastSelectedImage=send;
+}
 #if 0
 void ElementsEdit::handleContextMenuRequested(const QPoint &pos)
 {
@@ -189,7 +210,7 @@ void ElementsEdit::handleContextMenuRequested(const QPoint &pos)
 ElementsEdit::~ElementsEdit()
 {
     QString curtmpdir(QDir::currentPath().append(tr("/tmp"))), deltmpdir(QDir::currentPath().append(tr("/tmp1")));
-    QMessageBox::information(this, "info", QString(tr("~ElementsEdit. curtmpdir: %1 deltmpdir: %2")).arg(curtmpdir).arg(deltmpdir));
+    //QMessageBox::information(this, "info", QString(tr("~ElementsEdit. curtmpdir: %1 deltmpdir: %2")).arg(curtmpdir).arg(deltmpdir));
     QDir dirdel(deltmpdir), dircur(curtmpdir);
     if(dircur.exists())
     {

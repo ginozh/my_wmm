@@ -24,7 +24,8 @@ dir="/c/QtProjects";
 #dir="/c/QtProjects/qtmovie";ffmpeg -i $dir/lovechina1.mp3 -framerate 1 -i "$dir/jpg/img%3d.jpg" -vf subtitles=subtitle.srt  $dir/output.avi
 # ok
 # ffmpeg -i subtitle.srt subtitle.ass
-dir="/c/QtProjects/qtmovie";ffmpeg -i $dir/lovechina1.mp3 -framerate 1 -i "$dir/jpg/img%3d.jpg" -vf ass=subtitle.ass  $dir/output.avi
+#dir="/c/QtProjects/qtmovie";rm $dir/output.avi;ffmpeg -ss 00:00:10 -t 00:00:08 -i $dir/lovechina1.mp3 -framerate 1 -i "$dir/jpg/img%3d.jpg" -vf ass=subtitle.ass  -vf lutyuv="u=128:v=128" -vf fade="in:5:8" $dir/output.avi
+dir="/c/QtProjects/qtmovie";rm $dir/output.avi;ffmpeg -ss 00:00:10 -t 00:00:08 -i $dir/lovechina1.mp3 -framerate 1 -i "$dir/jpg/img%3d.jpg" -vf ass=subtitle.ass  $dir/output.avi
 
 #dir="/c/QtProjects/qtmovie";ffmpeg -i output.avi -i $dir/sub.ass -vf ass=sub.ass   $dir/out.avi
 

@@ -69,10 +69,12 @@ public:
     ~ElementsEdit();
 public slots:
     void load();
+    void selectedImage();
     //void handleContextMenuRequested(const QPoint &pos);
 private:
     FlowLayout *m_flowLayout;
     QString m_tmpdir;
+    QWidget *m_lastSelectedImage;
 };
 //! [0]
 

@@ -2445,6 +2445,7 @@ loop_end:
             time_t now = time(0);
             struct tm *ptm, tmbuf;
             ptm = localtime_r(&now, &tmbuf);
+            //struct tm *ptm = localtime(&now);
             if (ptm) {
                 if (strftime(now_time, sizeof(now_time), "%Y-%m-%d %H:%M:%S", ptm))
                     val = now_time;

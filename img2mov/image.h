@@ -11,18 +11,22 @@ class Image : public QLabel
 
 public:
     Image(QWidget *parent=0, const QString& path=tr(""));
+    void unselectedImage();
+signals:
+    void selectedImageSignal();
 protected:
     void contextMenuEvent(QContextMenuEvent * event) Q_DECL_OVERRIDE;
+    void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
+    void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 #if 0
-protected:
-    void    mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 private slots:
     void handleContextMenuRequested(const QPoint &pos);
-#endif
 private slots:
     void open();
+#endif
 private:
     QPixmap *m_pixMap;
+    bool m_focus;
 };
 //! [0]
 #endif // IMAGE_H
