@@ -34,7 +34,8 @@ SOURCES += main.cpp \
     flowlayout.cpp \
     elementsedit.cpp \
     element.cpp \
-    image.cpp
+    image.cpp \
+    slider.cpp
 
 HEADERS  += mainwindow.h \
     ffmpeg.h \
@@ -46,4 +47,5 @@ HEADERS  += mainwindow.h \
     flowlayout.h \
     elementsedit.h \
     element.h \
-    image.h
+    image.h \
+    slider.h

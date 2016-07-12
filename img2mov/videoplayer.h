@@ -4,6 +4,7 @@
 #include <QMediaPlayer>
 #include <QMovie>
 #include <QWidget>
+#include "slider.h"
 
 QT_BEGIN_NAMESPACE
 class QAbstractButton;
@@ -36,7 +37,8 @@ private:
     QMediaPlayer mediaPlayer;
     QGraphicsVideoItem *videoItem;
     QAbstractButton *playButton;
-    QSlider *positionSlider;
+    //QSlider *positionSlider;
+    Slider *positionSlider;
 };
 
 #endif

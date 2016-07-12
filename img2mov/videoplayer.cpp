@@ -18,14 +18,14 @@ VideoPlayer::VideoPlayer(QWidget *parent)
     QGraphicsView *graphicsView = new QGraphicsView(scene);
 
     scene->addItem(videoItem);
-
+#if 0
     QSlider *rotateSlider = new QSlider(Qt::Horizontal);
     rotateSlider->setRange(-180,  180);
     rotateSlider->setValue(0);
 
     connect(rotateSlider, SIGNAL(valueChanged(int)),
             this, SLOT(rotateVideo(int)));
-
+#endif
     QAbstractButton *openButton = new QPushButton(tr("Open..."));
     connect(openButton, SIGNAL(clicked()), this, SLOT(openFile()));
 
@@ -36,7 +36,8 @@ VideoPlayer::VideoPlayer(QWidget *parent)
     connect(playButton, SIGNAL(clicked()),
             this, SLOT(play()));
 
-    positionSlider = new QSlider(Qt::Horizontal);
+    //positionSlider = new QSlider(Qt::Horizontal);
+    positionSlider = new Slider(Qt::Horizontal);
     positionSlider->setRange(0, 0);
 
     connect(positionSlider, SIGNAL(sliderMoved(int)),
@@ -50,7 +51,7 @@ VideoPlayer::VideoPlayer(QWidget *parent)
 
     QBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(graphicsView);
-    layout->addWidget(rotateSlider);
+    //layout->addWidget(rotateSlider);
     layout->addLayout(controlLayout);
 
     setLayout(layout);
