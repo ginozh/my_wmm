@@ -67,6 +67,9 @@ class ElementsEdit : public QWidget
 public:
     ElementsEdit(QWidget *parent = 0);
     ~ElementsEdit();
+signals:
+    void playVideo(const QString&);
+
 public slots:
     void load();
     void selectedImage();

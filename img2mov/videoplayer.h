@@ -25,6 +25,7 @@ public:
 public slots:
     void openFile();
     void play();
+    void playVideo(const QString&);
 
 private slots:
     void mediaStateChanged(QMediaPlayer::State state);

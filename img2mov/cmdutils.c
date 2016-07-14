@@ -108,14 +108,17 @@ static void log_callback_report(void *ptr, int level, const char *fmt, va_list v
 }
 
 static void (*program_exit)(int ret);
-
+static int iExit = 0;
 void register_exit(void (*cb)(int ret))
 {
     program_exit = cb;
+    iExit = 0;
 }
 //#include <execinfo.h>
 void exit_program(int ret)
 {
+    if(iExit)
+        return ;
 #if 0
     int size = 16;  
     void * array[16];  
@@ -127,11 +130,12 @@ void exit_program(int ret)
     }  
     free(stacktrace);  
 #endif
-    return; //storm
+    //return; //storm
     if (program_exit)
         program_exit(ret);
 
-    exit(ret);
+    iExit = 1;
+    //exit(ret);
 }
 
 double parse_number_or_die(const char *context, const char *numstr, int type,

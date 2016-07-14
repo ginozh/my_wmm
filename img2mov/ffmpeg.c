@@ -455,6 +455,32 @@ static int decode_interrupt_cb(void *ctx)
 }
 
 const AVIOInterruptCB int_cb = { decode_interrupt_cb, NULL };
+void ffmpeg_init_globalvar() //storm
+{
+    vstats_file = NULL;
+    run_as_daemon  = 0;
+    nb_frames_dup = 0;
+    nb_frames_drop = 0;
+    memset(decode_error_stat, 0, sizeof(decode_error_stat));
+
+    current_time;
+    progress_avio = NULL;
+
+    subtitle_out = NULL;
+
+    input_streams = NULL;
+    nb_input_streams = 0;
+    input_files   = NULL;
+    nb_input_files   = 0;
+
+    output_streams = NULL;
+    nb_output_streams = 0;
+    output_files   = NULL;
+    nb_output_files   = 0;
+
+    filtergraphs = NULL;
+    nb_filtergraphs = 0;
+}
 
 static void ffmpeg_cleanup(int ret)
 {
@@ -4267,6 +4293,8 @@ int qt_ffmpeg(int argc, char **argv)
     int ret;
     int64_t ti;
     int idx;
+    ffmpeg_init_globalvar(); //storm
+    //av_log(NULL, AV_LOG_INFO, "1 nb_input_files %d.\n", nb_input_files);
     register_exit(ffmpeg_cleanup);
 
     setvbuf(stderr,NULL,_IONBF,0); /* win32 runtime needs this */
@@ -4274,6 +4302,7 @@ int qt_ffmpeg(int argc, char **argv)
     av_log_set_flags(AV_LOG_SKIP_REPEATED);
     parse_loglevel(argc, argv, options);
 
+    //av_log(NULL, AV_LOG_INFO, "2 nb_input_files %d.\n", nb_input_files);
     if(argc>1 && !strcmp(argv[1], "-d")){
         run_as_daemon=1;
         av_log_set_callback(log_callback_null);
@@ -4297,11 +4326,13 @@ int qt_ffmpeg(int argc, char **argv)
 
     term_init();
 
+    //av_log(NULL, AV_LOG_INFO, "3 nb_input_files %d.\n", nb_input_files);
     /* parse options and open all input/output files */
     ret = ffmpeg_parse_options(argc, argv);
     if (ret < 0)
         exit_program(1);
 
+    //av_log(NULL, AV_LOG_INFO, "4 nb_input_files %d.\n", nb_input_files);
     if (nb_output_files <= 0 && nb_input_files == 0) {
         show_usage();
         av_log(NULL, AV_LOG_WARNING, "Use -h to get full help or, even better, run 'man %s'. nb_output_files: %d nb_input_files: %d\n", program_name, nb_output_files, nb_input_files);
@@ -4328,7 +4359,8 @@ int qt_ffmpeg(int argc, char **argv)
     }
     av_log(NULL, AV_LOG_DEBUG, "%"PRIu64" frames successfully decoded, %"PRIu64" decoding errors\n",
            decode_error_stat[0], decode_error_stat[1]);
-    return 0; //storm //will core
+    ffmpeg_cleanup(0);//exit_program(0); //storm //will core
+    return 0;
     if ((decode_error_stat[0] + decode_error_stat[1]) * max_error_rate < decode_error_stat[1])
         exit_program(69);
 

@@ -1014,7 +1014,7 @@ static int open_input_file(OptionsContext *o, const char *filename)
 
     /* dump the file content */
     av_dump_format(ic, nb_input_files, filename, 0);
-
+    //av_log(NULL, AV_LOG_INFO, "5 nb_input_files %d.\n", nb_input_files);
     GROW_ARRAY(input_files, nb_input_files);
     f = av_mallocz(sizeof(*f));
     if (!f)
@@ -2321,6 +2321,7 @@ loop_end:
         if (o->chapters_input_file == INT_MAX) {
             /* copy chapters from the first input file that has them*/
             o->chapters_input_file = -1;
+            //av_log(NULL, AV_LOG_INFO, "6 nb_input_files %d input_files: %d.\n", nb_input_files, (int)input_files);
             for (i = 0; i < nb_input_files; i++)
                 if (input_files[i]->ctx->nb_chapters) {
                     o->chapters_input_file = i;

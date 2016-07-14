@@ -26,9 +26,10 @@ VideoPlayer::VideoPlayer(QWidget *parent)
     connect(rotateSlider, SIGNAL(valueChanged(int)),
             this, SLOT(rotateVideo(int)));
 #endif
+#if 1
     QAbstractButton *openButton = new QPushButton(tr("Open..."));
     connect(openButton, SIGNAL(clicked()), this, SLOT(openFile()));
-
+#endif
     playButton = new QPushButton;
     playButton->setEnabled(false);
     playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
@@ -67,18 +68,31 @@ VideoPlayer::~VideoPlayer()
 {
 }
 
-
+#if 1
 void VideoPlayer::openFile()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Movie"),QDir::homePath());
+    //QMessageBox::information(this, "info", QString(tr("open fileName: %1")).arg(fileName));
 
+    if (!fileName.isEmpty()) {
+        QString vfileName("C:/QtProjects/qtmovie/first.avi");
+        //QMessageBox::information(this, "info", QString(tr("open fileName: %1")).arg(vfileName));
+        mediaPlayer.setMedia(QUrl::fromLocalFile(vfileName));
+        //mediaPlayer.setMedia(QUrl::fromLocalFile(fileName));
+
+        playButton->setEnabled(true);
+    }
+}
+#endif
+void VideoPlayer::playVideo(const QString& fileName)
+{
+    //QMessageBox::information(this, "info", QString(tr("set fileName: %1")).arg(fileName));
     if (!fileName.isEmpty()) {
         mediaPlayer.setMedia(QUrl::fromLocalFile(fileName));
 
         playButton->setEnabled(true);
     }
 }
-
 void VideoPlayer::play()
 {
     switch(mediaPlayer.state()) {

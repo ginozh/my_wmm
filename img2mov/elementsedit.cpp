@@ -181,6 +181,8 @@ void ElementsEdit::load()
     //QMessageBox::information(this, "info", QString(tr("files: %1. copyto: %2")).arg(fileNames).arg(fileCopyNames));
 
     //3. create mp4 file
+    //QString vfileName("C:\\QtProjects\\qtmovie\\first.avi");
+    QString vfileName = QString(tr("%1/first.avi")).arg(curtmpdir);
 	char **charlist;
     QVector<QString> vqsArgv;
     vqsArgv.push_back("ffmpeg");
@@ -190,8 +192,10 @@ void ElementsEdit::load()
     vqsArgv.push_back("-framerate");
     vqsArgv.push_back("3");
     vqsArgv.push_back("-i");
-    vqsArgv.push_back("C:\\QtProjects\\qtmovie\\jpg\\img%3d.jpg");
-    vqsArgv.push_back("myoutput.avi");
+    QString infileNames = QString(tr("%1/img%3d.jpg")).arg(curtmpdir);
+    //vqsArgv.push_back("C:\\QtProjects\\qtmovie\\jpg\\img%3d.jpg");
+    vqsArgv.push_back(infileNames);
+    vqsArgv.push_back(vfileName);
     // -y -framerate 1 -i "C:\QtProjects\qtmovie\jpg\img%3d.jpg" myoutput.avi
 	int charlist_size=vqsArgv.size();
 	charlist=(char **)malloc(charlist_size*sizeof(char *));
@@ -203,8 +207,13 @@ void ElementsEdit::load()
         //snprintf(charlist[i],strlen, vqsArgv[i].toStdString().c_str());
 		strcpy(charlist[i],vqsArgv[i].toStdString().c_str());
     }
+    //QMessageBox::information(this, "info", QString(tr("start fmpeg")));
     qt_ffmpeg(charlist_size, charlist);
 
+
+    //QMessageBox::information(this, "info", QString(tr("fileName: %1")).arg(vfileName));
+    //4. let videoplay play 
+    emit playVideo(vfileName);
 }
 void ElementsEdit::selectedImage()
 {
