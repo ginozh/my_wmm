@@ -35,7 +35,8 @@ SOURCES += main.cpp \
     elementsedit.cpp \
     element.cpp \
     image.cpp \
-    slider.cpp
+    slider.cpp \
+    menu.cpp
 
 HEADERS  += mainwindow.h \
     ffmpeg.h \
@@ -48,4 +49,5 @@ HEADERS  += mainwindow.h \
     elementsedit.h \
     element.h \
     image.h \
-    slider.h
+    slider.h \
+    menu.h

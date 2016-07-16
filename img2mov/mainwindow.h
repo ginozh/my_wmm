@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "videoplayer.h"
 #include "elementsedit.h"
+#include "menu.h"
 QT_FORWARD_DECLARE_CLASS(QAction)
 QT_FORWARD_DECLARE_CLASS(QTextEdit)
 QT_FORWARD_DECLARE_CLASS(QTreeView)
@@ -22,6 +23,10 @@ private slots:
     void load();
 #endif
 private:
+    QWidget *m_centralWidget;
+    QTabWidget *m_tabWidget;
+    Menu *m_menu;
+
     QTreeView *m_treeView;
     QTextEdit *m_detailsText;
     VideoPlayer *m_player;
