@@ -11,8 +11,10 @@ VideoPlayer::VideoPlayer(QWidget *parent)
     , playButton(0)
     , positionSlider(0)
 {
+    setMaximumWidth(600);
+
     videoItem = new QGraphicsVideoItem;
-    videoItem->setSize(QSizeF(640, 480));
+    videoItem->setSize(QSizeF(500, 480));
 
     QGraphicsScene *scene = new QGraphicsScene(this);
     QGraphicsView *graphicsView = new QGraphicsView(scene);

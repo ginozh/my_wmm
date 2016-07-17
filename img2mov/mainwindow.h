@@ -5,6 +5,7 @@
 #include "videoplayer.h"
 #include "elementsedit.h"
 #include "menu.h"
+#include "tabwidget.h"
 QT_FORWARD_DECLARE_CLASS(QAction)
 QT_FORWARD_DECLARE_CLASS(QTextEdit)
 QT_FORWARD_DECLARE_CLASS(QTreeView)
@@ -24,7 +25,7 @@ private slots:
 #endif
 private:
     QWidget *m_centralWidget;
-    QTabWidget *m_tabWidget;
+    TabWidget *m_tabWidget;
     Menu *m_menu;
 
     QTreeView *m_treeView;

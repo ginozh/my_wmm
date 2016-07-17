@@ -20,7 +20,8 @@ int main(int argc, char *argv[])
     MainWindow mainWindow;
     const QRect availableGeometry = QApplication::desktop()->availableGeometry(&mainWindow);
     mainWindow.resize(availableGeometry.width() / 3, availableGeometry.height() / 2);
-    mainWindow.show();
+    //mainWindow.show();
+    mainWindow.showMaximized();
 
     return app.exec();
 }

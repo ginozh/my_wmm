@@ -37,35 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
     //QMenu *findMenu = menuBar()->addMenu(tr("&Edit"));
     menuBar()->addMenu(tr("&About"))->addAction(tr("&About Qt"), qApp, &QApplication::aboutQt);
 #endif
-    m_tabWidget = new QTabWidget(m_centralWidget);
-    QWidget *nullTab = new QWidget;
-    QWidget *tab1 = new QWidget;
-    QTableWidget *tableWidget = new QTableWidget(10, 10);
-
-    QHBoxLayout *tab1hbox = new QHBoxLayout;
-    tab1hbox->setMargin(5);
-    tab1hbox->addWidget(tableWidget);
-    tab1->setLayout(tab1hbox);
-
-    QWidget *tab2 = new QWidget;
-    QTextEdit *textEdit = new QTextEdit;
-    textEdit->setPlainText(tr("Twinkle, twinkle, little star,\n"
-                              "How I wonder what you are.\n"
-                              "Up above the world so high,\n"
-                              "Like a diamond in the sky.\n"
-                              "Twinkle, twinkle, little star,\n"
-                              "How I wonder what you are!\n"));
-
-    QHBoxLayout *tab2hbox = new QHBoxLayout;
-    tab2hbox->setMargin(5);
-    tab2hbox->addWidget(textEdit);
-    tab2->setLayout(tab2hbox);
-
-    m_tabWidget->addTab(nullTab, tr("   "));
-    m_tabWidget->addTab(tab1, tr("&Home"));
-    m_tabWidget->addTab(tab2, tr("&Animations"));
-    m_tabWidget->setTabEnabled(0, false);
-    m_tabWidget->setCurrentWidget(tab1);
+    m_tabWidget = new TabWidget(m_centralWidget, m_elementsEdit);
 
     QSplitter *centralSplitter = new QSplitter(m_centralWidget);
     //setCentralWidget(centralSplitter);

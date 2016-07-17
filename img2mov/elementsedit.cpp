@@ -39,7 +39,7 @@ ElementsEdit::ElementsEdit(QWidget *parent)
     m_flowLayout->addWidget(new Element());
     m_flowLayout->addWidget(new Element());
     */
-#if 0
+#if 1
     //test
     m_flowLayout->addWidget(new Element(this, tr("C:\\QtProjects\\qtmovie\\jpg\\img001.jpg")));
     m_flowLayout->addWidget(new Element(this, tr("C:\\QtProjects\\qtmovie\\jpg\\img002.jpg")));
