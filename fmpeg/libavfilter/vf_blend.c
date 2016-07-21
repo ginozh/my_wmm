@@ -331,10 +331,10 @@ static void blend_expr_## name(const uint8_t *_top, ptrdiff_t top_linesize,     
         bottom += bottom_linesize;                                             \
     }                                                                          \
 }
-
-DEFINE_BLEND_EXPR(uint8_t, 8bit, 1)
-DEFINE_BLEND_EXPR(uint16_t, 16bit, 2)
-
+//DEFINE_BLEND_EXPR(uint8_t, 8bit, 1)
+//DEFINE_BLEND_EXPR(uint16_t, 16bit, 2)
+static void blend_expr_8bit(const uint8_t *_top, ptrdiff_t top_linesize,          const uint8_t *_bottom, ptrdiff_t bottom_linesize,    uint8_t *_dst, ptrdiff_t dst_linesize,                ptrdiff_t width, ptrdiff_t height,              FilterParams *param, double *values)           ; 
+static void blend_expr_16bit(const uint8_t *_top, ptrdiff_t top_linesize,          const uint8_t *_bottom, ptrdiff_t bottom_linesize,    uint8_t *_dst, ptrdiff_t dst_linesize,                ptrdiff_t width, ptrdiff_t height,              FilterParams *param, double *values)            ;
 static int filter_slice(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
 {
     ThreadData *td = arg;
@@ -665,3 +665,83 @@ AVFilter ff_vf_tblend = {
 };
 
 #endif
+
+//storm
+static void blend_expr_16bit(const uint8_t *_top, ptrdiff_t top_linesize,          
+                               const uint8_t *_bottom, ptrdiff_t bottom_linesize,    
+                               uint8_t *_dst, ptrdiff_t dst_linesize,                
+                               ptrdiff_t width, ptrdiff_t height,              
+                               FilterParams *param, double *values)            
+{                                                                              
+    const uint16_t *top = (uint16_t*)_top;                                             
+    const uint16_t *bottom = (uint16_t*)_bottom;                                       
+    uint16_t *dst = (uint16_t*)_dst;                                                   
+    AVExpr *e = param->e;                                                      
+    int y, x;                                                                  
+    dst_linesize /= 2;                                                       
+    top_linesize /= 2;                                                       
+    bottom_linesize /= 2;                                                    
+                                                                               
+    for (y = 0; y < height; y++) {                                             
+        values[VAR_Y] = y;                                                     
+        for (x = 0; x < width; x++) {                                          
+            values[VAR_X]      = x;                                            
+            values[VAR_TOP]    = values[VAR_A] = top[x];                       
+            values[VAR_BOTTOM] = values[VAR_B] = bottom[x];                    
+            dst[x] = av_expr_eval(e, values, NULL);                            
+        }                                                                      
+        dst    += dst_linesize;                                                
+        top    += top_linesize;                                                
+        bottom += bottom_linesize;                                             
+    }                                                                          
+}
+static int cntExpr=0;
+static void blend_expr_8bit(const uint8_t *_top, ptrdiff_t top_linesize,          
+                               const uint8_t *_bottom, ptrdiff_t bottom_linesize,    
+                               uint8_t *_dst, ptrdiff_t dst_linesize,                
+                               ptrdiff_t width, ptrdiff_t height,              
+                               FilterParams *param, double *values)            
+{                                                                              
+    const uint8_t *top = (uint8_t*)_top;                                             
+    const uint8_t *bottom = (uint8_t*)_bottom;                                       
+    uint8_t *dst = (uint8_t*)_dst;                                                   
+    AVExpr *e = param->e;                                                      
+    int y, x;                                                                  
+    dst_linesize /= 1;                                                       
+    top_linesize /= 1;                                                       
+    bottom_linesize /= 1;                                                    
+    //printf ("cntExpr: %d\n", ++cntExpr) ; //why 75 time?
+    for (y = 0; y < height; y++) {                                             
+        values[VAR_Y] = y;                                                     
+        for (x = 0; x < width; x++) {                                          
+            values[VAR_X]      = x;                                            
+            values[VAR_TOP]    = values[VAR_A] = top[x];                       
+            values[VAR_BOTTOM] = values[VAR_B] = bottom[x];                    
+            if(x<=(cntExpr*1024/75))
+                dst[x] = values[VAR_BOTTOM];//av_expr_eval(e, values, NULL);                            
+            else
+                dst[x] = values[VAR_TOP];//av_expr_eval(e, values, NULL);                            
+        }                                                                      
+        dst    += dst_linesize;                                                
+        top    += top_linesize;                                                
+        bottom += bottom_linesize;                                             
+    }
+#if 0
+    top = (uint8_t*)_top;                                             
+    bottom = (uint8_t*)_bottom;                                       
+    dst = (uint8_t*)_dst;                                                   
+    for (y = 0; y < 1; y++) {                                             
+        values[VAR_Y] = y;                                                     
+        for (x = 0; x < width; x++) {                                          
+            values[VAR_X]      = x;                                            
+            values[VAR_TOP]    = values[VAR_A] = top[x];                       
+            values[VAR_BOTTOM] = values[VAR_B] = bottom[x];                    
+            dst[x] = av_expr_eval(e, values, NULL);                            
+        }                                                                      
+        dst    += dst_linesize;                                                
+        top    += top_linesize;                                                
+        bottom += bottom_linesize;                                             
+    }
+#endif
+}
+
