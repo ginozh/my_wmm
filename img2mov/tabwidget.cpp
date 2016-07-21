@@ -11,19 +11,19 @@
 
 TabWidget::TabWidget(QWidget *parent, QWidget *elementsEdit)
     : QTabWidget(parent)
-    , m_iconSize(65, 65)
+    , m_iconSize(100, 100)
     , m_elementsEdit(elementsEdit)
 {
     QWidget *tabNull = new QWidget;
     addTab(tabNull, tr("   "));
-    //createTabHome();
-    createTabHome1();
+    createTabHome();
     createTabAnimations();
 
     setTabEnabled(0, false);
     //setCurrentWidget(contentsWidget);
     setMaximumHeight(m_iconSize.height() + 100);
 }
+#if 0
 void TabWidget::createTabHome()
 {
     contentsWidget = new QListWidget;
@@ -62,7 +62,8 @@ void TabWidget::createTabHome()
     //contentsWidget->setLayout(hboxHome);
     addTab(contentsWidget, tr("&Home"));
 }
-void TabWidget::createTabHome1()
+#endif
+void TabWidget::createTabHome()
 {
     QWidget *tabHome = new QWidget;
 #if 0
@@ -78,7 +79,7 @@ void TabWidget::createTabHome1()
     //QTableWidget *tableWidget = new QTableWidget(10, 10);
     QToolButton *addPhotos = new QToolButton(this);
     addPhotos->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    addPhotos->setIcon(QIcon("addphotos.png"));
+    addPhotos->setIcon(QIcon("images/addphotos.png"));
     addPhotos->setIconSize(m_iconSize);
     addPhotos->setText("Add photos");
     //addPhotos->setMaximumHeight(m_iconSize.height() + 250);
@@ -88,7 +89,7 @@ void TabWidget::createTabHome1()
 
     QToolButton *addMusic = new QToolButton(this);
     addMusic->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    addMusic->setIcon(QIcon("addmusic.png"));
+    addMusic->setIcon(QIcon("images/addmusic.png"));
     addMusic->setIconSize(m_iconSize);
     addMusic->setText("Add music");
     addPhotos->setMinimumWidth(m_iconSize.width() + 100);
@@ -123,23 +124,93 @@ void TabWidget::createTabHome1()
 
     addTab(tabHome, tr("&Home"));
 
-    setCurrentWidget(tabHome);
+    //setCurrentWidget(tabHome);
 }
 void TabWidget::createTabAnimations()
 {
     QWidget *tabAnimations = new QWidget;
-    QTextEdit *textEdit = new QTextEdit;
-    textEdit->setPlainText(tr("Twinkle, twinkle, little star,\n"
-                              "How I wonder what you are.\n"
-                              "Up above the world so high,\n"
-                              "Like a diamond in the sky.\n"
-                              "Twinkle, twinkle, little star,\n"
-                              "How I wonder what you are!\n"));
+    QWidget *leftTransition = new QWidget;
+    QWidget *rightPanZoom = new QWidget;
+
+    QVBoxLayout *vboxLeftTransition = new QVBoxLayout;
+    QWidget *lefttopTransition = new QWidget;
+    {
+        QHBoxLayout *hboxTopTransition = new QHBoxLayout;
+#if 0
+        QListWidget *lefttopleftTransition = new QListWidget;
+        {
+            lefttopleftTransition->setIconSize(m_iconSize);
+            lefttopleftTransition->setMinimumHeight(m_iconSize.height() + 250);
+            lefttopleftTransition->setMaximumWidth(m_iconSize.width() + 50);
+            lefttopleftTransition->setMovement(QListView::Static);
+
+            QListWidgetItem *revealleftItem = new QListWidgetItem();
+            QPixmap image("images/reveal_left.png");
+            const QSize maximumSize(40, 40); // Reduce in case someone has large photo images.
+            if (image.size().width() > maximumSize.width() || image.height() > maximumSize.height())
+                image = image.scaled(maximumSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            revealleftItem->setIcon(image);
+            revealleftItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+            lefttopleftTransition->addItem(revealleftItem);
+
+            connect(revealleftItem, SIGNAL(clicked()), m_elementsEdit, SLOT(selectedTransition()));
+        }
+        hboxTopTransition->addWidget(lefttopleftTransition);
+#endif
+        QToolButton *lefttopleftTransition = new QToolButton(this);
+        {
+            //lefttopleftTransition->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+            lefttopleftTransition->setIcon(QIcon("images/reveal_left.png"));
+            lefttopleftTransition->setIconSize(m_iconSize);
+            //lefttopleftTransition->setText("Add photos");
+            //lefttopleftTransition->setMaximumHeight(m_iconSize.height() + 250);
+            lefttopleftTransition->setMinimumWidth(m_iconSize.width() + 100);
+            //lefttopleftTransition->setMinimumWidth(lefttopleftTransition->text().length());
+            connect(lefttopleftTransition, SIGNAL(clicked()), m_elementsEdit, SLOT(selectedTransition()));
+        }
+        hboxTopTransition->addWidget(lefttopleftTransition);
+        QWidget *lefttoprightTransition = new QWidget;
+        {
+            //QVBoxLayout *vboxTopTransition = new QVBoxLayout;
+            //QWidget *lefttopTransition = new QWidget;
+        }
+        hboxTopTransition->setMargin(5);
+        hboxTopTransition->addWidget(lefttoprightTransition);
+        lefttopTransition->setLayout(hboxTopTransition);
+    }
+    QLabel *leftbottomTransition = new QLabel;
+    leftbottomTransition->setText(tr("Transitions"));
+    leftbottomTransition->setAlignment(Qt::AlignHCenter);
+    vboxLeftTransition->setMargin(5);
+    vboxLeftTransition->addWidget(lefttopTransition);
+    vboxLeftTransition->addWidget(leftbottomTransition);
+    leftTransition->setLayout(vboxLeftTransition);
+
+    QVBoxLayout *vboxRightPanZoom = new QVBoxLayout;
+    QWidget *righttopPanZoom = new QWidget;
+    {
+        QHBoxLayout *hboxTopPanZoom = new QHBoxLayout;
+        QListWidget *righttopleftTransition = new QListWidget;
+        QWidget *righttoprightTransition = new QWidget;
+        hboxTopPanZoom->setMargin(5);
+        hboxTopPanZoom->addWidget(righttopleftTransition);
+        hboxTopPanZoom->addWidget(righttoprightTransition);
+        righttopPanZoom->setLayout(hboxTopPanZoom);
+    }
+    QLabel *rightbottomPanZoom = new QLabel;
+    rightbottomPanZoom->setText(tr("Pan and zoom"));
+    rightbottomPanZoom->setAlignment(Qt::AlignHCenter);
+    vboxRightPanZoom->setMargin(5);
+    vboxRightPanZoom->addWidget(righttopPanZoom);
+    vboxRightPanZoom->addWidget(rightbottomPanZoom);
+    rightPanZoom->setLayout(vboxRightPanZoom);
 
     QHBoxLayout *hboxAnimations = new QHBoxLayout;
     hboxAnimations->setMargin(5);
-    hboxAnimations->addWidget(textEdit);
+    hboxAnimations->addWidget(leftTransition);
+    hboxAnimations->addWidget(rightPanZoom);
     tabAnimations->setLayout(hboxAnimations);
 
     addTab(tabAnimations, tr("&Animations"));
+    setCurrentWidget(tabAnimations);
 }

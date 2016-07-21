@@ -10,9 +10,7 @@ class TabWidget : public QTabWidget
 public:
     TabWidget(QWidget *parent=0, QWidget *elementsEdit=0);
 private:
-    //void createIcons();
     void createTabHome();
-    void createTabHome1();
     void createTabAnimations();
 private:
     QListWidget *contentsWidget;

@@ -6,6 +6,8 @@
 #include <QMessageBox>
 #include <QDir>
 #include <QVector>
+#include <QTime>
+#include <QDebug>
 
 #include "elementsedit.h"
 #include "element.h"
@@ -17,6 +19,7 @@ ElementsEdit::ElementsEdit(QWidget *parent)
     : QWidget(parent)
       , m_flowLayout(new FlowLayout(this))
       , m_lastSelectedImage(0)
+      , m_idxCurrentImage(-1)
 {   
     m_tmpdir=QDir::currentPath().append(tr("/tmp"));
 
@@ -208,10 +211,11 @@ void ElementsEdit::load()
 		strcpy(charlist[i],vqsArgv[i].toStdString().c_str());
     }
     //QMessageBox::information(this, "info", QString(tr("start fmpeg")));
+    QTime startTime = QTime::currentTime();
     qt_ffmpeg(charlist_size, charlist);
-
-
-    //QMessageBox::information(this, "info", QString(tr("fileName: %1")).arg(vfileName));
+    int dt = startTime.msecsTo(QTime::currentTime());
+    //qDebug()<< "ffmpeg waste: " << dt;
+    //QMessageBox::information(this, "info", QString(tr("fileName: %1 waste: %2")).arg(vfileName).arg(dt));
     //4. let videoplay play 
     emit playVideo(vfileName);
 }
@@ -220,6 +224,11 @@ void ElementsEdit::selectedImage()
     QWidget* send = qobject_cast<QWidget *>(sender());
     if(send == m_lastSelectedImage)
         return;
+    int iCurrentIdx=-1;
+    if(send && (iCurrentIdx=m_flowLayout->indexOf(send))>=0)
+    {
+        m_idxCurrentImage = iCurrentIdx;
+    }
     if(m_lastSelectedImage)
     {
         QWidget *lastWidget = qobject_cast<QWidget *>(m_lastSelectedImage);
@@ -234,6 +243,65 @@ void ElementsEdit::selectedImage()
         }
     }
     m_lastSelectedImage=send;
+}
+void ElementsEdit::selectedTransition()
+{
+    if(m_idxCurrentImage >= 1)
+    {
+        Element *firstElement = qobject_cast<Element *>(m_flowLayout->itemAt(m_idxCurrentImage-1)->widget());
+        Element *secondElement = qobject_cast<Element *>(m_flowLayout->itemAt(m_idxCurrentImage)->widget());
+        if (firstElement && secondElement)
+        {
+            const QString& firstImageName = firstElement->getImageName();
+            const QString& secondImageName = secondElement->getImageName();
+            char **charlist;
+            QVector<QString> vqsArgv;
+            vqsArgv.push_back("ffmpeg");
+            vqsArgv.push_back("-y");
+            vqsArgv.push_back("-v");
+            vqsArgv.push_back("debug");
+            vqsArgv.push_back("-framerate");
+            vqsArgv.push_back("25");
+            vqsArgv.push_back("-loop");
+            vqsArgv.push_back("1");
+            vqsArgv.push_back("-t");
+            vqsArgv.push_back("1");
+            vqsArgv.push_back("-i");
+            vqsArgv.push_back(firstImageName);
+            vqsArgv.push_back("-loop");
+            vqsArgv.push_back("1");
+            vqsArgv.push_back("-t");
+            vqsArgv.push_back("1");
+            vqsArgv.push_back("-i");
+            vqsArgv.push_back(secondImageName);
+            //ffmpeg -y -framerate 25 -loop 1 -t 1 -i img001.jpg -loop 1 -t 1 -i img002.jpg -filter_complex "blend=all_expr='if(gte(N*SW*50+X,W),B,A)'" -pix_fmt yuv420p  out.mkv
+            vqsArgv.push_back("-filter_complex");
+            vqsArgv.push_back("blend=all_expr='if(gte(N*SW*50+X,W),B,A)'");
+            vqsArgv.push_back("-pix_fmt");
+            vqsArgv.push_back("yuv420p");
+            //QString vfileName = QString(tr("tmp/out.mkv"));
+            QString vfileName("C:\\qtproject\\img2mov\\debug\\transition.avi");
+            vqsArgv.push_back(vfileName);
+            // -y -framerate 1 -i "C:\QtProjects\qtmovie\jpg\img%3d.jpg" myoutput.avi
+            int charlist_size=vqsArgv.size();
+            charlist=(char **)malloc(charlist_size*sizeof(char *));
+            for(int i=0;i<charlist_size;i++){
+                int strlen=vqsArgv[i].size()+1;
+                charlist[i]=(char *)malloc(strlen);
+                memset(charlist[i], 0, strlen);
+                //charlist[i]=vqsArgv[i].toStdString().c_str();
+                //snprintf(charlist[i],strlen, vqsArgv[i].toStdString().c_str());
+                strcpy(charlist[i],vqsArgv[i].toStdString().c_str());
+            }
+            //QMessageBox::information(this, "info", QString(tr("start fmpeg")));
+            QTime startTime = QTime::currentTime();
+            qt_ffmpeg(charlist_size, charlist);
+            int dt = startTime.msecsTo(QTime::currentTime());
+            //qDebug()<< "ffmpeg waste: " << dt;
+            QMessageBox::information(this, "info", QString(tr("vfileName: %1 ffmpeg waste: %2")).arg(vfileName).arg(dt));
+            emit playVideo(vfileName);
+        }
+    }
 }
 #if 0
 void ElementsEdit::handleContextMenuRequested(const QPoint &pos)
