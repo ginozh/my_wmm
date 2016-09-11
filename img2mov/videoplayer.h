@@ -5,6 +5,7 @@
 #include <QMovie>
 #include <QWidget>
 #include "slider.h"
+#include <QBuffer>
 
 QT_BEGIN_NAMESPACE
 class QAbstractButton;
@@ -25,7 +26,7 @@ public:
 public slots:
     void openFile();
     void play();
-    void playVideo(const QString&);
+    void playVideo(const QByteArray&);
 
 private slots:
     void mediaStateChanged(QMediaPlayer::State state);
@@ -40,6 +41,8 @@ private:
     QAbstractButton *playButton;
     //QSlider *positionSlider;
     Slider *positionSlider;
+    QByteArray m_playData;
+    QBuffer m_playBuffer;
 };
 
 #endif

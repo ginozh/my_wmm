@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QScrollArea>
 #include "flowlayout.h"
+#include <QBuffer>
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -18,7 +19,7 @@ public:
     ElementsEdit(QWidget *parent = 0);
     ~ElementsEdit();
 signals:
-    void playVideo(const QString&);
+    void playVideo(const QByteArray&);
 
 public slots:
     void load();
@@ -30,6 +31,8 @@ private:
     QString m_tmpdir;
     QWidget *m_lastSelectedImage;
     int m_idxCurrentImage;
+    QByteArray m_playData;
+    QBuffer m_playBuffer;
 };
 //! [0]
 

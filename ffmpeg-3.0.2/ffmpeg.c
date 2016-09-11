@@ -455,6 +455,32 @@ static int decode_interrupt_cb(void *ctx)
 }
 
 const AVIOInterruptCB int_cb = { decode_interrupt_cb, NULL };
+static void ffmpeg_init_globalvar() //storm
+{
+    vstats_file = NULL;
+    run_as_daemon  = 0;
+    nb_frames_dup = 0;
+    nb_frames_drop = 0;
+    memset(decode_error_stat, 0, sizeof(decode_error_stat));
+
+    current_time;
+    progress_avio = NULL;
+
+    subtitle_out = NULL;
+
+    input_streams = NULL;
+    nb_input_streams = 0;
+    input_files   = NULL;
+    nb_input_files   = 0;
+
+    output_streams = NULL;
+    nb_output_streams = 0;
+    output_files   = NULL;
+    nb_output_files   = 0;
+
+    filtergraphs = NULL;
+    nb_filtergraphs = 0;
+}
 
 static void ffmpeg_cleanup(int ret)
 {
@@ -4261,12 +4287,18 @@ static int64_t getmaxrss(void)
 static void log_callback_null(void *ptr, int level, const char *fmt, va_list vl)
 {
 }
-
+#define CALL_FFMPEG
+#ifdef CALL_FFMPEG
+static int qt_ffmpeg(int argc, char **argv)
+#else
+//buffer="/9j//gAQTGF2YzU3LjI0LjEwMgD/2wBDAAgEBAQEBAUFBQUFBQYGBgYGBgYGBgYGBgYHBwcICAgHBwcGBgcHCAgICAkJCQgICAgJCQoKCgwMCwsODg4RERT/xAGiAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgsBAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKCxAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/wAARCAAIAAgDARIAAhIAAxIA/9oADAMBAAIRAxEAPwDR4x5ey1/4Wl9n+1faPP0X/hJf+Eg/snyPsXl/ZP7W+xf2p/pO3/kBf2L8/wBu/sf/AEWs7/m+v/P/AEI9fGe341/11/3fG+w+t/VfhzT6p9V/tH6x9e5vrv8AY/P/AGV/sfwf9yf1z/aT7M9D6tlP9k+3+vR+sctvqnsP33tdv4luX6vy+/z8/tva+57L2Xvnnn//2Q==";len=$(echo -n "$buffer" | wc -m);./ffmpeg_g -y -framerate 25 -loop 1 -t 1 -i "buffer:image/jpg;base64,$buffer,$len" -pix_fmt yuv420p  -vcodec mpeg4 -f avi jpg/out.avi
 int main(int argc, char **argv)
+#endif
 {
     int ret;
     int64_t ti;
 
+    ffmpeg_init_globalvar(); //storm
     register_exit(ffmpeg_cleanup);
 
     setvbuf(stderr,NULL,_IONBF,0); /* win32 runtime needs this */
@@ -4280,6 +4312,10 @@ int main(int argc, char **argv)
         argc--;
         argv++;
     }
+    for(int idx=0; idx<argc; idx++) {
+        av_log(NULL, AV_LOG_WARNING, " ==%s==\n", argv[idx]);
+    }
+    av_log(NULL, AV_LOG_WARNING, "\n");
 
     avcodec_register_all();
 #if CONFIG_AVDEVICE
@@ -4327,6 +4363,109 @@ int main(int argc, char **argv)
     if ((decode_error_stat[0] + decode_error_stat[1]) * max_error_rate < decode_error_stat[1])
         exit_program(69);
 
+#ifndef CALL_FFMPEG
+    exit_program(received_nb_signals ? 255 : main_return_code);
+#endif
+    return main_return_code;
+}
+#ifdef CALL_FFMPEG
+
+#include "libavutil/file.h"
+#define c 30
+#define len 10*1024
+char *argvv[c];//[len];
+    //./ffmpeg_g -y -framerate 25 -loop 1 -t 1 -i
+    //"buffer:image/jpg;base64,/9j//gAQTGF2YzU3LjI0LjEwMgD/2wBDAAgEBAQEBAUFBQUFBQYGBgYGBgYGBgYGBgYHBwcICAgHBwcGBgcHCAgICAkJCQgICAgJCQoKCgwMCwsODg4RERT/xAGiAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgsBAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKCxAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/wAARCAAIAAgDARIAAhIAAxIA/9oADAMBAAIRAxEAPwDR4x5ey1/4Wl9n+1faPP0X/hJf+Eg/snyPsXl/ZP7W+xf2p/pO3/kBf2L8/wBu/sf/AEWs7/m+v/P/AEI9fGe341/11/3fG+w+t/VfhzT6p9V/tH6x9e5vrv8AY/P/AGV/sfwf9yf1z/aT7M9D6tlP9k+3+vR+sctvqnsP33tdv4luX6vy+/z8/tva+57L2Xvnnn//2Q=="
+    //-pix_fmt yuv420p  -vcodec mpeg4 -f avi "buffer:image/gif;base64,b2s="
+static int call_main(int argc, char **argv)
+{
+    struct to_buffer sinbuffer, soutbuffer;
+    int i=0;
+    uint8_t* in_buffer;
+    size_t in_len;
+    size_t out_len = 10*1024*1024;
+    uint8_t* out_buffer;
+    int ret;
+#define IN_BUFFER_PTR
+#ifndef IN_BUFFER_PTR
+    in_buffer = av_mallocz(len);
+#endif
+    out_buffer = av_mallocz(out_len);
+    for(int j=0; j<c; j++)
+    {
+        argvv[j]=av_mallocz(len);
+    }
+    //memset(argvv, 0, c*len);
+    snprintf(argvv[i++], len, "./ffmpeg");
+    snprintf(argvv[i++], len, "-y");
+    snprintf(argvv[i++], len, "-v");
+    snprintf(argvv[i++], len, "trace");
+    snprintf(argvv[i++], len, "-framerate");
+    snprintf(argvv[i++], len, "2");
+    snprintf(argvv[i++], len, "-loop");
+    snprintf(argvv[i++], len, "1");
+    snprintf(argvv[i++], len, "-t");
+    snprintf(argvv[i++], len, "1");
+    snprintf(argvv[i++], len, "-i");
+#ifdef IN_BUFFER_PTR
+    ret = av_file_map("jpg/img001.jpg", &in_buffer, &in_len, 0, NULL);
+    if (ret < 0)
+        exit_program(1);
+    sinbuffer.ptr = in_buffer;
+    sinbuffer.in_len = in_len;
+    sinbuffer.out_len = NULL;
+    snprintf(argvv[i++], len, "buffer:image/jpg;nobase64,%zu", (size_t)&sinbuffer);
+    //snprintf(argvv[i++], len, "buffer:image/jpg;nobase64,%zu,%d", (size_t)in_buffer, in_len);
+#else
+    snprintf(in_buffer, len, "/9j//gAQTGF2YzU3LjI0LjEwMgD/2wBDAAgEBAQEBAUFBQUFBQYGBgYGBgYGBgYGBgYHBwcICAgHBwcGBgcHCAgICAkJCQgICAgJCQoKCgwMCwsODg4RERT/xAGiAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgsBAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKCxAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/wAARCAAIAAgDARIAAhIAAxIA/9oADAMBAAIRAxEAPwDR4x5ey1/4Wl9n+1faPP0X/hJf+Eg/snyPsXl/ZP7W+xf2p/pO3/kBf2L8/wBu/sf/AEWs7/m+v/P/AEI9fGe341/11/3fG+w+t/VfhzT6p9V/tH6x9e5vrv8AY/P/AGV/sfwf9yf1z/aT7M9D6tlP9k+3+vR+sctvqnsP33tdv4luX6vy+/z8/tva+57L2Xvnnn//2Q==");
+    sinbuffer.ptr = in_buffer;
+    sinbuffer.in_len = strlen(in_buffer);
+    sinbuffer.out_len = NULL;
+    snprintf(argvv[i++], len, "buffer:image/jpg;base64,%zu", (size_t)&sinbuffer);
+    //snprintf(argvv[i++], len, "buffer:image/jpg;base64,%zu,%d", (size_t)in_buffer, strlen(in_buffer));
+#endif
+    snprintf(argvv[i++], len, "-pix_fmt");
+    snprintf(argvv[i++], len, "yuv420p");
+    snprintf(argvv[i++], len, "-vcodec");
+    snprintf(argvv[i++], len, "mpeg4");
+    snprintf(argvv[i++], len, "-f");
+    snprintf(argvv[i++], len, "avi");
+#define OUT_BUFFER_PTR
+#ifdef OUT_BUFFER_PTR
+    soutbuffer.ptr = out_buffer;
+    soutbuffer.in_len = out_len;
+    soutbuffer.out_len = &out_len;
+    snprintf(argvv[i++], len, "buffer:video/avi;nobase64,%zu", (size_t)&soutbuffer);
+    //snprintf(argvv[i++], len, "buffer:video/avi;nobase64,%zu,%d", (size_t)out_buffer, out_len);
+#else
+    snprintf(argvv[i++], len, "jpg/out.avi");
+#endif
+    //snprintf(argvv[i++], len, "buffer:video/avi;base64,b2s=");
+    qt_ffmpeg(i, argvv);
+    av_file_unmap(in_buffer, in_len);
+#ifdef OUT_BUFFER_PTR
+    // write to "jpg/dump.avi"
+    av_log(NULL, AV_LOG_WARNING, "main out_len: %zu\n", out_len);
+#endif
+#ifndef IN_BUFFER_PTR
+    av_freep(&in_buffer);
+#endif
+    av_freep(&out_buffer);
+    for(int j=0; j<c; j++)
+    {
+        av_freep  (&argvv[j]);
+    }
+
     exit_program(received_nb_signals ? 255 : main_return_code);
     return main_return_code;
 }
+#include <unistd.h>
+int main(int argc, char **argv)
+{
+    for(int i=0; i<=1; i++)
+    {
+        call_main(argc, argv);
+        sleep(1);
+    }
+}
+#endif

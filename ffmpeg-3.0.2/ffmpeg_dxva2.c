@@ -126,7 +126,7 @@ typedef struct DXVA2SurfaceWrapper {
 } DXVA2SurfaceWrapper;
 
 static void dxva2_destroy_decoder(AVCodecContext *s)
-{
+{ av_log(NULL, AV_LOG_WARNING, "dxva2_destroy_decoder\n"); //storm
     InputStream  *ist = s->opaque;
     DXVA2Context *ctx = ist->hwaccel_ctx;
     int i;

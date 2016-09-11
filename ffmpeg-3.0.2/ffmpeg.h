@@ -497,6 +497,11 @@ typedef struct OutputFile {
     int shortest;
 } OutputFile;
 
+struct to_buffer { //storm
+    uint8_t *ptr;
+    size_t in_len;
+    size_t* out_len;
+};
 extern InputStream **input_streams;
 extern int        nb_input_streams;
 extern InputFile   **input_files;

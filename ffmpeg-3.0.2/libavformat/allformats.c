@@ -373,6 +373,8 @@ void av_register_all(void)
     REGISTER_PROTOCOL(CONCAT,           concat);
     REGISTER_PROTOCOL(CRYPTO,           crypto);
     REGISTER_PROTOCOL(DATA,             data);
+    //storm
+    REGISTER_PROTOCOL(BUFFER,           buffer); //storm
     REGISTER_PROTOCOL(FFRTMPCRYPT,      ffrtmpcrypt);
     REGISTER_PROTOCOL(FFRTMPHTTP,       ffrtmphttp);
     REGISTER_PROTOCOL(FILE,             file);

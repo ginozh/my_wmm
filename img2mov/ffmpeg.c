@@ -4189,7 +4189,7 @@ static int transcode(void)
     }
 
     /* dump report by using the first video and audio streams */
-    print_report(1, timer_start, av_gettime_relative());
+    //print_report(1, timer_start, av_gettime_relative());
 
     /* close each encoder */
     for (i = 0; i < nb_output_streams; i++) {
@@ -4292,7 +4292,6 @@ int qt_ffmpeg(int argc, char **argv)
 {
     int ret;
     int64_t ti;
-    int idx;
     ffmpeg_init_globalvar(); //storm
     //av_log(NULL, AV_LOG_INFO, "1 nb_input_files %d.\n", nb_input_files);
     register_exit(ffmpeg_cleanup);
@@ -4309,8 +4308,8 @@ int qt_ffmpeg(int argc, char **argv)
         argc--;
         argv++;
     }
-    for(idx=0; idx<argc; idx++) {
-        av_log(NULL, AV_LOG_WARNING, " ==%s==", argv[idx]);
+    for(int idx=0; idx<argc; idx++) {
+        av_log(NULL, AV_LOG_WARNING, " ==%s==\n", argv[idx]);
     }
     av_log(NULL, AV_LOG_WARNING, "\n");
 

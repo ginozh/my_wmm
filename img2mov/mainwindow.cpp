@@ -59,7 +59,7 @@ MainWindow::MainWindow(QWidget *parent)
 #else
     centralSplitter->addWidget(m_elementsEdit);
 #endif
-    connect(m_elementsEdit, SIGNAL(playVideo(const QString&)), m_player, SLOT(playVideo(const QString&)));
+    connect(m_elementsEdit, SIGNAL(playVideo(const QByteArray&)), m_player, SLOT(playVideo(const QByteArray&)));
 
     setCentralWidget(m_centralWidget);
 

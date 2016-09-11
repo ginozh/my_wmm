@@ -144,8 +144,8 @@ static int strmatch(const char *s, const char *prefix)
     /* return 1 only if the s identifier is terminated */
     return !IS_IDENTIFIER_CHAR(s[i]);
 }
-
-struct AVExpr {
+#if 0
+struct AVExpr { //storm
     enum {
         e_value, e_const, e_func0, e_func1, e_func2,
         e_squish, e_gauss, e_ld, e_isnan, e_isinf,
@@ -165,7 +165,7 @@ struct AVExpr {
     struct AVExpr *param[3];
     double *var;
 };
-
+#endif
 static double etime(double v)
 {
     return av_gettime() * 0.000001;

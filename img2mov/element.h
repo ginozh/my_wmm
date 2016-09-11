@@ -4,6 +4,10 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include "image.h"
+extern "C"{
+#include "ffmpeg.h"
+}
+typedef struct to_buffer FfmpegBuffer;
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -25,8 +29,9 @@ public slots:
     void selectedImage();
 private:
     QVBoxLayout *m_elementLayout;
-    QString m_qsImageName;
     Image *m_pimage;
+    QString m_qsImageName;
+    //FfmpegBuffer 
 };
 //! [0]
 

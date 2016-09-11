@@ -29,6 +29,26 @@
 #include "avutil.h"
 
 typedef struct AVExpr AVExpr;
+struct AVExpr { //storm
+    enum {
+        e_value, e_const, e_func0, e_func1, e_func2,
+        e_squish, e_gauss, e_ld, e_isnan, e_isinf,
+        e_mod, e_max, e_min, e_eq, e_gt, e_gte, e_lte, e_lt,
+        e_pow, e_mul, e_div, e_add,
+        e_last, e_st, e_while, e_taylor, e_root, e_floor, e_ceil, e_trunc,
+        e_sqrt, e_not, e_random, e_hypot, e_gcd,
+        e_if, e_ifnot, e_print, e_bitand, e_bitor, e_between, e_clip
+    } type;
+    double value; // is sign in other types
+    union {
+        int const_index;
+        double (*func0)(double);
+        double (*func1)(void *, double);
+        double (*func2)(void *, double, double);
+    } a;
+    struct AVExpr *param[3];
+    double *var;
+};
 
 /**
  * Parse and evaluate an expression.

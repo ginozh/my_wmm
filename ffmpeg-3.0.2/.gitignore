@@ -1,0 +1,16 @@
+*.a
+*.core
+*.o
+*.d
+*.so
+tags
+cscope*
+# Binaries
+# --------
+*.dll
+*.exe
+*.lib
+
+*.ver
+*.pc
+*.def

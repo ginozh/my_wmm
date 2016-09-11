@@ -119,7 +119,7 @@ void exit_program(int ret)
     if (program_exit)
         program_exit(ret);
 
-    exit(ret);
+    //exit(ret); //storm
 }
 
 double parse_number_or_die(const char *context, const char *numstr, int type,
@@ -369,7 +369,7 @@ void parse_options(void *optctx, int argc, char **argv, const OptionDef *options
     int optindex, handleoptions = 1, ret;
 
     /* perform system-dependent conversions for arguments list */
-    prepare_app_arguments(&argc, &argv);
+    //prepare_app_arguments(&argc, &argv); //storm
 
     /* parse options */
     optindex = 1;
@@ -740,7 +740,7 @@ int split_commandline(OptionParseContext *octx, int argc, char *argv[],
     int dashdash = -2;
 
     /* perform system-dependent conversions for arguments list */
-    prepare_app_arguments(&argc, &argv);
+    //prepare_app_arguments(&argc, &argv); //storm
 
     init_parse_context(octx, groups, nb_groups);
     av_log(NULL, AV_LOG_DEBUG, "Splitting the commandline.\n");

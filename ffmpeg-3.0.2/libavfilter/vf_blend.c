@@ -46,10 +46,348 @@ typedef struct BlendContext {
     int tblend;
     AVFrame *prev_frame;        /* only used with tblend */
 } BlendContext;
+// storm
+typedef int (*FuncDef)(const uint8_t *top, ptrdiff_t top_linesize,          
+        const uint8_t *bottom, ptrdiff_t bottom_linesize,    
+        uint8_t *dst, ptrdiff_t dst_linesize,                
+        ptrdiff_t width, ptrdiff_t height,              
+        FilterParams *param, double *values);
+typedef struct BlendFuncDef {
+    FuncDef func_arg;
+    /*int (*func_arg)(const uint8_t *top, ptrdiff_t top_linesize,          
+                               const uint8_t *bottom, ptrdiff_t bottom_linesize,    
+                               uint8_t *dst, ptrdiff_t dst_linesize,                
+                               ptrdiff_t width, ptrdiff_t height,              
+                               FilterParams *param, double *values);*/
+}BlendFuncDef;
+//1. (all 3)
+static const char *const var_names[] = {   "X",   "Y",   "W",   "H",   "SW",   "SH",   "T",   "N",   "A",   "B",   "TOP",   "BOTTOM"
+    ,   "bowtieh"
+    ,   "bowtiev"
+    ,   "diagboxout"
+    ,   "diagcrossout"
+    ,   "diagdownright"
+    ,   "filledvdown"
+    ,   "filledvleft"
+    ,   "filledvright"
+    ,   "filledvup"
+    ,   "barsh"
+    ,   "barsvertical"
+    ,   "crossfade"
+    ,   "checkerb"
+    ,   "circle"
+    ,   "circles"
+    ,   "diamond"
+    ,   "heart"
+    ,   "rectangle"
+    ,   "wheel"
+    ,   "insetbottoml"
+    ,   "insetbottomr"
+    ,   "insettopleft"
+    ,   "insettopr"
+    ,   "iris"
+    ,   "revealdown"
+    ,   "revealright"
+    ,   "revealleft"
+    ,   "roll"
+    ,   "slide"
+    ,   "slideupt"
+    ,   "slidedownt"
+    ,   "splith"
+    ,   "splitv"
+    ,   "fanin"
+    ,   "test"
+    , NULL };
+//2. (all 3)
+enum                                   { VAR_X, VAR_Y, VAR_W, VAR_H, VAR_SW, VAR_SH, VAR_T, VAR_N, VAR_A, VAR_B, VAR_TOP, VAR_BOTTOM
+    , VAR_BOWTIEH
+    , VAR_BOWTIEV
+    , VAR_DIAGBOXOUT
+    , VAR_DIAGCROSSOUT
+    , VAR_DIAGDOWNRIGHT
+    , VAR_FILLEDVDOWN
+    , VAR_FILLEDVLEFT
+    , VAR_FILLEDVRIGHT
+    , VAR_FILLEDVUP
+    , VAR_BARSH
+    , VAR_BARSVERTICAL
+    , VAR_CROSSFADE
+    , VAR_CHECKERB
+    , VAR_CIRCLE
+    , VAR_CIRCLES
+    , VAR_DIAMOND
+    , VAR_HEART
+    , VAR_RECTANGLE
+    , VAR_WHEEL
+    , VAR_INSETBOTTOML
+    , VAR_INSETBOTTOMR
+    , VAR_INSETTOPLEFT
+    , VAR_INSETTOPR
+    , VAR_IRIS
+    , VAR_REVEALDOWN
+    , VAR_REVEALRIGHT
+    , VAR_REVEALLEFT
+    , VAR_ROLL
+    , VAR_SLIDE
+    , VAR_SLIDEUPT
+    , VAR_SLIDEDOWNT
+    , VAR_SPLITH
+    , VAR_SPLITV
+    , VAR_FANIN
+    , VAR_TEST
+    , VAR_VARS_NB };
 
-static const char *const var_names[] = {   "X",   "Y",   "W",   "H",   "SW",   "SH",   "T",   "N",   "A",   "B",   "TOP",   "BOTTOM",        NULL };
-enum                                   { VAR_X, VAR_Y, VAR_W, VAR_H, VAR_SW, VAR_SH, VAR_T, VAR_N, VAR_A, VAR_B, VAR_TOP, VAR_BOTTOM, VAR_VARS_NB };
+#define DEFINE_ANIMATION_EXPR(type, name, div, expr_before_xexchange, expr_before_expr, expr)\
+static inline int animation_expr_## name(const uint8_t *_top, ptrdiff_t top_linesize,          \
+                               const uint8_t *_bottom, ptrdiff_t bottom_linesize,    \
+                               uint8_t *_dst, ptrdiff_t dst_linesize,                \
+                               ptrdiff_t width, ptrdiff_t height,              \
+                               FilterParams *param, double *values)\
+{\
+    const type *top = (type*)_top;                                             \
+    const type *bottom = (type*)_bottom;                                       \
+    type *dst = (type*)_dst;                                                   \
+    AVExpr *e = param->e;                                                      \
+    int y, x;                                                                  \
+    double W=values[VAR_W]; \
+    double T=values[VAR_T]; \
+    double N=values[VAR_N]; \
+    double H=values[VAR_H]; \
+    double f, tant, xpartlen=0, ypartlen=0, change_rate, xchange, ychange, wh, whalf, hhalf; \
+    double tmp1=0, tmp2=0, tmp3=0; \
+    double t=e->param[1]->value;\
+    double at=e->param[2]->value;\
+    t = t <= at? t:at;\
+    f = 25; if(f){} \
+    tant = tan(N*M_PI/(2*f*t));if(tant){} \
+    change_rate=N/(t*f); if(change_rate){} \
+    if(xchange){} if(ychange){} \
+    wh = W/H; \
+    whalf = W/2; hhalf = H/2; \
+    if(W){} if(T){} if(N){} if(H){} if(xpartlen){} if(ypartlen){} if(wh){} if(whalf){} if(hhalf){} \
+    if(tmp1){} if(tmp2){} if(tmp3){} \
+\
+    expr_before_xexchange; \
+    xchange=xpartlen*change_rate; \
+    ychange=ypartlen*change_rate; \
+    for (y = 0; y < height; y++) {                                             \
+        for (x = 0; x < width; x++) {                                          \
+            expr_before_expr; \
+            dst[x] = expr; \
+        }\
+        dst    += dst_linesize;                                                \
+        top    += top_linesize;                                                \
+        bottom += bottom_linesize;                                             \
+    }\
+    return 0;\
+}
+//#define DEFINE_ANIMATION_EXPR(uint8_t, name, 1, expr_before_xexchange, expr_before_expr, expr)
+static inline int animation_expr_test1(const uint8_t *_top, ptrdiff_t top_linesize,          
+                               const uint8_t *_bottom, ptrdiff_t bottom_linesize,    
+                               uint8_t *_dst, ptrdiff_t dst_linesize,                
+                               ptrdiff_t width, ptrdiff_t height,              
+                               FilterParams *param, double *values)
+{
+    const uint8_t *top = (uint8_t*)_top;                                             
+    const uint8_t *bottom = (uint8_t*)_bottom;                                       
+    uint8_t *dst = (uint8_t*)_dst;                                                   
+    AVExpr *e = param->e;                                                      
+    int y, x;                                                                  
+    double W=values[VAR_W]; 
+    double T=values[VAR_T]; 
+    double N=values[VAR_N]; 
+    double H=values[VAR_H]; 
+    double f, tant, xpartlen=0, ypartlen=0, change_rate, xchange, ychange, wh, whalf, hhalf; 
+    double tmp1=0, tmp2=0; 
+    double t=e->param[1]->value;
+    double at=e->param[2]->value;
+    t = t <= at? t:at;
+    f = 25; if(f){} 
+    tant = tan(N*M_PI/(2*f*t));if(tant){} 
+    change_rate=N/(t*f); if(change_rate){} 
+    if(xchange){} if(ychange){} 
+    wh = W/H; 
+    whalf = W/2; hhalf = H/2; 
+    if(W){} if(T){} if(N){} if(H){} if(xpartlen){} if(ypartlen){} if(wh){} if(whalf){} if(hhalf){} 
+    if(tmp1){} if(tmp2){} 
 
+    xpartlen=M_PI*90/180,xchange=xpartlen*N/(t*f),tmp1=tan(xchange);
+    xchange=xpartlen*change_rate; 
+    ychange=ypartlen*change_rate; 
+    for (y = 0; y < height; y++) {                                             
+        for (x = 0; x < width; x++) {                                          
+            if (!(tmp1>=(H-y)/(W-x) || x<=(H-W*tmp1-y)*tmp1)) {
+                av_log(NULL, AV_LOG_VERBOSE, "y: %d x: %d\n",(int)(H-(H-y)*cos(xchange)-(W-x)*sin(xchange)), (int)(W-(W-x)*cos(xchange)+(H-y)*sin(xchange)) );} 
+            dst[x] =((tmp1>=(H-y)/(W-x) || x<=(H-W*tmp1-y)*tmp1)? bottom[x]:(*(top+322*top_linesize+503))  ) ; 
+        }
+        dst    += dst_linesize;                                                
+        top    += top_linesize;                                                
+        bottom += bottom_linesize;                                             
+    }
+    return 0;
+}
+#if 0
+#define W values[VAR_W]
+#define T values[VAR_T]
+#define N values[VAR_N]
+#define H values[VAR_H]
+#define f 25
+#endif
+// diagonals
+DEFINE_ANIMATION_EXPR(uint8_t, bowtieh, 1, , , ( ((x<=tant*y && x<=tant*(H-y))||(x>=(W-y*tant) && x>=(W-H*tant+y*tant)) || tant<0)?bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, bowtiev, 1, , , ( ( (y<=x*tant && y<=(W-x)*tant) || (y>=H-x*tant && y>=(H-W*tant+x*tant) ) || tant<0 )?bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, diagboxout, 1, xpartlen=W/2, , ( ( (x<=whalf && ( x<=(whalf-xchange-y*wh) || (y<=hhalf && x>=(xchange+whalf-wh*y)) || x<=(y*wh-xchange-whalf) || (y>=hhalf && x>=(xchange+wh*y-whalf)) )) || (x>=whalf && (x>=(xchange+whalf+y*wh) || (y<=hhalf && x<=(whalf-xchange+y*wh) ) || x>=(3*whalf+xchange-wh*y) || (y>=hhalf && x<=(3*whalf-xchange-wh*y)) ) ) )? top[x]:bottom[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, diagcrossout, 1, xpartlen=W/2, ,( (  (x<=whalf && (x>=wh*y+xchange || x>=(W-wh*y+xchange) || (y<=hhalf && x<=(y*wh-xchange)) || (y>=hhalf && x<=(W-y*wh-xchange)) )) || (x>=whalf && (x<=(W-xchange-y*wh) || x<=W*y/H-xchange || (y<=hhalf && x>=(W-y*wh+xchange)) || (y>=hhalf && x>=(y*wh+xchange)) ) ) )?top[x]:bottom[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, diagdownright, 1, xpartlen=W+H, ,( (x<=xchange-y)? bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, filledvdown, 1, xpartlen=(W+H)/2 , , ( ((x>=whalf && x<=(whalf+xchange-y*wh/2)) || (x<=whalf && x>=(wh*y/2-xchange+whalf)) )? bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, filledvleft, 1, xpartlen=W/2, , ( (( y<=hhalf && x>=(3*whalf-wh*y-3*xchange))|| (y>=hhalf && x>=(whalf+wh*y-3*xchange) ) )? bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, filledvright, 1, xpartlen=W*3/2, , ( ( abs(hhalf-y)<=H*(xchange-x)/W ) ? bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, filledvup, 1, xpartlen=W*3/2, , ( ( abs(whalf-x)<=xchange-W+y*W/H) ? bottom[x]:top[x] ) )
+// dissolves
+DEFINE_ANIMATION_EXPR(uint8_t, barsh, 1, ypartlen=H/54 , ,((  y%((int)(ypartlen))>=0 && y%((int)(ypartlen))<=ychange)? bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, barsvertical, 1, xpartlen=W/72, ,((  x%((int)(xpartlen))>=0 && x%((int)(xpartlen))<=xchange)? bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, crossfade, 1, , , (bottom[x]*(T>=t?1:(T/t))+top[x]*(1-(T>=t?1:(T/t)))) )
+// patterns and shapes
+DEFINE_ANIMATION_EXPR(uint8_t, checkerb, 1, (xpartlen=W/12,ypartlen=H/18) , ,(( (((int)floor(y/ypartlen))%2==0 && x%((int)xpartlen)>=0 && x%((int)xpartlen)<=xchange) ||(((int)floor(y/ypartlen))%2==1 &&  ((((int)x)%((int)xpartlen)>=xpartlen/2 && ((int)x)%((int)xpartlen)<=xchange+xpartlen/2) || ( xchange>=xpartlen/2 && ((int)x)%((int)xpartlen)<=xchange-xpartlen/2) ) ) )? bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, circle, 1, xpartlen=W/2, ,((( (x-whalf)*(x-whalf)+(y-hhalf)*(y-hhalf)<=xchange*xchange) )? bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, circles, 1, (xpartlen=(W/5)/2, ypartlen=xpartlen*H/W), (tmp1=x-((int)(x/(2*xpartlen)))*2*xpartlen-xpartlen,tmp2=y-((int)(y/(2*ypartlen)))*2*ypartlen-ypartlen ),((tmp1*tmp1+tmp2*tmp2<=xchange*xchange )? bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, diamond, 1, (xpartlen=W), ,(( (x<=whalf && ( (y<=hhalf && x>=W-y*W/H-xchange) ||(y>=hhalf && x>=y*W/H-xchange)) ) || (x>=whalf && (( y<=hhalf && x<=xchange+W*y/H) ||(y>=hhalf && x<=xchange-W*y/H+W)))  )? bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, heart, 1, xpartlen=(W+H)/2, , (( (x<=whalf && ((y>=hhalf && x>=y-hhalf+whalf-xchange) || (y<=hhalf && x>=hhalf-y+whalf-xchange) || (y<=hhalf && x>=whalf-xchange/2 && x<=sqrt(xchange*xchange/4-y*y+y*H-y*xchange-hhalf*hhalf+hhalf*xchange)+whalf-xchange/2 ) || (y<=hhalf && x<=whalf-xchange/2 && x>=-sqrt(xchange*xchange/4-y*y+y*H-y*xchange-hhalf*hhalf+hhalf*xchange)+whalf-xchange/2)) ) || (x>=whalf && ((y>=hhalf && x<=whalf+xchange+hhalf-y) || (y<=hhalf && x<=whalf+xchange+y-hhalf) || (x>=whalf+xchange/2 && x<=sqrt(xchange*xchange/4-y*y+y*H-y*xchange-hhalf*hhalf+hhalf*xchange)+whalf+xchange/2 ) || (x<=whalf+xchange/2 && x>=-sqrt(xchange*xchange/4-y*y+y*H-y*xchange-hhalf*hhalf+hhalf*xchange)+whalf+xchange/2)  ) ) )? bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, rectangle, 1, (xpartlen=W/2, ypartlen=H/2), ,(( abs(W/2-x)<=xchange && abs(H/2-y)<=ychange)? bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, wheel, 1, (xpartlen=M_PI*90/180, xchange=xpartlen*N/(t*f),tmp1=tan(xchange)), ,(( (((x>=whalf && y<hhalf) ||(x<=whalf && y>=hhalf)) && tmp1>=(whalf-x)/(y-hhalf))|| (((x<=whalf && y<hhalf) || (x>=whalf && y>hhalf)) && tmp1>=(y-hhalf)/(x-whalf)) || tmp1<0)? bottom[x]:top[x] ) )
+// reveals
+//insetbottomleft
+DEFINE_ANIMATION_EXPR(uint8_t, insetbottoml, 1, (xpartlen=W, ypartlen=H), ,((W-xchange<=x && ychange>=y)? bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, insetbottomr, 1, (xpartlen=W, ypartlen=H), ,((xchange>=x && ychange>=y)? bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, insettopleft, 1, (xpartlen=W, ypartlen=H), ,((W-xchange<=x && H-ychange<=y)? bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, insettopr, 1, (xpartlen=W, ypartlen=H), ,((xchange>=x && H-ychange<=y)? bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, iris, 1, (xpartlen=whalf, ypartlen=hhalf), ,( (abs(y-hhalf)<=ychange || abs(x-whalf)<=xchange)? bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, revealdown, 1, (ypartlen=H), ,( (y<=ychange)? bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, revealright, 1, (xpartlen=W), ,( (x<=xchange)? bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, revealleft, 1,(xpartlen=W) , , ((x>=W-xchange)?bottom[x]:top[x]) )
+DEFINE_ANIMATION_EXPR(uint8_t, roll, 1, (xpartlen=M_PI*90/180,xchange=xpartlen*N/(t*f),tmp1=tan(xchange),tmp2=sin(xchange), tmp3=cos(xchange)), ,((tmp1>=(H-y)/(W-x) || x<=(H-W*tmp1-y)*tmp1|| tmp1<=0)? bottom[x]:*(_top+(int)((H-y)*tmp3-(W-x)*tmp2)*top_linesize+(int)((W-x)*tmp3+(H-y)*tmp2))  ))
+DEFINE_ANIMATION_EXPR(uint8_t, slide, 1, (ypartlen=H), ,((y>=H-ychange)? bottom[x]:(*(top+((int)ychange)*top_linesize+x) ) ))
+DEFINE_ANIMATION_EXPR(uint8_t, slideupt, 1, (ypartlen=H), ,((y>=H-ychange)? (H>=ychange?(*(_bottom+((int)(y-(H-ychange)))*bottom_linesize+x)):bottom[x] ):(*(top+((int)ychange)*top_linesize+x) ) ))
+DEFINE_ANIMATION_EXPR(uint8_t, slidedownt, 1, (ypartlen=H), ,((y<ychange)? (H>=ychange?(*(_bottom+((int)(H-ychange+y))*bottom_linesize+x)):bottom[x] ):(*(_top+((int)(y-ychange))*top_linesize+x) ) ))
+DEFINE_ANIMATION_EXPR(uint8_t, splith, 1,(ypartlen=H/2) , , ((abs(y-hhalf)<=ychange)?bottom[x]:top[x]) )
+DEFINE_ANIMATION_EXPR(uint8_t, splitv, 1,(xpartlen=W/2) , , ((abs(x-whalf)<=xchange)?bottom[x]:top[x]) )
+// shatters
+// sweeps and curls
+DEFINE_ANIMATION_EXPR(uint8_t, fanin, 1, (xpartlen=M_PI*180/180,xchange=xpartlen*N/(t*f),tmp1=tan(xchange)), ,(( (x<=W/5 && (xchange>=xpartlen/2 || tmp1*abs(W/5-x) >=abs(hhalf-y))) || (x>=W*4/5 && (xchange>=xpartlen/2 || tmp1*(x-4*W/5)>=abs(hhalf-y))) || (x>=W/5 && x<=W*4/5 && xchange>=xpartlen/2 && (-tmp1*(x-W/5)<=abs(hhalf-y) || -tmp1*(4*W/5-x)<=abs(hhalf-y)) )  ) ? bottom[x]:top[x]  ))
+// Wipes
+// Cinematic
+// Contemporary
+//DEFINE_ANIMATION_EXPR(uint8_t, crossfade, 1, (top[x]*(T>=0.5?1:(T/0.5))+bottom[x]*(1-(T>=0.5?1:(T/0.5)))) )
+////DEFINE_ANIMATION_EXPR(uint8_t, test, 1, (x<=W*N/(2*t*f)||x>=(W-W*N/(2*t*f))?bottom[x]:top[x])  )
+//DEFINE_ANIMATION_EXPR(uint8_t, test, 1, ( (x<=tan(N*M_PI/(2*f*t))*y)?bottom[x]:top[x] ) )
+//DEFINE_ANIMATION_EXPR(uint8_t, bowtieh, 1, ( ((x<=tant*y && x<=tant*(H-y))||(x>=(W-y*tant) && x>=(W-H*tant+y*tant)) || tant<0)?bottom[x]:top[x] ) )
+//#define a 1
+//DEFINE_ANIMATION_EXPR(uint8_t, test, 1, ( (  (x<=W/2 && x>=y*W/(2*H) && y>=H/2) || (x<=W/2 && x>=(H*H/W-2*H*y/W+W/4) && y<=H/2 ) )? bottom[x]:top[x] ) )
+//DEFINE_ANIMATION_EXPR(uint8_t, test, 1, ( ( (x<=W/2 && x>=W*3/8 && y<=H/2 && x<=sqrt(5*W*W/64-H*H/4-y*W*W/(8*H)+y*H-y*y)+3*W/8) || (x<=W*3/8 && x>=-sqrt(5*W*W/64-H*H/4-y*W*W/(8*H)+y*H-y*y)+3*W/8)||(x<=W/2 && x>=y*W/(2*H) && y>=H/2) || (x<=W/2 && x>=(H*H/W-2*H*y/W+W/4) && y<=H/2 ) || (x>=W*5/8 && x<=sqrt(5*W*W/64-H*H/4-y*W*W/(8*H)+y*H-y*y)+5*W/8) || (x<=W*5/8 && x>=W/2 && x>=-sqrt(5*W*W/64-H*H/4-y*W*W/(8*H)+y*H-y*y)+5*W/8) || (x>=W/2 && y<=H/2 && x<=(3*W/4-H*H/W+2*y*H/W) )  || (x>=W/2 && y>=H/2 && x<=(W-W*y/(H*2)) ) )? bottom[x]:top[x] ) )
+//#define C ((W/2+H/2)*N/(t*f))
+//DEFINE_ANIMATION_EXPR(uint8_t, test, 1, ( ( (x<=W/2 && y>=H/2 && x>=y-H/2+W/2-C) || (x<=W/2 && y<=H/2 && x>=H/2-y+W/2-C) || (x<=W/2 && y<=H/2 && x>=(W/2-C/2) && x<=(sqrt(C*C/4-y*y+y*H-y*C-H*H/4+H*C/2)+W/2-C/2) ) || (x<=W/2 && y<=H/2 && x<=(W/2-C/2) && (x>=-sqrt(C*C/4-y*y+y*H-y*C-H*H/4+H*C/2)+W/2-C/2) ) )? bottom[x]:top[x] ) )
+//#define xchange (W*N/(xsize*t*f))
+//DEFINE_ANIMATION_EXPR(uint8_t, test, 1, ( ( (( ((int)floor(x/xsize))%2==1 || x%xsize>=W*(1-N/(t*f))/xsize ) && ((int)floor(y/ysize))%2==0) || ( (((int)floor(x/xsize))%2==0 || x%xsize>=W*(1-N/(t*f))/xsize) && ((int)floor(y/ysize))%2==1) )? bottom[x]:top[x] ) )
+//DEFINE_ANIMATION_EXPR(uint8_t, test, 1, (xpartlen=(W/5)/2, ypartlen=xpartlen*H/W), ,((( pow(x-(((int)x)%((int)(xpartlen*2))*xpartlen*2)-xpartlen, 2)+pow(y-((int)y)%((int)(ypartlen*2))*ypartlen*2-ypartlen, 2)<=xchange*xchange) )? bottom[x]:top[x] ) )
+//DEFINE_ANIMATION_EXPR(uint8_t, test, 1, (xpartlen=(W/5)/2, ypartlen=xpartlen*H/W), ,((( pow(x-xpartlen*2*floor(x/(xpartlen*2))-xpartlen, 2)+pow(y-ypartlen*2*floor(y/ypartlen)-ypartlen, 2)<=ypartlen*ypartlen) && y>=ypartlen*2*floor(y/(ypartlen*2)) && y<=ypartlen*2*ceil(y/(ypartlen*2)) && x>=xpartlen*2*floor(x/(xpartlen*2)) && x<=xpartlen*2*ceil(x/(xpartlen*2)))? bottom[x]:top[x] ) )
+//DEFINE_ANIMATION_EXPR(uint8_t, test, 1, (xpartlen=(W/5)/2, ypartlen=xpartlen*H/W), ,(((x-(int)(x/(2*xpartlen))*2*xpartlen-xpartlen)*(x-(int)(x/(2*xpartlen))*2*xpartlen-xpartlen)+(y-(int)(y/(2*ypartlen))*2*ypartlen-ypartlen)*(y-(int)(y/(2*ypartlen))*2*ypartlen-ypartlen)<=xchange*xchange )? bottom[x]:top[x] ) )
+//DEFINE_ANIMATION_EXPR(uint8_t, test, 1, (xpartlen=M_PI*45/180), ,(( tan(xchange)>=(W/2-x)/(y-H/2))? bottom[x]:top[x] ) )
+//DEFINE_ANIMATION_EXPR(uint8_t, test, 1, (xpartlen=M_PI*90/180,xchange=xpartlen*N/(t*f),tmp1=tan(xchange)), ,(()? bottom[x]:(*(top+((int)ychange)*top_linesize+x) ) ))
+//DEFINE_ANIMATION_EXPR(uint8_t, test, 1, (xpartlen=M_PI*180/180,xchange=xpartlen*N/(t*f),tmp1=tan(xchange)), ,(( (( tmp1>=(hhalf-y)/(W/5-x) || tmp1<=0 || xchange>=xpartlen) && x<=W/5 && y<=hhalf ) || (x>=W/5 && y<=hhalf && xchange>=xpartlen/2 && tan(xpartlen-xchange)<=(hhalf-y)/(x-W/5) ) ) ? bottom[x]:top[x]  ))
+DEFINE_ANIMATION_EXPR(uint8_t, test, 1, (xpartlen=M_PI*360/180,xchange=xpartlen*N/(t*f),tmp1=tan(xchange), tmp2=tan(xpartlen-xchange)), ,(( ( y<=H/2 && ((x>=W/5 && x<=W/2 && (xchange>=xpartlen/4 || tmp1>=(hhalf-y)/(x-W/5) )) || (x>=W/2 && x<=4*W/5 && ( xchange>=xpartlen/4 || tmp1>=(hhalf-y)/(4*W/5-x)) )|| (x<=W/5 && (xchange>=xpartlen/2 ||  (xchange>=xpartlen/4 && -tmp1<=(hhalf-y)/(W/5-x)) ) ) || (x>=4*W/5 && (xchange>=xpartlen/2 ||  (xchange>=xpartlen/4 && -tmp1<=(hhalf-y)/(x-4*W/5))) ) ) ) || (y>=hhalf && ( (x<=W/5 && (xchange>=3*xpartlen/4 || (xchange>=xpartlen/2 && tmp1>=(y-hhalf)/(W/5-x)) )) || (x>=4*W/5 && (xchange>=3*xpartlen/4 || (xchange>=xpartlen/2 && tmp1>=(y-hhalf)/(x-4*W/5))) ) || (x>=W/2 && x<=4*W/5 && (xchange>=xpartlen || (xchange>=3*xpartlen/4 && tmp2>=(y-hhalf)/(x-W/5) )) )  ) ) ) ? bottom[x]:top[x]  ))
+#if 0
+#undef T
+#undef N
+#undef W
+#undef H
+#undef f
+#endif
+//#undef a
+#if 0
+static inline int animation_expr_crossfade(const uint8_t *top, ptrdiff_t top_linesize,          
+                               const uint8_t *bottom, ptrdiff_t bottom_linesize,    
+                               uint8_t *dst, ptrdiff_t dst_linesize,                
+                               ptrdiff_t width, ptrdiff_t height,              
+                               FilterParams *param, double *values)
+{
+    double W = values[VAR_W];
+    double H = values[VAR_H];
+    double N = values[VAR_N];
+    double T = values[VAR_T];
+    AVExpr *e = param->e;                                                      
+    int y, x;                                                                  
+    double t=e->param[1]->value;
+    double at=e->param[2]->value;
+    double f = 25;
+    t = t <= at? t:at;
+
+    for (y = 0; y < height; y++) {                                             
+        for (x = 0; x < width; x++) {                                          
+            /*if ((x<=((H*W-2*W*y)/(2*H)-W*N/(2*f)) )
+                    || (x<=(2*y*W-H*W)/(2*H)-W*N/(2*f))
+                    || (x>=(W*H+2*y*W)/(2*H)+W*N/(2*f))
+                    || (x>= (3*W*H-2*W*y)/(2*H)+W*N/(2*f))
+               )*/
+            // A*(if(gte(T,0.5),1,T/0.5))+B*(1-(if(gte(T,0.5),1,T/0.5)))'
+            dst[x]= top[x]*(T>=0.5?1:(T/0.5))+bottom[x]*(1-(T>=0.5?1:(T/0.5)));
+#if 0
+            if(x >= W*(f-N+1)/f)
+            {
+                dst[x] =bottom[x];
+            }
+            else
+            {
+                dst[x] = top[x];
+            }
+#endif
+        }
+        dst    += dst_linesize;                                                
+        top    += top_linesize;                                                
+        bottom += bottom_linesize;                                             
+    }
+    return 0;
+}
+#endif 
+//3. (all 3)
+const BlendFuncDef blendfuncs[] = {
+                                        {NULL}, {NULL},{NULL},{NULL},{NULL},{NULL},{NULL},{NULL},{NULL},{NULL},{NULL},  {NULL},
+    {.func_arg = animation_expr_bowtieh},
+    {.func_arg = animation_expr_bowtiev},
+    {.func_arg = animation_expr_diagboxout},
+    {.func_arg = animation_expr_diagcrossout},
+    {.func_arg = animation_expr_diagdownright},
+    {.func_arg = animation_expr_filledvdown},
+    {.func_arg = animation_expr_filledvleft},
+    {.func_arg = animation_expr_filledvright},
+    {.func_arg = animation_expr_filledvup},
+    {.func_arg = animation_expr_barsh},
+    {.func_arg = animation_expr_barsvertical},
+    {.func_arg = animation_expr_crossfade},
+    {.func_arg = animation_expr_checkerb},
+    {.func_arg = animation_expr_circle},
+    {.func_arg = animation_expr_circles},
+    {.func_arg = animation_expr_diamond},
+    {.func_arg = animation_expr_heart},
+    {.func_arg = animation_expr_rectangle},
+    {.func_arg = animation_expr_wheel},
+    {.func_arg = animation_expr_insetbottoml},
+    {.func_arg = animation_expr_insetbottomr},
+    {.func_arg = animation_expr_insettopleft},
+    {.func_arg = animation_expr_insettopr},
+    {.func_arg = animation_expr_iris},
+    {.func_arg = animation_expr_revealdown},
+    {.func_arg = animation_expr_revealright},
+    {.func_arg = animation_expr_revealleft},
+    {.func_arg = animation_expr_roll},
+    {.func_arg = animation_expr_slide},
+    {.func_arg = animation_expr_slideupt},
+    {.func_arg = animation_expr_slidedownt},
+    {.func_arg = animation_expr_splith},
+    {.func_arg = animation_expr_splitv},
+    {.func_arg = animation_expr_fanin},
+    {.func_arg = animation_expr_test},
+    {NULL}
+};
 typedef struct ThreadData {
     const AVFrame *top, *bottom;
     AVFrame *dst;
@@ -331,10 +669,10 @@ static void blend_expr_## name(const uint8_t *_top, ptrdiff_t top_linesize,     
         bottom += bottom_linesize;                                             \
     }                                                                          \
 }
-
-DEFINE_BLEND_EXPR(uint8_t, 8bit, 1)
-DEFINE_BLEND_EXPR(uint16_t, 16bit, 2)
-
+//DEFINE_BLEND_EXPR(uint8_t, 8bit, 1)
+//DEFINE_BLEND_EXPR(uint16_t, 16bit, 2)
+static void blend_expr_8bit(const uint8_t *_top, ptrdiff_t top_linesize,          const uint8_t *_bottom, ptrdiff_t bottom_linesize,    uint8_t *_dst, ptrdiff_t dst_linesize,                ptrdiff_t width, ptrdiff_t height,              FilterParams *param, double *values)           ; 
+static void blend_expr_16bit(const uint8_t *_top, ptrdiff_t top_linesize,          const uint8_t *_bottom, ptrdiff_t bottom_linesize,    uint8_t *_dst, ptrdiff_t dst_linesize,                ptrdiff_t width, ptrdiff_t height,              FilterParams *param, double *values)            ;
 static int filter_slice(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
 {
     ThreadData *td = arg;
@@ -665,3 +1003,197 @@ AVFilter ff_vf_tblend = {
 };
 
 #endif
+
+//storm
+static void blend_expr_16bit(const uint8_t *_top, ptrdiff_t top_linesize,          
+                               const uint8_t *_bottom, ptrdiff_t bottom_linesize,    
+                               uint8_t *_dst, ptrdiff_t dst_linesize,                
+                               ptrdiff_t width, ptrdiff_t height,              
+                               FilterParams *param, double *values)            
+{                                                                              
+    const uint16_t *top = (uint16_t*)_top;                                             
+    const uint16_t *bottom = (uint16_t*)_bottom;                                       
+    uint16_t *dst = (uint16_t*)_dst;                                                   
+    AVExpr *e = param->e;                                                      
+    int y, x;                                                                  
+    dst_linesize /= 2;                                                       
+    top_linesize /= 2;                                                       
+    bottom_linesize /= 2;                                                    
+                                                                               
+    for (y = 0; y < height; y++) {                                             
+        values[VAR_Y] = y;                                                     
+        for (x = 0; x < width; x++) {                                          
+            values[VAR_X]      = x;                                            
+            values[VAR_TOP]    = values[VAR_A] = top[x];                       
+            values[VAR_BOTTOM] = values[VAR_B] = bottom[x];                    
+            dst[x] = av_expr_eval(e, values, NULL);                            
+        }                                                                      
+        dst    += dst_linesize;                                                
+        top    += top_linesize;                                                
+        bottom += bottom_linesize;                                             
+    }                                                                          
+}
+static int cntExpr=0; // storm
+static void blend_expr_normal_8bit(const uint8_t *_top, ptrdiff_t top_linesize,          
+                               const uint8_t *_bottom, ptrdiff_t bottom_linesize,    
+                               uint8_t *_dst, ptrdiff_t dst_linesize,                
+                               ptrdiff_t width, ptrdiff_t height,              
+                               FilterParams *param, double *values)            
+{                                                                              
+    const uint8_t *top = (uint8_t*)_top;                                             
+    const uint8_t *bottom = (uint8_t*)_bottom;                                       
+    uint8_t *dst = (uint8_t*)_dst;                                                   
+    AVExpr *e = param->e;                                                      
+    int y, x;                                                                  
+    //double W = values[VAR_W];
+    //double H = values[VAR_H];
+    //double N = values[VAR_N];
+    
+    dst_linesize /= 1;                                                       
+    top_linesize /= 1;                                                       
+    bottom_linesize /= 1;                                                    
+    for (y = 0; y < height; y++) {                                             
+        values[VAR_Y] = y;                                                     
+        for (x = 0; x < width; x++) {                                          
+            values[VAR_X]      = x;                                            
+            values[VAR_TOP]    = values[VAR_A] = top[x];                       
+            values[VAR_BOTTOM] = values[VAR_B] = bottom[x];                    
+            dst[x] = av_expr_eval(e, values, NULL);                            
+        }                                                                      
+        dst    += dst_linesize;                                                
+        top    += top_linesize;                                                
+        bottom += bottom_linesize;                                             
+    }
+}
+static void blend_expr_8bit(const uint8_t *_top, ptrdiff_t top_linesize,          
+                               const uint8_t *_bottom, ptrdiff_t bottom_linesize,    
+                               uint8_t *_dst, ptrdiff_t dst_linesize,                
+                               ptrdiff_t width, ptrdiff_t height,              
+                               FilterParams *param, double *values)            
+{                                                                              
+    const uint8_t *top = (uint8_t*)_top;                                             
+    const uint8_t *bottom = (uint8_t*)_bottom;                                       
+    uint8_t *dst = (uint8_t*)_dst;                                                   
+    AVExpr *e = param->e;                                                      
+#if 0
+    int y, x;                                                                  
+    double W = values[VAR_W];
+    double H = values[VAR_H];
+    double N = values[VAR_N];
+#endif 
+    dst_linesize /= 1;                                                       
+    top_linesize /= 1;                                                       
+    bottom_linesize /= 1;                                                    
+    //printf ("cntExpr: %d\n", ++cntExpr) ; //why 75(50 frame) time? 2 frame == 3 
+    av_log(NULL, AV_LOG_VERBOSE, "cntExpr:  %d\n", ++cntExpr) ;
+    av_log(NULL, AV_LOG_VERBOSE, "values[VAR_N]: %f values[VAR_T]: %f values[VAR_W]: %f values[VAR_H]: %f values[VAR_SW]: %f values[VAR_SH]: %f e->type: %d\n"
+            , values[VAR_N], values[VAR_T], values[VAR_W], values[VAR_H], values[VAR_SW], values[VAR_SH], e->type) ;
+    if(e->type == e_if)
+    {
+        FuncDef blend_fun = blendfuncs[e->param[0]->a.const_index].func_arg;
+        if(blend_fun)
+        {
+            blend_fun(top, top_linesize, bottom, bottom_linesize, dst,dst_linesize, width, height, param, values);
+        }
+        else
+        {
+            blend_expr_normal_8bit(top, top_linesize, bottom, bottom_linesize, dst,dst_linesize, width, height, param, values);
+        }
+#if 0
+        if(e->param[0]->a.const_index == VAR_REVEALLEFT)
+        {
+            FuncDef abc = blendfuncs[VAR_REVEALLEFT].func_arg;
+            abc(top, top_linesize, bottom, bottom_linesize, dst,dst_linesize, width, height, param, values);
+        }
+        if(e->param[0]->a.const_index == VAR_CROSSFADE)
+        {
+            FuncDef abc = blendfuncs[VAR_CROSSFADE].func_arg;
+            abc(top, top_linesize, bottom, bottom_linesize, dst,dst_linesize, width, height, param, values);
+        }
+#endif
+    }
+    else
+    {
+        blend_expr_normal_8bit(top, top_linesize, bottom, bottom_linesize, dst,dst_linesize, width, height, param, values);
+    }
+#if 0
+    for (y = 0; y < height; y++) {                                             
+        values[VAR_Y] = y;                                                     
+        for (x = 0; x < width; x++) {                                          
+            values[VAR_X]      = x;                                            
+            values[VAR_TOP]    = values[VAR_A] = top[x];                       
+            values[VAR_BOTTOM] = values[VAR_B] = bottom[x];                    
+            // if(gte(N*SW*50+X,W),B,A)
+            //
+            if(e->a.const_index == VAR_AB)
+            {
+                //if((values[VAR_N]*values[VAR_SW]*50+values[VAR_X]) >= values[VAR_W])
+                //if(values[VAR_X] >= values[VAR_W]*(25-values[VAR_N]+1)/25)
+                if(values[VAR_X] <= (values[VAR_W]/2) *(1-values[VAR_Y]/(values[VAR_H]/2)))
+                {
+                    dst[x] = values[VAR_B];//av_expr_eval(e, values, NULL);                            
+                }
+                else
+                {
+                    dst[x] = values[VAR_A];//av_expr_eval(e, values, NULL);                            
+                }
+            }
+            // 'if(ab,1.5,2)'
+            else if(e->type == e_if)
+            {
+                if(e->param[0]->a.const_index == VAR_AB)
+                {
+                    double t=e->param[1]->value;
+                    double at=e->param[2]->value;
+                    double f = 25;
+                    t = t <= at? t:at;
+                    if ((x<=((H*W-2*W*y)/(2*H)-W*N/(2*f)) )
+                            || (x<=(2*y*W-H*W)/(2*H)-W*N/(2*f))
+                            || (x>=(W*H+2*y*W)/(2*H)+W*N/(2*f))
+                            || (x>= (3*W*H-2*W*y)/(2*H)+W*N/(2*f))
+                            || ((x>=(W*H+2*W*y)/(W*H+8*y)+W*N/(2*f)) && x<=W/2 && y <= H/2 )
+                            )
+                    {
+                        dst[x] = values[VAR_A];//av_expr_eval(e, values, NULL);                            
+                    }
+                    else
+                    {
+                        dst[x] = values[VAR_B];//av_expr_eval(e, values, NULL);                            
+                    }
+                }
+            }
+            else
+            {
+                dst[x] = av_expr_eval(e, values, NULL);                            
+            }
+            /*
+            if(x<=(cntExpr*1024/75))
+                dst[x] = values[VAR_BOTTOM];//av_expr_eval(e, values, NULL);                            
+            else
+                dst[x] = values[VAR_TOP];//av_expr_eval(e, values, NULL);                            
+            */
+        }                                                                      
+        dst    += dst_linesize;                                                
+        top    += top_linesize;                                                
+        bottom += bottom_linesize;                                             
+    }
+#endif
+#if 0
+    top = (uint8_t*)_top;                                             
+    bottom = (uint8_t*)_bottom;                                       
+    dst = (uint8_t*)_dst;                                                   
+    for (y = 0; y < 1; y++) {                                             
+        values[VAR_Y] = y;                                                     
+        for (x = 0; x < width; x++) {                                          
+            values[VAR_X]      = x;                                            
+            values[VAR_TOP]    = values[VAR_A] = top[x];                       
+            values[VAR_BOTTOM] = values[VAR_B] = bottom[x];                    
+            dst[x] = av_expr_eval(e, values, NULL);                            
+        }                                                                      
+        dst    += dst_linesize;                                                
+        top    += top_linesize;                                                
+        bottom += bottom_linesize;                                             
+    }
+#endif
+}
+

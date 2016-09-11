@@ -247,7 +247,7 @@ static void prepare_app_arguments(int *argc_ptr, char ***argv_ptr)
     char *argstr_flat;
     wchar_t **argv_w;
     int i, buffsize = 0, offset = 0;
-return ;
+//return ;
 
     if (win32_argv_utf8) {
         *argc_ptr = win32_argc;
@@ -386,7 +386,7 @@ void parse_options(void *optctx, int argc, char **argv, const OptionDef *options
     int optindex, handleoptions = 1, ret;
 
     /* perform system-dependent conversions for arguments list */
-    prepare_app_arguments(&argc, &argv);
+    //prepare_app_arguments(&argc, &argv); //storm
 
     /* parse options */
     optindex = 1;
@@ -757,7 +757,7 @@ int split_commandline(OptionParseContext *octx, int argc, char *argv[],
     int dashdash = -2;
 
     /* perform system-dependent conversions for arguments list */
-    prepare_app_arguments(&argc, &argv);
+    //prepare_app_arguments(&argc, &argv); //storm
 
     init_parse_context(octx, groups, nb_groups);
     av_log(NULL, AV_LOG_DEBUG, "Splitting the commandline.\n");

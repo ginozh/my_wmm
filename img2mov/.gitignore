@@ -20,9 +20,11 @@
 core
 !core/
 tags
+cscope*
 .DS_Store
 .directory
 *.debug
+debug
 Makefile*
 *.prl
 *.app

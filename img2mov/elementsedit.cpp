@@ -105,7 +105,7 @@ void ElementsEdit::load()
             idx++;
         //m_flowLayout->addWidget(new Element(this, files[i]), 1, 1);
     }
-
+#if 0
     //1, delete old images
     QString curtmpdir, deltmpdir;
     if(m_tmpdir.compare(QDir::currentPath().append(tr("/tmp")))==0)
@@ -181,11 +181,13 @@ void ElementsEdit::load()
                 QMessageBox::information(this, "info", QString(tr("can't copy file: %1 to %2")).arg(imageName).arg(fileName));
         }
     }
+#endif
     //QMessageBox::information(this, "info", QString(tr("files: %1. copyto: %2")).arg(fileNames).arg(fileCopyNames));
 
     //3. create mp4 file
     //QString vfileName("C:\\QtProjects\\qtmovie\\first.avi");
-    QString vfileName = QString(tr("%1/first.avi")).arg(curtmpdir);
+    //QString vfileName = QString(tr("%1/first.avi")).arg(curtmpdir);
+    QString vfileName = QString(tr("%1/first.avi")).arg("tmp");
 	char **charlist;
     QVector<QString> vqsArgv;
     vqsArgv.push_back("ffmpeg");
@@ -194,11 +196,44 @@ void ElementsEdit::load()
     vqsArgv.push_back("debug");
     vqsArgv.push_back("-framerate");
     vqsArgv.push_back("3");
+    vqsArgv.push_back("-loop");
+    vqsArgv.push_back("1");
+    vqsArgv.push_back("-t");
+    vqsArgv.push_back("1");
     vqsArgv.push_back("-i");
-    QString infileNames = QString(tr("%1/img%3d.jpg")).arg(curtmpdir);
-    //vqsArgv.push_back("C:\\QtProjects\\qtmovie\\jpg\\img%3d.jpg");
-    vqsArgv.push_back(infileNames);
-    vqsArgv.push_back(vfileName);
+    //QString infileNames = QString(tr("%1/img%3d.jpg")).arg(curtmpdir);
+    //vqsArgv.push_back(infileNames);
+    //./ffmpeg_g.exe -y -framerate 25 -loop 1 -t 1 -i jpg/img001.jpg -pix_fmt yuv420p  -v
+    //codec mpeg4 -f avi jpg/out.avi
+    QString infileNames = QString(tr("C:\\QtProjects\\qtmovie\\jpg\\img001.jpg"));
+        QFile file(infileNames);
+        if (!file.open(QFile::ReadOnly)) {
+            QMessageBox::warning(this, tr("Codecs"),
+                                 tr("Cannot read file %1:\n%2")
+                                 .arg(infileNames)
+                                 .arg(file.errorString()));
+            return;
+        }
+        m_playData = file.readAll();
+        file.close();
+    struct to_buffer sinbuffer, soutbuffer;
+    sinbuffer.ptr = (uint8_t*)m_playData.data();
+    sinbuffer.in_len = m_playData.size();
+    sinbuffer.out_len = NULL;
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&sinbuffer));
+    //vqsArgv.push_back("C:\\QtProjects\\qtmovie\\jpg\\img001.jpg");
+    //vqsArgv.push_back(vfileName);
+    uint8_t* out_buffer;
+    size_t out_len = 10*1024*1024;
+	out_buffer=(uint8_t *)malloc(out_len);
+
+    soutbuffer.ptr = out_buffer;
+    soutbuffer.in_len = out_len;
+    soutbuffer.out_len = &out_len;
+    vqsArgv.push_back(QString(tr("-f")));
+    vqsArgv.push_back(QString(tr("avi")));
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&soutbuffer));
+
     // -y -framerate 1 -i "C:\QtProjects\qtmovie\jpg\img%3d.jpg" myoutput.avi
 	int charlist_size=vqsArgv.size();
 	charlist=(char **)malloc(charlist_size*sizeof(char *));
@@ -213,11 +248,27 @@ void ElementsEdit::load()
     //QMessageBox::information(this, "info", QString(tr("start fmpeg")));
     QTime startTime = QTime::currentTime();
     qt_ffmpeg(charlist_size, charlist);
+
     int dt = startTime.msecsTo(QTime::currentTime());
     //qDebug()<< "ffmpeg waste: " << dt;
     //QMessageBox::information(this, "info", QString(tr("fileName: %1 waste: %2")).arg(vfileName).arg(dt));
     //4. let videoplay play 
-    emit playVideo(vfileName);
+    //emit playVideo(vfileName);
+    QByteArray tmp=QByteArray((const char*)soutbuffer.ptr, (int)out_len);
+#if 0
+        QFile ofile(vfileName);
+        if (!ofile.open(QFile::WriteOnly)) {
+            QMessageBox::warning(this, tr("Codecs"),
+                                 tr("Cannot read file %1:\n%2")
+                                 .arg(vfileName)
+                                 .arg(ofile.errorString()));
+            return;
+        }
+        ofile.write((const char*)soutbuffer.ptr, (int)out_len);
+        ofile.close();
+    QMessageBox::information(this, "info", QString(tr("ofile: %1 len: %2")).arg(vfileName).arg(out_len));
+#endif
+    emit playVideo(tmp);
 }
 void ElementsEdit::selectedImage()
 {
@@ -299,7 +350,7 @@ void ElementsEdit::selectedTransition()
             int dt = startTime.msecsTo(QTime::currentTime());
             //qDebug()<< "ffmpeg waste: " << dt;
             QMessageBox::information(this, "info", QString(tr("vfileName: %1 ffmpeg waste: %2")).arg(vfileName).arg(dt));
-            emit playVideo(vfileName);
+            //emit playVideo(vfileName);
         }
     }
 }

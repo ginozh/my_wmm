@@ -86,14 +86,35 @@ void VideoPlayer::openFile()
     }
 }
 #endif
-void VideoPlayer::playVideo(const QString& fileName)
+//void VideoPlayer::playVideo(const QString& fileName)
+void VideoPlayer::playVideo(const QByteArray& fileName)
 {
     //QMessageBox::information(this, "info", QString(tr("set fileName: %1")).arg(fileName));
     if (!fileName.isEmpty()) {
-        mediaPlayer.setMedia(QUrl::fromLocalFile(fileName));
+#if 0
+        QFile file(fileName);
+        if (!file.open(QFile::ReadOnly)) {
+            QMessageBox::warning(this, tr("Codecs"),
+                                 tr("Cannot read file %1:\n%2")
+                                 .arg(fileName)
+                                 .arg(file.errorString()));
+            return;
+        }
+        m_playData = file.readAll();
+        m_playBuffer.setBuffer(&m_playData);
+        m_playBuffer.open(QIODevice::ReadOnly);
+        file.close();
+#endif
+        m_playData = fileName;
+        m_playBuffer.setBuffer(&m_playData);
+        m_playBuffer.open(QIODevice::ReadOnly);
+
+        mediaPlayer.setMedia(QUrl::fromLocalFile("tmp.avi"), &m_playBuffer);
 
         playButton->setEnabled(true);
     }
+    else
+        QMessageBox::information(this, "info", QString(tr("fileName is null")));
 }
 void VideoPlayer::play()
 {
