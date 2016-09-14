@@ -100,8 +100,8 @@ static av_cold int buffer_open(URLContext *h, const char *uri, int flags)
         dc->size = in_size;
         dc->data = data;
     }
-    av_log(NULL, AV_LOG_DEBUG, "buffer_open flags: %d dc->data: %p dc->size: %zu dc->filesize: %zu uri: %.100s h: %p dc: %p\n", 
-            flags,dc->data, dc->size, dc->filesize,  uri, h, dc);
+    av_log(NULL, AV_LOG_DEBUG, "buffer_open flags: %d sbuffer: %p dc->data: %p dc->size: %zu dc->filesize: %zu uri: %.100s h: %p dc: %p data: %.100s\n", 
+            flags,sbuffer, dc->data, dc->size, dc->filesize,  uri, h, dc, dc->data);
     return 0;
 }
 

@@ -24,7 +24,11 @@
 1、对应主线程1.3： 接收参数为图片数组，总视频buffer
     1.1、ffmpeg转化为小图片(min(384*, 图片最小像素));
     1.2、ffmpeg生成各个图片视频
+        N秒: ./ffmpeg -y -framerate 1/N -i 'jpg/img001.jpg'  jpg/mi.mp4
     1.3、ffmpeg合成总视频
+        ./ffmpeg_g -y -f concat -i mylist.txt  -c copy jpg/mm.mp4
+        大概耗费0.08s
+        如果是多个图片合成
     1.4、信号通知主线程完毕
 2、对应主线程2.2： 接收参数为图片数组，
     需要动画的开始图片索引、结束图片索引(可能2个图片合成或者单个图片合成)，生成的视频索引，动画名称

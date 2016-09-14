@@ -18,6 +18,8 @@ class ElementsEdit : public QWidget
 public:
     ElementsEdit(QWidget *parent = 0);
     ~ElementsEdit();
+private:
+    int callFfmpeg(const QVector<QString>& vqsArgv);
 signals:
     void playVideo(const QByteArray&);
 

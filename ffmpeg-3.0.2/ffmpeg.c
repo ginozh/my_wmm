@@ -4371,9 +4371,79 @@ int main(int argc, char **argv)
 #ifdef CALL_FFMPEG
 
 #include "libavutil/file.h"
-#define c 30
+#define c 50
 #define len 10*1024
 char *argvv[c];//[len];
+
+// ./ffmpeg -y -f concat -i "buffer:text/txt;testconcat.txt"  -c copy jpg/mm.avi
+// cat testconcat.txt
+// file buffer:video/avi;jpg/512.1.avi
+// file buffer:video/avi;jpg/512.2.avi
+static int test_concat(int argc, char **argv)
+{
+    struct to_buffer sinbuffer, sinbuffer1, sinbuffer2, soutbuffer;
+    uint8_t* in_buffer, *in_buffer1, *in_buffer2;
+    size_t /*in_len,*/ in_len1, in_len2;
+    int i=0;
+    size_t out_len = 10*1024*1024;
+    uint8_t* out_buffer;
+    int ret;
+    out_buffer = av_mallocz(out_len);
+    for(int j=0; j<c; j++)
+    {
+        argvv[j]=av_mallocz(len);
+    }
+// ./ffmpeg -y -f concat -i "buffer:text/txt;testconcat.txt"  -c copy jpg/mm.avi
+    snprintf(argvv[i++], len, "./ffmpeg");
+    snprintf(argvv[i++], len, "-y");
+    snprintf(argvv[i++], len, "-v");
+    snprintf(argvv[i++], len, "trace");
+    snprintf(argvv[i++], len, "-f");
+    snprintf(argvv[i++], len, "concat");
+    snprintf(argvv[i++], len, "-i");
+    ret = av_file_map("jpg/512.1.avi", &in_buffer1, &in_len1, 0, NULL);
+    if (ret < 0)
+        exit_program(1);
+    sinbuffer1.ptr = in_buffer1;
+    sinbuffer1.in_len = in_len1;
+    sinbuffer1.out_len = NULL;
+    ret = av_file_map("jpg/512.2.avi", &in_buffer2, &in_len2, 0, NULL);
+    if (ret < 0)
+        exit_program(1);
+    sinbuffer2.ptr = in_buffer2;
+    sinbuffer2.in_len = in_len2;
+    sinbuffer2.out_len = NULL;
+
+    in_buffer = av_mallocz(len);
+    // cat testconcat.txt
+    // file buffer:video/avi;jpg/512.1.avi
+    // file buffer:video/avi;jpg/512.2.avi
+    snprintf(in_buffer, len, "file buffer:video/avi;nobase64,%zu\nfile buffer:video/avi;nobase64,%zu\n", (size_t)&sinbuffer1, (size_t)&sinbuffer2);
+    sinbuffer.ptr = in_buffer;
+    sinbuffer.in_len = strlen(in_buffer);
+    sinbuffer.out_len = NULL;
+    snprintf(argvv[i++], len, "buffer:image/jpg;nobase64,%zu", (size_t)&sinbuffer);
+    snprintf(argvv[i++], len, "-c");
+    snprintf(argvv[i++], len, "copy");
+    snprintf(argvv[i++], len, "-f");
+    snprintf(argvv[i++], len, "avi");
+    //snprintf(argvv[i++], len, "jpg/mm.avi");
+    soutbuffer.ptr = out_buffer;
+    soutbuffer.in_len = out_len;
+    soutbuffer.out_len = &out_len;
+    snprintf(argvv[i++], len, "buffer:video/avi;nobase64,%zu", (size_t)&soutbuffer);
+    qt_ffmpeg(i, argvv);
+    av_file_unmap(in_buffer1, in_len1);
+    av_file_unmap(in_buffer2, in_len2);
+    av_freep(&in_buffer);
+    av_freep(&out_buffer);
+    for(int j=0; j<c; j++)
+    {
+        av_freep  (&argvv[j]);
+    }
+    exit_program(received_nb_signals ? 255 : main_return_code);
+    return main_return_code;
+}
     //./ffmpeg_g -y -framerate 25 -loop 1 -t 1 -i
     //"buffer:image/jpg;base64,/9j//gAQTGF2YzU3LjI0LjEwMgD/2wBDAAgEBAQEBAUFBQUFBQYGBgYGBgYGBgYGBgYHBwcICAgHBwcGBgcHCAgICAkJCQgICAgJCQoKCgwMCwsODg4RERT/xAGiAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgsBAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKCxAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/wAARCAAIAAgDARIAAhIAAxIA/9oADAMBAAIRAxEAPwDR4x5ey1/4Wl9n+1faPP0X/hJf+Eg/snyPsXl/ZP7W+xf2p/pO3/kBf2L8/wBu/sf/AEWs7/m+v/P/AEI9fGe341/11/3fG+w+t/VfhzT6p9V/tH6x9e5vrv8AY/P/AGV/sfwf9yf1z/aT7M9D6tlP9k+3+vR+sctvqnsP33tdv4luX6vy+/z8/tva+57L2Xvnnn//2Q=="
     //-pix_fmt yuv420p  -vcodec mpeg4 -f avi "buffer:image/gif;base64,b2s="
@@ -4462,9 +4532,10 @@ static int call_main(int argc, char **argv)
 #include <unistd.h>
 int main(int argc, char **argv)
 {
-    for(int i=0; i<=1; i++)
+    for(int i=0; i<1; i++)
     {
-        call_main(argc, argv);
+        //call_main(argc, argv);
+        test_concat(argc, argv);
         sleep(1);
     }
 }

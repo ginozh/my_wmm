@@ -112,12 +112,12 @@ static int add_file(AVFormatContext *avf, char *filename, ConcatFile **rfile,
     const char *proto;
     size_t url_len, proto_len;
     int ret;
-
-    if (cat->safe > 0 && !safe_filename(filename)) {
+#if 0
+    if (cat->safe > 0 && !safe_filename(filename)) { //storm. for buffer_uri
         av_log(avf, AV_LOG_ERROR, "Unsafe file name '%s'\n", filename);
         FAIL(AVERROR(EPERM));
     }
-
+#endif
     proto = avio_find_protocol_name(filename);
     proto_len = proto ? strlen(proto) : 0;
     if (!memcmp(filename, proto, proto_len) &&
