@@ -28,11 +28,13 @@ private:
     bool createAnimation(Element *firstElement, Element *secondElement
             , const QString& animationName);
     void initialProgress();
+    void assignProgress();
 signals:
-    void playVideo(const QByteArray&);
+    void playVideo(const QString& fileName, const QByteArray& buffer);
     void verticalLineMoved(int);
 protected:
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    void resizeEvent(QResizeEvent * event) Q_DECL_OVERRIDE;
 public slots:
     void load();
     void selectedImage();
@@ -48,6 +50,10 @@ private:
     QFrame *m_vecticalLine; //进度条竖线
     qint64 m_duration;
     qint64 m_imgWidth;
+    qint64 m_signalImgWidth;
+    qint64 m_imgHeight;
+    qint64 m_lineWidth;
+    qint64 m_playPosition;
 
     QString m_tmpdir;
     QWidget *m_lastSelectedImage;

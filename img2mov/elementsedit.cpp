@@ -29,6 +29,13 @@ ElementsEdit::ElementsEdit(QWidget *parent)
 
     setBackgroundRole(QPalette::Midlight);
     setCursor(QCursor(Qt::PointingHandCursor));
+
+    m_duration=0;
+    m_imgWidth=0;
+    m_signalImgWidth=0;
+    m_imgHeight=0;
+    m_lineWidth=10;
+    m_playPosition=0;
 #if 0
     m_flowLayout->addWidget(new QPushButton(tr("Short")));
     m_flowLayout->addWidget(new QPushButton(tr("Longer")));
@@ -257,7 +264,7 @@ void ElementsEdit::load()
     createFinalVideoAndPlay();
     //6, 设置播放进度条
     //计算长度 for 进度条 ，需要在当前线程渲染之后，否则不对。放在duration信号槽内处理
-    // -> 
+    // 
     
     
     setCursor(QCursor(Qt::ArrowCursor));
@@ -448,7 +455,7 @@ void ElementsEdit::createFinalVideoAndPlay()
     }
     //5, 播放视频
     QByteArray tmp=QByteArray((const char*)soutbuffer.ptr, (int)out_len);
-    emit playVideo(tmp);
+    emit playVideo("tmp.avi", tmp);
 }
 void ElementsEdit::mousePressEvent(QMouseEvent *event)
 {
@@ -457,6 +464,11 @@ void ElementsEdit::mousePressEvent(QMouseEvent *event)
         load();
     }
     QWidget::mousePressEvent(event);
+}
+void ElementsEdit::resizeEvent(QResizeEvent * event)
+{
+    QWidget::resizeEvent(event);
+    assignProgress();
 }
 #if 0
 void ElementsEdit::handleContextMenuRequested(const QPoint &pos)
@@ -495,14 +507,14 @@ void ElementsEdit::durationChanged(qint64 duration)
 }
 void ElementsEdit::positionChanged(qint64 position)
 {
-    m_vecticalLine->setGeometry(QRect(position*m_imgWidth/m_duration, 0, 10, 210)); //uncomplete
-    //positionSlider->setValue(position);
+    m_playPosition=position;
+    assignProgress();
 }
 void ElementsEdit::initialProgress()
 {
     m_imgWidth=0;
-    int imgHeight=0;
-    for (int i = 0; i < m_flowLayout->count(); ++i)
+    m_imgHeight=0;
+    for (int i = 0; m_flowLayout && i < m_flowLayout->count(); ++i)
     {
         Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(i)->widget());
         if (!element)
@@ -511,22 +523,37 @@ void ElementsEdit::initialProgress()
             continue;
         }
         //QMessageBox::information(this, "info", QString(tr("imgWidth: %1")).arg(element->geometry().width()));
-        if(imgHeight<element->geometry().height())
-            imgHeight=element->geometry().height();
+        if(m_imgHeight<element->geometry().height())
+            m_imgHeight=element->geometry().height();
+        if(m_signalImgWidth<element->geometry().width())
+            m_signalImgWidth=element->geometry().width();
         m_imgWidth+=element->geometry().width();
     }
     //QMessageBox::information(this, "info", QString(tr("m_imgWidth: %1 imgHeight: %2")).arg(m_imgWidth).arg(imgHeight));
-    if(m_flowLayout->count()>0)
+    if(m_flowLayout && m_flowLayout->count()>0)
     //for (int i = 0; i < m_flowLayout->count(); ++i)
     {
         //获取每个element的(x, y, width, height)
         //Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(0)->widget());
         //const QRect &rect=element->geometry();
-        m_vecticalLine->setGeometry(QRect(0, 0, 10, imgHeight)); //uncomplete
+        m_vecticalLine->setGeometry(QRect(0, 0, m_lineWidth, m_imgHeight)); //uncomplete
         m_vecticalLine->raise(); // top level, Raises this widget to the top of the parent widget's stack.
         //m_vecticalLine->setGeometry(QRect(rect.x(), rect.y(), 160, rect.height()));
         //m_vecticalLine->setWindowFlags(Qt::WindowStaysOnTopHint);
         m_vecticalLine->show();
-        //QMessageBox::information(this, "info", QString(tr("x: %1 y: %2 h: %3")).arg(geometry().x()).arg(geometry().y()).arg(element->height()));
+        //QMessageBox::information(this, "info", QString(tr("m_lineWidth: %1 m_imgHeight: %2")).arg(m_lineWidth).arg(m_imgHeight));
+    }
+}
+void ElementsEdit::assignProgress()
+{
+    if(m_duration && m_signalImgWidth)
+    {
+        int xMax=(geometry().width()/m_signalImgWidth)*m_signalImgWidth;
+        //QMessageBox::information(this, "info", QString(tr("xMax: %1 width: %2 signalwidth: %3")).arg(xMax).arg(geometry().width()).arg(m_signalImgWidth));
+        int xOri=m_playPosition*m_imgWidth/m_duration;
+        int x=xOri%xMax;
+        int y=(xOri/xMax)*m_imgHeight;
+        //QMessageBox::information(this, "info", QString(tr("xMax: %1 xOri: %2 x: %3 y: %4 posi: %5 duration: %6")).arg(xMax).arg(xOri).arg(x).arg(y).arg(m_playPosition).arg(m_duration));
+        m_vecticalLine->setGeometry(QRect(x, y, m_lineWidth, m_imgHeight)); //uncomplete
     }
 }

@@ -87,7 +87,7 @@ void VideoPlayer::openFile()
 }
 #endif
 //void VideoPlayer::playVideo(const QString& fileName)
-void VideoPlayer::playVideo(const QByteArray& fileName)
+void VideoPlayer::playVideo(const QString& fileName, const QByteArray& buffer)
 {
     //QMessageBox::information(this, "info", QString(tr("set fileName: %1")).arg(fileName));
     if (!fileName.isEmpty()) {
@@ -105,11 +105,11 @@ void VideoPlayer::playVideo(const QByteArray& fileName)
         m_playBuffer.open(QIODevice::ReadOnly);
         file.close();
 #endif
-        m_playData = fileName;
+        m_playData = buffer;
         m_playBuffer.setBuffer(&m_playData);
         m_playBuffer.open(QIODevice::ReadOnly);
 
-        mediaPlayer.setMedia(QUrl::fromLocalFile("tmp.avi"), &m_playBuffer);
+        mediaPlayer.setMedia(QUrl::fromLocalFile(fileName), &m_playBuffer);
 
         playButton->setEnabled(true);
         mediaPlayer.setPosition(0); 
