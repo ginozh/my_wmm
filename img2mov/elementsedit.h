@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QScrollArea>
 #include "flowlayout.h"
+#include "element.h"
 #include <QBuffer>
 
 QT_BEGIN_NAMESPACE
@@ -20,6 +21,9 @@ public:
     ~ElementsEdit();
 private:
     int callFfmpeg(const QVector<QString>& vqsArgv);
+    void createFinalVideo();
+    void scaleImage(Element *element);
+    void createVideo(Element *element);
 signals:
     void playVideo(const QByteArray&);
 
@@ -30,6 +34,7 @@ public slots:
     //void handleContextMenuRequested(const QPoint &pos);
 private:
     FlowLayout *m_flowLayout;
+    QFrame *m_vecticalLine;
     QString m_tmpdir;
     QWidget *m_lastSelectedImage;
     int m_idxCurrentImage;

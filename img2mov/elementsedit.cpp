@@ -14,10 +14,12 @@
 extern "C"{
 #include "ffmpeg.h"
 }
+//#define DEBUG_FFMPEG
 //! [1]
 ElementsEdit::ElementsEdit(QWidget *parent)
     : QWidget(parent)
       , m_flowLayout(new FlowLayout(this))
+      , m_vecticalLine(new QFrame(this))
       , m_lastSelectedImage(0)
       , m_idxCurrentImage(-1)
 {   
@@ -42,13 +44,28 @@ ElementsEdit::ElementsEdit(QWidget *parent)
     m_flowLayout->addWidget(new Element());
     m_flowLayout->addWidget(new Element());
     */
-#if 1
+#if 0
     //test
     m_flowLayout->addWidget(new Element(this, tr("C:\\QtProjects\\qtmovie\\jpg\\img001.jpg")));
     m_flowLayout->addWidget(new Element(this, tr("C:\\QtProjects\\qtmovie\\jpg\\img002.jpg")));
     m_flowLayout->addWidget(new Element(this, tr("C:\\QtProjects\\qtmovie\\jpg\\img003.jpg")));
 #endif
     setLayout(m_flowLayout);
+    m_vecticalLine->setObjectName(QStringLiteral("line"));
+    m_vecticalLine->setEnabled(true);
+    m_vecticalLine->hide();
+    m_vecticalLine->setGeometry(QRect(300, 250, 10, 200));
+    m_vecticalLine->setLineWidth(0);
+    m_vecticalLine->setMidLineWidth(10);
+    QPalette palette1;
+    QBrush brush2(QColor(0, 0, 0, 255));
+    brush2.setStyle(Qt::SolidPattern);
+    palette1.setBrush(QPalette::Active, QPalette::Mid, brush2);
+    palette1.setBrush(QPalette::Inactive, QPalette::Mid, brush2);
+    palette1.setBrush(QPalette::Disabled, QPalette::Mid, brush2);
+    m_vecticalLine->setPalette(palette1);
+    m_vecticalLine->setFrameShape(QFrame::VLine);
+    m_vecticalLine->setFrameShadow(QFrame::Sunken);
 #else
     QVBoxLayout *layout    = new QVBoxLayout(this);
     layout->addWidget(new Element());
@@ -76,7 +93,10 @@ int ElementsEdit::callFfmpeg(const QVector<QString>& vqsArgv)
 	int charlist_size=vqsArgv.size();
     char **charlist;
 	charlist=(char **)malloc(charlist_size*sizeof(char *));
-    //QString input;
+//#define OUTPUT_WASTE
+#ifdef OUTPUT_WASTE
+    QString input;
+#endif
 	for(int i=0;i<charlist_size;i++){
 		int strlen=vqsArgv[i].size()+1;
 		charlist[i]=(char *)malloc(strlen);
@@ -84,15 +104,78 @@ int ElementsEdit::callFfmpeg(const QVector<QString>& vqsArgv)
 		//charlist[i]=vqsArgv[i].toStdString().c_str();
         //snprintf(charlist[i],strlen, vqsArgv[i].toStdString().c_str());
 		strcpy(charlist[i],vqsArgv[i].toStdString().c_str());
-        //input.append(charlist[i]);
+#ifdef OUTPUT_WASTE
+        input.append(charlist[i]);
+#endif
     }
     //QMessageBox::information(this, "info", input);
+#ifdef OUTPUT_WASTE
     QTime startTime = QTime::currentTime();
+#endif
     ret=qt_ffmpeg(charlist_size, charlist);
 
+#ifdef OUTPUT_WASTE
     int dt = startTime.msecsTo(QTime::currentTime());
     qDebug()<< "ffmpeg waste: " << dt<< " ret: "<< ret;
+    QMessageBox::information(this, "info", QString(tr("waste: %1 input: %2")).arg(dt).arg(input));
+#endif
     return ret;
+}
+void ElementsEdit::createVideo(Element *element)
+{
+    QVector<QString> vqsArgv;
+    vqsArgv.push_back("ffmpeg");
+    vqsArgv.push_back("-y");
+#ifdef DEBUG_FFMPEG
+    vqsArgv.push_back("-v");
+    vqsArgv.push_back("debug");
+#endif
+    vqsArgv.push_back("-framerate");
+    vqsArgv.push_back(QString(tr("25"))); //uncomplete 
+    vqsArgv.push_back("-loop");
+    vqsArgv.push_back("1");
+    vqsArgv.push_back("-t");
+    vqsArgv.push_back(QString(tr("2"))); //uncomplete 2(s)
+    vqsArgv.push_back("-i");
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbInputScaleFile));//uncomplete
+    vqsArgv.push_back(QString(tr("-f")));
+    vqsArgv.push_back(QString(tr("avi")));
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbScaleAniVideo));
+    //vqsArgv.push_back(QString(tr("pic%1.avi")).arg(i));
+    int ret;
+    if(ret=callFfmpeg(vqsArgv))
+    {
+        QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
+    }
+    element->m_fbInputAniVideo.ptr=element->m_fbScaleAniVideo.ptr;
+    element->m_fbInputAniVideo.in_len=*element->m_fbScaleAniVideo.out_len;
+    element->m_fbInputAniVideo.out_len=NULL;
+}
+void ElementsEdit::scaleImage(Element *element)
+{
+    //./ffmpeg -y -i 'jpg/img001.jpg' -vf scale=512:384 jpg/512img001.jpg
+    QVector<QString> vqsArgv;
+    vqsArgv.push_back("ffmpeg");
+    vqsArgv.push_back("-y");
+#ifdef DEBUG_FFMPEG
+    vqsArgv.push_back("-v");
+    vqsArgv.push_back("debug");
+#endif
+    vqsArgv.push_back("-i");
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbOriFile));//uncomplete
+    vqsArgv.push_back("-vf");
+    vqsArgv.push_back(QString(tr("scale=%1")).arg("256:192")); //512:384
+    vqsArgv.push_back(QString(tr("-f")));
+    vqsArgv.push_back(QString(tr("mjpeg")));
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbScaleFile));
+    int ret;
+    if(ret=callFfmpeg(vqsArgv))
+    {
+        QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
+    }
+    element->m_fbInputScaleFile.ptr=element->m_fbScaleFile.ptr;
+    element->m_fbInputScaleFile.in_len=*element->m_fbScaleFile.out_len;
+    element->m_fbInputScaleFile.out_len=NULL;
 }
 //! [1]
 void ElementsEdit::load()
@@ -128,30 +211,9 @@ void ElementsEdit::load()
         //2, 转化为小图片
         //QImage.scale: 1,是否支持内存读入文件内容。2，是否可以输出文件内容到buffer
         //or ffmpeg
-
+        scaleImage(element);
         //3, 图片视频
-#if 1
-        QVector<QString> vqsArgv;
-        vqsArgv.push_back("ffmpeg");
-        vqsArgv.push_back("-y");
-        vqsArgv.push_back("-v");
-        vqsArgv.push_back("debug");
-        vqsArgv.push_back("-framerate");
-        vqsArgv.push_back(QString(tr("1/2"))); //uncomplete 2(s)
-        vqsArgv.push_back("-i");
-        vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbOriFile));//uncomplete
-        vqsArgv.push_back(QString(tr("-f")));
-        vqsArgv.push_back(QString(tr("avi")));
-        vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbScaleAniVideo));
-        int ret;
-        if(ret=callFfmpeg(vqsArgv))
-        {
-            QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
-        }
-        element->m_fbInputAniVideo.ptr=element->m_fbScaleAniVideo.ptr;
-        element->m_fbInputAniVideo.in_len=*element->m_fbScaleAniVideo.out_len;
-        element->m_fbInputAniVideo.out_len=NULL;
-#endif
+        createVideo(element);
     }
     //4, 生成总视频
     //./ffmpeg_gr -y -f avi -i jpg/mi2.avi -f avi -i jpg/mm.avi -f avi jpg/all.avi
@@ -159,8 +221,10 @@ void ElementsEdit::load()
     QVector<QString> vqsArgv;
     vqsArgv.push_back("ffmpeg");
     vqsArgv.push_back("-y");
+#ifdef DEBUG_FFMPEG
     vqsArgv.push_back("-v");
     vqsArgv.push_back("debug");
+#endif
     //vqsArgv.push_back("-framerate");
     //vqsArgv.push_back("25"); //uncomplete
     vqsArgv.push_back("-f");
@@ -224,6 +288,21 @@ void ElementsEdit::load()
     //5, 播放视频
     QByteArray tmp=QByteArray((const char*)soutbuffer.ptr, (int)out_len);
     emit playVideo(tmp);
+
+    //6, 
+    if(m_flowLayout->count()>0)
+    //for (int i = 0; i < m_flowLayout->count(); ++i)
+    {
+        //获取每个element的(x, y, width, height)
+        Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(0)->widget());
+        const QRect &rect=element->geometry();
+        m_vecticalLine->setGeometry(QRect(0, 0, 10, 210)); //uncomplete
+        m_vecticalLine->raise(); // top level, Raises this widget to the top of the parent widget's stack.
+        //m_vecticalLine->setGeometry(QRect(rect.x(), rect.y(), 160, rect.height()));
+        //m_vecticalLine->setWindowFlags(Qt::WindowStaysOnTopHint);
+        m_vecticalLine->show();
+        //QMessageBox::information(this, "info", QString(tr("x: %1 y: %2 h: %3")).arg(geometry().x()).arg(geometry().y()).arg(element->height()));
+    }
 }
 #if 0
 void ElementsEdit::load()
@@ -347,8 +426,10 @@ void ElementsEdit::load()
     QVector<QString> vqsArgv;
     vqsArgv.push_back("ffmpeg");
     vqsArgv.push_back("-y");
+#ifdef DEBUG_FFMPEG
     vqsArgv.push_back("-v");
     vqsArgv.push_back("debug");
+#endif
     vqsArgv.push_back("-framerate");
     vqsArgv.push_back("3");
     vqsArgv.push_back("-loop");
@@ -462,53 +543,127 @@ void ElementsEdit::selectedTransition()
             const QString& firstImageName = firstElement->getImageName();
             const QString& secondImageName = secondElement->getImageName();
             char **charlist;
+            int iSecond=2;
             QVector<QString> vqsArgv;
+            // blend="  crossfade";gdb --args ./ffmpeg_g   -y -framerate 25 -loop 1  -t 2 -i jpg/512img001.jpg -loop 1  -t 2 -i jpg/512img003.jpg     -filter_complex "blend=all_expr='if( $blend,1.5,2)'"    -pix_fmt yuv420p   jpg/mi.avi
             vqsArgv.push_back("ffmpeg");
             vqsArgv.push_back("-y");
+#ifdef DEBUG_FFMPEG
             vqsArgv.push_back("-v");
             vqsArgv.push_back("debug");
+#endif
             vqsArgv.push_back("-framerate");
             vqsArgv.push_back("25");
             vqsArgv.push_back("-loop");
             vqsArgv.push_back("1");
             vqsArgv.push_back("-t");
-            vqsArgv.push_back("1");
+            vqsArgv.push_back(QString(tr("%1")).arg(iSecond));
             vqsArgv.push_back("-i");
-            vqsArgv.push_back(firstImageName);
+            //vqsArgv.push_back(firstImageName);
+            vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&firstElement->m_fbInputScaleFile));//uncomplete
             vqsArgv.push_back("-loop");
             vqsArgv.push_back("1");
             vqsArgv.push_back("-t");
-            vqsArgv.push_back("1");
+            vqsArgv.push_back(QString(tr("%1")).arg(iSecond));
             vqsArgv.push_back("-i");
-            vqsArgv.push_back(secondImageName);
+            vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&secondElement->m_fbInputScaleFile));//uncomplete
+            //vqsArgv.push_back(secondImageName);
             //ffmpeg -y -framerate 25 -loop 1 -t 1 -i img001.jpg -loop 1 -t 1 -i img002.jpg -filter_complex "blend=all_expr='if(gte(N*SW*50+X,W),B,A)'" -pix_fmt yuv420p  out.mkv
             vqsArgv.push_back("-filter_complex");
-            vqsArgv.push_back("blend=all_expr='if(gte(N*SW*50+X,W),B,A)'");
+            //vqsArgv.push_back("blend=all_expr='if(gte(N*SW*50+X,W),B,A)'");
+            vqsArgv.push_back(QString(tr("blend=all_expr='if(heart,1.5,%1)'")).arg(iSecond));
             vqsArgv.push_back("-pix_fmt");
             vqsArgv.push_back("yuv420p");
-            //QString vfileName = QString(tr("tmp/out.mkv"));
+#if 0
             QString vfileName("C:\\qtproject\\img2mov\\debug\\transition.avi");
             vqsArgv.push_back(vfileName);
+#else
+            vqsArgv.push_back(QString(tr("-f")));
+            vqsArgv.push_back(QString(tr("avi")));
+            secondElement->m_fbScaleAniVideo.in_len = 10*1024*1024;
+            *secondElement->m_fbScaleAniVideo.out_len = 10*1024*1024;
+            vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&secondElement->m_fbScaleAniVideo));
+#endif
             // -y -framerate 1 -i "C:\QtProjects\qtmovie\jpg\img%3d.jpg" myoutput.avi
-            int charlist_size=vqsArgv.size();
-            charlist=(char **)malloc(charlist_size*sizeof(char *));
-            for(int i=0;i<charlist_size;i++){
-                int strlen=vqsArgv[i].size()+1;
-                charlist[i]=(char *)malloc(strlen);
-                memset(charlist[i], 0, strlen);
-                //charlist[i]=vqsArgv[i].toStdString().c_str();
-                //snprintf(charlist[i],strlen, vqsArgv[i].toStdString().c_str());
-                strcpy(charlist[i],vqsArgv[i].toStdString().c_str());
+            //QTime startTime = QTime::currentTime();
+            int ret;
+            if(ret=callFfmpeg(vqsArgv))
+            {
+                QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
             }
-            //QMessageBox::information(this, "info", QString(tr("start fmpeg")));
-            QTime startTime = QTime::currentTime();
-            qt_ffmpeg(charlist_size, charlist);
-            int dt = startTime.msecsTo(QTime::currentTime());
+            secondElement->m_fbInputAniVideo.ptr=secondElement->m_fbScaleAniVideo.ptr;
+            secondElement->m_fbInputAniVideo.in_len=*secondElement->m_fbScaleAniVideo.out_len;
+            secondElement->m_fbInputAniVideo.out_len=NULL;
+            //int dt = startTime.msecsTo(QTime::currentTime());
             //qDebug()<< "ffmpeg waste: " << dt;
-            QMessageBox::information(this, "info", QString(tr("vfileName: %1 ffmpeg waste: %2")).arg(vfileName).arg(dt));
+            //QMessageBox::information(this, "info", QString(tr("ffmpeg waste: %1")).arg(dt));
             //emit playVideo(vfileName);
         }
     }
+    //4, 生成总视频
+    createFinalVideo();
+}
+void ElementsEdit::createFinalVideo()
+{
+    QVector<QString> vqsArgv;
+    vqsArgv.push_back("ffmpeg");
+    vqsArgv.push_back("-y");
+#ifdef DEBUG_FFMPEG
+    vqsArgv.push_back("-v");
+    vqsArgv.push_back("debug");
+#endif
+    //vqsArgv.push_back("-framerate");
+    //vqsArgv.push_back("25"); //uncomplete
+    vqsArgv.push_back("-f");
+    vqsArgv.push_back("concat"); //uncomplete
+    struct to_buffer sinbuffer;
+    QByteArray sinString;
+    for (int i = 0; i < m_flowLayout->count(); ++i)
+    {
+        Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(i)->widget());
+        if (!element)
+        {
+            // err uncomplete
+            continue;
+        }
+        if(!element->m_fbInputAniVideo.ptr)
+        {
+            // err uncomplete
+            continue;
+        }
+        //snprintf(in_buffer, len, "file buffer:video/avi;nobase64,%zu\n
+        sinString.append(QString(tr("file buffer:video/avi;nobase64,%1\n")).arg((size_t)&element->m_fbInputAniVideo));
+    }
+    sinbuffer.ptr = (uint8_t*)sinString.data();
+    sinbuffer.in_len = sinString.length();
+    sinbuffer.out_len = NULL;
+    vqsArgv.push_back(QString(tr("-i")));
+    vqsArgv.push_back(QString(tr("buffer:video/avi;nobase64,%1")).arg((size_t)&sinbuffer));
+    vqsArgv.push_back(QString(tr("-c")));
+    vqsArgv.push_back(QString(tr("copy")));
+    //printf("video input. stbuf: %p buf.ptr: %p in_len: %zu\n", &sinbuffer, sinbuffer.ptr, sinbuffer.in_len);
+
+    uint8_t* out_buffer;
+    size_t out_len = 10*1024*1024;
+	out_buffer=(uint8_t *)malloc(out_len);
+
+    struct to_buffer soutbuffer;
+    soutbuffer.ptr = out_buffer;
+    soutbuffer.in_len = out_len;
+    soutbuffer.out_len = &out_len;
+    vqsArgv.push_back(QString(tr("-f")));
+    vqsArgv.push_back(QString(tr("avi")));
+    vqsArgv.push_back(QString(tr("buffer:video/avi;nobase64,%1")).arg((size_t)&soutbuffer));
+    //vqsArgv.push_back(QString(tr("mm.avi")));
+    //printf("video out. stbuf: %p buf.ptr: %p in_len: %zu out_len: %zu\n", &soutbuffer, soutbuffer.ptr, soutbuffer.in_len, *soutbuffer.out_len);
+    int ret;
+    if(ret=callFfmpeg(vqsArgv))
+    {
+        QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
+    }
+    //5, 播放视频
+    QByteArray tmp=QByteArray((const char*)soutbuffer.ptr, (int)out_len);
+    emit playVideo(tmp);
 }
 #if 0
 void ElementsEdit::handleContextMenuRequested(const QPoint &pos)

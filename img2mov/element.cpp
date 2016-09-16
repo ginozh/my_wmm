@@ -1,6 +1,7 @@
 #include "element.h"
 #include <QPushButton>
 #include <QLabel>
+#include <QMessageBox>
 
 Element::Element(QWidget *parent, const QString& qsImageName)
     : QWidget(parent)
@@ -8,6 +9,7 @@ Element::Element(QWidget *parent, const QString& qsImageName)
     , m_pimage(0)
     , m_qsImageName(qsImageName)
 {
+    //setWindowFlags(Qt::WindowStaysOnBottomHint);
     memset(&m_fbOriFile, 0, sizeof(m_fbOriFile));
     memset(&m_fbScaleFile, 0, sizeof(m_fbScaleFile));
     memset(&m_fbScaleAniVideo, 0, sizeof(m_fbScaleAniVideo));
@@ -42,6 +44,13 @@ Element::Element(QWidget *parent, const QString& qsImageName)
         m_fbScaleAniVideo.ptr = m_pBufferVideo;
         m_fbScaleAniVideo.in_len = m_iOutVidow;
         m_fbScaleAniVideo.out_len = &m_iOutVidow;
+
+        m_iOutScaleFile = 1024*1024;
+        m_pBufferScaleFile=(uint8_t *)malloc(m_iOutScaleFile);
+
+        m_fbScaleFile.ptr = m_pBufferScaleFile;
+        m_fbScaleFile.in_len = m_iOutScaleFile;
+        m_fbScaleFile.out_len = &m_iOutScaleFile;
 #if 0
         m_pimage->setContextMenuPolicy(Qt::CustomContextMenu);
         connect(m_pimage, SIGNAL(customContextMenuRequested(QPoint)), parentWidget(), SLOT(handleContextMenuRequested(QPoint)) );
@@ -52,6 +61,12 @@ Element::Element(QWidget *parent, const QString& qsImageName)
     m_elementLayout->addWidget(new QPushButton(tr("")));
     m_elementLayout->addWidget(new QLabel(tr("input text")));
     setLayout(m_elementLayout);
+#if 0
+    for (int i = 0; i < m_elementLayout->count(); ++i)
+    {
+        QMessageBox::information(this, "info", QString(tr("i: %1 height %2")) .arg(i).arg(m_elementLayout->itemAt(i)->widget()->height())) ;
+    }
+#endif
 }
 Element::~Element()
 {

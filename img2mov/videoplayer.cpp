@@ -33,7 +33,7 @@ VideoPlayer::VideoPlayer(QWidget *parent)
     connect(openButton, SIGNAL(clicked()), this, SLOT(openFile()));
 #endif
     playButton = new QPushButton;
-    playButton->setEnabled(false);
+    playButton->setEnabled(false); //uncomplete
     playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 
     connect(playButton, SIGNAL(clicked()),
@@ -77,10 +77,10 @@ void VideoPlayer::openFile()
     //QMessageBox::information(this, "info", QString(tr("open fileName: %1")).arg(fileName));
 
     if (!fileName.isEmpty()) {
-        QString vfileName("C:/QtProjects/qtmovie/first.avi");
+        //QString vfileName("C:/QtProjects/qtmovie/first.avi");
         //QMessageBox::information(this, "info", QString(tr("open fileName: %1")).arg(vfileName));
-        mediaPlayer.setMedia(QUrl::fromLocalFile(vfileName));
-        //mediaPlayer.setMedia(QUrl::fromLocalFile(fileName));
+        //mediaPlayer.setMedia(QUrl::fromLocalFile(vfileName));
+        mediaPlayer.setMedia(QUrl::fromLocalFile(fileName));
 
         playButton->setEnabled(true);
     }
@@ -112,6 +112,8 @@ void VideoPlayer::playVideo(const QByteArray& fileName)
         mediaPlayer.setMedia(QUrl::fromLocalFile("tmp.avi"), &m_playBuffer);
 
         playButton->setEnabled(true);
+        mediaPlayer.setPosition(0); 
+        mediaPlayer.pause(); // for display image
     }
     else
         QMessageBox::information(this, "info", QString(tr("fileName is null")));
@@ -134,6 +136,8 @@ void VideoPlayer::mediaStateChanged(QMediaPlayer::State state)
     case QMediaPlayer::PlayingState:
         playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
         break;
+    case QMediaPlayer::StoppedState:
+        //mediaPlayer.pause(); // for display image  //uncomplete
     default:
         playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
         break;
@@ -143,6 +147,13 @@ void VideoPlayer::mediaStateChanged(QMediaPlayer::State state)
 void VideoPlayer::positionChanged(qint64 position)
 {
     positionSlider->setValue(position);
+    switch(mediaPlayer.state()) {
+    case QMediaPlayer::StoppedState:
+        //mediaPlayer.pause(); // for display image  //uncomplete
+        break;
+    default:
+        break;
+    }
 }
 
 void VideoPlayer::durationChanged(qint64 duration)
