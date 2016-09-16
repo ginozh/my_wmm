@@ -18,14 +18,17 @@ extern "C"{
 //! [1]
 ElementsEdit::ElementsEdit(QWidget *parent)
     : QWidget(parent)
-      , m_flowLayout(new FlowLayout(this))
+      //, m_flowLayout(new FlowLayout(this))
+      , m_flowLayout(NULL)
       , m_vecticalLine(new QFrame(this))
       , m_lastSelectedImage(0)
       , m_idxCurrentImage(-1)
+      , m_isFirstClick(true)
 {   
-    m_tmpdir=QDir::currentPath().append(tr("/tmp"));
+    //m_tmpdir=QDir::currentPath().append(tr("/tmp"));
 
-    setBackgroundRole(QPalette::Dark);
+    setBackgroundRole(QPalette::Midlight);
+    setCursor(QCursor(Qt::PointingHandCursor));
 #if 0
     m_flowLayout->addWidget(new QPushButton(tr("Short")));
     m_flowLayout->addWidget(new QPushButton(tr("Longer")));
@@ -50,7 +53,8 @@ ElementsEdit::ElementsEdit(QWidget *parent)
     m_flowLayout->addWidget(new Element(this, tr("C:\\QtProjects\\qtmovie\\jpg\\img002.jpg")));
     m_flowLayout->addWidget(new Element(this, tr("C:\\QtProjects\\qtmovie\\jpg\\img003.jpg")));
 #endif
-    setLayout(m_flowLayout);
+    //setLayout(m_flowLayout);
+
     m_vecticalLine->setObjectName(QStringLiteral("line"));
     m_vecticalLine->setEnabled(true);
     m_vecticalLine->hide();
@@ -66,6 +70,27 @@ ElementsEdit::ElementsEdit(QWidget *parent)
     m_vecticalLine->setPalette(palette1);
     m_vecticalLine->setFrameShape(QFrame::VLine);
     m_vecticalLine->setFrameShadow(QFrame::Sunken);
+
+#if 0
+    QSize iconSize(200, 200);
+    QToolButton *m_addPhotos = new QToolButton();
+    m_addPhotos->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    m_addPhotos->setIcon(QIcon("images/addphotos.png"));
+    m_addPhotos->setIconSize(iconSize);
+    m_addPhotos->setText("Add photos");
+#endif
+    m_firstLabel=new QLabel(this);
+    m_firstLabel->setText(tr("Click here to browse for photos"));
+    //label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    QFont font = m_firstLabel->font();
+    font.setPointSize(25);
+    font.setBold(true);
+    m_firstLabel->setFont(font);
+    //m_firstLabel->setAlignment(Qt::AlignCenter);
+    m_firstLayout = new QVBoxLayout(this);
+    //layout->addWidget(m_addPhotos, 0, Qt::AlignCenter);
+    m_firstLayout->addWidget(m_firstLabel, 0, Qt::AlignCenter);
+    setLayout(m_firstLayout);
 #else
     QVBoxLayout *layout    = new QVBoxLayout(this);
     layout->addWidget(new Element());
@@ -143,7 +168,7 @@ void ElementsEdit::createVideo(Element *element)
     vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbScaleAniVideo));
     //vqsArgv.push_back(QString(tr("pic%1.avi")).arg(i));
     int ret;
-    if(ret=callFfmpeg(vqsArgv))
+    if((ret=callFfmpeg(vqsArgv)))
     {
         QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
     }
@@ -169,7 +194,7 @@ void ElementsEdit::scaleImage(Element *element)
     vqsArgv.push_back(QString(tr("mjpeg")));
     vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbScaleFile));
     int ret;
-    if(ret=callFfmpeg(vqsArgv))
+    if((ret=callFfmpeg(vqsArgv)))
     {
         QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
     }
@@ -180,6 +205,7 @@ void ElementsEdit::scaleImage(Element *element)
 //! [1]
 void ElementsEdit::load()
 {
+    setCursor(QCursor(Qt::WaitCursor));
     QWidget *currWidget = qobject_cast<QWidget *>(sender());
     //只有image过来的insert事件，它的父类(element)才会是m_flowLayout的元素
     int idx = -1;
@@ -218,6 +244,8 @@ void ElementsEdit::load()
     //4, 生成总视频
     //./ffmpeg_gr -y -f avi -i jpg/mi2.avi -f avi -i jpg/mm.avi -f avi jpg/all.avi
     //uncomplete
+    createFinalVideoAndPlay();
+#if 0
     QVector<QString> vqsArgv;
     vqsArgv.push_back("ffmpeg");
     vqsArgv.push_back("-y");
@@ -280,7 +308,7 @@ void ElementsEdit::load()
     //vqsArgv.push_back(QString(tr("mm.avi")));
     //printf("video out. stbuf: %p buf.ptr: %p in_len: %zu out_len: %zu\n", &soutbuffer, soutbuffer.ptr, soutbuffer.in_len, *soutbuffer.out_len);
     int ret;
-    if(ret=callFfmpeg(vqsArgv))
+    if((ret=callFfmpeg(vqsArgv)))
     {
         QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
     }
@@ -288,14 +316,14 @@ void ElementsEdit::load()
     //5, 播放视频
     QByteArray tmp=QByteArray((const char*)soutbuffer.ptr, (int)out_len);
     emit playVideo(tmp);
-
-    //6, 
+#endif
+    //6, 设置播放进度条
     if(m_flowLayout->count()>0)
     //for (int i = 0; i < m_flowLayout->count(); ++i)
     {
         //获取每个element的(x, y, width, height)
-        Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(0)->widget());
-        const QRect &rect=element->geometry();
+        //Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(0)->widget());
+        //const QRect &rect=element->geometry();
         m_vecticalLine->setGeometry(QRect(0, 0, 10, 210)); //uncomplete
         m_vecticalLine->raise(); // top level, Raises this widget to the top of the parent widget's stack.
         //m_vecticalLine->setGeometry(QRect(rect.x(), rect.y(), 160, rect.height()));
@@ -303,6 +331,7 @@ void ElementsEdit::load()
         m_vecticalLine->show();
         //QMessageBox::information(this, "info", QString(tr("x: %1 y: %2 h: %3")).arg(geometry().x()).arg(geometry().y()).arg(element->height()));
     }
+    setCursor(QCursor(Qt::ArrowCursor));
 }
 #if 0
 void ElementsEdit::load()
@@ -540,70 +569,80 @@ void ElementsEdit::selectedTransition()
         Element *secondElement = qobject_cast<Element *>(m_flowLayout->itemAt(m_idxCurrentImage)->widget());
         if (firstElement && secondElement)
         {
-            const QString& firstImageName = firstElement->getImageName();
-            const QString& secondImageName = secondElement->getImageName();
-            char **charlist;
-            int iSecond=2;
-            QVector<QString> vqsArgv;
-            // blend="  crossfade";gdb --args ./ffmpeg_g   -y -framerate 25 -loop 1  -t 2 -i jpg/512img001.jpg -loop 1  -t 2 -i jpg/512img003.jpg     -filter_complex "blend=all_expr='if( $blend,1.5,2)'"    -pix_fmt yuv420p   jpg/mi.avi
-            vqsArgv.push_back("ffmpeg");
-            vqsArgv.push_back("-y");
-#ifdef DEBUG_FFMPEG
-            vqsArgv.push_back("-v");
-            vqsArgv.push_back("debug");
-#endif
-            vqsArgv.push_back("-framerate");
-            vqsArgv.push_back("25");
-            vqsArgv.push_back("-loop");
-            vqsArgv.push_back("1");
-            vqsArgv.push_back("-t");
-            vqsArgv.push_back(QString(tr("%1")).arg(iSecond));
-            vqsArgv.push_back("-i");
-            //vqsArgv.push_back(firstImageName);
-            vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&firstElement->m_fbInputScaleFile));//uncomplete
-            vqsArgv.push_back("-loop");
-            vqsArgv.push_back("1");
-            vqsArgv.push_back("-t");
-            vqsArgv.push_back(QString(tr("%1")).arg(iSecond));
-            vqsArgv.push_back("-i");
-            vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&secondElement->m_fbInputScaleFile));//uncomplete
-            //vqsArgv.push_back(secondImageName);
-            //ffmpeg -y -framerate 25 -loop 1 -t 1 -i img001.jpg -loop 1 -t 1 -i img002.jpg -filter_complex "blend=all_expr='if(gte(N*SW*50+X,W),B,A)'" -pix_fmt yuv420p  out.mkv
-            vqsArgv.push_back("-filter_complex");
-            //vqsArgv.push_back("blend=all_expr='if(gte(N*SW*50+X,W),B,A)'");
-            vqsArgv.push_back(QString(tr("blend=all_expr='if(heart,1.5,%1)'")).arg(iSecond));
-            vqsArgv.push_back("-pix_fmt");
-            vqsArgv.push_back("yuv420p");
-#if 0
-            QString vfileName("C:\\qtproject\\img2mov\\debug\\transition.avi");
-            vqsArgv.push_back(vfileName);
-#else
-            vqsArgv.push_back(QString(tr("-f")));
-            vqsArgv.push_back(QString(tr("avi")));
-            secondElement->m_fbScaleAniVideo.in_len = 10*1024*1024;
-            *secondElement->m_fbScaleAniVideo.out_len = 10*1024*1024;
-            vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&secondElement->m_fbScaleAniVideo));
-#endif
-            // -y -framerate 1 -i "C:\QtProjects\qtmovie\jpg\img%3d.jpg" myoutput.avi
-            //QTime startTime = QTime::currentTime();
-            int ret;
-            if(ret=callFfmpeg(vqsArgv))
+            if(!createAnimation(firstElement, secondElement ,"heart"))
             {
-                QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
+                // uncomplete
+                return;
             }
-            secondElement->m_fbInputAniVideo.ptr=secondElement->m_fbScaleAniVideo.ptr;
-            secondElement->m_fbInputAniVideo.in_len=*secondElement->m_fbScaleAniVideo.out_len;
-            secondElement->m_fbInputAniVideo.out_len=NULL;
-            //int dt = startTime.msecsTo(QTime::currentTime());
-            //qDebug()<< "ffmpeg waste: " << dt;
-            //QMessageBox::information(this, "info", QString(tr("ffmpeg waste: %1")).arg(dt));
-            //emit playVideo(vfileName);
         }
     }
     //4, 生成总视频
-    createFinalVideo();
+    createFinalVideoAndPlay();
 }
-void ElementsEdit::createFinalVideo()
+bool ElementsEdit::createAnimation(Element *firstElement, Element *secondElement
+        , const QString& animationName)
+{
+    //const QString& firstImageName = firstElement->getImageName();
+    //const QString& secondImageName = secondElement->getImageName();
+    //char **charlist;
+    int iSecond=2;
+    QVector<QString> vqsArgv;
+    // blend="  crossfade";gdb --args ./ffmpeg_g   -y -framerate 25 -loop 1  -t 2 -i jpg/512img001.jpg -loop 1  -t 2 -i jpg/512img003.jpg     -filter_complex "blend=all_expr='if( $blend,1.5,2)'"    -pix_fmt yuv420p   jpg/mi.avi
+    vqsArgv.push_back("ffmpeg");
+    vqsArgv.push_back("-y");
+#ifdef DEBUG_FFMPEG
+    vqsArgv.push_back("-v");
+    vqsArgv.push_back("debug");
+#endif
+    vqsArgv.push_back("-framerate");
+    vqsArgv.push_back("25");
+    vqsArgv.push_back("-loop");
+    vqsArgv.push_back("1");
+    vqsArgv.push_back("-t");
+    vqsArgv.push_back(QString(tr("%1")).arg(iSecond));
+    vqsArgv.push_back("-i");
+    //vqsArgv.push_back(firstImageName);
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&firstElement->m_fbInputScaleFile));//uncomplete
+    vqsArgv.push_back("-loop");
+    vqsArgv.push_back("1");
+    vqsArgv.push_back("-t");
+    vqsArgv.push_back(QString(tr("%1")).arg(iSecond));
+    vqsArgv.push_back("-i");
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&secondElement->m_fbInputScaleFile));//uncomplete
+    //vqsArgv.push_back(secondImageName);
+    //ffmpeg -y -framerate 25 -loop 1 -t 1 -i img001.jpg -loop 1 -t 1 -i img002.jpg -filter_complex "blend=all_expr='if(gte(N*SW*50+X,W),B,A)'" -pix_fmt yuv420p  out.mkv
+    vqsArgv.push_back("-filter_complex");
+    //vqsArgv.push_back("blend=all_expr='if(gte(N*SW*50+X,W),B,A)'");
+    vqsArgv.push_back(QString(tr("blend=all_expr='if(%1,1.5,%2)'")).arg(animationName).arg(iSecond));
+    vqsArgv.push_back("-pix_fmt");
+    vqsArgv.push_back("yuv420p");
+#if 0
+    QString vfileName("C:\\qtproject\\img2mov\\debug\\transition.avi");
+    vqsArgv.push_back(vfileName);
+#else
+    vqsArgv.push_back(QString(tr("-f")));
+    vqsArgv.push_back(QString(tr("avi")));
+    secondElement->m_fbScaleAniVideo.in_len = 10*1024*1024;
+    *secondElement->m_fbScaleAniVideo.out_len = 10*1024*1024;
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&secondElement->m_fbScaleAniVideo));
+#endif
+    // -y -framerate 1 -i "C:\QtProjects\qtmovie\jpg\img%3d.jpg" myoutput.avi
+    //QTime startTime = QTime::currentTime();
+    int ret;
+    if((ret=callFfmpeg(vqsArgv)))
+    {
+        QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
+    }
+    secondElement->m_fbInputAniVideo.ptr=secondElement->m_fbScaleAniVideo.ptr;
+    secondElement->m_fbInputAniVideo.in_len=*secondElement->m_fbScaleAniVideo.out_len;
+    secondElement->m_fbInputAniVideo.out_len=NULL;
+    //int dt = startTime.msecsTo(QTime::currentTime());
+    //qDebug()<< "ffmpeg waste: " << dt;
+    //QMessageBox::information(this, "info", QString(tr("ffmpeg waste: %1")).arg(dt));
+    //emit playVideo(vfileName);
+    return true;
+}
+void ElementsEdit::createFinalVideoAndPlay()
 {
     QVector<QString> vqsArgv;
     vqsArgv.push_back("ffmpeg");
@@ -657,13 +696,28 @@ void ElementsEdit::createFinalVideo()
     //vqsArgv.push_back(QString(tr("mm.avi")));
     //printf("video out. stbuf: %p buf.ptr: %p in_len: %zu out_len: %zu\n", &soutbuffer, soutbuffer.ptr, soutbuffer.in_len, *soutbuffer.out_len);
     int ret;
-    if(ret=callFfmpeg(vqsArgv))
+    if((ret=callFfmpeg(vqsArgv)))
     {
         QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
     }
     //5, 播放视频
     QByteArray tmp=QByteArray((const char*)soutbuffer.ptr, (int)out_len);
     emit playVideo(tmp);
+}
+void ElementsEdit::mousePressEvent(QMouseEvent *event)
+{
+    if(m_isFirstClick)
+    {
+        m_isFirstClick=false;
+
+        //qDeleteAll(children());
+        delete m_firstLayout;
+        m_flowLayout = new FlowLayout(this);
+        setLayout(m_flowLayout);
+        load();
+        delete m_firstLabel;
+    }
+    QWidget::mousePressEvent(event);
 }
 #if 0
 void ElementsEdit::handleContextMenuRequested(const QPoint &pos)

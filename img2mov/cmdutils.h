@@ -577,9 +577,16 @@ void *grow_array(void *array, int elem_size, int *size, int new_size);
     char name[16];\
     snprintf(name, sizeof(name), "%d", rate);
 
+#if defined(WIN32) 
+//storm
+#define REP_64 "0x%lld" 
+#else
+#define REP_64 "0x%"PRIx64
+#endif
+
 #define GET_CH_LAYOUT_NAME(ch_layout)\
     char name[16];\
-    snprintf(name, sizeof(name), "0x%"PRIx64, ch_layout);
+    snprintf(name, sizeof(name), REP_64, ch_layout);/*storm*//*snprintf(name, sizeof(name), "0x%"PRIx64, ch_layout);*/
 
 #define GET_CH_LAYOUT_DESC(ch_layout)\
     char name[128];\

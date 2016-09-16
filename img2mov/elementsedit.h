@@ -6,6 +6,7 @@
 #include "flowlayout.h"
 #include "element.h"
 #include <QBuffer>
+#include <QToolButton>
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -21,12 +22,15 @@ public:
     ~ElementsEdit();
 private:
     int callFfmpeg(const QVector<QString>& vqsArgv);
-    void createFinalVideo();
+    void createFinalVideoAndPlay();
     void scaleImage(Element *element);
     void createVideo(Element *element);
+    bool createAnimation(Element *firstElement, Element *secondElement
+            , const QString& animationName);
 signals:
     void playVideo(const QByteArray&);
-
+protected:
+    void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 public slots:
     void load();
     void selectedImage();
@@ -34,12 +38,17 @@ public slots:
     //void handleContextMenuRequested(const QPoint &pos);
 private:
     FlowLayout *m_flowLayout;
-    QFrame *m_vecticalLine;
+    QVBoxLayout *m_firstLayout;
+    QLabel* m_firstLabel;
+    QFrame *m_vecticalLine; //进度条竖线
+
     QString m_tmpdir;
     QWidget *m_lastSelectedImage;
     int m_idxCurrentImage;
     QByteArray m_playData;
     QBuffer m_playBuffer;
+
+    bool m_isFirstClick;
 };
 //! [0]
 
