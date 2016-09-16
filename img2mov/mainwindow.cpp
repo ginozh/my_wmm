@@ -60,6 +60,10 @@ MainWindow::MainWindow(QWidget *parent)
     centralSplitter->addWidget(m_elementsEdit);
 #endif
     connect(m_elementsEdit, SIGNAL(playVideo(const QByteArray&)), m_player, SLOT(playVideo(const QByteArray&)));
+    connect(m_player->getMediaPlayer(), SIGNAL(durationChanged(qint64)), m_elementsEdit, SLOT(durationChanged(qint64)));
+    connect(m_player->getMediaPlayer(), SIGNAL(positionChanged(qint64)), m_elementsEdit, SLOT(positionChanged(qint64)));
+    connect(m_elementsEdit, SIGNAL(verticalLineMoved(int)), m_player, SLOT(setPosition(int)));
+
 
     setCentralWidget(m_centralWidget);
 
