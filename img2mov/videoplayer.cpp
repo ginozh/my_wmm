@@ -28,7 +28,9 @@ VideoPlayer::VideoPlayer(QWidget *parent)
     connect(rotateSlider, SIGNAL(valueChanged(int)),
             this, SLOT(rotateVideo(int)));
 #endif
-#if 1
+
+//#define OPEN_FILE
+#ifdef OPEN_FILE
     QAbstractButton *openButton = new QPushButton(tr("Open..."));
     connect(openButton, SIGNAL(clicked()), this, SLOT(openFile()));
 #endif
@@ -48,7 +50,9 @@ VideoPlayer::VideoPlayer(QWidget *parent)
 
     QBoxLayout *controlLayout = new QHBoxLayout;
     controlLayout->setMargin(0);
+#ifdef OPEN_FILE
     controlLayout->addWidget(openButton);
+#endif
     controlLayout->addWidget(playButton);
     controlLayout->addWidget(positionSlider);
 
