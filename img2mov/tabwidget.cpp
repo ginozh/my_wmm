@@ -12,6 +12,7 @@
 #include <QApplication>
 #include <QScrollArea>
 #include "flowlayout.h"
+#include "animation.h"
 
 TabWidget::TabWidget(QWidget *parent, QWidget *elementsEdit)
     : QTabWidget(parent)
@@ -130,6 +131,152 @@ void TabWidget::createTabHome()
 
     //setCurrentWidget(tabHome);
 }
+/*
+-----------------------------------------------------------
+|                |     |     |                |           |
+|                |-----------|                |           |
+|                |           |                |           |
+|----------------------------|----------------------------|
+|                            |                            |
+|----------------------------|----------------------------|
+ * */
+void TabWidget::createTabAnimations()
+{
+    QWidget *tabAnimations = new QWidget;
+    tabAnimations->setMinimumHeight(200);
+    tabAnimations->setMaximumHeight(200);
+    QHBoxLayout *hboxAnimations = new QHBoxLayout;
+    {
+        QVBoxLayout *vboxLeftTransition = new QVBoxLayout;
+        {
+            QHBoxLayout* hboxTopTransition = new QHBoxLayout;
+            {
+                QScrollArea *scrollArea = new QScrollArea;
+                scrollArea->setBackgroundRole(QPalette::Dark);
+                scrollArea->setMinimumWidth(500);
+                scrollArea->setMinimumHeight(120);
+                scrollArea->setMaximumHeight(120);
+                //scrollArea->setContentsMargins(10, 10, 10, 10);
+                scrollArea->setContentsMargins(0, 0, 0, 0);
+                scrollArea->setWidgetResizable (true);
+                {
+                    QWidget* animations = new QWidget();
+                    {
+                        FlowLayout* flowLayout = new FlowLayout();
+                        flowLayout->setContentsMargins(10, 10, 10, 10);
+                        {
+#if 0
+                            for(int i=0; i<10; i++){
+                            QLabel* label = new QLabel();
+                            label->setMinimumSize(QSize(100, 100));
+                            label->setMaximumSize(QSize(100, 100));
+                            label->setContentsMargins(5, 5, 5, 5);
+                            label->setPixmap(QPixmap(QString::fromUtf8("../../../../QtProjects/qtmovie/jpg/img001.jpg")));
+                            tabAnimations->setObjectName(QStringLiteral("heart"));
+
+                            label->setScaledContents(true);
+                            //connect(label, SIGNAL(selectedAnimationSignal()), m_elementsEdit, SLOT(selectedTransition()));
+
+                            flowLayout->insertWidget(0, label);
+                            }
+#endif
+                            Animation *animation=new Animation("images/bowtieh.png", "bowtieh") ;
+                            connect(animation, SIGNAL(selectedAnimationSignal(const QString&)), m_elementsEdit, SLOT(selectedTransition(const QString&)));
+
+                            flowLayout->insertWidget(0, animation);
+                        }
+
+                        animations->setLayout(flowLayout);
+                    }
+                    scrollArea->setWidget(animations);
+                }
+
+                hboxTopTransition->addWidget(scrollArea);
+            }
+            {
+                QVBoxLayout *vboxTopRightTransition = new QVBoxLayout;
+                {
+                    QHBoxLayout *hboxTopRightTopTransition = new QHBoxLayout;
+                    {
+                        QLabel *lblDurationTrans = new QLabel(tr("Duration: "));
+
+                        hboxTopRightTopTransition->addWidget(lblDurationTrans);
+                    }
+                    {
+                        QComboBox* comboBox = new QComboBox();
+
+                        hboxTopRightTopTransition->addWidget(comboBox);
+                    }
+
+                    vboxTopRightTransition->addLayout(hboxTopRightTopTransition);
+                }
+                {
+                    QLabel *lblApplyTransiton = new QLabel(tr("Apply to all"));
+                    lblApplyTransiton->setAlignment(Qt::AlignCenter);
+
+                    vboxTopRightTransition->addWidget(lblApplyTransiton);
+                }
+
+                hboxTopTransition->addLayout(vboxTopRightTransition);
+            }
+
+            vboxLeftTransition->addLayout(hboxTopTransition);
+        }
+        {
+            QLabel *lblTransition = new QLabel(tr("Transition"));
+            lblTransition->setAlignment(Qt::AlignCenter);
+
+            vboxLeftTransition->addWidget(lblTransition);
+        }
+
+        hboxAnimations->addLayout(vboxLeftTransition);
+    }
+    {
+        QVBoxLayout *vboxRightPanZoom = new QVBoxLayout;
+        {
+            QHBoxLayout* hboxTopPanZoom = new QHBoxLayout;
+            {
+                QScrollArea *scrollArea = new QScrollArea;
+                {
+                    QWidget* panzooms = new QWidget();
+                    {
+                    }
+
+                    scrollArea->setBackgroundRole(QPalette::Dark);
+                    scrollArea->setMinimumWidth(500);
+                    scrollArea->setMinimumHeight(120);
+                    scrollArea->setMaximumHeight(120);
+                    scrollArea->setContentsMargins(10, 10, 10, 10);
+                    scrollArea->setWidgetResizable (true);
+                    scrollArea->setWidget(panzooms);
+                }
+
+                hboxTopPanZoom->addWidget(scrollArea);
+            }
+            {
+                QLabel *lblApplyPanzoom = new QLabel(tr("Apply to all"));
+                lblApplyPanzoom->setAlignment(Qt::AlignCenter);
+
+                hboxTopPanZoom->addWidget(lblApplyPanzoom);
+            }
+            vboxRightPanZoom->addLayout(hboxTopPanZoom);
+        }
+        {
+            QLabel *lblPanZoom = new QLabel(tr("Pan and zoom"));
+            lblPanZoom->setAlignment(Qt::AlignCenter);
+
+            vboxRightPanZoom->addWidget(lblPanZoom);
+        }
+
+        hboxAnimations->addLayout(vboxRightPanZoom);
+    }
+
+    tabAnimations->setLayout(hboxAnimations);
+
+    addTab(tabAnimations, tr("&Animations"));
+    setCurrentWidget(tabAnimations);
+}
+#if 0
 void TabWidget::createTabAnimations()
 {
     //QWidget *centralWidget;
@@ -190,7 +337,7 @@ void TabWidget::createTabAnimations()
         hboxAnimations->setSpacing(6);
         hboxAnimations->setContentsMargins(11, 11, 11, 11);
         hboxAnimations->setObjectName(QStringLiteral("hboxAnimations"));
-        hboxAnimations->setContentsMargins(0, 0, 0, 0);
+        //hboxAnimations->setContentsMargins(0, 0, 0, 0);
         {
             //// QWidgetleftTransition
             leftTransition = new QWidget(horizontalLayoutWidget);
@@ -204,7 +351,7 @@ void TabWidget::createTabAnimations()
                 vboxLeftTransition->setSpacing(6);
                 vboxLeftTransition->setContentsMargins(11, 11, 11, 11);
                 vboxLeftTransition->setObjectName(QStringLiteral("vboxLeftTransition"));
-                vboxLeftTransition->setContentsMargins(0, 0, 0, 0);
+                //vboxLeftTransition->setContentsMargins(0, 0, 0, 0);
                 {
                     // QWidget lefttopTransition
                     lefttopTransition = new QWidget(verticalLayoutWidget);
@@ -218,7 +365,7 @@ void TabWidget::createTabAnimations()
                         hboxTopTransition->setSpacing(6);
                         hboxTopTransition->setContentsMargins(11, 11, 11, 11);
                         hboxTopTransition->setObjectName(QStringLiteral("hboxTopTransition"));
-                        hboxTopTransition->setContentsMargins(0, 0, 0, 0);
+                        //hboxTopTransition->setContentsMargins(0, 0, 0, 0);
                         {
                             // QWidget lefttopleftTransition
                             lefttopleftTransition = new QWidget(horizontalLayoutWidget_2);
@@ -254,7 +401,7 @@ void TabWidget::createTabAnimations()
                                 flowLayout->setSpacing(6);
                                 flowLayout->setContentsMargins(11, 11, 11, 11);
                                 flowLayout->setObjectName(QStringLiteral("flowLayout"));
-                                flowLayout->setContentsMargins(0, 0, 0, 0);
+                                //flowLayout->setContentsMargins(0, 0, 0, 0);
                                 label = new QLabel(animationsWidget);
                                 label->setObjectName(QStringLiteral("label"));
                                 label->setMaximumSize(QSize(100, 100));
@@ -315,7 +462,7 @@ void TabWidget::createTabAnimations()
                                 vboxTopRightTransition->setSpacing(6);
                                 vboxTopRightTransition->setContentsMargins(11, 11, 11, 11);
                                 vboxTopRightTransition->setObjectName(QStringLiteral("vboxTopRightTransition"));
-                                vboxTopRightTransition->setContentsMargins(0, 0, 0, 0);
+                                //vboxTopRightTransition->setContentsMargins(0, 0, 0, 0);
                                 {
                                     // QWidget lefttoprighttopTransition
                                     lefttoprighttopTransition = new QWidget(verticalLayoutWidget_2);
@@ -329,7 +476,7 @@ void TabWidget::createTabAnimations()
                                         hboxTopRightTopTransition->setSpacing(6);
                                         hboxTopRightTopTransition->setContentsMargins(11, 11, 11, 11);
                                         hboxTopRightTopTransition->setObjectName(QStringLiteral("hboxTopRightTopTransition"));
-                                        hboxTopRightTopTransition->setContentsMargins(0, 0, 0, 0);
+                                        //hboxTopRightTopTransition->setContentsMargins(0, 0, 0, 0);
                                         lblDurationTrans = new QLabel(horizontalLayoutWidget_3);
                                         lblDurationTrans->setObjectName(QStringLiteral("lblDurationTrans"));
                                         lblDurationTrans->setText(QApplication::translate("MainWindow", "Duration:", 0));
@@ -399,7 +546,7 @@ void TabWidget::createTabAnimations()
                 vboxRightPanZoom->setSpacing(6);
                 vboxRightPanZoom->setContentsMargins(11, 11, 11, 11);
                 vboxRightPanZoom->setObjectName(QStringLiteral("vboxRightPanZoom"));
-                vboxRightPanZoom->setContentsMargins(0, 0, 0, 0);
+                //vboxRightPanZoom->setContentsMargins(0, 0, 0, 0);
                 {
                     // QWidget righttopPanZoom
                     righttopPanZoom = new QWidget(verticalLayoutWidget_3);
@@ -413,7 +560,7 @@ void TabWidget::createTabAnimations()
                         hboxTopPanZoom->setSpacing(6);
                         hboxTopPanZoom->setContentsMargins(11, 11, 11, 11);
                         hboxTopPanZoom->setObjectName(QStringLiteral("hboxTopPanZoom"));
-                        hboxTopPanZoom->setContentsMargins(0, 0, 0, 0);
+                        //hboxTopPanZoom->setContentsMargins(0, 0, 0, 0);
                         {
                             // QWidget righttopleftPanZoom
                             righttopleftPanZoom = new QWidget(horizontalLayoutWidget_4);
@@ -477,6 +624,7 @@ void TabWidget::createTabAnimations()
     addTab(tabAnimations, tr("&Animations"));
     setCurrentWidget(tabAnimations);
 }
+#endif
 #if 0
 void TabWidget::createTabAnimations()
 {

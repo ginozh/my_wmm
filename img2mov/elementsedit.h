@@ -38,7 +38,7 @@ protected:
 public slots:
     void load();
     void selectedImage();
-    void selectedTransition();
+    void selectedTransition(const QString& animation);
     void durationChanged(qint64 duration);
     void positionChanged(qint64 position);
     //void handleContextMenuRequested(const QPoint &pos);

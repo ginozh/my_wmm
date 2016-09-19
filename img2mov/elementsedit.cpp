@@ -314,7 +314,7 @@ void ElementsEdit::selectedImage()
     }
     m_lastSelectedImage=send;
 }
-void ElementsEdit::selectedTransition()
+void ElementsEdit::selectedTransition(const QString& animation)
 {
     if(m_idxCurrentImage >= 1)
     {
@@ -322,15 +322,15 @@ void ElementsEdit::selectedTransition()
         Element *secondElement = qobject_cast<Element *>(m_flowLayout->itemAt(m_idxCurrentImage)->widget());
         if (firstElement && secondElement)
         {
-            if(!createAnimation(firstElement, secondElement ,"heart"))
+            if(!createAnimation(firstElement, secondElement ,animation))
             {
                 // uncomplete
                 return;
             }
         }
+        //4, 生成总视频
+        createFinalVideoAndPlay();
     }
-    //4, 生成总视频
-    createFinalVideoAndPlay();
 }
 bool ElementsEdit::createAnimation(Element *firstElement, Element *secondElement
         , const QString& animationName)
