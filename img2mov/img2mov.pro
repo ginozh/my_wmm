@@ -38,7 +38,9 @@ SOURCES += main.cpp \
     slider.cpp \
     menu.cpp \
     tabwidget.cpp \
-    animation.cpp
+    animation.cpp \
+    videoscene.cpp \
+    videotextitem.cpp
 
 HEADERS  += mainwindow.h \
     ffmpeg.h \
@@ -54,4 +56,6 @@ HEADERS  += mainwindow.h \
     slider.h \
     menu.h \
     tabwidget.h \
-    animation.h
+    animation.h \
+    videoscene.h \
+    videotextitem.h

@@ -26,48 +26,8 @@ TabWidget::TabWidget(QWidget *parent, QWidget *elementsEdit)
 
     setTabEnabled(0, false);
     //setCurrentWidget(contentsWidget);
-    setMaximumHeight(m_iconSize.height() + 100);
+    setMaximumHeight(m_iconSize.height() + 120);
 }
-#if 0
-void TabWidget::createTabHome()
-{
-    contentsWidget = new QListWidget;
-    QHBoxLayout *hboxHome = new QHBoxLayout;
-
-    //contentsWidget->setViewMode(QListView::IconMode);
-    contentsWidget->setIconSize(m_iconSize);
-    contentsWidget->setMinimumHeight(m_iconSize.height() + 50);
-    contentsWidget->setMovement(QListView::Static);
-    //contentsWidget->setMaximumWidth(528);
-    //contentsWidget->setMaximumHeight(100);
-    //contentsWidget->setMaximumHeight(100);
-    contentsWidget->setSpacing(12);
-
-    QListWidgetItem *configButton = new QListWidgetItem();
-    //configButton->setIcon(QIcon(":/images/addphotos.png"));
-    //configButton->setIcon(QIcon("C:\\qtproject\\img2mov\\images\\addphotos.png"));
-    configButton->setIcon(QIcon("addphotos.png"));
-    configButton->setText(tr("Add photos"));
-    configButton->setTextAlignment(Qt::AlignHCenter);
-    configButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    //contentsWidget->insertItem(0, configButton);
-    contentsWidget->addItem(configButton);
-
-    QListWidgetItem *updateButton = new QListWidgetItem();
-    //updateButton->setIcon(QIcon(":/images/addmusic.png"));
-    updateButton->setIcon(QIcon("addmusic.png"));
-    updateButton->setText(tr("Add music"));
-    updateButton->setTextAlignment(Qt::AlignHCenter);
-    updateButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    //contentsWidget->insertItem(0, updateButton);
-    contentsWidget->addItem(updateButton);
-
-    //hboxHome->addWidget(contentsWidget);
-    //hboxHome->addWidget(updateButton);
-    //contentsWidget->setLayout(hboxHome);
-    addTab(contentsWidget, tr("&Home"));
-}
-#endif
 void TabWidget::createTabHome()
 {
     QWidget *tabHome = new QWidget;
@@ -143,8 +103,8 @@ void TabWidget::createTabHome()
 void TabWidget::createTabAnimations()
 {
     QWidget *tabAnimations = new QWidget;
-    tabAnimations->setMinimumHeight(200);
-    tabAnimations->setMaximumHeight(200);
+    ////tabAnimations->setMinimumHeight(200);
+    ////tabAnimations->setMaximumHeight(300);
     QHBoxLayout *hboxAnimations = new QHBoxLayout;
     {
         QVBoxLayout *vboxLeftTransition = new QVBoxLayout;
@@ -152,38 +112,29 @@ void TabWidget::createTabAnimations()
             QHBoxLayout* hboxTopTransition = new QHBoxLayout;
             {
                 QScrollArea *scrollArea = new QScrollArea;
-                scrollArea->setBackgroundRole(QPalette::Dark);
-                scrollArea->setMinimumWidth(500);
-                scrollArea->setMinimumHeight(120);
-                scrollArea->setMaximumHeight(120);
-                //scrollArea->setContentsMargins(10, 10, 10, 10);
-                scrollArea->setContentsMargins(0, 0, 0, 0);
-                scrollArea->setWidgetResizable (true);
+                initialScrollArea(scrollArea);
+
+
                 {
                     QWidget* animations = new QWidget();
                     {
                         FlowLayout* flowLayout = new FlowLayout();
-                        flowLayout->setContentsMargins(10, 10, 10, 10);
+                        //flowLayout->setContentsMargins(10, 10, 10, 10);
+                        flowLayout->setContentsMargins(5, 5, 5, 5);
                         {
+#define INITIAL_ANIMATION(animation_name) do {\
+    Animation *animation_name=new Animation("images/"#animation_name".png", ""#animation_name"", m_iconSize) ; \
+    connect(animation_name, SIGNAL(selectedAnimationSignal(const QString&)), m_elementsEdit, SLOT(selectedTransition(const QString&))); \
+    flowLayout->insertWidget(0, animation_name); \
+} while(0)
 #if 0
-                            for(int i=0; i<10; i++){
-                            QLabel* label = new QLabel();
-                            label->setMinimumSize(QSize(100, 100));
-                            label->setMaximumSize(QSize(100, 100));
-                            label->setContentsMargins(5, 5, 5, 5);
-                            label->setPixmap(QPixmap(QString::fromUtf8("../../../../QtProjects/qtmovie/jpg/img001.jpg")));
-                            tabAnimations->setObjectName(QStringLiteral("heart"));
-
-                            label->setScaledContents(true);
-                            //connect(label, SIGNAL(selectedAnimationSignal()), m_elementsEdit, SLOT(selectedTransition()));
-
-                            flowLayout->insertWidget(0, label);
-                            }
-#endif
                             Animation *animation=new Animation("images/bowtieh.png", "bowtieh") ;
                             connect(animation, SIGNAL(selectedAnimationSignal(const QString&)), m_elementsEdit, SLOT(selectedTransition(const QString&)));
 
                             flowLayout->insertWidget(0, animation);
+#endif
+                            INITIAL_ANIMATION(bowtieh);
+                            INITIAL_ANIMATION(bowtiev);
                         }
 
                         animations->setLayout(flowLayout);
@@ -204,6 +155,7 @@ void TabWidget::createTabAnimations()
                     }
                     {
                         QComboBox* comboBox = new QComboBox();
+                        comboBox->setEditable(true);
 
                         hboxTopRightTopTransition->addWidget(comboBox);
                     }
@@ -211,10 +163,11 @@ void TabWidget::createTabAnimations()
                     vboxTopRightTransition->addLayout(hboxTopRightTopTransition);
                 }
                 {
-                    QLabel *lblApplyTransiton = new QLabel(tr("Apply to all"));
-                    lblApplyTransiton->setAlignment(Qt::AlignCenter);
+                    QAbstractButton *btnApplyTrans = new QPushButton(tr("Apply to all"));
+                    //connect(btnApplyTrans, SIGNAL(clicked()), m_elementsEdit, SLOT(openFile()));
+                    //btnApplyTrans->setAlignment(Qt::AlignCenter);
 
-                    vboxTopRightTransition->addWidget(lblApplyTransiton);
+                    vboxTopRightTransition->addWidget(btnApplyTrans);
                 }
 
                 hboxTopTransition->addLayout(vboxTopRightTransition);
@@ -232,32 +185,33 @@ void TabWidget::createTabAnimations()
         hboxAnimations->addLayout(vboxLeftTransition);
     }
     {
+        appendLine(hboxAnimations);
+    }
+    {
         QVBoxLayout *vboxRightPanZoom = new QVBoxLayout;
         {
             QHBoxLayout* hboxTopPanZoom = new QHBoxLayout;
             {
                 QScrollArea *scrollArea = new QScrollArea;
+                initialScrollArea(scrollArea);
+
+
                 {
                     QWidget* panzooms = new QWidget();
                     {
                     }
 
-                    scrollArea->setBackgroundRole(QPalette::Dark);
-                    scrollArea->setMinimumWidth(500);
-                    scrollArea->setMinimumHeight(120);
-                    scrollArea->setMaximumHeight(120);
-                    scrollArea->setContentsMargins(10, 10, 10, 10);
-                    scrollArea->setWidgetResizable (true);
                     scrollArea->setWidget(panzooms);
                 }
 
                 hboxTopPanZoom->addWidget(scrollArea);
             }
             {
-                QLabel *lblApplyPanzoom = new QLabel(tr("Apply to all"));
-                lblApplyPanzoom->setAlignment(Qt::AlignCenter);
+                QAbstractButton *btnApplyPanzoom = new QPushButton(tr("Apply to all"));
+                //connect(btnApplyPanzoom, SIGNAL(clicked()), m_elementsEdit, SLOT(openFile()));
+                //btnApplyPanzoom->setAlignment(Qt::AlignCenter);
 
-                hboxTopPanZoom->addWidget(lblApplyPanzoom);
+                hboxTopPanZoom->addWidget(btnApplyPanzoom);
             }
             vboxRightPanZoom->addLayout(hboxTopPanZoom);
         }
@@ -270,462 +224,34 @@ void TabWidget::createTabAnimations()
 
         hboxAnimations->addLayout(vboxRightPanZoom);
     }
+    {
+        appendLine(hboxAnimations);
+    }
 
     tabAnimations->setLayout(hboxAnimations);
 
     addTab(tabAnimations, tr("&Animations"));
     setCurrentWidget(tabAnimations);
 }
-#if 0
-void TabWidget::createTabAnimations()
+void TabWidget::appendLine(QHBoxLayout *hboxAnimations)
 {
-    //QWidget *centralWidget;
-    //QTabWidget *tabWidget;
-    //QWidget *tab;
-    //QWidget *tabHome;
-    QWidget *horizontalLayoutWidget;
-    QHBoxLayout *hboxAnimations;
-    QWidget *leftTransition;
-    QWidget *verticalLayoutWidget;
-    QVBoxLayout *vboxLeftTransition;
-    QWidget *lefttopTransition;
-    QWidget *horizontalLayoutWidget_2;
-    QHBoxLayout *hboxTopTransition;
-    QWidget *lefttopleftTransition;
-    QLabel *lblAnimation1;
-    QLabel *lblAnimation1_2;
-    QWidget *lefttoprightTransition;
-    QWidget *verticalLayoutWidget_2;
-    QVBoxLayout *vboxTopRightTransition;
-    QWidget *lefttoprighttopTransition;
-    QWidget *horizontalLayoutWidget_3;
-    QHBoxLayout *hboxTopRightTopTransition;
-    QLabel *lblDurationTrans;
-    QComboBox *comboBox;
-    QWidget *lefttoprightbottomTransition;
-    QLabel *label_3;
-    QWidget *leftbottomTransition;
-    QLabel *label;
-    QFrame *line;
-    QWidget *rightPanZoom;
-    QWidget *verticalLayoutWidget_3;
-    QVBoxLayout *vboxRightPanZoom;
-    QWidget *righttopPanZoom;
-    QWidget *horizontalLayoutWidget_4;
-    QHBoxLayout *hboxTopPanZoom;
-    QWidget *righttopleftPanZoom;
-    QLabel *label_2;
-    QLabel *label_4;
-    QWidget *righttoprightPanZoom;
-    QLabel *lblApplyAllPanzoom;
-    QWidget *rightbottomPanZoom;
-    QLabel *lblPanZoom;
-    QFrame *line_2;
-    QWidget *tabAnimations;
-    //QMenuBar *menuBar;
-    //QToolBar *mainToolBar;
-    //QStatusBar *statusBar;
+    QFrame *line = new QFrame();
+    line->setObjectName(QStringLiteral("line"));
+    line->setFrameShape(QFrame::VLine);
+    line->setFrameShadow(QFrame::Sunken);
 
-    tabAnimations = new QWidget();
-    tabAnimations->setObjectName(QStringLiteral("tabAnimations"));
-    horizontalLayoutWidget = new QWidget(tabAnimations);
-    horizontalLayoutWidget->setObjectName(QStringLiteral("horizontalLayoutWidget"));
-    horizontalLayoutWidget->setGeometry(QRect(0, 0, 1000, 200));
-    {
-        // hboxlayout
-        hboxAnimations = new QHBoxLayout(horizontalLayoutWidget);
-        hboxAnimations->setSpacing(6);
-        hboxAnimations->setContentsMargins(11, 11, 11, 11);
-        hboxAnimations->setObjectName(QStringLiteral("hboxAnimations"));
-        //hboxAnimations->setContentsMargins(0, 0, 0, 0);
-        {
-            //// QWidgetleftTransition
-            leftTransition = new QWidget(horizontalLayoutWidget);
-            leftTransition->setObjectName(QStringLiteral("leftTransition"));
-            verticalLayoutWidget = new QWidget(leftTransition);
-            verticalLayoutWidget->setObjectName(QStringLiteral("verticalLayoutWidget"));
-            verticalLayoutWidget->setGeometry(QRect(0, 0, 500, 200));
-            {
-                //vboxleyout vboxLeftTransition
-                vboxLeftTransition = new QVBoxLayout(verticalLayoutWidget);
-                vboxLeftTransition->setSpacing(6);
-                vboxLeftTransition->setContentsMargins(11, 11, 11, 11);
-                vboxLeftTransition->setObjectName(QStringLiteral("vboxLeftTransition"));
-                //vboxLeftTransition->setContentsMargins(0, 0, 0, 0);
-                {
-                    // QWidget lefttopTransition
-                    lefttopTransition = new QWidget(verticalLayoutWidget);
-                    lefttopTransition->setObjectName(QStringLiteral("lefttopTransition"));
-                    horizontalLayoutWidget_2 = new QWidget(lefttopTransition);
-                    horizontalLayoutWidget_2->setObjectName(QStringLiteral("horizontalLayoutWidget_2"));
-                    horizontalLayoutWidget_2->setGeometry(QRect(0, 0, 500, 150));
-                    {
-                        //// QHBoxLayout hboxTopTransition
-                        hboxTopTransition = new QHBoxLayout(horizontalLayoutWidget_2);
-                        hboxTopTransition->setSpacing(6);
-                        hboxTopTransition->setContentsMargins(11, 11, 11, 11);
-                        hboxTopTransition->setObjectName(QStringLiteral("hboxTopTransition"));
-                        //hboxTopTransition->setContentsMargins(0, 0, 0, 0);
-                        {
-                            // QWidget lefttopleftTransition
-                            lefttopleftTransition = new QWidget(horizontalLayoutWidget_2);
-                            lefttopleftTransition->setObjectName(QStringLiteral("lefttopleftTransition"));
-#if 1
-                            {
-                                QScrollArea *scrollArea;
-                                QWidget *scrollAreaWidgetContents;
-                                QWidget *animationsWidget;
-                                QVBoxLayout *verticalLayout;
-                                QHBoxLayout *horizontalLayout;
-                                QLabel *label;
-                                QLabel *label_2;
-                                QLabel *label_3;
-                                QHBoxLayout *horizontalLayout_2;
-                                QLabel *label_5;
-                                QLabel *label_4;
-                                QLabel *label_6;
-                                scrollArea = new QScrollArea(lefttopleftTransition);
-                                scrollArea->setObjectName(QStringLiteral("scrollArea"));
-                                scrollArea->setGeometry(QRect(0, 0, 250, 120));// 10, 30, 54, 31
-                                scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-                                scrollArea->setWidgetResizable(true);
-                                animationsWidget = new QWidget();
-                                animationsWidget->setObjectName(QStringLiteral("animationsWidget"));
-                                animationsWidget->setGeometry(QRect(0, 0, 220, 110)); // 留30的scrollbar
-                                animationsWidget->setMinimumSize(QSize(200, 200));
-                                animationsWidget->setBaseSize(QSize(0, 0));
-                                scrollArea->setWidget(animationsWidget);
-
-#if 1
-                                FlowLayout* flowLayout = new FlowLayout(animationsWidget);
-                                flowLayout->setSpacing(6);
-                                flowLayout->setContentsMargins(11, 11, 11, 11);
-                                flowLayout->setObjectName(QStringLiteral("flowLayout"));
-                                //flowLayout->setContentsMargins(0, 0, 0, 0);
-                                label = new QLabel(animationsWidget);
-                                label->setObjectName(QStringLiteral("label"));
-                                label->setMaximumSize(QSize(100, 100));
-                                label->setPixmap(QPixmap(QString::fromUtf8("../../../QtProjects/qtmovie/jpg/img001.jpg")));
-                                label->setScaledContents(true);
-
-                                flowLayout->insertWidget(0, label);
-
-                                label_2 = new QLabel(animationsWidget);
-                                label_2->setObjectName(QStringLiteral("label_2"));
-                                label_2->setMaximumSize(QSize(100, 100));
-                                label_2->setPixmap(QPixmap(QString::fromUtf8("../../../QtProjects/qtmovie/jpg/img002.jpg")));
-                                label_2->setScaledContents(true);
-                                flowLayout->insertWidget(0, label_2);
-
-                                label_6 = new QLabel(animationsWidget);
-                                label_6->setObjectName(QStringLiteral("label_6"));
-                                label_6->setMaximumSize(QSize(100, 100));
-                                label_6->setPixmap(QPixmap(QString::fromUtf8("../../../QtProjects/qtmovie/jpg/img002.jpg")));
-                                label_6->setScaledContents(true);
-                                flowLayout->insertWidget(0, label_6);
-                                label_5 = new QLabel(animationsWidget);
-                                label_5->setObjectName(QStringLiteral("label_5"));
-                                label_5->setMaximumSize(QSize(100, 100));
-                                label_5->setPixmap(QPixmap(QString::fromUtf8("../../../QtProjects/qtmovie/jpg/img002.jpg")));
-                                label_5->setScaledContents(true);
-                                flowLayout->insertWidget(0, label_5);
-                                label_4 = new QLabel(animationsWidget);
-                                label_4->setObjectName(QStringLiteral("label_4"));
-                                label_4->setMaximumSize(QSize(100, 100));
-                                label_4->setPixmap(QPixmap(QString::fromUtf8("../../../QtProjects/qtmovie/jpg/img002.jpg")));
-                                label_4->setScaledContents(true);
-                                flowLayout->insertWidget(0, label_4);
-                                label_3 = new QLabel(animationsWidget);
-                                label_3->setObjectName(QStringLiteral("label_3"));
-                                label_3->setMaximumSize(QSize(100, 100));
-                                label_3->setPixmap(QPixmap(QString::fromUtf8("../../../QtProjects/qtmovie/jpg/img002.jpg")));
-                                label_3->setScaledContents(true);
-                                flowLayout->insertWidget(0, label_3);
-#endif
-                            }
-#endif
-
-
-                            hboxTopTransition->addWidget(lefttopleftTransition);
-                        }
-                        {
-                            // QWidget lefttoprightTransition
-
-                            lefttoprightTransition = new QWidget(horizontalLayoutWidget_2);
-                            lefttoprightTransition->setObjectName(QStringLiteral("lefttoprightTransition"));
-                            verticalLayoutWidget_2 = new QWidget(lefttoprightTransition);
-                            verticalLayoutWidget_2->setObjectName(QStringLiteral("verticalLayoutWidget_2"));
-                            verticalLayoutWidget_2->setGeometry(QRect(10, 0, 200, 140));
-                            {
-                                //// QVBoxLayout vboxTopRightTransition
-                                vboxTopRightTransition = new QVBoxLayout(verticalLayoutWidget_2);
-                                vboxTopRightTransition->setSpacing(6);
-                                vboxTopRightTransition->setContentsMargins(11, 11, 11, 11);
-                                vboxTopRightTransition->setObjectName(QStringLiteral("vboxTopRightTransition"));
-                                //vboxTopRightTransition->setContentsMargins(0, 0, 0, 0);
-                                {
-                                    // QWidget lefttoprighttopTransition
-                                    lefttoprighttopTransition = new QWidget(verticalLayoutWidget_2);
-                                    lefttoprighttopTransition->setObjectName(QStringLiteral("lefttoprighttopTransition"));
-                                    horizontalLayoutWidget_3 = new QWidget(lefttoprighttopTransition);
-                                    horizontalLayoutWidget_3->setObjectName(QStringLiteral("horizontalLayoutWidget_3"));
-                                    horizontalLayoutWidget_3->setGeometry(QRect(0, 0, 200, 70));
-                                    {
-                                        //// QHBoxLayout hboxTopRightTopTransition
-                                        hboxTopRightTopTransition = new QHBoxLayout(horizontalLayoutWidget_3);
-                                        hboxTopRightTopTransition->setSpacing(6);
-                                        hboxTopRightTopTransition->setContentsMargins(11, 11, 11, 11);
-                                        hboxTopRightTopTransition->setObjectName(QStringLiteral("hboxTopRightTopTransition"));
-                                        //hboxTopRightTopTransition->setContentsMargins(0, 0, 0, 0);
-                                        lblDurationTrans = new QLabel(horizontalLayoutWidget_3);
-                                        lblDurationTrans->setObjectName(QStringLiteral("lblDurationTrans"));
-                                        lblDurationTrans->setText(QApplication::translate("MainWindow", "Duration:", 0));
-                                        hboxTopRightTopTransition->addWidget(lblDurationTrans);
-
-                                        comboBox = new QComboBox(horizontalLayoutWidget_3);
-                                        comboBox->setObjectName(QStringLiteral("comboBox"));
-                                        hboxTopRightTopTransition->addWidget(comboBox);
-                                    }
-
-                                    vboxTopRightTransition->addWidget(lefttoprighttopTransition);
-
-                                    {
-                                        // QWidget
-                                        lefttoprightbottomTransition = new QWidget(verticalLayoutWidget_2);
-                                        lefttoprightbottomTransition->setObjectName(QStringLiteral("lefttoprightbottomTransition"));
-                                        label_3 = new QLabel(lefttoprightbottomTransition);
-                                        label_3->setObjectName(QStringLiteral("label_3"));
-                                        label_3->setGeometry(QRect(0, 0, 200, 31));
-                                        label_3->setText(QApplication::translate("MainWindow", "Apply to all", 0));
-                                    }
-                                    vboxTopRightTransition->addWidget(lefttoprightbottomTransition);
-                                }
-                            }
-                            hboxTopTransition->addWidget(lefttoprightTransition);
-                        }
-                    }
-                    vboxLeftTransition->addWidget(lefttopTransition);
-                    {
-                        // QWidget leftbottomTransition
-
-                        leftbottomTransition = new QWidget(verticalLayoutWidget);
-                        leftbottomTransition->setObjectName(QStringLiteral("leftbottomTransition"));
-                        label = new QLabel(leftbottomTransition);
-                        label->setObjectName(QStringLiteral("label"));
-                        label->setGeometry(QRect(0, 0, 500, 50));
-                        label->setScaledContents(false);
-                        label->setAlignment(Qt::AlignCenter);
-                        label->setText(QApplication::translate("MainWindow", "Transition", 0));
-                    }
-                    vboxLeftTransition->addWidget(leftbottomTransition);
-                }
-            }
-            hboxAnimations->addWidget(leftTransition);
-        }
-
-        {
-            line = new QFrame(horizontalLayoutWidget);
-            line->setObjectName(QStringLiteral("line"));
-            line->setFrameShape(QFrame::VLine);
-            line->setFrameShadow(QFrame::Sunken);
-
-            hboxAnimations->addWidget(line);
-        }
-
-        {
-            // QWidget rightPanZoom
-
-            rightPanZoom = new QWidget(horizontalLayoutWidget);
-            rightPanZoom->setObjectName(QStringLiteral("rightPanZoom"));
-            verticalLayoutWidget_3 = new QWidget(rightPanZoom);
-            verticalLayoutWidget_3->setObjectName(QStringLiteral("verticalLayoutWidget_3"));
-            verticalLayoutWidget_3->setGeometry(QRect(0, 0, 261, 181));
-            {
-                //// QVBoxLayout vboxRightPanZoom
-                vboxRightPanZoom = new QVBoxLayout(verticalLayoutWidget_3);
-                vboxRightPanZoom->setSpacing(6);
-                vboxRightPanZoom->setContentsMargins(11, 11, 11, 11);
-                vboxRightPanZoom->setObjectName(QStringLiteral("vboxRightPanZoom"));
-                //vboxRightPanZoom->setContentsMargins(0, 0, 0, 0);
-                {
-                    // QWidget righttopPanZoom
-                    righttopPanZoom = new QWidget(verticalLayoutWidget_3);
-                    righttopPanZoom->setObjectName(QStringLiteral("righttopPanZoom"));
-                    horizontalLayoutWidget_4 = new QWidget(righttopPanZoom);
-                    horizontalLayoutWidget_4->setObjectName(QStringLiteral("horizontalLayoutWidget_4"));
-                    horizontalLayoutWidget_4->setGeometry(QRect(-1, -1, 261, 91));
-                    {
-                        //// QHBoxLayout
-                        hboxTopPanZoom = new QHBoxLayout(horizontalLayoutWidget_4);
-                        hboxTopPanZoom->setSpacing(6);
-                        hboxTopPanZoom->setContentsMargins(11, 11, 11, 11);
-                        hboxTopPanZoom->setObjectName(QStringLiteral("hboxTopPanZoom"));
-                        //hboxTopPanZoom->setContentsMargins(0, 0, 0, 0);
-                        {
-                            // QWidget righttopleftPanZoom
-                            righttopleftPanZoom = new QWidget(horizontalLayoutWidget_4);
-                            righttopleftPanZoom->setObjectName(QStringLiteral("righttopleftPanZoom"));
-                            label_2 = new QLabel(righttopleftPanZoom);
-                            label_2->setObjectName(QStringLiteral("label_2"));
-                            label_2->setGeometry(QRect(10, 30, 54, 12));
-                            label_2->setPixmap(QPixmap(QString::fromUtf8("../../../QtProjects/qtmovie/jpg/img003.jpg")));
-                            label_2->setScaledContents(true);
-                            label_2->setText(QString());
-                            label_4 = new QLabel(righttopleftPanZoom);
-                            label_4->setObjectName(QStringLiteral("label_4"));
-                            label_4->setGeometry(QRect(10, 50, 54, 12));
-                            label_4->setPixmap(QPixmap(QString::fromUtf8("../../../QtProjects/qtmovie/jpg/img004.jpg")));
-                            label_4->setScaledContents(true);
-                            label_4->setText(QString());
-
-                            hboxTopPanZoom->addWidget(righttopleftPanZoom);
-                        }
-                        {
-                            // QWidget righttoprightPanZoom
-                            righttoprightPanZoom = new QWidget(horizontalLayoutWidget_4);
-                            righttoprightPanZoom->setObjectName(QStringLiteral("righttoprightPanZoom"));
-                            lblApplyAllPanzoom = new QLabel(righttoprightPanZoom);
-                            lblApplyAllPanzoom->setObjectName(QStringLiteral("lblApplyAllPanzoom"));
-                            lblApplyAllPanzoom->setGeometry(QRect(50, 30, 41, 31));
-                            lblApplyAllPanzoom->setWordWrap(true);
-                            lblApplyAllPanzoom->setText(QApplication::translate("MainWindow", "Apply to all", 0));
-
-                            hboxTopPanZoom->addWidget(righttoprightPanZoom);
-                        }
-                    }
-                    vboxRightPanZoom->addWidget(righttopPanZoom);
-                }
-                {
-                    // QWidget rightbottomPanZoom
-                    rightbottomPanZoom = new QWidget(verticalLayoutWidget_3);
-                    rightbottomPanZoom->setObjectName(QStringLiteral("rightbottomPanZoom"));
-                    lblPanZoom = new QLabel(rightbottomPanZoom);
-                    lblPanZoom->setObjectName(QStringLiteral("lblPanZoom"));
-                    lblPanZoom->setGeometry(QRect(0, 40, 261, 20));
-                    lblPanZoom->setAlignment(Qt::AlignCenter);
-                    lblPanZoom->setText(QApplication::translate("MainWindow", "Pan and zoom", 0));
-
-                    vboxRightPanZoom->addWidget(rightbottomPanZoom);
-                }
-            }
-            hboxAnimations->addWidget(rightPanZoom);
-        }
-
-        {
-            line_2 = new QFrame(horizontalLayoutWidget);
-            line_2->setObjectName(QStringLiteral("line_2"));
-            line_2->setFrameShape(QFrame::VLine);
-            line_2->setFrameShadow(QFrame::Sunken);
-
-            hboxAnimations->addWidget(line_2);
-        }
-
-    }
-    addTab(tabAnimations, tr("&Animations"));
-    setCurrentWidget(tabAnimations);
+    hboxAnimations->addWidget(line);
 }
-#endif
-#if 0
-void TabWidget::createTabAnimations()
+void TabWidget::initialScrollArea(QScrollArea *scrollArea)
 {
-    QWidget *tabAnimations = new QWidget;
-    QWidget *leftTransition = new QWidget;
-    QWidget *rightPanZoom = new QWidget;
-
-    QVBoxLayout *vboxLeftTransition = new QVBoxLayout;
-    QWidget *lefttopTransition = new QWidget;
-    {
-        QHBoxLayout *hboxTopTransition = new QHBoxLayout;
-#if 0
-        QListWidget *lefttopleftTransition = new QListWidget;
-        {
-            lefttopleftTransition->setIconSize(m_iconSize);
-            lefttopleftTransition->setMinimumHeight(m_iconSize.height() + 250);
-            lefttopleftTransition->setMaximumWidth(m_iconSize.width() + 50);
-            lefttopleftTransition->setMovement(QListView::Static);
-
-            QListWidgetItem *revealleftItem = new QListWidgetItem();
-            QPixmap image("images/reveal_left.png");
-            const QSize maximumSize(40, 40); // Reduce in case someone has large photo images.
-            if (image.size().width() > maximumSize.width() || image.height() > maximumSize.height())
-                image = image.scaled(maximumSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-            revealleftItem->setIcon(image);
-            revealleftItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-            lefttopleftTransition->addItem(revealleftItem);
-
-            connect(revealleftItem, SIGNAL(clicked()), m_elementsEdit, SLOT(selectedTransition()));
-        }
-        hboxTopTransition->addWidget(lefttopleftTransition);
-#endif
-#if 0
-        QToolButton *lefttopleftTransition = new QToolButton(this);
-        {
-            //lefttopleftTransition->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-            lefttopleftTransition->setIcon(QIcon("images/reveal_left.png"));
-            lefttopleftTransition->setIconSize(m_iconSize);
-            //lefttopleftTransition->setText("Add photos");
-            //lefttopleftTransition->setMaximumHeight(m_iconSize.height() + 250);
-            lefttopleftTransition->setMinimumWidth(m_iconSize.width());
-            //lefttopleftTransition->setMinimumWidth(lefttopleftTransition->text().length());
-            connect(lefttopleftTransition, SIGNAL(clicked()), m_elementsEdit, SLOT(selectedTransition()));
-        }
-#endif
-#if 1
-        QLabel *lefttopleftTransition = new QLabel(this);
-        QPixmap image("images/reveal_left.png");
-        const QSize maximumSize(100, 100); // Reduce in case someone has large photo images.
-        if (image.size().width() > maximumSize.width() || image.height() > maximumSize.height())
-            image = image.scaled(maximumSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        lefttopleftTransition->setPixmap(image);
-#endif
-        //hboxTopTransition->addWidget(lefttopleftTransition);
-        FlowLayout* flowLayout = new FlowLayout;
-        flowLayout->insertWidget(0, lefttopleftTransition);
-        hboxTopTransition->addLayout(flowLayout);
-
-        QWidget *lefttoprightTransition = new QWidget;
-        {
-            //QVBoxLayout *vboxTopTransition = new QVBoxLayout;
-            //QWidget *lefttopTransition = new QWidget;
-        }
-        hboxTopTransition->setMargin(5);
-        hboxTopTransition->addWidget(lefttoprightTransition);
-        lefttopTransition->setLayout(hboxTopTransition);
-    }
-    QLabel *leftbottomTransition = new QLabel;
-    leftbottomTransition->setText(tr("Transitions"));
-    leftbottomTransition->setAlignment(Qt::AlignHCenter);
-    vboxLeftTransition->setMargin(5);
-    vboxLeftTransition->addWidget(lefttopTransition);
-    vboxLeftTransition->addWidget(leftbottomTransition);
-    leftTransition->setLayout(vboxLeftTransition);
-
-    QVBoxLayout *vboxRightPanZoom = new QVBoxLayout;
-    QWidget *righttopPanZoom = new QWidget;
-    {
-        QHBoxLayout *hboxTopPanZoom = new QHBoxLayout;
-        QListWidget *righttopleftTransition = new QListWidget;
-        QWidget *righttoprightTransition = new QWidget;
-        hboxTopPanZoom->setMargin(5);
-        hboxTopPanZoom->addWidget(righttopleftTransition);
-        hboxTopPanZoom->addWidget(righttoprightTransition);
-        righttopPanZoom->setLayout(hboxTopPanZoom);
-    }
-    QLabel *rightbottomPanZoom = new QLabel;
-    rightbottomPanZoom->setText(tr("Pan and zoom"));
-    rightbottomPanZoom->setAlignment(Qt::AlignHCenter);
-    vboxRightPanZoom->setMargin(5);
-    vboxRightPanZoom->addWidget(righttopPanZoom);
-    vboxRightPanZoom->addWidget(rightbottomPanZoom);
-    rightPanZoom->setLayout(vboxRightPanZoom);
-
-    QHBoxLayout *hboxAnimations = new QHBoxLayout;
-    hboxAnimations->setMargin(5);
-    hboxAnimations->addWidget(leftTransition);
-    hboxAnimations->addWidget(rightPanZoom);
-    tabAnimations->setLayout(hboxAnimations);
-
-    addTab(tabAnimations, tr("&Animations"));
-    setCurrentWidget(tabAnimations);
+    //scrollArea->setBackgroundRole(QPalette::Dark);
+    scrollArea->setMinimumWidth(500);
+    ////scrollArea->setMinimumHeight(120);
+    ////scrollArea->setMaximumHeight(120);
+    //scrollArea->setContentsMargins(10, 10, 10, 10);
+    scrollArea->setContentsMargins(0, 0, 0, 0);
+    scrollArea->setWidgetResizable (true);
 }
-#endif
+void TabWidget::createTabText()
+{
+}

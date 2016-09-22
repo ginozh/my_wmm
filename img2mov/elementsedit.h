@@ -22,7 +22,7 @@ public:
     ~ElementsEdit();
 private:
     int callFfmpeg(const QVector<QString>& vqsArgv);
-    void createFinalVideoAndPlay();
+    void createFinalVideoAndPlay(bool bPlay=false);
     void scaleImage(Element *element);
     void createVideo(Element *element);
     bool createAnimation(Element *firstElement, Element *secondElement
@@ -30,8 +30,9 @@ private:
     void initialProgress();
     void assignProgress();
 signals:
-    void playVideo(const QString& fileName, const QByteArray& buffer);
-    void verticalLineMoved(int);
+    void readyVideo(const QString& fileName, const QByteArray& buffer, int position);
+    void changePlayPosition(int);
+    void playVideo();
 protected:
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void resizeEvent(QResizeEvent * event) Q_DECL_OVERRIDE;
@@ -47,13 +48,17 @@ private:
     QVBoxLayout *m_firstLayout;
     QLabel* m_firstLabel;
 
-    QFrame *m_vecticalLine; //进度条竖线
+    //进度条竖线
+    QFrame *m_vecticalLine; 
     qint64 m_duration;
     qint64 m_imgWidth;
     qint64 m_signalImgWidth;
     qint64 m_imgHeight;
     qint64 m_lineWidth;
     qint64 m_playPosition;
+    //end
+
+    qint64 m_imgPlayPosition; //选中图片计算出来的位移
 
     QString m_tmpdir;
     QWidget *m_lastSelectedImage;

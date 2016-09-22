@@ -36,6 +36,8 @@ ElementsEdit::ElementsEdit(QWidget *parent)
     m_imgHeight=0;
     m_lineWidth=10;
     m_playPosition=0;
+
+    m_imgPlayPosition = 0;
 #if 0
     m_flowLayout->addWidget(new QPushButton(tr("Short")));
     m_flowLayout->addWidget(new QPushButton(tr("Longer")));
@@ -289,7 +291,9 @@ void ElementsEdit::selectedImage()
         //QMessageBox::information(this, "info", QString(tr("imgWidth: %1")).arg(element->geometry().width()));
         imgWidth+=element->geometry().width();
     }
-    emit verticalLineMoved(imgWidth*m_duration/m_imgWidth);
+    if(m_imgWidth)
+        m_imgPlayPosition = imgWidth*m_duration/m_imgWidth;
+    emit changePlayPosition(m_imgPlayPosition); 
 
     // 2, 移除上次高亮
     if(send == m_lastSelectedImage)
@@ -329,7 +333,7 @@ void ElementsEdit::selectedTransition(const QString& animation)
             }
         }
         //4, 生成总视频
-        createFinalVideoAndPlay();
+        createFinalVideoAndPlay(true);
     }
 }
 bool ElementsEdit::createAnimation(Element *firstElement, Element *secondElement
@@ -395,7 +399,7 @@ bool ElementsEdit::createAnimation(Element *firstElement, Element *secondElement
     //emit playVideo(vfileName);
     return true;
 }
-void ElementsEdit::createFinalVideoAndPlay()
+void ElementsEdit::createFinalVideoAndPlay(bool bPlay)
 {
     QVector<QString> vqsArgv;
     vqsArgv.push_back("ffmpeg");
@@ -455,7 +459,12 @@ void ElementsEdit::createFinalVideoAndPlay()
     }
     //5, 播放视频
     QByteArray tmp=QByteArray((const char*)soutbuffer.ptr, (int)out_len);
-    emit playVideo("tmp.avi", tmp);
+    emit readyVideo("tmp.avi", tmp, m_imgPlayPosition);
+    emit changePlayPosition(m_imgPlayPosition);
+    if(bPlay)
+    {
+        emit playVideo();
+    }
 }
 void ElementsEdit::mousePressEvent(QMouseEvent *event)
 {
@@ -500,11 +509,13 @@ ElementsEdit::~ElementsEdit()
 			dirdel.remove(file);
     }
 }
+//每次重新生成视频时都会调用此函数. (生成动画时不能初始化m_vecticalLine的位置)
 void ElementsEdit::durationChanged(qint64 duration)
 {
     m_duration=duration;
-    initialProgress(); //需要在load渲染之后被调用
+    initialProgress(); //需要在load 图片渲染之后被调用，否则element的长宽不对
 }
+//视频播放时被调用，m_vecticalLine也需要跟着变化
 void ElementsEdit::positionChanged(qint64 position)
 {
     m_playPosition=position;
@@ -530,12 +541,13 @@ void ElementsEdit::initialProgress()
         m_imgWidth+=element->geometry().width();
     }
     //QMessageBox::information(this, "info", QString(tr("m_imgWidth: %1 imgHeight: %2")).arg(m_imgWidth).arg(imgHeight));
-    if(m_flowLayout && m_flowLayout->count()>0)
+    if(!m_imgPlayPosition && m_flowLayout && m_flowLayout->count()>0 )
     //for (int i = 0; i < m_flowLayout->count(); ++i)
     {
         //获取每个element的(x, y, width, height)
         //Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(0)->widget());
         //const QRect &rect=element->geometry();
+        //QMessageBox::information(this, "info", QString(tr("initail m_vecticalLine")));
         m_vecticalLine->setGeometry(QRect(0, 0, m_lineWidth, m_imgHeight)); //uncomplete
         m_vecticalLine->raise(); // top level, Raises this widget to the top of the parent widget's stack.
         //m_vecticalLine->setGeometry(QRect(rect.x(), rect.y(), 160, rect.height()));
@@ -553,7 +565,9 @@ void ElementsEdit::assignProgress()
         int xOri=m_playPosition*m_imgWidth/m_duration;
         int x=xOri%xMax;
         int y=(xOri/xMax)*m_imgHeight;
-        //QMessageBox::information(this, "info", QString(tr("xMax: %1 xOri: %2 x: %3 y: %4 posi: %5 duration: %6")).arg(xMax).arg(xOri).arg(x).arg(y).arg(m_playPosition).arg(m_duration));
+        //if(!x)
+        //    QMessageBox::information(this, "info", QString(tr("xMax: %1 xOri: %2 x: %3 y: %4 posi: %5 duration: %6 m_imgWidth: %7")).arg(xMax).arg(xOri).arg(x).arg(y).arg(m_playPosition).arg(m_duration).arg(m_imgWidth));
+            //QMessageBox::information(this, "info", QString(tr("assign m_vecticalLine")));
         m_vecticalLine->setGeometry(QRect(x, y, m_lineWidth, m_imgHeight)); //uncomplete
     }
 }

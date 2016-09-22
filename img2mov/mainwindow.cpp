@@ -59,10 +59,11 @@ MainWindow::MainWindow(QWidget *parent)
 #else
     centralSplitter->addWidget(m_elementsEdit);
 #endif
-    connect(m_elementsEdit, SIGNAL(playVideo(const QString&,const QByteArray&)), m_player, SLOT(playVideo(const QString&, const QByteArray&)));
+    connect(m_elementsEdit, SIGNAL(readyVideo(const QString&,const QByteArray&,int)), m_player, SLOT(readyVideo(const QString&, const QByteArray&, int)));
     connect(m_player->getMediaPlayer(), SIGNAL(durationChanged(qint64)), m_elementsEdit, SLOT(durationChanged(qint64)));
-    connect(m_player->getMediaPlayer(), SIGNAL(positionChanged(qint64)), m_elementsEdit, SLOT(positionChanged(qint64)));
-    connect(m_elementsEdit, SIGNAL(verticalLineMoved(int)), m_player, SLOT(setPosition(int)));
+    connect(m_player->getMediaPlayer(), SIGNAL(positionChanged(qint64)), m_elementsEdit, SLOT(positionChanged(qint64))); //播放条变更后，移动图片区的垂直条
+    connect(m_elementsEdit, SIGNAL(changePlayPosition(int)), m_player, SLOT(setPosition(int)));
+    connect(m_elementsEdit, SIGNAL(playVideo()), m_player, SLOT(play()));
 
 
     setCentralWidget(m_centralWidget);

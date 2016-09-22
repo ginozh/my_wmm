@@ -5,6 +5,7 @@
 #include <QMovie>
 #include <QWidget>
 #include "slider.h"
+#include "videoscene.h"
 #include <QBuffer>
 
 QT_BEGIN_NAMESPACE
@@ -27,7 +28,7 @@ public:
 public slots:
     void openFile();
     void play();
-    void playVideo(const QString& fileName, const QByteArray& buffer);
+    void readyVideo(const QString& fileName, const QByteArray& buffer, int position);
 
 private slots:
     void mediaStateChanged(QMediaPlayer::State state);
@@ -44,6 +45,8 @@ private:
     Slider *positionSlider;
     QByteArray m_playData;
     QBuffer m_playBuffer;
+    DiagramScene *scene;
+    QGraphicsView *graphicsView;
 };
 
 #endif
