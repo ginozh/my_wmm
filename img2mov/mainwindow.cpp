@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
     //QMenu *findMenu = menuBar()->addMenu(tr("&Edit"));
     menuBar()->addMenu(tr("&About"))->addAction(tr("&About Qt"), qApp, &QApplication::aboutQt);
 #endif
-    m_tabWidget = new TabWidget(m_centralWidget, m_elementsEdit);
+    m_tabWidget = new TabWidget(m_centralWidget, m_elementsEdit, m_player->Scene());
 
     QSplitter *centralSplitter = new QSplitter(m_centralWidget);
     //setCentralWidget(centralSplitter);
@@ -59,13 +59,6 @@ MainWindow::MainWindow(QWidget *parent)
 #else
     centralSplitter->addWidget(m_elementsEdit);
 #endif
-    connect(m_elementsEdit, SIGNAL(readyVideo(const QString&,const QByteArray&,int)), m_player, SLOT(readyVideo(const QString&, const QByteArray&, int)));
-    connect(m_player->getMediaPlayer(), SIGNAL(durationChanged(qint64)), m_elementsEdit, SLOT(durationChanged(qint64)));
-    connect(m_player->getMediaPlayer(), SIGNAL(positionChanged(qint64)), m_elementsEdit, SLOT(positionChanged(qint64))); //播放条变更后，移动图片区的垂直条
-    connect(m_elementsEdit, SIGNAL(changePlayPosition(int)), m_player, SLOT(setPosition(int)));
-    connect(m_elementsEdit, SIGNAL(playVideo()), m_player, SLOT(play()));
-
-
     setCentralWidget(m_centralWidget);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -74,6 +67,23 @@ MainWindow::MainWindow(QWidget *parent)
     mainLayout->addWidget(centralSplitter);
 
     m_centralWidget->setLayout(mainLayout);
+
+
+    connect(m_elementsEdit, SIGNAL(readyVideo(const QString&,const QByteArray&,int)), m_player, SLOT(readyVideo(const QString&, const QByteArray&, int)));
+    connect(m_player->getMediaPlayer(), SIGNAL(durationChanged(qint64)), m_elementsEdit, SLOT(durationChanged(qint64)));
+    connect(m_player->getMediaPlayer(), SIGNAL(positionChanged(qint64)), m_elementsEdit, SLOT(positionChanged(qint64))); //播放条变更后，移动图片区的垂直条
+    connect(m_elementsEdit, SIGNAL(changePlayPosition(int)), m_player, SLOT(setPosition(int)));
+    connect(m_elementsEdit, SIGNAL(playVideo()), m_player, SLOT(play()));
+
+    //创建videotext
+    connect(m_elementsEdit, SIGNAL(createTextSignal(void*)), m_player->Scene(), SLOT(createText(void*)));
+    //显示/隐藏videotext
+    connect(m_elementsEdit, SIGNAL(displayTextSignal(void*, bool /*display*/)), m_player->Scene(), SLOT(displayVideoText(void*, bool)));
+    //激活videotext
+    connect(m_elementsEdit, SIGNAL(activeVideoTextSignal(void*, const QString&)), m_player->Scene(), SLOT(activeVideoText(void*, const QString&)));
+
+    // tab
+    connect(m_elementsEdit, SIGNAL(activeTabTextSignal(void*)), m_tabWidget, SLOT(activeTabText(void*)));
 
 }
 #if 0

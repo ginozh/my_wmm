@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include "image.h"
+#include "lineedit.h"
 extern "C"{
 #include "ffmpeg.h"
 }
@@ -11,6 +12,7 @@ typedef struct to_buffer FfmpegBuffer;
 
 QT_BEGIN_NAMESPACE
 class QLabel;
+class QPushButton;
 QT_END_NAMESPACE
 //! [0]
 class Element : public QWidget
@@ -25,9 +27,11 @@ public:
 signals:
     void insertImage();
     void selectedImageSignal();
+    void selectedTextSignal(const QString&);
 public slots:
     void insert();
     void selectedImage();
+    void selectedText(const QString&);
 private:
     QVBoxLayout *m_elementLayout;
     Image *m_pimage;
@@ -43,6 +47,9 @@ public: // uncomplete
     size_t m_iOutScaleFile; 
     uint8_t* m_pBufferVideo;
     size_t m_iOutVidow; 
+
+    QPushButton* m_pushBtn;
+    LineEdit* m_lineEdit;
 };
 //! [0]
 

@@ -67,8 +67,7 @@ tab: font and text animation
     playButton->setEnabled(false); //uncomplete
     playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 
-    connect(playButton, SIGNAL(clicked()),
-            this, SLOT(play()));
+    connect(playButton, SIGNAL(clicked()), this, SLOT(play()));
 
     //positionSlider = new QSlider(Qt::Horizontal);
     positionSlider = new Slider(Qt::Horizontal);
@@ -241,3 +240,4 @@ tips:
 画板:
     widgets/widgets/scribble
  * */
+

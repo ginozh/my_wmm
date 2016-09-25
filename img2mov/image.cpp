@@ -4,12 +4,19 @@
 #include <QPainter>
 #include <QPen>
 class ElementsEdit;
-Image::Image(QWidget *parent,const QString& path)
+Image::Image(const QString& path, QSize size, QWidget *parent)
     : QLabel(parent)
     , m_pixMap(new QPixmap())
 {
     m_focus=false;
+    setMinimumSize(size);
+    setMaximumSize(size);
+    //setContentsMargins(5, 5, 5, 5);
+    setPixmap(QPixmap(path));
     setScaledContents(true);
+#if 0
+    //setMaximumSize(200,200);
+    //setMinimumSize(200,200);
     if(!path.isEmpty())
     {
         m_pixMap->load(path);
@@ -20,13 +27,14 @@ Image::Image(QWidget *parent,const QString& path)
 
         setPixmap(*m_pixMap);
     }
+#endif
     setContextMenuPolicy(Qt::DefaultContextMenu);
     //webenginewidgets/simplebrowser/tabwidget.cpp
     //setContextMenuPolicy(Qt::CustomContextMenu);
     //connect(this, &QLabel::customContextMenuRequested, parent()->parent(), &ElementsEdit::handleContextMenuRequested);
-    connect(this, SIGNAL(selectedImageSignal()), parentWidget(), SLOT(selectedImage()));
+    //connect(this, SIGNAL(selectedImageSignal()), parentWidget(), SLOT(selectedImage()));
 }
-void Image::contextMenuEvent(QContextMenuEvent * event)
+void Image::contextMenuEvent(QContextMenuEvent * /*event*/)
 {
     //connect(tree, SIGNAL(customContextMenuRequested(QPoint)), this,    SLOT(customContextMenuRequested(QPoint)));
     //QMessageBox::information(this,tr("right button"),tr("right"));

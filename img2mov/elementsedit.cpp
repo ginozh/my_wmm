@@ -21,8 +21,8 @@ ElementsEdit::ElementsEdit(QWidget *parent)
       //, m_flowLayout(new FlowLayout(this))
       , m_flowLayout(NULL)
       , m_vecticalLine(new QFrame(this))
-      , m_lastSelectedImage(0)
-      , m_idxCurrentImage(-1)
+      , m_lastSelectedElement(0)
+      , m_idxCurrentElement(-1)
       , m_isFirstClick(true)
 {   
     //m_tmpdir=QDir::currentPath().append(tr("/tmp"));
@@ -38,36 +38,12 @@ ElementsEdit::ElementsEdit(QWidget *parent)
     m_playPosition=0;
 
     m_imgPlayPosition = 0;
-#if 0
-    m_flowLayout->addWidget(new QPushButton(tr("Short")));
-    m_flowLayout->addWidget(new QPushButton(tr("Longer")));
-    m_flowLayout->addWidget(new QPushButton(tr("Different text")));
-    m_flowLayout->addWidget(new QPushButton(tr("More text")));
-    m_flowLayout->addWidget(new QPushButton(tr("Even longer button text")));
-#endif
-    //m_flowLayout->setSpacing(0);
-    //m_flowLayout->setMargin(0);
-    //m_flowLayout->setContentsMargins(0,0,0,0);
 #if 1
-    /*
-    m_flowLayout->addWidget(new Element());
-    m_flowLayout->addWidget(new Element());
-    m_flowLayout->addWidget(new Element());
-    m_flowLayout->addWidget(new Element());
-    m_flowLayout->addWidget(new Element());
-    */
-#if 0
-    //test
-    m_flowLayout->addWidget(new Element(this, tr("C:\\QtProjects\\qtmovie\\jpg\\img001.jpg")));
-    m_flowLayout->addWidget(new Element(this, tr("C:\\QtProjects\\qtmovie\\jpg\\img002.jpg")));
-    m_flowLayout->addWidget(new Element(this, tr("C:\\QtProjects\\qtmovie\\jpg\\img003.jpg")));
-#endif
-    //setLayout(m_flowLayout);
 
     m_vecticalLine->setObjectName(QStringLiteral("line"));
     m_vecticalLine->setEnabled(true);
     m_vecticalLine->hide();
-    m_vecticalLine->setGeometry(QRect(300, 250, 10, 200));
+    //m_vecticalLine->setGeometry(QRect(300, 250, 10, 200));
     m_vecticalLine->setLineWidth(0);
     m_vecticalLine->setMidLineWidth(10);
     QPalette palette1;
@@ -80,14 +56,6 @@ ElementsEdit::ElementsEdit(QWidget *parent)
     m_vecticalLine->setFrameShape(QFrame::VLine);
     m_vecticalLine->setFrameShadow(QFrame::Sunken);
 
-#if 0
-    QSize iconSize(200, 200);
-    QToolButton *m_addPhotos = new QToolButton();
-    m_addPhotos->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    m_addPhotos->setIcon(QIcon("images/addphotos.png"));
-    m_addPhotos->setIconSize(iconSize);
-    m_addPhotos->setText("Add photos");
-#endif
     m_firstLabel=new QLabel(this);
     m_firstLabel->setText(tr("Click here to browse for photos"));
     //label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
@@ -100,25 +68,8 @@ ElementsEdit::ElementsEdit(QWidget *parent)
     //layout->addWidget(m_addPhotos, 0, Qt::AlignCenter);
     m_firstLayout->addWidget(m_firstLabel, 0, Qt::AlignCenter);
     setLayout(m_firstLayout);
-#else
-    QVBoxLayout *layout    = new QVBoxLayout(this);
-    layout->addWidget(new Element());
-    layout->addWidget(new Element());
-    layout->addWidget(new Element());
-    layout->addWidget(new Element());
-    layout->addWidget(new Element());
-    setLayout(layout);
 #endif
 
-
-#if 0
-    setVisible(true);
-    //adjustScrollBar(scrollArea->horizontalScrollBar(), factor);
-    QScrollBar *scrollBar = horizontalScrollBar();
-    double factor = 1.0;
-    scrollBar->setValue(int(factor * scrollBar->value()
-                            + ((factor - 1) * scrollBar->pageStep()/2)));
-#endif 
     setWindowTitle(tr("Flow Layout"));
 }
 int ElementsEdit::callFfmpeg(const QVector<QString>& vqsArgv)
@@ -239,6 +190,7 @@ void ElementsEdit::load()
     for (int i = 0; i < files.count(); ++i) {
         // 1, 读取文件，生成image
         Element *element=new Element(this, files[i]);
+        emit createTextSignal((void*)element); 
         m_flowLayout->insertWidget(idx, element);
         QFileInfo fi(files[i]);
         QString ext = fi.suffix();  // ext = "gz"
@@ -269,11 +221,29 @@ void ElementsEdit::load()
     // 
     
     
+    m_vecticalLine->raise(); // top level, Raises this widget to the top of the parent widget's stack.
     setCursor(QCursor(Qt::ArrowCursor));
+}
+void ElementsEdit::selectedText(const QString& oritxt)
+{
+    //只能先选定image，才能对text操作
+    QWidget* send = qobject_cast<QWidget *>(sender());
+    //QMessageBox::information(this, "info", QString(tr("selected send: %1 m_lastSelectedElement: %2")).arg((size_t)send).arg((size_t)m_lastSelectedElement));
+    if(send == m_lastSelectedElement && send)
+    {
+        //QMessageBox::information(this, "info", QString(tr("send")));
+        //QWidget *lastWidget = qobject_cast<QWidget *>(m_lastSelectedElement);
+        //int idx = m_flowLayout->indexOf(lastWidget);
+        //1, 激活对应VideoText
+        emit activeVideoTextSignal((void*)send, oritxt);
+        //2, 激活对应tabTextTool
+        emit activeTabTextSignal((void*)send);
+    }
 }
 void ElementsEdit::selectedImage()
 {
     QWidget* send = qobject_cast<QWidget *>(sender());
+    //QMessageBox::information(this, "info", QString(tr("selectedImage send: %1 m_lastSelectedElement: %2")).arg((size_t)send).arg((size_t)m_lastSelectedElement));
     //1, 计算播放位移
     int imgWidth=0;
     for (int i = 0; i < m_flowLayout->count(); ++i)
@@ -296,16 +266,16 @@ void ElementsEdit::selectedImage()
     emit changePlayPosition(m_imgPlayPosition); 
 
     // 2, 移除上次高亮
-    if(send == m_lastSelectedImage)
+    if(send == m_lastSelectedElement)
         return;
     int iCurrentIdx=-1;
     if(send && (iCurrentIdx=m_flowLayout->indexOf(send))>=0)
     {
-        m_idxCurrentImage = iCurrentIdx;
+        m_idxCurrentElement = iCurrentIdx;
     }
-    if(m_lastSelectedImage)
+    if(m_lastSelectedElement)
     {
-        QWidget *lastWidget = qobject_cast<QWidget *>(m_lastSelectedImage);
+        QWidget *lastWidget = qobject_cast<QWidget *>(m_lastSelectedElement);
         int idx = m_flowLayout->indexOf(lastWidget);
         if(idx<0)
         {
@@ -313,17 +283,23 @@ void ElementsEdit::selectedImage()
         }
         else
         {
-            (qobject_cast<Element *>(m_lastSelectedImage))->unselectedImage();
+            (qobject_cast<Element *>(m_lastSelectedElement))->unselectedImage();
+            //移除上一次的VideoText的显示
+            emit displayTextSignal((void*)m_lastSelectedElement, false);
         }
     }
-    m_lastSelectedImage=send;
+    // 3, 显示本次VideoText
+    m_lastSelectedElement=send;
+    emit displayTextSignal((void*)send, true);
+    // 4, 激活对应tabTextTool
+    //emit activeTabTextSignal((void*)send);
 }
 void ElementsEdit::selectedTransition(const QString& animation)
 {
-    if(m_idxCurrentImage >= 1)
+    if(m_idxCurrentElement >= 1)
     {
-        Element *firstElement = qobject_cast<Element *>(m_flowLayout->itemAt(m_idxCurrentImage-1)->widget());
-        Element *secondElement = qobject_cast<Element *>(m_flowLayout->itemAt(m_idxCurrentImage)->widget());
+        Element *firstElement = qobject_cast<Element *>(m_flowLayout->itemAt(m_idxCurrentElement-1)->widget());
+        Element *secondElement = qobject_cast<Element *>(m_flowLayout->itemAt(m_idxCurrentElement)->widget());
         if (firstElement && secondElement)
         {
             if(!createAnimation(firstElement, secondElement ,animation))

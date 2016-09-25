@@ -24,6 +24,7 @@ public:
 
     QSize sizeHint() const { return QSize(800, 600); }
     QMediaPlayer* getMediaPlayer(){return &mediaPlayer;}
+    DiagramScene *Scene(){return scene;}
 
 public slots:
     void openFile();
@@ -47,6 +48,7 @@ private:
     QBuffer m_playBuffer;
     DiagramScene *scene;
     QGraphicsView *graphicsView;
+
 };
 
 #endif

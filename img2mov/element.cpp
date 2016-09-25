@@ -16,13 +16,21 @@ Element::Element(QWidget *parent, const QString& qsImageName)
     memset(&m_fbInputAniVideo, 0, sizeof(m_fbInputAniVideo));
     m_elementLayout->setSpacing(0);
     m_elementLayout->setMargin(0);
+    int iMaxWidth=300;
+    int iMaxHeight=iMaxWidth*3/4;
+    setMinimumWidth(iMaxWidth);
+    setMaximumWidth(iMaxWidth);
     //m_elementLayout->addWidget(new Image(tr("C:\\QtProjects\\qtmovie\\jpg\\img001.jpg")));
     if(!qsImageName.isEmpty())
     {
-        m_pimage = new Image(this, qsImageName);
+        m_pimage = new Image(qsImageName, QSize(iMaxWidth, iMaxHeight), this);
         //webenginewidgets/simplebrowser/tabwidget.cpp
         m_elementLayout->addWidget(m_pimage);
+
         connect(this, SIGNAL(insertImage()), parentWidget(), SLOT(load()) );
+
+        //必须要二层，因为elementsedit是根据send(即element)来确定哪个element的
+        connect(m_pimage, SIGNAL(selectedImageSignal()), this, SLOT(selectedImage()) );
         connect(this, SIGNAL(selectedImageSignal()), parentWidget(), SLOT(selectedImage()) );
 
         //load orignal file
@@ -58,8 +66,18 @@ Element::Element(QWidget *parent, const QString& qsImageName)
         //connect(this, &QLabel::customContextMenuRequested, parent()->parent(), &ElementsEdit::handleContextMenuRequested);
 
     }
-    m_elementLayout->addWidget(new QPushButton(tr("")));
-    m_elementLayout->addWidget(new QLabel(tr("input text")));
+    m_pushBtn = new QPushButton(tr(""));
+    m_elementLayout->addWidget(m_pushBtn);
+    m_lineEdit =  new LineEdit();
+    //m_elementLayout->addWidget(new QLabel(tr("input text")));
+    m_elementLayout->addWidget(m_lineEdit);
+    //connect(this, SIGNAL(selectedTextSignal()), parentWidget(), SLOT(selectedText()) );
+    //connect(m_pushBtn, SIGNAL(clicked()), this, SLOT(selectedText()) );
+    //
+    //必须要二层，因为elementsedit是根据send(即element)来确定哪个element的
+    connect(m_lineEdit, SIGNAL(selectedTextSignal(const QString&)), this, SLOT(selectedText(const QString&)) );
+    connect(this, SIGNAL(selectedTextSignal(const QString&)), parent, SLOT(selectedText(const QString&)) );
+
     setLayout(m_elementLayout);
 #if 0
     for (int i = 0; i < m_elementLayout->count(); ++i)
@@ -89,4 +107,8 @@ void Element::insert()
 void Element::selectedImage()
 {
     emit selectedImageSignal();
+}
+void Element::selectedText(const QString& ori)
+{
+    emit selectedTextSignal(ori);
 }

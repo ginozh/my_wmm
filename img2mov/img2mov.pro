@@ -40,7 +40,8 @@ SOURCES += main.cpp \
     tabwidget.cpp \
     animation.cpp \
     videoscene.cpp \
-    videotextitem.cpp
+    videotextitem.cpp \
+    lineedit.cpp
 
 HEADERS  += mainwindow.h \
     ffmpeg.h \
@@ -58,4 +59,5 @@ HEADERS  += mainwindow.h \
     tabwidget.h \
     animation.h \
     videoscene.h \
-    videotextitem.h
+    videotextitem.h \
+    lineedit.h

@@ -10,7 +10,7 @@ class Image : public QLabel
     Q_OBJECT
 
 public:
-    Image(QWidget *parent=0, const QString& path=tr(""));
+    Image(const QString& path, QSize size, QWidget *parent=0);
     void unselectedImage();
 signals:
     void selectedImageSignal();
