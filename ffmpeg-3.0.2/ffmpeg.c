@@ -4375,6 +4375,56 @@ int main(int argc, char **argv)
 #define len 10*1024
 char *argvv[c];//[len];
 
+static int test_ass(int argc, char **argv)
+{
+    struct to_buffer sinbuffer, sinbuffer1, sinbuffer2, soutbuffer;
+    uint8_t* in_buffer, *in_buffer1, *in_buffer2;
+    size_t /*in_len,*/ in_len1, in_len2;
+    int i=0;
+    size_t out_len = 10*1024*1024;
+    uint8_t* out_buffer;
+    int ret;
+    out_buffer = av_mallocz(out_len);
+    for(int j=0; j<c; j++)
+    {
+        argvv[j]=av_mallocz(len);
+    }
+    //./ffmpeg_r.exe -y -i jpg/mp3.512.5.avi -vf ass=jpg/subtitle.ass jpg/subt.mp3.512.5.avi
+    snprintf(argvv[i++], len, "./ffmpeg");
+    snprintf(argvv[i++], len, "-y");
+    snprintf(argvv[i++], len, "-v");
+    snprintf(argvv[i++], len, "trace");
+    snprintf(argvv[i++], len, "-i");
+    ret = av_file_map("jpg/mp3.512.5.avi", &in_buffer1, &in_len1, 0, NULL);
+    if (ret < 0)
+        exit_program(1);
+    sinbuffer1.ptr = in_buffer1;
+    sinbuffer1.in_len = in_len1;
+    sinbuffer1.out_len = NULL;
+    snprintf(argvv[i++], len, "buffer:video/avi;nobase64,%zu", (size_t)&sinbuffer1);
+    snprintf(argvv[i++], len, "-vf");
+#if 1
+    ret = av_file_map("jpg/subtitle.ass", &in_buffer2, &in_len2, 0, NULL);
+    if (ret < 0)
+        exit_program(1);
+    sinbuffer2.ptr = in_buffer2;
+    sinbuffer2.in_len = in_len2;
+    sinbuffer2.out_len = NULL;
+    snprintf(argvv[i++], len, "ass=buffer|%zu", (size_t)&sinbuffer2);
+#else
+    snprintf(argvv[i++], len, "ass=jpg/subtitle.ass");
+#endif
+    snprintf(argvv[i++], len, "jpg/txt.avi");
+    qt_ffmpeg(i, argvv);
+    av_file_unmap(in_buffer1, in_len1);
+    av_file_unmap(in_buffer2, in_len2);
+    for(int j=0; j<c; j++)
+    {
+        av_freep  (&argvv[j]);
+    }
+    exit_program(received_nb_signals ? 255 : main_return_code);
+    return main_return_code;
+}
 // ./ffmpeg -y -f concat -i "buffer:text/txt;testconcat.txt"  -c copy jpg/mm.avi
 // cat testconcat.txt
 // file buffer:video/avi;jpg/512.1.avi
@@ -4535,7 +4585,8 @@ int main(int argc, char **argv)
     for(int i=0; i<1; i++)
     {
         //call_main(argc, argv);
-        test_concat(argc, argv);
+        //test_concat(argc, argv);
+        test_ass(argc, argv);
         sleep(1);
     }
 }

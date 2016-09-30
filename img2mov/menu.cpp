@@ -1,12 +1,14 @@
 #include "Menu.h"
 #include <QApplication>
-Menu::Menu(QWidget *parent, QWidget *elementsEdit)
+Menu::Menu(QWidget *parent, QWidget *elementsEdit, int x, int y)
     : QLabel(parent)
     , m_menu(new QMenu(this))
     , m_elementsEdit(elementsEdit)
 {
+    //widgets/graphicsview/diagramscene
     setObjectName(QStringLiteral("label"));
-    setGeometry(QRect(25, 25, 54, 22));
+    //setGeometry(QRect(x, y, 54, 22));
+    //setGeometry(rect);
     setText(QApplication::translate("MainWindow", "Menu", 0));
     raise();
 

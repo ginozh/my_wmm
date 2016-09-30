@@ -22,31 +22,38 @@ void myMessageHandler(QtMsgType type, const char *msg)
     QString txt;
 	switch (type) {
 		case QtDebugMsg:
-			txt = QString("Debug: %1").arg(msg);
+			txt = QString("Debug: %1\n").arg(msg);
+            //qDebug("%s", msg);
 			break;
 		case QtWarningMsg:
-			txt = QString("Warning: %1").arg(msg);
+			txt = QString("Warning: %1\n").arg(msg);
+            //qWarning("%s", msg);
 			break;
 		case QtInfoMsg:
-			txt = QString("Info: %1").arg(msg);
+			txt = QString("Info: %1\n").arg(msg);
+            //qInfo("%s", msg);
 			break;
 		case QtCriticalMsg:
-			txt = QString("Critical: %1").arg(msg);
+			txt = QString("Critical: %1\n").arg(msg);
+            //qCritical("%s", msg);
 			break;
 		case QtFatalMsg:
-			txt = QString("Fatal: %1").arg(msg);
+			txt = QString("Fatal: %1\n").arg(msg);
+            //qFatal("%s", msg);
 			break;
 	}
+#if 1
     QFile outFile("log.txt");
     outFile.open(QIODevice::WriteOnly | QIODevice::Append);
     QTextStream ts(&outFile);
     ts << txt << endl;
+#endif
 }
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-#if 0
+#if 1
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     qInstallMessageHandler(myMessageHandler);
 #else

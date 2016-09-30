@@ -6,6 +6,7 @@
 #include <QFontComboBox>
 #include <QColorDialog>
 #include <QTableWidget>
+#include <QMessageBox>
 #include "videoscene.h"
 
 
@@ -717,20 +718,20 @@ void TabWidget::activeTabText(void* element)
     m_element = element;
     //激活tabtext
     setCurrentWidget(m_tabText);
-    stTabText *textItem;
+    stTextAttr *textItem;
     if(m_mapText.contains(element))
     {
         textItem=m_mapText[element];
     }
     else
     {
-        textItem = new stTabText;
+        textItem = new stTextAttr;
         m_mapText.insert(element, textItem);
     }
     //赋值. 将element对应的保存的text值填充到各个控件中
     assignTabWidget(textItem);
 }
-void TabWidget::assignTabWidget(const stTabText *textItem)
+void TabWidget::assignTabWidget(const stTextAttr *textItem)
 {
     if(!textItem)
     {
@@ -769,7 +770,8 @@ void TabWidget::handleFontChange()
     if(!m_element || !m_mapText.contains(m_element))
         return;
 
-    stTabText *textItem=m_mapText[m_element];
+    //QMessageBox::information(this, "Error Opening Picture", QString(tr("x: %1 y: %2")).arg(frameGeometry().x()).arg(frameGeometry().y()));
+    stTextAttr *textItem=m_mapText[m_element];
 
     QFont font = m_fontCombo->currentFont();
     font.setPointSize(m_fontSizeCombo->currentText().toInt());
@@ -779,5 +781,7 @@ void TabWidget::handleFontChange()
 
     textItem->m_qfont = font;
 
-    m_scene->setFont(m_element, font);
+    //m_scene->setFont(m_element, font);
+    m_scene->setTextAttr(m_element, textItem);
+
 }

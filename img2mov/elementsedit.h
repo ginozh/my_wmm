@@ -7,6 +7,7 @@
 #include "element.h"
 #include <QBuffer>
 #include <QToolButton>
+#include "comm.h"
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -29,6 +30,8 @@ private:
             , const QString& animationName);
     void initialProgress();
     void assignProgress();
+    //QString createAss(stTextAttr* stTextAttr, const QString&);
+    QByteArray createAss(stTextAttr* stTextAttr, const QString& qsText);
 signals:
     void readyVideo(const QString& fileName, const QByteArray& buffer, int position);
     void changePlayPosition(int);
@@ -49,6 +52,7 @@ public slots:
     void positionChanged(qint64 position);
     //void selectedText(void*);
     //void handleContextMenuRequested(const QPoint &pos);
+    void updatedText(stTextAttr* stTextAttr, const QString&);
 private:
     FlowLayout *m_flowLayout;
     QVBoxLayout *m_firstLayout;
@@ -74,6 +78,13 @@ private:
     QBuffer m_playBuffer;
 
     bool m_isFirstClick;
+
+    uint8_t* m_pOutBuffer;
+    size_t m_outlen;
+    size_t m_outMaxLen;
+    uint8_t* m_pTextVideoOutBuffer; // 包含文字的视频
+    size_t m_textVideoOutLen;
+    size_t m_textVideoMaxOutLen;
 };
 //! [0]
 

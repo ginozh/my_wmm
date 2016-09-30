@@ -14,6 +14,8 @@ public:
     void unselectedImage();
 signals:
     void selectedImageSignal();
+public slots:
+    void focusImage();
 protected:
     void contextMenuEvent(QContextMenuEvent * event) Q_DECL_OVERRIDE;
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;

@@ -43,6 +43,8 @@
 #include "internal.h"
 #include "formats.h"
 #include "video.h"
+//storm
+#include "ffmpeg.h"
 
 typedef struct {
     const AVClass *class;
@@ -227,6 +229,10 @@ static av_cold int init_ass(AVFilterContext *ctx)
 {
     AssContext *ass = ctx->priv;
     int ret = init(ctx);
+    //storm 
+    const char* bufferpre="buffer|";
+    int prelen = strlen(bufferpre);
+    const char *data;
 
     if (ret < 0)
         return ret;
@@ -234,7 +240,34 @@ static av_cold int init_ass(AVFilterContext *ctx)
     /* Initialize fonts */
     ass_set_fonts(ass->renderer, NULL, NULL, 1, NULL, 1);
 
-    ass->track = ass_read_file(ass->library, ass->filename, NULL);
+    av_log(ctx, AV_LOG_DEBUG,
+            "init_ass filename: %s len: %d pre: %s len: %d\n", ass->filename, strlen(ass->filename),
+            bufferpre, prelen);
+    //storm
+    if (strlen(ass->filename)>prelen && !av_strncasecmp(ass->filename, "buffer|", prelen)) 
+    {
+        struct to_buffer* sbuffer=NULL;
+        data = ass->filename + prelen;
+
+        sbuffer = (struct to_buffer*)atol(data);
+#if 0
+        av_log(ctx, AV_LOG_DEBUG,
+                "init_ass in_len: %d buffer: %s\n", sbuffer->in_len, (char*)sbuffer->ptr);
+        av_log(NULL, AV_LOG_DEBUG, "start\n");
+        for(int i=0; i<sbuffer->in_len; i++)
+        {
+            av_log(NULL, AV_LOG_DEBUG,
+                    "i:%d %c", i, (char)sbuffer->ptr[i]);
+        }
+        av_log(NULL, AV_LOG_DEBUG, "\nend\n");
+#endif
+        ass->track = ass_read_memory(ass->library, sbuffer->ptr, sbuffer->in_len, NULL);
+    }
+    else
+    {
+        ass->track = ass_read_file(ass->library, ass->filename, NULL);
+    }
+
     if (!ass->track) {
         av_log(ctx, AV_LOG_ERROR,
                "Could not create a libass track when reading file '%s'\n",

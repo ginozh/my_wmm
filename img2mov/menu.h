@@ -9,7 +9,9 @@ class Menu : public QLabel
     Q_OBJECT
 
 public:
-    Menu(QWidget *parent=0, QWidget *elementsEdit=0);
+//    Menu(QWidget *parent=0, QWidget *elementsEdit=0);
+    //Menu(QWidget *parent, QWidget *elementsEdit, const QRect &rect);
+    Menu(QWidget *parent, QWidget *elementsEdit, int x, int y);
 protected:
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 private:

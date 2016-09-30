@@ -23,6 +23,9 @@ public:
 private slots:
     void load();
 #endif
+protected:
+    //void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
+    void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
 private:
     QWidget *m_centralWidget;
     TabWidget *m_tabWidget;

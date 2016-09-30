@@ -8,6 +8,8 @@ DiagramTextItem::DiagramTextItem(QGraphicsItem *parent)
     setFlag(QGraphicsItem::ItemIsMovable);
     setFlag(QGraphicsItem::ItemIsSelectable);
     setFlag(QGraphicsItem::ItemIsFocusable);
+
+    m_stTextAttr = 0;
 }
 //! [0]
 

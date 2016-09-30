@@ -18,8 +18,8 @@ Element::Element(QWidget *parent, const QString& qsImageName)
     m_elementLayout->setMargin(0);
     int iMaxWidth=300;
     int iMaxHeight=iMaxWidth*3/4;
-    setMinimumWidth(iMaxWidth);
-    setMaximumWidth(iMaxWidth);
+    //setMinimumWidth(iMaxWidth);
+    //setMaximumWidth(iMaxWidth);
     //m_elementLayout->addWidget(new Image(tr("C:\\QtProjects\\qtmovie\\jpg\\img001.jpg")));
     if(!qsImageName.isEmpty())
     {
@@ -29,6 +29,7 @@ Element::Element(QWidget *parent, const QString& qsImageName)
 
         connect(this, SIGNAL(insertImage()), parentWidget(), SLOT(load()) );
 
+        //connect(parentWidget(), SIGNAL(focusImageSignal()), m_pimage(), SLOT(focusImage()) );
         //必须要二层，因为elementsedit是根据send(即element)来确定哪个element的
         connect(m_pimage, SIGNAL(selectedImageSignal()), this, SLOT(selectedImage()) );
         connect(this, SIGNAL(selectedImageSignal()), parentWidget(), SLOT(selectedImage()) );

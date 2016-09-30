@@ -11,17 +11,20 @@ Image::Image(const QString& path, QSize size, QWidget *parent)
     m_focus=false;
     setMinimumSize(size);
     setMaximumSize(size);
+    //setMinimumHeight(size.height());
+    //setMaximumHeight(size.height());
     //setContentsMargins(5, 5, 5, 5);
+#if 0
     setPixmap(QPixmap(path));
     setScaledContents(true);
-#if 0
     //setMaximumSize(200,200);
     //setMinimumSize(200,200);
+#else
     if(!path.isEmpty())
     {
         m_pixMap->load(path);
         QPixmap& image=*m_pixMap;
-        const QSize maximumSize(200, 200); // Reduce in case someone has large photo images.
+        const QSize maximumSize(size); // Reduce in case someone has large photo images.
         if (image.size().width() > maximumSize.width() || image.height() > maximumSize.height())
             image = image.scaled(maximumSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
@@ -44,13 +47,17 @@ void Image::contextMenuEvent(QContextMenuEvent * /*event*/)
     menu.addAction(tr("Add images"), parentWidget(), SLOT(insert())  );
     menu.exec(QCursor::pos());
 }
+void Image::focusImage()
+{
+    mousePressEvent(NULL);
+}
 #if 1
 void Image::mousePressEvent(QMouseEvent *event)
 {
     m_focus=true;
     update();
     emit selectedImageSignal();
-    if (event->buttons() & Qt::RightButton)
+    if (event && (event->buttons() & Qt::RightButton))
     {
         //QMessageBox::information(this,tr("right button"),tr("right"));
     }

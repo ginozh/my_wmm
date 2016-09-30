@@ -9,7 +9,9 @@ CONFIG += c++11
 #QMAKE_CXXFLAGS += /MP
 
 INCLUDEPATH += C:\QtProjects\ffmpeg-3.0.2
+#QMAKE_CFLAGS += -D__STDC_CONSTANT_MACROS -static-libgcc -static-libstdc++ -ggdb
 QMAKE_CFLAGS += -D__STDC_CONSTANT_MACROS
+#QMAKE_CXXFLAGS += -D__STDC_CONSTANT_MACROS -static-libgcc -static-libstdc++ -ggdb
 QMAKE_CXXFLAGS += -D__STDC_CONSTANT_MACROS
 DEFINES += __STDC_FORMAT_MACROS
 LIBS += -lavcodec
@@ -60,4 +62,5 @@ HEADERS  += mainwindow.h \
     animation.h \
     videoscene.h \
     videotextitem.h \
-    lineedit.h
+    lineedit.h \
+    comm.h

@@ -3,6 +3,7 @@
 
 #include <QGraphicsTextItem>
 #include <QPen>
+#include "comm.h"
 
 QT_BEGIN_NAMESPACE
 class QFocusEvent;
@@ -23,6 +24,16 @@ public:
 
     int type() const Q_DECL_OVERRIDE { return Type; }
 
+    stTextAttr* textAttr()
+    {
+        //if(m_stTextAttr->m_qsText.compare(toPlainText()))
+        {
+            //m_stTextAttr->m_qsText = toPlainText() ;
+        }
+        return m_stTextAttr;
+    }
+    void setTextAttr(stTextAttr* stTextAttr){m_stTextAttr=stTextAttr;}
+
 signals:
     void lostFocus(DiagramTextItem *item);
     void selectedChange(QGraphicsItem *item);
@@ -31,6 +42,8 @@ protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) Q_DECL_OVERRIDE;
     void focusOutEvent(QFocusEvent *event) Q_DECL_OVERRIDE;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) Q_DECL_OVERRIDE;
+private:
+    stTextAttr* m_stTextAttr;
 };
 //! [0]
 

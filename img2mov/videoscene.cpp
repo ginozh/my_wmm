@@ -53,6 +53,18 @@ void DiagramScene::setItemColor(const QColor &color)
     */
 }
 //! [3]
+void DiagramScene::setTextAttr(void* element, stTextAttr *textAttr)
+{
+    if(!textAttr)
+        return;
+    myFont = textAttr->m_qfont;
+    if(element && m_mapText.contains(element))
+    {
+        DiagramTextItem *textItem = m_mapText[element];
+        textItem->setFont(myFont);
+        textItem->setTextAttr(textAttr);
+    }
+}
 
 void DiagramScene::setFont(void* element, const QFont &font)
 {
@@ -104,6 +116,7 @@ void DiagramScene::editorLostFocus(DiagramTextItem *item)
     // 1, 判断是否修改过 umcomplete
     //
     // 2, 如果修改过内容则生成文字视频
+    emit updatedTextSignal(item->textAttr(), item->toPlainText());
 #if 0
     if (item->toPlainText().isEmpty()) {
         removeItem(item);

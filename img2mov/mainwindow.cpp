@@ -62,7 +62,8 @@ MainWindow::MainWindow(QWidget *parent)
     setCentralWidget(m_centralWidget);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    m_menu = new Menu(m_centralWidget, m_elementsEdit);
+    m_menu = new Menu(m_centralWidget, m_elementsEdit, m_tabWidget->geometry().x(), m_tabWidget->geometry().y());
+    //QMessageBox::information(this, "Error Opening Picture", QString(tr("x: %1 y: %2")).arg(m_tabWidget->frameGeometry().x()).arg(m_tabWidget->frameGeometry().y()));
     mainLayout->addWidget(m_tabWidget);
     mainLayout->addWidget(centralSplitter);
 
@@ -81,6 +82,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_elementsEdit, SIGNAL(displayTextSignal(void*, bool /*display*/)), m_player->Scene(), SLOT(displayVideoText(void*, bool)));
     //激活videotext
     connect(m_elementsEdit, SIGNAL(activeVideoTextSignal(void*, const QString&)), m_player->Scene(), SLOT(activeVideoText(void*, const QString&)));
+    //更新videotext，生成2个视频：一个包含文字视频、一个未包含文字视频。
+    //编辑文字时显示无文字视频；播放时显示有文字视频？
+    connect(m_player->Scene(), SIGNAL(updatedTextSignal(stTextAttr*, const QString&)), m_elementsEdit, SLOT(updatedText(stTextAttr*, const QString&)));
 
     // tab
     connect(m_elementsEdit, SIGNAL(activeTabTextSignal(void*)), m_tabWidget, SLOT(activeTabText(void*)));
@@ -102,5 +106,19 @@ void MainWindow::load()
         QMessageBox::information(this, "Error Opening Picture",
                                  "Could not open picture");
                                  */
+}
+#endif
+void MainWindow::resizeEvent(QResizeEvent *ev)
+{
+    m_menu->setGeometry(QRect(m_tabWidget->geometry().x()+18, m_tabWidget->geometry().y()+3, m_tabWidget->iconSize().width()+30, m_tabWidget->iconSize().height()));
+    //QMessageBox::information(this, "menu", QString(tr("x: %1 y: %2")).arg(m_tabWidget->frameGeometry().x()).arg(m_tabWidget->frameGeometry().y()));
+    //QMessageBox::information(this, "menu", QString(tr("w: %1 h: %2")).arg(m_tabWidget->iconSize().width()).arg(m_tabWidget->iconSize().height()));
+    //qDebug()<< "resizeEvent w: " << m_tabWidget->iconSize().width() << " h: "<< m_tabWidget->iconSize().height();
+    QMainWindow::resizeEvent(ev);
+}
+#if 0
+void MainWindow::paintEvent(QPaintEvent *ev)
+{
+    QMainWindow::paintEvent(ev);
 }
 #endif

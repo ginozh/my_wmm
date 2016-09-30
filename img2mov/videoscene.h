@@ -5,6 +5,7 @@
 
 #include <QGraphicsScene>
 #include <QMap>
+#include "comm.h"
 
 QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;
@@ -34,6 +35,7 @@ public:
     void setItemColor(const QColor &color);
     void setFont(const QFont &font);
     void setFont(void* element, const QFont &font);
+    void setTextAttr(void* element, stTextAttr *textAttr);
 
 public slots:
     void setMode(Mode mode);
@@ -47,6 +49,7 @@ signals:
     //void itemInserted(DiagramItem *item);
     void textInserted(QGraphicsTextItem *item);
     void itemSelected(QGraphicsItem *item);
+    void updatedTextSignal(stTextAttr*, const QString&);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) Q_DECL_OVERRIDE;

@@ -7,6 +7,7 @@
 #include <QMap>
 #include <QFontComboBox>
 #include <QComboBox>
+#include "comm.h"
 
 QT_BEGIN_NAMESPACE
 class QHBoxLayout;
@@ -16,44 +17,6 @@ class QColor;
 QT_END_NAMESPACE
 class DiagramScene;
 
-
-typedef struct stTabText{
-public:
-    stTabText(const QString& qsStartTimeText="2.00s", const QString& qsDurationText="2.00")
-    {
-        initTabTextVar(qsStartTimeText, qsDurationText);
-    }
-    void initTabTextVar(const QString& qsStartTimeText, const QString& qsDurationText)
-    {
-        //m_qfont = ;
-        m_fontSize = "8";
-        m_isBoldChecked = false;
-        m_isItalicChecked = false;
-        m_isUnderlineChecked = false;
-        m_fontColor = Qt::white;
-
-        m_textAlign = Qt::AlignHCenter; //AlignRight;
-        m_idxEffects = 0;
-        m_qsStartTimeText = qsStartTimeText;
-        m_qsDurationText = qsDurationText;
-    }
-public:
-    //font
-    QFont m_qfont;
-    QString m_fontSize;
-    bool m_isBoldChecked; //setChecked
-    bool m_isItalicChecked;
-    bool m_isUnderlineChecked;
-    QColor m_fontColor;
-    //Paragraph
-    Qt::Alignment m_textAlign; 
-    //Adjust
-    QString m_qsStartTimeText;
-    QString m_qsDurationText;
-    //Effects
-    int m_idxEffects;
-
-}stTabText;
 class ParameterEdit : public QWidget
 {
 public:
@@ -106,14 +69,14 @@ private:
     QMenu *createColorMenu(const char *slot, QColor defaultColor);
     QIcon createColorToolButtonIcon(const QString &imageFile, QColor color);
     QIcon createColorIcon(QColor color);
-    void assignTabWidget(const stTabText *textItem);
+    void assignTabWidget(const stTextAttr *textItem);
 private:
     QListWidget *contentsWidget;
     QSize m_iconSize;
     QWidget *m_elementsEdit;
     DiagramScene* m_scene;
     void* m_element;
-    QMap<void*, stTabText*> m_mapText;
+    QMap<void*, stTextAttr*> m_mapText;
 
     QWidget *m_tabHome;
     QWidget *m_tabAnimations;
