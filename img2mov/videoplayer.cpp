@@ -14,7 +14,8 @@ VideoPlayer::VideoPlayer(QWidget *parent)
     setMinimumWidth(400);
     setMaximumWidth(600);
 
-    scene = new DiagramScene(NULL, this);
+    //scene = new DiagramScene(NULL, this);
+    scene = new DiagramScene(this);
     graphicsView = new QGraphicsView(scene);
 
     videoItem = new QGraphicsVideoItem;

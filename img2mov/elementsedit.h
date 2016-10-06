@@ -12,6 +12,7 @@
 QT_BEGIN_NAMESPACE
 class QLabel;
 QT_END_NAMESPACE
+class DiagramScene;
 //! [0]
 class ElementsEdit : public QWidget
 //class ElementsEdit : public QScrollArea
@@ -19,7 +20,7 @@ class ElementsEdit : public QWidget
     Q_OBJECT
 
 public:
-    ElementsEdit(QWidget *parent = 0);
+    ElementsEdit(QWidget *parent, DiagramScene* scene);
     ~ElementsEdit();
 private:
     int callFfmpeg(const QVector<QString>& vqsArgv);
@@ -85,6 +86,8 @@ private:
     uint8_t* m_pTextVideoOutBuffer; // 包含文字的视频
     size_t m_textVideoOutLen;
     size_t m_textVideoMaxOutLen;
+
+    DiagramScene* m_scene;
 };
 //! [0]
 

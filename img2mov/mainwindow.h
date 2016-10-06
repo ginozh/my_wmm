@@ -26,6 +26,7 @@ private slots:
 protected:
     //void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
     void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
+    void keyPressEvent(QKeyEvent *keyEvent) Q_DECL_OVERRIDE;
 private:
     QWidget *m_centralWidget;
     TabWidget *m_tabWidget;

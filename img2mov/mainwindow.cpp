@@ -21,11 +21,15 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     //, m_treeView(new QTreeView)
     //, m_detailsText(new QTextEdit)
-    , m_centralWidget(new QWidget(this))
-    , m_player(new VideoPlayer)
-    , m_elementsEdit(new ElementsEdit)
 {
     setWindowTitle(tr("img to movie"));
+    //installEventFilter( m_player->Scene() );
+
+    //setFocusPolicy ( Qt::StrongFocus );
+    m_centralWidget = new QWidget(this);
+    m_player = new VideoPlayer(this);
+    m_elementsEdit = new ElementsEdit(this, m_player->Scene());
+
 #if 0
     //widgets/widgets/tablet
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
@@ -122,3 +126,9 @@ void MainWindow::paintEvent(QPaintEvent *ev)
     QMainWindow::paintEvent(ev);
 }
 #endif
+void MainWindow::keyPressEvent(QKeyEvent *keyEvent) 
+{
+    //m_player->Scene()->setFocus();
+    //QMessageBox::information(NULL, "info", QString(tr("MainWindow::keyPressEvent")));
+    QMainWindow::keyPressEvent(keyEvent);
+}

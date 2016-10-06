@@ -3,7 +3,7 @@
 #include <QLabel>
 #include <QMessageBox>
 
-Element::Element(QWidget *parent, const QString& qsImageName)
+Element::Element(QWidget *parent, const QString& qsImageName,DiagramScene* scene)
     : QWidget(parent)
     , m_elementLayout(new QVBoxLayout(this))
     , m_pimage(0)
@@ -69,7 +69,7 @@ Element::Element(QWidget *parent, const QString& qsImageName)
     }
     m_pushBtn = new QPushButton(tr(""));
     m_elementLayout->addWidget(m_pushBtn);
-    m_lineEdit =  new LineEdit();
+    m_lineEdit =  new LineEdit(scene);
     //m_elementLayout->addWidget(new QLabel(tr("input text")));
     m_elementLayout->addWidget(m_lineEdit);
     //connect(this, SIGNAL(selectedTextSignal()), parentWidget(), SLOT(selectedText()) );
