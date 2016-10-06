@@ -14,6 +14,7 @@ class QHBoxLayout;
 class QMenu;
 class QIcon;
 class QColor;
+class QAction;
 QT_END_NAMESPACE
 class DiagramScene;
 
@@ -70,6 +71,7 @@ private:
     QIcon createColorToolButtonIcon(const QString &imageFile, QColor color);
     QIcon createColorIcon(QColor color);
     void assignTabWidget(const stTextAttr *textItem);
+    void textColorChanged();
 private:
     QListWidget *contentsWidget;
     QSize m_iconSize;
@@ -90,6 +92,8 @@ private:
     QToolButton *m_italicButton;
     QToolButton *m_underlineButton;
     ColorEdit *m_colorEdit;
+    QToolButton* fontColorToolButton;
+    QAction *textAction;
     //Paragraph
     QToolButton *m_leftTextButton;
     QToolButton *m_centerTextButton;

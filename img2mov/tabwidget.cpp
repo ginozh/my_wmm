@@ -249,8 +249,8 @@ void TabWidget::createTabAnimations()
                         //flowLayout->setContentsMargins(10, 10, 10, 10);
                         flowLayout->setContentsMargins(5, 5, 5, 5);
                         {
-#define INITIAL_ANIMATION(animation_name) do {\
-    Animation *animation_name=new Animation("images/"#animation_name".png", ""#animation_name"", m_iconSize) ; \
+#define INITIAL_ANIMATION(animation_name, tips_name) do {\
+    Animation *animation_name=new Animation("images/"#animation_name".png", tips_name, m_iconSize) ; \
     connect(animation_name, SIGNAL(selectedAnimationSignal(const QString&)), m_elementsEdit, SLOT(selectedTransition(const QString&))); \
     flowLayout->insertWidget(flowLayout->count(), animation_name); \
 } while(0)
@@ -260,40 +260,40 @@ void TabWidget::createTabAnimations()
 
                             flowLayout->insertWidget(0, animation);
 #endif
-                            INITIAL_ANIMATION( bowtieh);
-                            INITIAL_ANIMATION( bowtiev);
-                            INITIAL_ANIMATION( diagboxout);
-                            INITIAL_ANIMATION( diagcrossout);
-                            INITIAL_ANIMATION( diagdownright);
-                            INITIAL_ANIMATION( filledvdown);
-                            INITIAL_ANIMATION( filledvleft);
-                            INITIAL_ANIMATION( filledvright);
-                            INITIAL_ANIMATION( filledvup);
-                            INITIAL_ANIMATION( barsh);
-                            INITIAL_ANIMATION( barsvertical);
-                            INITIAL_ANIMATION( crossfade);
-                            INITIAL_ANIMATION( checkerb);
-                            INITIAL_ANIMATION( circle);
-                            INITIAL_ANIMATION( circles);
-                            INITIAL_ANIMATION( diamond);
-                            INITIAL_ANIMATION( heart);
-                            INITIAL_ANIMATION( rectangle);
-                            INITIAL_ANIMATION( wheel);
-                            INITIAL_ANIMATION( insetbottoml);
-                            INITIAL_ANIMATION( insetbottomr);
-                            INITIAL_ANIMATION( insettopleft);
-                            INITIAL_ANIMATION( insettopr);
-                            INITIAL_ANIMATION( iris);
-                            INITIAL_ANIMATION( revealdown);
-                            INITIAL_ANIMATION( revealright);
-                            INITIAL_ANIMATION( revealleft);
-                            INITIAL_ANIMATION( roll);
-                            INITIAL_ANIMATION( slide);
-                            INITIAL_ANIMATION( slideupt);
-                            //INITIAL_ANIMATION( slidedownt);
-                            INITIAL_ANIMATION( splith);
-                            INITIAL_ANIMATION( splitv);
-                            INITIAL_ANIMATION( fanin);
+                            INITIAL_ANIMATION( bowtieh, "bow tie - horizontal");
+                            INITIAL_ANIMATION( bowtiev, "bow tie - vertical");
+                            INITIAL_ANIMATION( diagboxout, "diagonal - box out");
+                            INITIAL_ANIMATION( diagcrossout, "diagonal - cross out");
+                            INITIAL_ANIMATION( diagdownright, "diagonal down-right");
+                            INITIAL_ANIMATION( filledvdown, "filled v down");
+                            INITIAL_ANIMATION( filledvleft, "filled v left");
+                            INITIAL_ANIMATION( filledvright, "filled v right");
+                            INITIAL_ANIMATION( filledvup, "filled v up");
+                            INITIAL_ANIMATION( barsh, "bars - horizontal");
+                            INITIAL_ANIMATION( barsvertical, "bars - vertical");
+                            INITIAL_ANIMATION( crossfade, "crossfade");
+                            INITIAL_ANIMATION( checkerb, "checkerboard");
+                            INITIAL_ANIMATION( circle, "circle");
+                            INITIAL_ANIMATION( circles, "circles");
+                            INITIAL_ANIMATION( diamond, "diamond");
+                            INITIAL_ANIMATION( heart, "heart");
+                            INITIAL_ANIMATION( rectangle, "rectangle");
+                            INITIAL_ANIMATION( wheel, "wheel");
+                            INITIAL_ANIMATION( insetbottoml, "inset bottom-left");
+                            INITIAL_ANIMATION( insetbottomr, "inset bottom-right");
+                            INITIAL_ANIMATION( insettopleft, "inset top-left");
+                            INITIAL_ANIMATION( insettopr, "inset top-right");
+                            INITIAL_ANIMATION( iris, "iris");
+                            INITIAL_ANIMATION( revealdown, "reveal down");
+                            INITIAL_ANIMATION( revealright, "reveal right");
+                            INITIAL_ANIMATION( revealleft, "reveal left");
+                            INITIAL_ANIMATION( roll, "roll");
+                            INITIAL_ANIMATION( slide, "slide");
+                            INITIAL_ANIMATION( slideupt, "slide down together");
+                            //INITIAL_ANIMATION( slidedownt, "");
+                            INITIAL_ANIMATION( splith, "split horizontal");
+                            INITIAL_ANIMATION( splitv, "split vertical");
+                            INITIAL_ANIMATION( fanin, "fan in");
                         }
 
                         animations->setLayout(flowLayout);
@@ -472,8 +472,19 @@ void TabWidget::createTabText()
                 //widgets/dialogs/standarddialogs
                 // c:\QtProjects\QtExamples\widgets\graphicsview\boxes\debug
                 //widgets/graphicsview/boxes/scene.cpp
+#if 0
                 m_colorEdit = new ColorEdit(Qt::white, 1);
                 hboxMidFont->addWidget(m_colorEdit);
+#endif
+                fontColorToolButton = new QToolButton;
+                hboxMidFont->addWidget(fontColorToolButton);
+                fontColorToolButton->setPopupMode(QToolButton::MenuButtonPopup);
+                fontColorToolButton->setMenu(createColorMenu(SLOT(textColorChanged()), Qt::black));
+                textAction = fontColorToolButton->menu()->defaultAction();
+                fontColorToolButton->setIcon(createColorToolButtonIcon("images/textpointer.png", Qt::black));
+                fontColorToolButton->setAutoFillBackground(true);
+                //connect(fontColorToolButton, SIGNAL(clicked()), this, SLOT(textButtonTriggered()));
+
             }
 
         }
@@ -555,6 +566,7 @@ void TabWidget::createTabText()
                 QToolButton *editextBtn = new QToolButton(this);
                 editextBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
                 editextBtn->setIcon(QIcon("images/edittext.png"));
+                //editextBtn->setIcon(QIcon("images/textpointer.png"));
                 editextBtn->setIconSize(m_iconSize);
                 editextBtn->setText("Edit text");
                 hboxAdjust->addWidget(editextBtn, Qt::AlignLeft);
@@ -621,12 +633,22 @@ void TabWidget::createTabText()
                     FlowLayout* flowLayout = new FlowLayout();
                     flowLayout->setContentsMargins(5, 5, 5, 5);
                     {
-#define INITIAL_TEXT(animation_name) do {\
-    Animation *animation_name=new Animation("images/"#animation_name".png", ""#animation_name"", m_iconSize) ; \
-    connect(animation_name, SIGNAL(selectedAnimationSignal(const QString&)), m_elementsEdit, SLOT(selectedTransition(const QString&))); \
-    flowLayout->insertWidget(0, animation_name); \
+#define INITIAL_TEXT(animation_name, tips_name) do {\
+    Animation *animation_name=new Animation("images/"#animation_name".png", tips_name, m_iconSize) ; \
+    /*connect(animation_name, SIGNAL(selectedAnimationSignal(const QString&)), m_elementsEdit, SLOT(selectedTransition(const QString&)));*/ \
+    flowLayout->insertWidget(flowLayout->count(), animation_name); \
 } while(0)
-                        //INITIAL_TEXT(bowtiev);
+                        INITIAL_TEXT(none, "none");
+                        INITIAL_TEXT(fade, "fade");
+                        INITIAL_TEXT(stretch, "stretch");
+                        INITIAL_TEXT(spinin, "spin in");
+                        INITIAL_TEXT(spinout, "spin out");
+                        INITIAL_TEXT(flyinleft, "fly in -left");
+                        INITIAL_TEXT(flyinright, "fly in -right");
+                        INITIAL_TEXT(scroll, "scroll");
+                        INITIAL_TEXT(swingdown, "swing down");
+                        INITIAL_TEXT(zoominsmall, "zoom in - small");
+                        INITIAL_TEXT(zoominbig, "zoom in - big");
                     }
 
                     effects->setLayout(flowLayout);
@@ -784,4 +806,12 @@ void TabWidget::handleFontChange()
     //m_scene->setFont(m_element, font);
     m_scene->setTextAttr(m_element, textItem);
 
+}
+void TabWidget::textColorChanged()
+{
+    textAction = qobject_cast<QAction *>(sender());
+    fontColorToolButton->setIcon(createColorToolButtonIcon(
+                                     ":/images/textpointer.png",
+                                     qvariant_cast<QColor>(textAction->data())));
+    //textButtonTriggered();
 }

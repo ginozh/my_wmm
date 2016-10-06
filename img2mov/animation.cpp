@@ -59,11 +59,14 @@ void Animation::mouseMoveEvent(QMouseEvent *event)
 {
     //QPoint widgetPosition = mapFromGlobal(event->globalPos());
 
-    QString text = QString::fromLatin1("animation: %1").arg(m_animation);
-    QToolTip::showText(event->globalPos(), text);
 }
 void Animation::enterEvent(QEvent *event)
 {
+    //QMessageBox::information(this,"info",QString(tr("type: %1")).arg(event->type()));
+    QString text = QString::fromLatin1("%1").arg(m_animation);
+    QEnterEvent *helpEvent = static_cast<QEnterEvent *>(event);
+    QToolTip::showText(helpEvent->globalPos(), text, this);
+
     m_focus=true;
     update();
     emit selectedAnimationSignal(m_animation);
