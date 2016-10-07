@@ -48,6 +48,7 @@ bool LineEdit::eventFilter( QObject *o, QEvent *e )
 DiagramScene::DiagramScene(QObject *parent)
     : QGraphicsScene(parent)
 {
+#if 0
     DiagramTextItem *textItem;
     textItem = new DiagramTextItem();
     QFont font;
@@ -61,8 +62,8 @@ DiagramScene::DiagramScene(QObject *parent)
     textItem->setPos(50, 300);
 
     addItem(textItem);
-
     curtextItem = textItem;
+#endif
 }
 #if 0
 bool DiagramScene::eventFilter( QObject *o, QEvent *e ) 
@@ -102,6 +103,7 @@ void DiagramScene::keyPressEvent(QKeyEvent *keyEvent)
 {
     //m_player->Scene()->setFocus();
     //QMessageBox::information(NULL, "info", QString(tr("MainWindow::keyPressEvent")));
+#if 0
     if(curtextItem)
     {
         DiagramTextItem *textItem = curtextItem;
@@ -114,6 +116,7 @@ void DiagramScene::keyPressEvent(QKeyEvent *keyEvent)
         //QMessageBox::information(NULL, "info", QString(tr("DiagramScene::eventFilter key: %1 ok: %2")).arg(k->text()).arg(b));
     }
     else
+#endif
     {
         QGraphicsScene::keyPressEvent(keyEvent);
     }
@@ -132,7 +135,7 @@ void DiagramScene::activeVideoText(const QString& oritxt)
 void DiagramTextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     QStyleOptionGraphicsItem *o = const_cast<QStyleOptionGraphicsItem*>(option);
-    o->state |= QStyle::State_HasFocus|QStyle::State_Selected;
+    //o->state |= QStyle::State_HasFocus|QStyle::State_Selected;
     //o->state &= QStyle::State_UpArrow;
     QGraphicsTextItem::paint(painter, o, widget);
 }
@@ -141,12 +144,13 @@ MainWindow::MainWindow()
     scene = new DiagramScene(this);
     QGraphicsView *graphicsView = new QGraphicsView(scene);
 
+#if 0
     QGraphicsVideoItem* videoItem = new QGraphicsVideoItem;
     videoItem->setSize(QSizeF(500, 480));
     scene->addItem(videoItem);
-
+#endif
     //installEventFilter( scene );
-#if 0
+#if 1
     textItem = new DiagramTextItem();
     QFont font;
     font.setPointSize(font.pointSize() * 2);
@@ -188,8 +192,6 @@ MainWindow::MainWindow()
     {
         m_lineEdit =  new LineEdit(this,scene);
         hboxAnimations->addWidget(m_lineEdit);
-        //m_lineEdit->setPlaceholderText("A[Enter text here]");
-        //m_lineEdit->setReadOnly(true);
         //removeEventFilter(m_lineEdit);
         //m_lineEdit->installEventFilter( this );
     }
@@ -203,77 +205,6 @@ MainWindow::MainWindow()
 }
 //! [6]
 
-//! [7]
-void MainWindow::findStyles(const QFont &font)
-{
-    QFontDatabase fontDatabase;
-    QString currentItem = styleCombo->currentText();
-    styleCombo->clear();
-//! [7]
-
-//! [8]
-    QString style;
-    foreach (style, fontDatabase.styles(font.family()))
-        styleCombo->addItem(style);
-
-    int styleIndex = styleCombo->findText(currentItem);
-
-    if (styleIndex == -1)
-        styleCombo->setCurrentIndex(0);
-    else
-        styleCombo->setCurrentIndex(styleIndex);
-}
-//! [8]
-
-void MainWindow::findSizes(const QFont &font)
-{
-    QFontDatabase fontDatabase;
-    QString currentSize = sizeCombo->currentText();
-    sizeCombo->blockSignals(true);
-    sizeCombo->clear();
-
-    int size;
-    if(fontDatabase.isSmoothlyScalable(font.family(), fontDatabase.styleString(font))) {
-        foreach(size, QFontDatabase::standardSizes()) {
-            sizeCombo->addItem(QVariant(size).toString());
-            sizeCombo->setEditable(true);
-        }
-
-    } else {
-        foreach(size, fontDatabase.smoothSizes(font.family(), fontDatabase.styleString(font))) {
-            sizeCombo->addItem(QVariant(size).toString());
-            sizeCombo->setEditable(false);
-        }
-    }
-
-    sizeCombo->blockSignals(false);
-
-    int sizeIndex = sizeCombo->findText(currentSize);
-
-    if(sizeIndex == -1)
-        sizeCombo->setCurrentIndex(qMax(0, sizeCombo->count() / 3));
-    else
-        sizeCombo->setCurrentIndex(sizeIndex);
-}
-
-//! [9]
-void MainWindow::insertCharacter(const QString &character)
-{
-    lineEdit->insert(character);
-}
-//! [9]
-
-//! [10]
-#ifndef QT_NO_CLIPBOARD
-void MainWindow::updateClipboard()
-{
-//! [11]
-    clipboard->setText(lineEdit->text(), QClipboard::Clipboard);
-//! [11]
-    clipboard->setText(lineEdit->text(), QClipboard::Selection);
-}
-#endif
-//! [10]
 #if 0
 void MainWindow::keyPressEvent(QKeyEvent *keyEvent) 
 {

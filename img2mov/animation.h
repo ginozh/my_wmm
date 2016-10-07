@@ -4,13 +4,18 @@
 #include <QMouseEvent>
 #include <QPixmap>
 #include <QPoint>
+#include <QTimer>
+#include "videoplayer.h"
+#include "comm.h"
 //! [0]
 class Animation : public QLabel
 {
     Q_OBJECT
 
 public:
-    Animation(const QString& path, const QString& animation, QSize size,QWidget *parent=0);
+    Animation(const QString& path, const QString& animation, 
+            const QString& tipsname, QSize size, GlobalContext* globalContext,
+            QWidget *parent=0);
     void unselectedAnimation();
 signals:
     void selectedAnimationSignal(const QString& animation);
@@ -28,8 +33,11 @@ private slots:
 #endif
 private:
     QString m_animation;
+    QString m_tipsname;
     QPixmap *m_pixMap;
     bool m_focus;
+    QTimer m_timer;
+    GlobalContext* m_globalContext;
 };
 //! [0]
 #endif // ANIMATION_H

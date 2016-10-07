@@ -3,7 +3,7 @@
 #include <QLabel>
 #include <QMessageBox>
 
-Element::Element(QWidget *parent, const QString& qsImageName,DiagramScene* scene)
+Element::Element(QWidget *parent, const QString& qsImageName,GraphicsScene* scene)
     : QWidget(parent)
     , m_elementLayout(new QVBoxLayout(this))
     , m_pimage(0)

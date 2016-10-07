@@ -6,6 +6,8 @@
 #include "elementsedit.h"
 #include "menu.h"
 #include "tabwidget.h"
+#include "comm.h"
+
 QT_FORWARD_DECLARE_CLASS(QAction)
 QT_FORWARD_DECLARE_CLASS(QTextEdit)
 QT_FORWARD_DECLARE_CLASS(QTreeView)
@@ -19,6 +21,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 public:
     explicit MainWindow(QWidget *parent = nullptr);
+    GlobalContext* globalContext(){return m_globalContext;}
 #if 0
 private slots:
     void load();
@@ -29,14 +32,16 @@ protected:
     void keyPressEvent(QKeyEvent *keyEvent) Q_DECL_OVERRIDE;
 private:
     QWidget *m_centralWidget;
-    TabWidget *m_tabWidget;
+    //TabWidget *m_tabWidget;
     Menu *m_menu;
 
     QTreeView *m_treeView;
     QTextEdit *m_detailsText;
-    VideoPlayer *m_player;
-    ElementsEdit *m_elementsEdit;
+    //VideoPlayer *m_player;
+    //ElementsEdit *m_elementsEdit;
     QScrollArea *m_scrollArea;
+
+    GlobalContext* m_globalContext;
 };
 
 #endif // MAINWINDOW_H

@@ -19,6 +19,7 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
+    , m_globalContext(new GlobalContext)
     //, m_treeView(new QTreeView)
     //, m_detailsText(new QTextEdit)
 {
@@ -27,8 +28,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     //setFocusPolicy ( Qt::StrongFocus );
     m_centralWidget = new QWidget(this);
-    m_player = new VideoPlayer(this);
-    m_elementsEdit = new ElementsEdit(this, m_player->Scene());
+    m_globalContext->m_player = new VideoPlayer(this);
+    m_globalContext->m_scene = m_globalContext->m_player->Scene();
+
+    m_globalContext->m_elementsEdit = new ElementsEdit(this, m_globalContext);
 
 #if 0
     //widgets/widgets/tablet
@@ -41,24 +44,24 @@ MainWindow::MainWindow(QWidget *parent)
     //QMenu *findMenu = menuBar()->addMenu(tr("&Edit"));
     menuBar()->addMenu(tr("&About"))->addAction(tr("&About Qt"), qApp, &QApplication::aboutQt);
 #endif
-    m_tabWidget = new TabWidget(m_centralWidget, m_elementsEdit, m_player->Scene());
+    m_globalContext->m_tabWidget = new TabWidget(m_centralWidget, m_globalContext);
 
     QSplitter *centralSplitter = new QSplitter(m_centralWidget);
     //setCentralWidget(centralSplitter);
     //m_treeView = new QTreeView;
 
     //centralSplitter->addWidget(m_treeView);
-    centralSplitter->addWidget(m_player);
+    centralSplitter->addWidget(m_globalContext->m_player);
     /*const QRect availableGeometry = QApplication::desktop()->availableGeometry(m_player);
     m_player->resize(availableGeometry.width() / 6, availableGeometry.height() / 4);
     m_player->show();*/
     //m_detailsText->setReadOnly(true);
 #if 1
     m_scrollArea = new QScrollArea;
-    m_scrollArea->setBackgroundRole(QPalette::Dark);
+    m_scrollArea->setBackgroundRole(QPalette::Light);
     m_scrollArea->setMinimumWidth(500);
     m_scrollArea->setWidgetResizable (true);
-    m_scrollArea->setWidget(m_elementsEdit);
+    m_scrollArea->setWidget(m_globalContext->m_elementsEdit);
     centralSplitter->addWidget(m_scrollArea);
 #else
     centralSplitter->addWidget(m_elementsEdit);
@@ -66,32 +69,32 @@ MainWindow::MainWindow(QWidget *parent)
     setCentralWidget(m_centralWidget);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    m_menu = new Menu(m_centralWidget, m_elementsEdit, m_tabWidget->geometry().x(), m_tabWidget->geometry().y());
+    m_menu = new Menu(m_centralWidget, m_globalContext->m_elementsEdit, m_globalContext->m_tabWidget->geometry().x(), m_globalContext->m_tabWidget->geometry().y());
     //QMessageBox::information(this, "Error Opening Picture", QString(tr("x: %1 y: %2")).arg(m_tabWidget->frameGeometry().x()).arg(m_tabWidget->frameGeometry().y()));
-    mainLayout->addWidget(m_tabWidget);
+    mainLayout->addWidget(m_globalContext->m_tabWidget);
     mainLayout->addWidget(centralSplitter);
 
     m_centralWidget->setLayout(mainLayout);
 
 
-    connect(m_elementsEdit, SIGNAL(readyVideo(const QString&,const QByteArray&,int)), m_player, SLOT(readyVideo(const QString&, const QByteArray&, int)));
-    connect(m_player->getMediaPlayer(), SIGNAL(durationChanged(qint64)), m_elementsEdit, SLOT(durationChanged(qint64)));
-    connect(m_player->getMediaPlayer(), SIGNAL(positionChanged(qint64)), m_elementsEdit, SLOT(positionChanged(qint64))); //播放条变更后，移动图片区的垂直条
-    connect(m_elementsEdit, SIGNAL(changePlayPosition(int)), m_player, SLOT(setPosition(int)));
-    connect(m_elementsEdit, SIGNAL(playVideo()), m_player, SLOT(play()));
+    connect(m_globalContext->m_elementsEdit, SIGNAL(readyVideo(const QString&,const QByteArray&,int)), m_globalContext->m_player, SLOT(readyVideo(const QString&, const QByteArray&, int)));
+    connect(m_globalContext->m_player->MediaPlayer(), SIGNAL(durationChanged(qint64)), m_globalContext->m_elementsEdit, SLOT(durationChanged(qint64)));
+    connect(m_globalContext->m_player->MediaPlayer(), SIGNAL(positionChanged(qint64)), m_globalContext->m_elementsEdit, SLOT(positionChanged(qint64))); //播放条变更后，移动图片区的垂直条
+    connect(m_globalContext->m_elementsEdit, SIGNAL(changePlayPosition(int)), m_globalContext->m_player, SLOT(setPosition(int)));
+    connect(m_globalContext->m_elementsEdit, SIGNAL(playVideo()), m_globalContext->m_player, SLOT(play()));
 
     //创建videotext
-    connect(m_elementsEdit, SIGNAL(createTextSignal(void*)), m_player->Scene(), SLOT(createText(void*)));
+    connect(m_globalContext->m_elementsEdit, SIGNAL(createTextSignal(void*)), m_globalContext->m_scene, SLOT(createText(void*)));
     //显示/隐藏videotext
-    connect(m_elementsEdit, SIGNAL(displayTextSignal(void*, bool /*display*/)), m_player->Scene(), SLOT(displayVideoText(void*, bool)));
+    connect(m_globalContext->m_elementsEdit, SIGNAL(displayTextSignal(void*, bool /*display*/)), m_globalContext->m_scene, SLOT(displayVideoText(void*, bool)));
     //激活videotext
-    connect(m_elementsEdit, SIGNAL(activeVideoTextSignal(void*, const QString&)), m_player->Scene(), SLOT(activeVideoText(void*, const QString&)));
+    connect(m_globalContext->m_elementsEdit, SIGNAL(activeVideoTextSignal(void*, const QString&)), m_globalContext->m_scene, SLOT(activeVideoText(void*, const QString&)));
     //更新videotext，生成2个视频：一个包含文字视频、一个未包含文字视频。
     //编辑文字时显示无文字视频；播放时显示有文字视频？
-    connect(m_player->Scene(), SIGNAL(updatedTextSignal(stTextAttr*, const QString&)), m_elementsEdit, SLOT(updatedText(stTextAttr*, const QString&)));
+    connect(m_globalContext->m_scene, SIGNAL(updatedTextSignal(stTextAttr*, const QString&)), m_globalContext->m_elementsEdit, SLOT(updatedText(stTextAttr*, const QString&)));
 
     // tab
-    connect(m_elementsEdit, SIGNAL(activeTabTextSignal(void*)), m_tabWidget, SLOT(activeTabText(void*)));
+    connect(m_globalContext->m_elementsEdit, SIGNAL(activeTabTextSignal(void*)), m_globalContext->m_tabWidget, SLOT(activeTabText(void*)));
 
 }
 #if 0
@@ -114,7 +117,7 @@ void MainWindow::load()
 #endif
 void MainWindow::resizeEvent(QResizeEvent *ev)
 {
-    m_menu->setGeometry(QRect(m_tabWidget->geometry().x()+18, m_tabWidget->geometry().y()+3, m_tabWidget->iconSize().width()+30, m_tabWidget->iconSize().height()));
+    m_menu->setGeometry(QRect(m_globalContext->m_tabWidget->geometry().x()+18, m_globalContext->m_tabWidget->geometry().y()+3, m_globalContext->m_tabWidget->iconSize().width()+30, m_globalContext->m_tabWidget->iconSize().height()));
     //QMessageBox::information(this, "menu", QString(tr("x: %1 y: %2")).arg(m_tabWidget->frameGeometry().x()).arg(m_tabWidget->frameGeometry().y()));
     //QMessageBox::information(this, "menu", QString(tr("w: %1 h: %2")).arg(m_tabWidget->iconSize().width()).arg(m_tabWidget->iconSize().height()));
     //qDebug()<< "resizeEvent w: " << m_tabWidget->iconSize().width() << " h: "<< m_tabWidget->iconSize().height();

@@ -16,7 +16,7 @@ class QIcon;
 class QColor;
 class QAction;
 QT_END_NAMESPACE
-class DiagramScene;
+class GraphicsScene;
 
 class ParameterEdit : public QWidget
 {
@@ -51,7 +51,7 @@ class TabWidget : public QTabWidget
     Q_OBJECT
 
 public:
-    TabWidget(QWidget *parent, QWidget *elementsEdit, DiagramScene* scene);
+    TabWidget(QWidget *parent, GlobalContext* globalContext);
 public slots:
     void activeTabText(void* element);
 #if 0
@@ -75,8 +75,9 @@ private:
 private:
     QListWidget *contentsWidget;
     QSize m_iconSize;
-    QWidget *m_elementsEdit;
-    DiagramScene* m_scene;
+    //QWidget *m_elementsEdit;
+    //GraphicsScene* m_scene;
+    GlobalContext* m_globalContext;
     void* m_element;
     QMap<void*, stTextAttr*> m_mapText;
 
@@ -91,7 +92,7 @@ private:
     QToolButton *m_boldButton;
     QToolButton *m_italicButton;
     QToolButton *m_underlineButton;
-    ColorEdit *m_colorEdit;
+    //ColorEdit *m_colorEdit;
     QToolButton* fontColorToolButton;
     QAction *textAction;
     //Paragraph

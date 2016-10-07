@@ -12,7 +12,7 @@
 QT_BEGIN_NAMESPACE
 class QLabel;
 QT_END_NAMESPACE
-class DiagramScene;
+class GraphicsScene;
 //! [0]
 class ElementsEdit : public QWidget
 //class ElementsEdit : public QScrollArea
@@ -20,7 +20,7 @@ class ElementsEdit : public QWidget
     Q_OBJECT
 
 public:
-    ElementsEdit(QWidget *parent, DiagramScene* scene);
+    ElementsEdit(QWidget *parent, GlobalContext* globalContext);
     ~ElementsEdit();
 private:
     int callFfmpeg(const QVector<QString>& vqsArgv);
@@ -87,7 +87,7 @@ private:
     size_t m_textVideoOutLen;
     size_t m_textVideoMaxOutLen;
 
-    DiagramScene* m_scene;
+    GlobalContext* m_globalContext;
 };
 //! [0]
 

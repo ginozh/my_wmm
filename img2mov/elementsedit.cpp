@@ -16,7 +16,7 @@ extern "C"{
 }
 #define DEBUG_FFMPEG
 //! [1]
-ElementsEdit::ElementsEdit(QWidget *parent, DiagramScene* scene)
+ElementsEdit::ElementsEdit(QWidget *parent, GlobalContext* globalContext)
     : QWidget(parent)
       //, m_flowLayout(new FlowLayout(this))
       , m_flowLayout(NULL)
@@ -25,10 +25,10 @@ ElementsEdit::ElementsEdit(QWidget *parent, DiagramScene* scene)
       , m_idxCurrentElement(-1)
       , m_isFirstClick(true)
 {   
-    m_scene = scene;
+    m_globalContext = globalContext;
     //m_tmpdir=QDir::currentPath().append(tr("/tmp"));
 
-    setBackgroundRole(QPalette::Midlight);
+    setBackgroundRole(QPalette::Light);
     setCursor(QCursor(Qt::PointingHandCursor));
 
     m_duration=0;
@@ -197,7 +197,7 @@ void ElementsEdit::load()
     QString qsFileType;
     for (int i = 0; i < files.count(); ++i) {
         // 1, 读取文件，生成image
-        Element *element=new Element(this, files[i],m_scene);
+        Element *element=new Element(this, files[i], m_globalContext->m_scene);
         emit createTextSignal((void*)element); 
         m_flowLayout->insertWidget(idx, element);
         QFileInfo fi(files[i]);

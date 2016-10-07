@@ -18,18 +18,19 @@ class QColor;
 QT_END_NAMESPACE
 
 //! [0]
-class DiagramScene : public QGraphicsScene
+class GraphicsScene : public QGraphicsScene
 {
     Q_OBJECT
 
 public:
-    explicit DiagramScene(QObject *parent = 0);
+    explicit GraphicsScene(QObject *parent = 0);
     void setFont(void* element, const QFont &font);
     void setTextAttr(void* element, stTextAttr *textAttr);
+    GraphicsTextItem* getGraphicsTextItem(){return curtextItem;}
 
 public slots:
     //void setItemType(DiagramItem::DiagramType type);
-    void editorLostFocus(DiagramTextItem *item);
+    void editorLostFocus(GraphicsTextItem *item);
     void createText(void*);
     void displayVideoText(void*, bool);
     void activeVideoText(void* element, const QString&);
@@ -43,8 +44,8 @@ protected:
 
 private:
     
-    QMap<void*, DiagramTextItem*> m_mapText;
-    DiagramTextItem *curtextItem;
+    QMap<void*, GraphicsTextItem*> m_mapText;
+    GraphicsTextItem *curtextItem;
 
     QFont myFont;
     QColor myTextColor;

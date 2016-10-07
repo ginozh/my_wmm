@@ -4,10 +4,13 @@
 #include <QPainter>
 #include <QPen>
 #include <QToolTip>
-Animation::Animation(const QString& path, const QString& animation, QSize size, QWidget *parent)
+Animation::Animation(const QString& path, const QString& animation
+        , const QString& tipsname, QSize size, GlobalContext* globalContext, QWidget *parent)
     : QLabel(parent)
     , m_animation(animation)
+    , m_tipsname(tipsname)
     , m_pixMap(new QPixmap())
+    , m_globalContext(globalContext)
 {
     //QMessageBox::information(this,tr("info"),QString(tr("path: %1 animation: %2")).arg(path).arg(animation));
     m_focus=false;
@@ -63,16 +66,28 @@ void Animation::mouseMoveEvent(QMouseEvent *event)
 void Animation::enterEvent(QEvent *event)
 {
     //QMessageBox::information(this,"info",QString(tr("type: %1")).arg(event->type()));
-    QString text = QString::fromLatin1("%1").arg(m_animation);
+    QString text = QString::fromLatin1("%1").arg(m_tipsname);
     QEnterEvent *helpEvent = static_cast<QEnterEvent *>(event);
     QToolTip::showText(helpEvent->globalPos(), text, this);
 
     m_focus=true;
     update();
+
+    if(m_globalContext && m_globalContext->m_player)
+    {
+        m_timer.setSingleShot(true);
+        m_timer.setInterval(1500+300); //uncomplete
+        connect(&m_timer, SIGNAL(timeout()), m_globalContext->m_player->MediaPlayer(), SLOT(pause()));
+        m_timer.start();
+    }
+
     emit selectedAnimationSignal(m_animation);
 }
 void Animation::leaveEvent(QEvent *event)
 {
+    m_timer.disconnect();
+    m_timer.stop();
+
     m_focus=false;
     update();
 }

@@ -8,35 +8,35 @@
 #include <QKeyEvent>
 
 //! [0]
-DiagramScene::DiagramScene(QObject *parent)
+GraphicsScene::GraphicsScene(QObject *parent)
     : QGraphicsScene(parent)
 {
     curtextItem = 0;
 }
 //! [0]
 
-void DiagramScene::setTextAttr(void* element, stTextAttr *textAttr)
+void GraphicsScene::setTextAttr(void* element, stTextAttr *textAttr)
 {
     if(!textAttr)
         return;
     myFont = textAttr->m_qfont;
     if(element && m_mapText.contains(element))
     {
-        DiagramTextItem *textItem = m_mapText[element];
+        GraphicsTextItem *textItem = m_mapText[element];
         textItem->setFont(myFont);
         textItem->setTextAttr(textAttr);
     }
 }
 
 //! [5]
-void DiagramScene::editorLostFocus(DiagramTextItem *item)
+void GraphicsScene::editorLostFocus(GraphicsTextItem *item)
 {
 #if 0
     QTextCursor cursor = item->textCursor();
     cursor.clearSelection();
     item->setTextCursor(cursor);
 #endif
-    //QMessageBox::information(NULL, "info", QString(tr("DiagramScene::editorLostFocus")));
+    //QMessageBox::information(NULL, "info", QString(tr("GraphicsScene::editorLostFocus")));
 
     // 失去焦点则马上生成带文字的视频
     //
@@ -56,18 +56,18 @@ void DiagramScene::editorLostFocus(DiagramTextItem *item)
 
 
 
-void DiagramScene::createText(void* element)
+void GraphicsScene::createText(void* element)
 {
     if(!m_mapText.contains(element))
     {
-        DiagramTextItem *textItem;
-        textItem = new DiagramTextItem();
+        GraphicsTextItem *textItem;
+        textItem = new GraphicsTextItem();
         curtextItem = textItem;
         textItem->setFont(myFont);
         textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
         textItem->setZValue(1000.0);
-        connect(textItem, SIGNAL(lostFocus(DiagramTextItem*)),
-                this, SLOT(editorLostFocus(DiagramTextItem*)));
+        connect(textItem, SIGNAL(lostFocus(GraphicsTextItem*)),
+                this, SLOT(editorLostFocus(GraphicsTextItem*)));
 #if 0
         connect(textItem, SIGNAL(selectedChange(QGraphicsItem*)),
                 this, SIGNAL(itemSelected(QGraphicsItem*)));
@@ -84,23 +84,23 @@ void DiagramScene::createText(void* element)
         m_mapText.insert(element, textItem);
     }
 }
-void DiagramScene::displayVideoText(void* element, bool isDisplay)
+void GraphicsScene::displayVideoText(void* element, bool isDisplay)
 {
     if(m_mapText.contains(element))
     {
-        DiagramTextItem *textItem = m_mapText[element];
+        GraphicsTextItem *textItem = m_mapText[element];
         if(isDisplay)
             textItem->show();
         else
             textItem->hide();
     }
 }
-void DiagramScene::activeVideoText(void* element, const QString& oritxt)
+void GraphicsScene::activeVideoText(void* element, const QString& oritxt)
 {
     if(m_mapText.contains(element))
     {
-        //QMessageBox::information(NULL, "info", QString(tr("DiagramScene::activeVideoText")));
-        DiagramTextItem *textItem = m_mapText[element];
+        //QMessageBox::information(NULL, "info", QString(tr("GraphicsScene::activeVideoText")));
+        GraphicsTextItem *textItem = m_mapText[element];
         curtextItem = textItem;
 #if 1
         textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
@@ -127,15 +127,15 @@ void DiagramScene::activeVideoText(void* element, const QString& oritxt)
     }
 }
 #if 0
-//void DiagramScene::setVideoText(void* element, QFont& qfont)
-bool DiagramScene::eventFilter( QObject *o, QEvent *e ) 
+//void GraphicsScene::setVideoText(void* element, QFont& qfont)
+bool GraphicsScene::eventFilter( QObject *o, QEvent *e ) 
 {
 	if ( e->type() == QEvent::KeyPress ) {
 		// 对于键被按下进行特殊处理
 		QKeyEvent *k = (QKeyEvent *)e;
         if(curtextItem)
         {
-            DiagramTextItem *textItem = curtextItem;
+            GraphicsTextItem *textItem = curtextItem;
             textItem->setFocus(Qt::OtherFocusReason);
 #if 0
             textItem->setActive(true);
@@ -146,7 +146,7 @@ bool DiagramScene::eventFilter( QObject *o, QEvent *e )
             //emit textItem->selectedChange(textItem);
 #endif
             bool b = sendEvent(curtextItem, k);
-            //QMessageBox::information(NULL, "info", QString(tr("DiagramScene::eventFilter key: %1 ok: %2")).arg(k->text()).arg(b));
+            //QMessageBox::information(NULL, "info", QString(tr("GraphicsScene::eventFilter key: %1 ok: %2")).arg(k->text()).arg(b));
             qDebug( "iagramScene::eventFilter key press %d", k->key() );
         }
 		//qDebug( "Ate key press %d", k->key() );
@@ -158,18 +158,20 @@ bool DiagramScene::eventFilter( QObject *o, QEvent *e )
 	}
 }
 #endif
-void DiagramScene::keyPressEvent(QKeyEvent *keyEvent) 
+void GraphicsScene::keyPressEvent(QKeyEvent *keyEvent) 
 {
     //m_player->Scene()->setFocus();
-    //QMessageBox::information(NULL, "info", QString(tr("DiagramScene::keyPressEvent curtextItem: %1")).arg((int)curtextItem));
+    //QMessageBox::information(NULL, "info", QString(tr("GraphicsScene::keyPressEvent curtextItem: %1")).arg((int)curtextItem));
+#if 1
     if(curtextItem)
     {
-        DiagramTextItem *textItem = curtextItem;
+        GraphicsTextItem *textItem = curtextItem;
         textItem->setFocus(Qt::OtherFocusReason);
         bool b = sendEvent(curtextItem, keyEvent);
-        //QMessageBox::information(NULL, "info", QString(tr("DiagramScene::eventFilter key: %1 ok: %2")).arg(k->text()).arg(b));
+        //QMessageBox::information(NULL, "info", QString(tr("GraphicsScene::eventFilter key: %1 ok: %2")).arg(k->text()).arg(b));
     }
     else
+#endif
     {
         QGraphicsScene::keyPressEvent(keyEvent);
     }

@@ -8,7 +8,7 @@
 extern "C"{
 #include "ffmpeg.h"
 }
-class DiagramScene;
+class GraphicsScene;
 typedef struct to_buffer FfmpegBuffer;
 
 QT_BEGIN_NAMESPACE
@@ -21,7 +21,7 @@ class Element : public QWidget
     Q_OBJECT
 
 public:
-    Element(QWidget *parent, const QString& image, DiagramScene* scene);
+    Element(QWidget *parent, const QString& image, GraphicsScene* scene);
     ~Element();
     const QString& getImageName(){return m_qsImageName;}
     void unselectedImage(){if(m_pimage){m_pimage->unselectedImage();}}

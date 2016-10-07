@@ -55,8 +55,29 @@ private:
 class DiagramTextItem : public QGraphicsTextItem
 {
     Q_OBJECT
+public:
+    DiagramTextItem(){
+        setFlag(QGraphicsItem::ItemIsMovable);
+        setFlag(QGraphicsItem::ItemIsSelectable);
+    }
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) Q_DECL_OVERRIDE;
+    void focusOutEvent(QFocusEvent *event)
+    {
+        setTextInteractionFlags(Qt::NoTextInteraction);
+        //emit lostFocus(this);
+        QGraphicsTextItem::focusOutEvent(event);
+    }
+    //! [2]
+
+    //! [5]
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+    {
+        if (textInteractionFlags() == Qt::NoTextInteraction)
+            setTextInteractionFlags(Qt::TextEditorInteraction);
+        QGraphicsTextItem::mouseDoubleClickEvent(event);
+    }
+//! [5]
 };
 //! [0]
 class MainWindow : public QMainWindow
@@ -66,13 +87,6 @@ class MainWindow : public QMainWindow
 public:
     MainWindow();
 
-public slots:
-    void findStyles(const QFont &font);
-    void findSizes(const QFont &font);
-    void insertCharacter(const QString &character);
-#ifndef QT_NO_CLIPBOARD
-    void updateClipboard();
-#endif
 protected:
     //void keyPressEvent(QKeyEvent *keyEvent) Q_DECL_OVERRIDE;
     //bool eventFilter( QObject *, QEvent * ) Q_DECL_OVERRIDE;

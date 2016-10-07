@@ -23,8 +23,8 @@ public:
     ~VideoPlayer();
 
     QSize sizeHint() const { return QSize(800, 600); }
-    QMediaPlayer* getMediaPlayer(){return &mediaPlayer;}
-    DiagramScene *Scene(){return scene;}
+    QMediaPlayer* MediaPlayer(){return &mediaPlayer;}
+    GraphicsScene *Scene(){return scene;}
 
 public slots:
     void openFile();
@@ -46,7 +46,7 @@ private:
     Slider *positionSlider;
     QByteArray m_playData;
     QBuffer m_playBuffer;
-    DiagramScene *scene;
+    GraphicsScene *scene;
     QGraphicsView *graphicsView;
 
 };

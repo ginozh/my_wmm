@@ -14,19 +14,19 @@ class QGraphicsSceneMouseEvent;
 QT_END_NAMESPACE
 
 //! [0]
-class DiagramTextItem : public QGraphicsTextItem
+class GraphicsTextItem : public QGraphicsTextItem
 {
     Q_OBJECT
 
 public:
-    DiagramTextItem(QGraphicsItem *parent = 0);
+    GraphicsTextItem(QGraphicsItem *parent = 0);
     stTextAttr* textAttr()
     {
         return m_stTextAttr;
     }
     void setTextAttr(stTextAttr* stTextAttr){m_stTextAttr=stTextAttr;}
 signals:
-    void lostFocus(DiagramTextItem *item);
+    void lostFocus(GraphicsTextItem *item);
     void selectedChange(QGraphicsItem *item);
 
 protected:

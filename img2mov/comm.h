@@ -6,7 +6,7 @@
 #include<QColor>
 
 class ElementsEdit;
-class DiagramScene;
+class GraphicsScene;
 class VideoPlayer;
 class TabWidget;
 
@@ -49,7 +49,20 @@ public:
 
 }stTextAttr;
 
-typedef struct stContext{
-}stContext;
+class GlobalContext
+{
+public:
+    GlobalContext(){
+        m_elementsEdit=NULL;
+        m_scene=NULL;
+        m_player=NULL;
+        m_tabWidget=NULL;
+    }
+public:
+    ElementsEdit* m_elementsEdit;
+    GraphicsScene* m_scene;
+    VideoPlayer* m_player;
+    TabWidget* m_tabWidget;
+};
 
 #endif

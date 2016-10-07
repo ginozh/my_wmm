@@ -8,6 +8,7 @@
 #include <QTableWidget>
 #include <QMessageBox>
 #include "videoscene.h"
+#include <QScrollBar>
 
 
 //tmp
@@ -86,11 +87,10 @@ void ColorEdit::setColor(QRgb color)
 }
 
 
-TabWidget::TabWidget(QWidget *parent, QWidget *elementsEdit, DiagramScene* scene)
+TabWidget::TabWidget(QWidget *parent, GlobalContext* globalContext)
     : QTabWidget(parent)
     , m_iconSize(100, 100)
-    , m_elementsEdit(elementsEdit)
-    , m_scene(scene)
+    , m_globalContext(globalContext)
     , m_element(0)
 {
     QWidget *tabNull = new QWidget;
@@ -126,7 +126,7 @@ void TabWidget::createTabHome()
                 //addPhotos->setMaximumHeight(m_iconSize.height() + 250);
                 addPhotos->setMinimumWidth(m_iconSize.width() + 100);
                 //addPhotos->setMinimumWidth(addPhotos->text().length());
-                connect(addPhotos, SIGNAL(clicked()), m_elementsEdit, SLOT(load()));
+                connect(addPhotos, SIGNAL(clicked()), (const QObject*)m_globalContext->m_elementsEdit, SLOT(load()));
             }
             {
                 QToolButton *addMusic = new QToolButton();
@@ -136,7 +136,7 @@ void TabWidget::createTabHome()
                 addMusic->setIconSize(m_iconSize);
                 addMusic->setText("Add music");
                 addMusic->setMinimumWidth(m_iconSize.width() + 100);
-                //connect(addMusic, SIGNAL(clicked()), m_elementsEdit, SLOT(load()));
+                //connect(addMusic, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(load()));
             }
             {
                 QVBoxLayout *vboxTopRightAdd = new QVBoxLayout;
@@ -152,7 +152,7 @@ void TabWidget::createTabHome()
                     //addCaption->setMaximumHeight(m_iconSize.height() + 250);
                     //addCaption->setMinimumWidth(m_iconSize.width() + 100);
                     //addCaption->setMinimumWidth(addCaption->text().length());
-                    //connect(addCaption, SIGNAL(clicked()), m_elementsEdit, SLOT(load()));
+                    //connect(addCaption, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(load()));
 
                 }
             }
@@ -176,7 +176,7 @@ void TabWidget::createTabHome()
     //addPhotos->setMaximumHeight(m_iconSize.height() + 250);
     addPhotos->setMinimumWidth(m_iconSize.width() + 100);
     //addPhotos->setMinimumWidth(addPhotos->text().length());
-    connect(addPhotos, SIGNAL(clicked()), m_elementsEdit, SLOT(load()));
+    connect(addPhotos, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(load()));
 
     QToolButton *addMusic = new QToolButton(this);
     addMusic->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -250,13 +250,13 @@ void TabWidget::createTabAnimations()
                         flowLayout->setContentsMargins(5, 5, 5, 5);
                         {
 #define INITIAL_ANIMATION(animation_name, tips_name) do {\
-    Animation *animation_name=new Animation("images/"#animation_name".png", tips_name, m_iconSize) ; \
-    connect(animation_name, SIGNAL(selectedAnimationSignal(const QString&)), m_elementsEdit, SLOT(selectedTransition(const QString&))); \
+    Animation *animation_name=new Animation("images/"#animation_name".png", ""#animation_name"", tips_name, m_iconSize, m_globalContext) ; \
+    connect(animation_name, SIGNAL(selectedAnimationSignal(const QString&)), (const QObject*)m_globalContext->m_elementsEdit, SLOT(selectedTransition(const QString&))); \
     flowLayout->insertWidget(flowLayout->count(), animation_name); \
 } while(0)
 #if 0
                             Animation *animation=new Animation("images/bowtieh.png", "bowtieh") ;
-                            connect(animation, SIGNAL(selectedAnimationSignal(const QString&)), m_elementsEdit, SLOT(selectedTransition(const QString&)));
+                            connect(animation, SIGNAL(selectedAnimationSignal(const QString&)), m_globalContext->m_elementsEdit, SLOT(selectedTransition(const QString&)));
 
                             flowLayout->insertWidget(0, animation);
 #endif
@@ -323,7 +323,7 @@ void TabWidget::createTabAnimations()
                 }
                 {
                     QAbstractButton *btnApplyTrans = new QPushButton(tr("Apply to all"));
-                    //connect(btnApplyTrans, SIGNAL(clicked()), m_elementsEdit, SLOT(openFile()));
+                    //connect(btnApplyTrans, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(openFile()));
                     //btnApplyTrans->setAlignment(Qt::AlignCenter);
 
                     vboxTopRightTransition->addWidget(btnApplyTrans);
@@ -364,7 +364,7 @@ void TabWidget::createTabAnimations()
             }
             {
                 QAbstractButton *btnApplyPanzoom = new QPushButton(tr("Apply to all"));
-                //connect(btnApplyPanzoom, SIGNAL(clicked()), m_elementsEdit, SLOT(openFile()));
+                //connect(btnApplyPanzoom, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(openFile()));
                 //btnApplyPanzoom->setAlignment(Qt::AlignCenter);
 
                 hboxTopPanZoom->addWidget(btnApplyPanzoom);
@@ -634,8 +634,8 @@ void TabWidget::createTabText()
                     flowLayout->setContentsMargins(5, 5, 5, 5);
                     {
 #define INITIAL_TEXT(animation_name, tips_name) do {\
-    Animation *animation_name=new Animation("images/"#animation_name".png", tips_name, m_iconSize) ; \
-    /*connect(animation_name, SIGNAL(selectedAnimationSignal(const QString&)), m_elementsEdit, SLOT(selectedTransition(const QString&)));*/ \
+    Animation *animation_name=new Animation("images/"#animation_name".png", ""#animation_name"", tips_name, m_iconSize, m_globalContext) ; \
+    /*connect(animation_name, SIGNAL(selectedAnimationSignal(const QString&)), (const QObject*)m_globalContext->m_elementsEdit, SLOT(selectedTransition(const QString&)));*/ \
     flowLayout->insertWidget(flowLayout->count(), animation_name); \
 } while(0)
                         INITIAL_TEXT(none, "none");
@@ -684,13 +684,15 @@ void TabWidget::appendLine(QHBoxLayout *hbox)
 }
 void TabWidget::initialScrollArea(QScrollArea *scrollArea)
 {
-    //scrollArea->setBackgroundRole(QPalette::Dark);
+    scrollArea->setBackgroundRole(QPalette::Light);
     scrollArea->setMinimumWidth(500);
     ////scrollArea->setMinimumHeight(120);
     ////scrollArea->setMaximumHeight(120);
     //scrollArea->setContentsMargins(10, 10, 10, 10);
     scrollArea->setContentsMargins(0, 0, 0, 0);
     scrollArea->setWidgetResizable (true);
+    QScrollBar *scrollBar = scrollArea->verticalScrollBar();
+    scrollBar->setSingleStep(100);
 }
 QIcon TabWidget::createColorToolButtonIcon(const QString &imageFile, QColor color)
 {
@@ -764,7 +766,7 @@ void TabWidget::assignTabWidget(const stTextAttr *textItem)
     m_boldButton->setChecked(textItem->m_isBoldChecked);
     m_italicButton->setChecked(textItem->m_isItalicChecked);
     m_underlineButton->setChecked(textItem->m_isUnderlineChecked);
-    m_colorEdit->setColor(textItem->m_fontColor.rgb());
+    //m_colorEdit->setColor(textItem->m_fontColor.rgb());
 
     m_leftTextButton->setChecked(textItem->m_textAlign == Qt::AlignLeft);
     m_centerTextButton->setChecked(textItem->m_textAlign == Qt::AlignHCenter);
@@ -803,8 +805,8 @@ void TabWidget::handleFontChange()
 
     textItem->m_qfont = font;
 
-    //m_scene->setFont(m_element, font);
-    m_scene->setTextAttr(m_element, textItem);
+    //m_globalContext->m_scene->setFont(m_element, font);
+    m_globalContext->m_scene->setTextAttr(m_element, textItem);
 
 }
 void TabWidget::textColorChanged()
