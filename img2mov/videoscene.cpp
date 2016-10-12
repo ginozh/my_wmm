@@ -43,7 +43,11 @@ void GraphicsScene::editorLostFocus(GraphicsTextItem *item)
     // 1, 判断是否修改过 umcomplete
     //
     // 2, 如果修改过内容则生成文字视频
-    emit updatedTextSignal(item->textAttr(), item->toPlainText());
+    if(item->getChanged())
+    {
+        //QMessageBox::information(NULL, "info", QString(tr("GraphicsScene::editorLostFocus")));
+        emit updatedTextSignal(item->textAttr(), item->toPlainText());
+    }
 #if 0
     if (item->toPlainText().isEmpty()) {
         removeItem(item);
@@ -90,9 +94,27 @@ void GraphicsScene::displayVideoText(void* element, bool isDisplay)
     {
         GraphicsTextItem *textItem = m_mapText[element];
         if(isDisplay)
+        {
             textItem->show();
+            textItem->setEnabled(true);
+            //disable other
+            for( auto key: m_mapText.keys() )
+            {
+                if(key != element)
+                {
+                    GraphicsTextItem *tmptextItem = m_mapText.value( key );
+                    tmptextItem->setVisible(false);
+                    tmptextItem->setEnabled(false);
+                }
+
+            }
+        }
         else
-            textItem->hide();
+        {
+            //textItem->hide();
+            textItem->setVisible(false);
+            textItem->setEnabled(false);
+        }
     }
 }
 void GraphicsScene::activeVideoText(void* element, const QString& oritxt)
@@ -105,6 +127,9 @@ void GraphicsScene::activeVideoText(void* element, const QString& oritxt)
 #if 1
         textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
         textItem->setFocus(Qt::OtherFocusReason);
+        displayVideoText(element, true);
+        //textItem->setVisible(true);
+        //textItem->setEnabled(true);
 #if 0
         setFocusItem(textItem);
         textItem->setActive(true);
@@ -122,6 +147,12 @@ void GraphicsScene::activeVideoText(void* element, const QString& oritxt)
 #endif
         if(textItem->toPlainText().isEmpty())
         {
+            QFont font;
+            QFontMetrics fontMetrics(font);
+            int textWidth = fontMetrics.width(oritxt);
+            textItem->setTextWidth(textWidth+10);
+            textItem->setPos(width()/2-textItem->textWidth()/2,height()*3/5);
+
             textItem->setPlainText(oritxt);
         }
     }

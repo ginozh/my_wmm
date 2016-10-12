@@ -17,9 +17,12 @@ VideoPlayer::VideoPlayer(QWidget *parent)
     //scene = new GraphicsScene(NULL, this);
     scene = new GraphicsScene(this);
     graphicsView = new QGraphicsView(scene);
+    //graphicsView->setSceneRect(0,0,500,480);
+    scene->setSceneRect(0,0,512,384); //如果没有这个，可能宽度会变成764
+    graphicsView->setSceneRect(0,0,512,384);
 
     videoItem = new QGraphicsVideoItem;
-    videoItem->setSize(QSizeF(500, 480));
+    videoItem->setSize(QSizeF(512, 384));
     scene->addItem(videoItem);
 #if 0
     videoItem = new QGraphicsVideoItem;

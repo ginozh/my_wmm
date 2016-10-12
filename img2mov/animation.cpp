@@ -73,6 +73,8 @@ void Animation::enterEvent(QEvent *event)
     m_focus=true;
     update();
 
+    emit selectedAnimationSignal(m_animation);
+
     if(m_globalContext && m_globalContext->m_player)
     {
         m_timer.setSingleShot(true);
@@ -81,7 +83,6 @@ void Animation::enterEvent(QEvent *event)
         m_timer.start();
     }
 
-    emit selectedAnimationSignal(m_animation);
 }
 void Animation::leaveEvent(QEvent *event)
 {

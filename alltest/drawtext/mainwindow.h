@@ -7,6 +7,8 @@
 #include <QLineEdit>
 #include <QStyleOptionGraphicsItem>
 #include <QGraphicsTextItem>
+#include <QTextDocument>
+#include <QTextOption>
 
 QT_BEGIN_NAMESPACE
 class QClipboard;
@@ -18,8 +20,8 @@ class QCheckBox;
 class QGraphicsTextItem;
 QT_END_NAMESPACE
 class CharacterWidget;
-class DiagramScene;
-class DiagramTextItem;
+class GraphicsScene;
+class GraphicsTextItem;
 
 class LineEdit : public QLineEdit
 {
@@ -27,7 +29,7 @@ class LineEdit : public QLineEdit
 public:
     //LineEdit(int idx, QWidget *parent = 0);
     //LineEdit(QWidget *parent = 0);
-    LineEdit(QWidget *parent, DiagramScene* scene);
+    LineEdit(QWidget *parent, GraphicsScene* scene);
 signals:
     //void selectTextSignal(int idx);
     void selectedTextSignal(const QString&);
@@ -37,29 +39,28 @@ protected:
     bool eventFilter( QObject *, QEvent * ) Q_DECL_OVERRIDE;
 private:
     int m_idx;
-    DiagramScene *scene;
+    GraphicsScene *scene;
 };
-class DiagramScene : public QGraphicsScene
+class GraphicsScene : public QGraphicsScene
 {
     Q_OBJECT
 public:
-    explicit DiagramScene(QObject *parent = 0);
+    explicit GraphicsScene(QObject *parent = 0);
 protected:
     //bool eventFilter( QObject *, QEvent * ) Q_DECL_OVERRIDE;
     void keyPressEvent(QKeyEvent *keyEvent) Q_DECL_OVERRIDE;
 public slots:
     void activeVideoText(const QString&);
 private:
-    DiagramTextItem *curtextItem;
+    GraphicsTextItem *curtextItem;
 };
-class DiagramTextItem : public QGraphicsTextItem
+class GraphicsTextItem : public QGraphicsTextItem
 {
     Q_OBJECT
 public:
-    DiagramTextItem(){
-        setFlag(QGraphicsItem::ItemIsMovable);
-        setFlag(QGraphicsItem::ItemIsSelectable);
-    }
+    GraphicsTextItem();
+    QRectF boundingRect() const;
+    void hitFrame(QGraphicsSceneHoverEvent *event);
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) Q_DECL_OVERRIDE;
     void focusOutEvent(QFocusEvent *event)
@@ -77,6 +78,9 @@ protected:
             setTextInteractionFlags(Qt::TextEditorInteraction);
         QGraphicsTextItem::mouseDoubleClickEvent(event);
     }
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) Q_DECL_OVERRIDE;
+    void hoverMoveEvent(QGraphicsSceneHoverEvent *event) Q_DECL_OVERRIDE;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event)Q_DECL_OVERRIDE;
 //! [5]
 };
 //! [0]
@@ -102,10 +106,10 @@ private:
     QLineEdit *lineEdit;
     QScrollArea *scrollArea;
     QCheckBox *fontMerging;
-    DiagramTextItem * textItem;
+    GraphicsTextItem * textItem;
 
     LineEdit* m_lineEdit;
-    DiagramScene *scene;
+    GraphicsScene *scene;
 };
 //! [0]
 
