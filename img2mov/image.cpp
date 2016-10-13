@@ -87,3 +87,8 @@ void Image::unselectedImage()
     m_focus=false;
     update();
 }
+void Image::doSelectImage()
+{
+    m_focus=true;
+    update();
+}

@@ -25,6 +25,7 @@ public:
     ~Element();
     const QString& getImageName(){return m_qsImageName;}
     void unselectedImage(){if(m_pimage){m_pimage->unselectedImage();}}
+    void doSelectImage(){if(m_pimage){m_pimage->doSelectImage();}}
 signals:
     void insertImage();
     void selectedImageSignal();

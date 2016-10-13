@@ -43,7 +43,8 @@ SOURCES += main.cpp \
     animation.cpp \
     videoscene.cpp \
     videotextitem.cpp \
-    lineedit.cpp
+    lineedit.cpp \
+    videorectitem.cpp
 
 HEADERS  += mainwindow.h \
     ffmpeg.h \
@@ -63,4 +64,5 @@ HEADERS  += mainwindow.h \
     videoscene.h \
     videotextitem.h \
     lineedit.h \
-    comm.h
+    comm.h \
+    videorectitem.h

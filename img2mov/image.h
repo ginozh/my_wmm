@@ -12,6 +12,7 @@ class Image : public QLabel
 public:
     Image(const QString& path, QSize size, QWidget *parent=0);
     void unselectedImage();
+    void doSelectImage();
 signals:
     void selectedImageSignal();
 public slots:

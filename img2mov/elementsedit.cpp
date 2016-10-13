@@ -229,8 +229,17 @@ void ElementsEdit::load()
     // 
     
     //6, 选中合适的image
-    oldIdx = oldIdx > 0? oldIdx: 0;
+    //oldIdx = oldIdx > 0? oldIdx: 0;
     //emit focusImageSignal();
+
+    //7, 第一次选择
+    if(!m_lastSelectedElement)
+    {
+        m_idxCurrentElement = 0;
+        m_lastSelectedElement = qobject_cast<QWidget *>(m_flowLayout->itemAt(m_idxCurrentElement)->widget());
+        (qobject_cast<Element *>(m_lastSelectedElement))->doSelectImage();
+        emit displayTextSignal((void*)m_lastSelectedElement, true);
+    }
 
 
     m_vecticalLine->raise(); // top level, Raises this widget to the top of the parent widget's stack.
