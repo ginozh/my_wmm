@@ -145,6 +145,9 @@ void GraphicsScene::activeVideoText(void* element, const QString& oritxt)
         textItem->setFocus(Qt::OtherFocusReason);
         textItem->setActive(true);
 #endif
+
+        textItem->setFirstTextPosWH(oritxt);
+#if 0
         if(textItem->toPlainText().isEmpty())
         {
             QFont font;
@@ -155,6 +158,7 @@ void GraphicsScene::activeVideoText(void* element, const QString& oritxt)
 
             textItem->setPlainText(oritxt);
         }
+#endif
     }
 }
 #if 0

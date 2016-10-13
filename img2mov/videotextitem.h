@@ -28,6 +28,7 @@ public:
         return m_stTextAttr;
     }
     void setTextAttr(stTextAttr* stTextAttr){m_stTextAttr=stTextAttr;}
+    void setFirstTextPosWH(const QString& oritxt);
     bool getChanged(){return m_changed;}
 signals:
     void lostFocus(GraphicsTextItem *item);
@@ -42,10 +43,12 @@ protected:
     QRectF boundingRect() const Q_DECL_OVERRIDE;
     QPainterPath shape() const Q_DECL_OVERRIDE;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) Q_DECL_OVERRIDE;
+#if 1
     void mousePressEvent(QGraphicsSceneMouseEvent *event) Q_DECL_OVERRIDE;
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) Q_DECL_OVERRIDE;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) Q_DECL_OVERRIDE;
-    void showResizeFocus(bool visible);
+#endif
+    void showRectItemFocus(bool visible);
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) Q_DECL_OVERRIDE;
     void hoverMoveEvent(QGraphicsSceneHoverEvent *event) Q_DECL_OVERRIDE;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event)Q_DECL_OVERRIDE;
@@ -57,18 +60,18 @@ private:
     bool m_changed;
     QFont m_oldFont;
 
-    qreal width;
-    qreal height;
-    qreal margin;
-    MouseMode myMode;
-    QColor myColor;
-    QGraphicsTextItem *name;
-    QGraphicsPixmapItem *symbol;
-    QGraphicsRectItem *state;
-    QList<GraphicsRectItem*> resizeFocus;
-    GraphicsRectItem *curResizeFocus;
-    QPointF lastPoint;
-    QGraphicsRectItem *dashRect;
+    qreal m_width;
+    qreal m_height;
+    qreal m_margin;
+    MouseMode m_mode;
+    //QColor m_color;
+    //QGraphicsTextItem *name;
+    //QGraphicsPixmapItem *symbol;
+    //QGraphicsRectItem *state;
+    QList<GraphicsRectItem*> m_listGraphicsRectItem;
+    GraphicsRectItem *m_curGraphicsRectItem;
+    QPointF m_lastPoint;
+    QGraphicsRectItem *m_dashRect;
 };
 //! [0]
 

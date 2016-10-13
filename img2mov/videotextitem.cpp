@@ -6,11 +6,12 @@
 #include <QTextCursor>
 #include <QGraphicsSceneHoverEvent>
 #include <QTextDocument>
+#include <QDebug>
 
 //! [0]
 GraphicsTextItem::GraphicsTextItem(QGraphicsItem *parent)
     : QGraphicsTextItem(parent)
-    ,width(100),height(100),margin(8)
+    ,m_width(100),m_height(100),m_margin(8)
 {
     setFlag(QGraphicsItem::ItemIsMovable);
     setFlag(QGraphicsItem::ItemIsSelectable);
@@ -40,12 +41,29 @@ GraphicsTextItem::GraphicsTextItem(QGraphicsItem *parent)
     option.setAlignment(Qt::AlignHCenter);
     tdocument->setDefaultTextOption(option);
     //setTextWidth(tdocument->idealWidth());
-    setTextWidth(400);
+    ////setTextWidth(400);
 
 
 	createGraphicsRectItem();
 }
 //! [0]
+void GraphicsTextItem::setFirstTextPosWH(const QString& oritxt)
+{
+    if(toPlainText().isEmpty())
+    {
+        QFont font;
+        QFontMetrics fontMetrics(font);
+        int fw = fontMetrics.width(oritxt);
+        int fh = fontMetrics.height();
+        m_width=fw+20;
+        m_height=fh+10;
+
+        setTextWidth(m_width);
+        setPos(scene()->width()/2-textWidth()/2,scene()->height()*3/5);
+
+        setPlainText(oritxt);
+    }
+}
 //! [1]
 QVariant GraphicsTextItem::itemChange(GraphicsItemChange change,
                      const QVariant &value)
@@ -159,35 +177,41 @@ void GraphicsTextItem::documentChanged()
 {
     m_changed = true;
 }
+#if 1
 void GraphicsTextItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-	curResizeFocus = qgraphicsitem_cast<GraphicsRectItem*>(scene()->itemAt(event->scenePos(),sceneTransform() ));
-	if(curResizeFocus)
+	m_curGraphicsRectItem = qgraphicsitem_cast<GraphicsRectItem*>(scene()->itemAt(event->scenePos(),sceneTransform() ));
+	if(m_curGraphicsRectItem)
 	{
-		myMode = RESIZE;
-		lastPoint.setX(event->scenePos().x());
-		lastPoint.setY(event->scenePos().y());
-		dashRect = new QGraphicsRectItem();
-		dashRect->setPen(QPen(Qt::DashLine));
-		//dashRect->setPen(QPen(Qt::SolidLine));
-		dashRect->setParentItem(this);
-		//dashRect->setRect(margin, margin, width-margin*2, height-margin*2);
-		dashRect->setRect(0, 0, width, height);
-        //scene()->addItem(dashRect);
+        qDebug()<< "mousePressEvent: RESIZE";
+        //QMessageBox::information(NULL, "info", QString(tr("mousePressEvent resize")));
+		m_mode = RESIZE;
+		m_lastPoint.setX(event->scenePos().x());
+		m_lastPoint.setY(event->scenePos().y());
+		m_dashRect = new QGraphicsRectItem();
+		m_dashRect->setPen(QPen(Qt::DashLine));
+		//m_dashRect->setPen(QPen(Qt::SolidLine));
+		m_dashRect->setParentItem(this);
+		//m_dashRect->setRect(m_margin, m_margin, width-m_margin*2, m_height-m_margin*2);
+		m_dashRect->setRect(0, 0, m_width, m_height);
+        //scene()->addItem(m_dashRect);
 
 
         //clearFocus();
 	}
 	else
 	{
-		myMode = MOVE;
-		QGraphicsItem::mousePressEvent(event);
+        qDebug()<< "mousePressEvent: MOVE";
+		m_mode = MOVE;
+        //QMessageBox::information(NULL, "info", QString(tr("mousePressEvent move")));
+		QGraphicsTextItem::mousePressEvent(event);
 	}
 }
 void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-	if(myMode == RESIZE)
+	if(m_mode == RESIZE)
 	{
+        //qDebug()<< "mouseMoveEvent: RESIZE";
 		QPointF curPoint(event->scenePos());
         QRectF sceneRect = scene()->sceneRect();
         qreal x=curPoint.x(),y=curPoint.y();
@@ -201,10 +225,10 @@ void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                 y = sceneRect.height();
         }
 #endif
-		//qreal curX = margin, curY = margin, curWidth = width-margin*2, curHeight = height-margin*2;
-		qreal curX = 0, curY = 0, curWidth = width, curHeight = height;
-		qreal wChanging = x-lastPoint.x(), hChanging = y-lastPoint.y();
-		GraphicsRectItem::PosInHost pos = curResizeFocus->getInHost();
+		//qreal curX = m_margin, curY = m_margin, curWidth = m_width-m_margin*2, curHeight = m_height-m_margin*2;
+		qreal curX = 0, curY = 0, curWidth = m_width, curHeight = m_height;
+		qreal wChanging = x-m_lastPoint.x(), hChanging = y-m_lastPoint.y();
+		GraphicsRectItem::PosInHost pos = m_curGraphicsRectItem->getInHost();
 		switch(pos){
 			case GraphicsRectItem::NORTH_MIDDLE:
 				curY += hChanging; curHeight-=hChanging;
@@ -234,31 +258,33 @@ void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 				break;
 		}
 		if(curWidth < 20 ||curHeight <20) return; //!minimal size
-		dashRect->setRect(curX,curY,curWidth,curHeight);
+		m_dashRect->setRect(curX,curY,curWidth,curHeight);
 
         //scene()->update(scene()->sceneRect());
         //prepareGeometryChange();
 	}
 	else
     {
+        //qDebug()<< "mouseMoveEvent: MOVE";
         //QMessageBox::information(NULL, "info", QString(tr("mouseMoveEvent")));
-		QGraphicsItem::mouseMoveEvent(event);
+		QGraphicsTextItem::mouseMoveEvent(event);
     }
 }
 void GraphicsTextItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-	if(myMode == RESIZE)
+	if(m_mode == RESIZE)
 	{
-		//width = dashRect->rect().width() +margin*2;
-		width = dashRect->rect().width() ;
-		//height = dashRect->rect().height() +margin*2;
-		height = dashRect->rect().height() ;
-		//qreal curX = dashRect->rect().left() - margin;
+        //qDebug()<< "GraphicsTextItem::mouseReleaseEvent: RESIZE";
+		//width = m_dashRect->rect().width() +m_margin*2;
+		m_width = m_dashRect->rect().width() ;
+		//m_height = m_dashRect->rect().height() +m_margin*2;
+		m_height = m_dashRect->rect().height() ;
+		//qreal curX = m_dashRect->rect().left() - m_margin;
         //
 
-		qreal curX = dashRect->rect().left();
-		//qreal curY = dashRect->rect().top() - margin;
-		qreal curY = dashRect->rect().top();
+		qreal curX = m_dashRect->rect().left();
+		//qreal curY = m_dashRect->rect().top() - m_margin;
+		qreal curY = m_dashRect->rect().top();
 		QPointF curPos(curX,curY);
 		setPos(mapToScene(curPos));
 #if 0
@@ -268,28 +294,32 @@ void GraphicsTextItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         option.setAlignment(Qt::AlignHCenter);
         tdocument->setDefaultTextOption(option);
 #endif
-        setTextWidth(width);
+        setTextWidth(m_width);
 
-		//scene()->removeItem(dashRect);
-		delete dashRect;
+		//scene()->removeItem(m_dashRect);
+		delete m_dashRect;
         //scene()->update(scene()->sceneRect()); // 需要增加，否则原来的边框不会消失
 	}
 	else
-		QGraphicsItem::mouseReleaseEvent(event);
+    {
+        //qDebug("GraphicsTextItem::mouseReleaseEvent: MOVE\n");
+		QGraphicsTextItem::mouseReleaseEvent(event);
+    }
 }
-void GraphicsTextItem::showResizeFocus(bool visible)
+#endif
+void GraphicsTextItem::showRectItemFocus(bool visible)
 {
-	for(int i = 0; i < resizeFocus.count(); i++)
+	for(int i = 0; i < m_listGraphicsRectItem.count(); i++)
 	{
-		resizeFocus.at(i)->locateInHost();
-		resizeFocus.at(i)->setVisible(visible);
+		m_listGraphicsRectItem.at(i)->locateInHost();
+		m_listGraphicsRectItem.at(i)->setVisible(visible);
 	}
 }
 QRectF GraphicsTextItem::boundingRect() const
 {
-    //QMessageBox::information(NULL, "info", QString(tr("boundingRect w: %1 h: %2")).arg(width).arg(height));
+    //QMessageBox::information(NULL, "info", QString(tr("boundingRect w: %1 h: %2")).arg(m_width).arg(m_height));
     //qDebug("boundingRect\n");
-	return QRectF(0, 0, width, height);
+	return QRectF(0, 0, m_width, m_height);
 }
 void GraphicsTextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QWidget *widget)
 {
@@ -300,16 +330,16 @@ void GraphicsTextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 	if(option->state & QStyle::State_Selected ||
             option->state & QStyle::State_HasFocus)
 	{
-		/*painter->fillRect(margin, margin, width-margin*2, height-margin*2 ,fillColor);
+		/*painter->fillRect(m_margin, m_margin, m_width-m_margin*2, m_height-m_margin*2 ,fillColor);
 		painter->setPen(Qt::DotLine);
-		painter->drawRect(margin, margin, width-margin*2, height-margin*2);*/
-		showResizeFocus(true);
+		painter->drawRect(m_margin, m_margin, m_width-m_margin*2, m_height-m_margin*2);*/
+		showRectItemFocus(true);
 	}
 	else
 	{
-		/*painter->fillRect(margin, margin, width-margin*2, height-margin*2 ,fillColor);
-		painter->drawRect(margin, margin, width-margin*2, height-margin*2);*/
-		showResizeFocus(false);
+		/*painter->fillRect(m_margin, m_margin, m_width-m_margin*2, m_height-m_margin*2 ,fillColor);
+		painter->drawRect(m_margin, m_margin, m_width-m_margin*2, m_height-m_margin*2);*/
+		showRectItemFocus(false);
 	}
 #if 0
     //如果大小超过字的大小，则缩放height
@@ -318,9 +348,9 @@ void GraphicsTextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     int fh = fontMetrics.height();
     QString sceneText = toPlainText();
     int sceneTextWidth = fontMetrics.width(sceneText);
-    if(width>=sceneTextWidth)
+    if(m_width>=sceneTextWidth)
     {
-        height=(sceneTextWidth/width+1)*fh;
+        m_height=(sceneTextWidth/m_width+1)*fh;
     }
     else
     {
@@ -334,25 +364,25 @@ void GraphicsTextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 QPainterPath GraphicsTextItem::shape() const
 {
 	QPainterPath path;
-	path.addRect(0,0,width,height);
+	path.addRect(0,0,m_width,m_height);
 	return path;
 }
 void GraphicsTextItem::createGraphicsRectItem()
 {
-	GraphicsRectItem *north_middle = new GraphicsRectItem(margin,GraphicsRectItem::NORTH_MIDDLE,this);
-	resizeFocus.append(north_middle);
-	GraphicsRectItem *north_east = new GraphicsRectItem(margin,GraphicsRectItem::NORTH_EAST,this);
-	resizeFocus.append(north_east);
-	GraphicsRectItem *north_west = new GraphicsRectItem(margin,GraphicsRectItem::NORTH_WEST,this);
-	resizeFocus.append(north_west);
-	GraphicsRectItem *south_middle = new GraphicsRectItem(margin,GraphicsRectItem::SOUTH_MIDDLE,this);
-	resizeFocus.append(south_middle);
-	GraphicsRectItem *south_east = new GraphicsRectItem(margin,GraphicsRectItem::SOUTH_EAST,this);
-	resizeFocus.append(south_east);
-	GraphicsRectItem *south_west = new GraphicsRectItem(margin,GraphicsRectItem::SOUTH_WEST,this);
-	resizeFocus.append(south_west);
-	GraphicsRectItem *east_middle = new GraphicsRectItem(margin,GraphicsRectItem::EAST_MIDDLE,this);
-	resizeFocus.append(east_middle);
-	GraphicsRectItem *west_middle = new GraphicsRectItem(margin,GraphicsRectItem::WEST_MIDDLE,this);
-	resizeFocus.append(west_middle);
+	GraphicsRectItem *north_middle = new GraphicsRectItem(m_margin,GraphicsRectItem::NORTH_MIDDLE,this);
+	m_listGraphicsRectItem.append(north_middle);
+	GraphicsRectItem *north_east = new GraphicsRectItem(m_margin,GraphicsRectItem::NORTH_EAST,this);
+	m_listGraphicsRectItem.append(north_east);
+	GraphicsRectItem *north_west = new GraphicsRectItem(m_margin,GraphicsRectItem::NORTH_WEST,this);
+	m_listGraphicsRectItem.append(north_west);
+	GraphicsRectItem *south_middle = new GraphicsRectItem(m_margin,GraphicsRectItem::SOUTH_MIDDLE,this);
+	m_listGraphicsRectItem.append(south_middle);
+	GraphicsRectItem *south_east = new GraphicsRectItem(m_margin,GraphicsRectItem::SOUTH_EAST,this);
+	m_listGraphicsRectItem.append(south_east);
+	GraphicsRectItem *south_west = new GraphicsRectItem(m_margin,GraphicsRectItem::SOUTH_WEST,this);
+	m_listGraphicsRectItem.append(south_west);
+	GraphicsRectItem *east_middle = new GraphicsRectItem(m_margin,GraphicsRectItem::EAST_MIDDLE,this);
+	m_listGraphicsRectItem.append(east_middle);
+	GraphicsRectItem *west_middle = new GraphicsRectItem(m_margin,GraphicsRectItem::WEST_MIDDLE,this);
+	m_listGraphicsRectItem.append(west_middle);
 }
