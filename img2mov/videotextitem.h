@@ -27,7 +27,7 @@ public:
     {
         return m_stTextAttr;
     }
-    void setTextAttr(stTextAttr* stTextAttr){m_stTextAttr=stTextAttr;}
+    void setTextAttr(stTextAttr* stTextAttr);
     void setFirstTextPosWH(const QString& oritxt);
     bool getChanged(){return m_changed;}
 signals:
@@ -55,6 +55,7 @@ protected:
 private:
     void hitFrame(QGraphicsSceneHoverEvent *event);
     void createGraphicsRectItem();
+    void createAssInfo();
 private:
     stTextAttr* m_stTextAttr;
     bool m_changed;

@@ -53,7 +53,7 @@ public slots:
     void positionChanged(qint64 position);
     //void selectedText(void*);
     //void handleContextMenuRequested(const QPoint &pos);
-    void updatedText(stTextAttr* stTextAttr, const QString&);
+    void updatedText(const QString&);
 private:
     FlowLayout *m_flowLayout;
     QVBoxLayout *m_firstLayout;

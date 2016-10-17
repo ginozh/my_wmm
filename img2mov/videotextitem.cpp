@@ -39,12 +39,31 @@ GraphicsTextItem::GraphicsTextItem(QGraphicsItem *parent)
     tdocument->setModified(true);
     QTextOption option = tdocument->defaultTextOption();
     option.setAlignment(Qt::AlignHCenter);
+    option.setWrapMode(QTextOption::NoWrap);
     tdocument->setDefaultTextOption(option);
     //setTextWidth(tdocument->idealWidth());
     ////setTextWidth(400);
 
 
 	createGraphicsRectItem();
+}
+void GraphicsTextItem::setTextAttr(stTextAttr* stTextAttr)
+{
+    m_stTextAttr=stTextAttr;
+
+    if(m_stTextAttr)
+    {
+        setFont(m_stTextAttr->m_qfont);
+        setDefaultTextColor(m_stTextAttr->m_fontColor);
+
+        QTextDocument *tdocument =  document();
+        QTextOption option = tdocument->defaultTextOption();
+        if(m_stTextAttr->m_textAlign>=0)
+        {
+            option.setAlignment((Qt::AlignmentFlag)m_stTextAttr->m_textAlign);
+        }
+        tdocument->setDefaultTextOption(option);
+    }
 }
 //! [0]
 void GraphicsTextItem::setFirstTextPosWH(const QString& oritxt)
@@ -59,7 +78,10 @@ void GraphicsTextItem::setFirstTextPosWH(const QString& oritxt)
         m_height=fh+10;
 
         setTextWidth(m_width);
-        setPos(scene()->width()/2-textWidth()/2,scene()->height()*3/5);
+        int x=scene()->width()/2-textWidth()/2;
+        int y=scene()->height()*3/5;
+        setPos(x, y);
+        //QMessageBox::information(NULL, "info", QString(tr("GraphicsTextItem::setFirstTextPosWH x: %1 y: %2")).arg(x).arg(y));
 
         setPlainText(oritxt);
     }
@@ -101,7 +123,12 @@ void GraphicsTextItem::focusOutEvent(QFocusEvent *event)
     {
         m_changed = true;
     }
-    emit lostFocus(this);
+    if(m_changed)
+    {
+        createAssInfo();
+        emit lostFocus(this);
+        m_changed = false;
+    }
     QGraphicsTextItem::focusOutEvent(event);
 }
 #if 0
@@ -274,7 +301,7 @@ void GraphicsTextItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
 	if(m_mode == RESIZE)
 	{
-        //qDebug()<< "GraphicsTextItem::mouseReleaseEvent: RESIZE";
+        //qDebug(QString(tr("GraphicsTextItem::mouseReleaseEvent: RESIZE text: %1")).arg(toPlainText()).toStdString().c_str());
 		//width = m_dashRect->rect().width() +m_margin*2;
 		m_width = m_dashRect->rect().width() ;
 		//m_height = m_dashRect->rect().height() +m_margin*2;
@@ -302,7 +329,40 @@ void GraphicsTextItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 	}
 	else
     {
-        //qDebug("GraphicsTextItem::mouseReleaseEvent: MOVE\n");
+        //qDebug(QString(tr("GraphicsTextItem::mouseReleaseEvent: MOVE text: %1")).arg(toPlainText()).toStdString().c_str());
+        //QMessageBox::information(NULL, "info",QString(tr("GraphicsTextItem::mouseReleaseEvent: MOVE linecount: %1 blockCount: %2 text: %3")).arg(document()->lineCount()).arg(document()->blockCount()).arg(toPlainText()));//会有换行
+#if 0
+        const QString& str = toPlainText();
+
+        QStringList list = str.split('\n');
+        foreach (const QString &strline, list) {
+            //QMessageBox::information(NULL, "info",QString(tr("GraphicsTextItem::mouseReleaseEvent: MOVE text: %1")).arg(strline));
+            //QFont font;
+            QFontMetrics fontMetrics(m_stTextAttr->m_qfont);
+            int fw = fontMetrics.width(strline);
+            if(fw>m_width)
+            {
+                QString strRealLine;
+                for (int i = 0; i < strline.size(); ++i) {
+                    strRealLine.append(strline.at(i));
+                    fw = fontMetrics.width(strRealLine);
+                    if(fw>=m_width)
+                    {
+                        QMessageBox::information(NULL, "info",QString(tr("GraphicsTextItem::mouseReleaseEvent: MOVE text: %1")).arg(strRealLine));
+                        strRealLine.clear();
+                    }
+                }
+                if(!strRealLine.isEmpty())
+                {
+                    QMessageBox::information(NULL, "info",QString(tr("GraphicsTextItem::mouseReleaseEvent: MOVE text: %1")).arg(strRealLine));
+                }
+            }
+            else
+            {
+                QMessageBox::information(NULL, "info",QString(tr("GraphicsTextItem::mouseReleaseEvent: MOVE text: %1")).arg(strline));
+            }
+        }
+#endif
 		QGraphicsTextItem::mouseReleaseEvent(event);
     }
 }
@@ -386,3 +446,52 @@ void GraphicsTextItem::createGraphicsRectItem()
 	GraphicsRectItem *west_middle = new GraphicsRectItem(m_margin,GraphicsRectItem::WEST_MIDDLE,this);
 	m_listGraphicsRectItem.append(west_middle);
 }
+#if 1
+void GraphicsTextItem::createAssInfo()
+{
+    if(m_stTextAttr)
+    {
+        QMessageBox::information(NULL, "info", QString(tr("GraphicsTextItem::createAssInfo. rgb: %1")).arg(m_stTextAttr->m_fontColor.name()));
+        int iAlignment=8;
+        int iMarginL=10, iMarginR=10, iMarginV=10;
+        switch((Qt::AlignmentFlag)m_stTextAttr->m_textAlign)
+        {
+            case Qt::AlignLeft:
+                iAlignment=7;
+                iMarginL=pos().x();
+                iMarginV=pos().y();
+                break;
+            case Qt::AlignHCenter:
+                iAlignment=7;
+                iMarginL=pos().x();
+                iMarginV=pos().y();
+                break;
+            case Qt::AlignRight:
+                iAlignment=7;
+                iMarginL=pos().x();
+                iMarginV=pos().y();
+                break;
+            default:
+                break;
+        }
+        //"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour,
+        //Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline,
+        //Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding\n"
+        m_stTextAttr->m_qsStyle = QString(tr(
+        "Style: %1,      %2,       %3,       &Hffffff,      &Hffffff,        &H0,           &H0,       "
+        "%4,    %5,      %6,         0,         100,    100,    0,       0,     1,           1,      "
+        " 0,      %7,          %8,     %9,     %10,      0,          0\n")).
+            //arg((int)this).arg(m_stTextAttr->m_qfont.family()).arg(m_stTextAttr->m_qfont.pointSize()).
+            arg((int)this).arg(m_stTextAttr->m_qfont.family()).arg(m_stTextAttr->m_qfont.pixelSize()).
+            arg(m_stTextAttr->m_qfont.weight()==QFont::Bold?1:0).arg(m_stTextAttr->m_qfont.italic()?1:0).
+            arg(m_stTextAttr->m_qfont.underline()?1:0 ).arg(iAlignment).arg(iMarginL).arg(iMarginR).
+            arg(iMarginV);
+
+        document()->lineCount();
+        //Format:   Layer, Start,      End,        Style,  Name, MarginL, MarginR, MarginV, Effect, Text
+        m_stTextAttr->m_qsEvent = QString(tr(
+        "Dialogue:  0,     0:00:00.00, 0:00:01.94, %1,         , 0,       0,       0,           , {\\q2}%2")).
+            arg((int)this).arg(toPlainText());
+    }
+}
+#endif

@@ -9,12 +9,12 @@
 #include <QMessageBox>
 #include "videoscene.h"
 #include <QScrollBar>
+#include <QToolButton>
 
 
 //tmp
 #include <QTextEdit>
 #include <QPushButton>
-#include <QToolButton>
 #include <QLabel>
 #include <QComboBox>
 #include <QApplication>
@@ -484,6 +484,7 @@ void TabWidget::createTabText()
                 fontColorToolButton->setIcon(createColorToolButtonIcon("images/textpointer.png", Qt::black));
                 fontColorToolButton->setAutoFillBackground(true);
                 //connect(fontColorToolButton, SIGNAL(clicked()), this, SLOT(textButtonTriggered()));
+                connect(fontColorToolButton, SIGNAL(clicked()), this, SLOT(handleFontChange()));
 
             }
 
@@ -521,7 +522,15 @@ void TabWidget::createTabText()
                 m_leftTextButton->setCheckable(true);
                 m_leftTextButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
                 const QIcon leftIcon = QIcon::fromTheme("format-justify-left", QIcon(rsrcPath + "/textleft.png"));
+#if 0
+                QAction* actionAlignLeft = new QAction(leftIcon, tr("&Left"), m_leftTextButton);
+                actionAlignLeft->setShortcut(Qt::CTRL + Qt::Key_L);
+                actionAlignLeft->setCheckable(true);
+                actionAlignLeft->setPriority(QAction::LowPriority);
+                m_leftTextButton->addAction(actionAlignLeft);
+#endif
                 m_leftTextButton->setIcon(leftIcon);
+                ////connect(m_leftTextButton, SIGNAL(clicked()), this , SLOT(handleFontChange()));
 
                 hboxMidParagraph->addWidget(m_leftTextButton);
             }
@@ -542,6 +551,22 @@ void TabWidget::createTabText()
                 m_rightTextButton->setIcon(rightIcon);
 
                 hboxMidParagraph->addWidget(m_rightTextButton);
+            }
+            {
+                m_paragraphTextButtonG = new QButtonGroup(hboxMidParagraph);
+                m_paragraphTextButtonG->addButton(m_leftTextButton);
+                m_paragraphTextButtonG->setId(m_leftTextButton, Qt::AlignLeft);
+                m_paragraphTextButtonG->addButton(m_centerTextButton);
+                m_paragraphTextButtonG->setId(m_centerTextButton, Qt::AlignHCenter);
+                m_paragraphTextButtonG->addButton(m_rightTextButton);
+                m_paragraphTextButtonG->setId(m_rightTextButton, Qt::AlignRight);
+
+                m_centerTextButton->setChecked(true);
+
+                //connect(m_paragraphTextButtonG, SIGNAL(buttonClicked(int)), this, SLOT(paragraphGroupClicked(int)));
+                connect(m_paragraphTextButtonG, SIGNAL(buttonClicked(int)), this, SLOT(handleFontChange()));
+
+                //hboxMidParagraph->addWidget(m_paragraphTextButtonG);
             }
 
         }
@@ -696,7 +721,7 @@ void TabWidget::initialScrollArea(QScrollArea *scrollArea)
 }
 QIcon TabWidget::createColorToolButtonIcon(const QString &imageFile, QColor color)
 {
-    QPixmap pixmap(50, 80);
+    QPixmap pixmap(50, 60);
     pixmap.fill(Qt::transparent);
     QPainter painter(&pixmap);
     QPixmap image(imageFile);
@@ -798,12 +823,18 @@ void TabWidget::handleFontChange()
     stTextAttr *textItem=m_mapText[m_element];
 
     QFont font = m_fontCombo->currentFont();
-    font.setPointSize(m_fontSizeCombo->currentText().toInt());
+    //font.setPointSize(m_fontSizeCombo->currentText().toInt());
+    font.setPixelSize(m_fontSizeCombo->currentText().toInt());
     font.setWeight(m_boldButton->isChecked() ? QFont::Bold : QFont::Normal);
     font.setItalic(m_italicButton->isChecked());
     font.setUnderline(m_underlineButton->isChecked());
 
+    textItem->m_textAlign = m_paragraphTextButtonG->checkedId();
+
     textItem->m_qfont = font;
+
+    textItem->m_fontColor = qvariant_cast<QColor>(textAction->data());
+    //scene->setTextColor(qvariant_cast<QColor>(textAction->data()));
 
     //m_globalContext->m_scene->setFont(m_element, font);
     m_globalContext->m_scene->setTextAttr(m_element, textItem);
@@ -815,5 +846,7 @@ void TabWidget::textColorChanged()
     fontColorToolButton->setIcon(createColorToolButtonIcon(
                                      ":/images/textpointer.png",
                                      qvariant_cast<QColor>(textAction->data())));
+    fontColorToolButton->setAutoFillBackground(true);
     //textButtonTriggered();
+    handleFontChange();
 }

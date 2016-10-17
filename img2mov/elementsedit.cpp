@@ -315,7 +315,8 @@ void ElementsEdit::selectedImage()
     // 4, 激活对应tabTextTool
     //emit activeTabTextSignal((void*)send);
 }
-void ElementsEdit::updatedText(stTextAttr* stTextAttr, const QString& qsText)
+//void ElementsEdit::updatedText(stTextAttr* stTextAttr, const QString& qsText)
+void ElementsEdit::updatedText(const QString& qsAss)
 {
     QVector<QString> vqsArgv;
     vqsArgv.push_back("ffmpeg");
@@ -332,7 +333,9 @@ void ElementsEdit::updatedText(stTextAttr* stTextAttr, const QString& qsText)
     vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&sinbuffer));
     //./ffmpeg_r.exe -y -i jpg/mp3.512.5.avi -vf ass=jpg/subtitle.ass jpg/subt.mp3.512.5.avi
     vqsArgv.push_back(QString(tr("-vf")));
-    QByteArray qsInTxt = createAss(stTextAttr, qsText);
+    //QByteArray qsInTxt = createAss(stTextAttr, qsText);
+    QByteArray qsInTxt = qsAss.toUtf8();
+    QMessageBox::information(this, "info", QString(tr("qsAss: %1")).arg(qsAss));
     struct to_buffer sintxtbuffer;
     sintxtbuffer.ptr = (uint8_t*)qsInTxt.data();
     sintxtbuffer.in_len = qsInTxt.length();
@@ -626,12 +629,12 @@ QByteArray ElementsEdit::createAss(stTextAttr* stTextAttr, const QString& qsText
 "\n"
 "[V4+ Styles]\n"
 "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding\n"
-"Style: Default,Arial,   16,       &Hffffff,      &Hffffff,        &H0,           &H0,        0,         0,      0,         0,         100,    100,    0,       0,     1,           1,       0,      2,          10,      10,      10,      0,          0\n"
+"Style: Default,楷体,   16,       &Hffffff,      &Hffffff,        &H0,           &H0,        0,         0,      0,         0,         100,    100,    0,       0,     1,           1,       0,      2,          10,      10,      10,      0,          0\n"
 "\n"
 "[Events]\n"
 "Format:   Layer, Start,      End,        Style,  Name, MarginL, MarginR, MarginV, Effect, Text\n"
-"Dialogue: 0,     0:00:00.001, 0:00:01.99, Default,    , 0,       0,       0,             , Go kill something.\n"
-";Dialogue: 0,     0:00:00.01, 0:00:00.94, Default,    , 0,       0,       0,             , {\\move(0,0,60,120 [,100,500])}{\\fad(400,80)}{\\fs18\\t(130,500,\\fry360)}- Oh, stupid.\n"
+";Dialogue: 0,     0:00:00.001, 0:00:01.99, Default,    , 0,       0,       0,             , Go kill something.\n"
+"Dialogue: 0,     0:00:00.01, 0:00:00.94, Default,    , 0,       0,       0,             , {\\move(0,0,60,120 [,100,500])}{\\fad(400,80)}{\\fs18\\t(130,500,\\fry360)}- Oh, stupid.\\N贱人\n"
 ";Dialogue: 0,     0:00:01.01, 0:00:01.99, Default,    , 0,       0,       0,             , Go kill something.\n"
 );
     return qs;

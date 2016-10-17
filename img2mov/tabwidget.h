@@ -4,6 +4,7 @@
 #include <QListWidget>
 #include <QScrollArea>
 #include <QToolButton>
+#include <QButtonGroup>
 #include <QMap>
 #include <QFontComboBox>
 #include <QComboBox>
@@ -59,6 +60,7 @@ public slots:
     void currentFontChanged();
     void currentBoldChanged(bool);
 #endif
+    void textColorChanged();
     void handleFontChange();
 
 private:
@@ -71,7 +73,6 @@ private:
     QIcon createColorToolButtonIcon(const QString &imageFile, QColor color);
     QIcon createColorIcon(QColor color);
     void assignTabWidget(const stTextAttr *textItem);
-    void textColorChanged();
 private:
     QListWidget *contentsWidget;
     QSize m_iconSize;
@@ -96,6 +97,7 @@ private:
     QToolButton* fontColorToolButton;
     QAction *textAction;
     //Paragraph
+    QButtonGroup *m_paragraphTextButtonG;
     QToolButton *m_leftTextButton;
     QToolButton *m_centerTextButton;
     QToolButton *m_rightTextButton;

@@ -36,7 +36,8 @@ public slots:
     void activeVideoText(void* element, const QString&);
 
 signals:
-    void updatedTextSignal(stTextAttr*, const QString&);
+    //void updatedTextSignal(stTextAttr*, const QString&);
+    void updatedTextSignal(const QString&);
 
 protected:
     void keyPressEvent(QKeyEvent *keyEvent) Q_DECL_OVERRIDE;

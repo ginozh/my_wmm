@@ -40,12 +40,16 @@ public:
     bool m_isUnderlineChecked;
     QColor m_fontColor;
     //Paragraph
-    Qt::Alignment m_textAlign; 
+    //Qt::Alignment m_textAlign; 
+    int m_textAlign; 
     //Adjust
     QString m_qsStartTimeText;
     QString m_qsDurationText;
     //Effects
     int m_idxEffects;
+    //ass
+    QString m_qsStyle;
+    QString m_qsEvent;
 
 }stTextAttr;
 
