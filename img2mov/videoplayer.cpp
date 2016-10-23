@@ -147,6 +147,7 @@ void VideoPlayer::readyVideo(const QString& fileName, const QByteArray& buffer, 
 
         mediaPlayer.stop();
         mediaPlayer.setMedia(QUrl::fromLocalFile(fileName), &m_playBuffer);
+        mediaPlayer.setNotifyInterval(100);
 
         playButton->setEnabled(true);
         mediaPlayer.pause(); // for display image

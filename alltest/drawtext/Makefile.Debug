@@ -100,6 +100,12 @@ debug/moc_mainwindow.cpp: ../../../msys32/mingw32/include/QtWidgets/QMainWindow 
 		../../../msys32/mingw32/include/QtCore/qstring.h \
 		../../../msys32/mingw32/include/QtWidgets/QGraphicsScene \
 		../../../msys32/mingw32/include/QtWidgets/qgraphicsscene.h \
+		../../../msys32/mingw32/include/QtWidgets/QLineEdit \
+		../../../msys32/mingw32/include/QtWidgets/qlineedit.h \
+		../../../msys32/mingw32/include/QtWidgets/QStyleOptionGraphicsItem \
+		../../../msys32/mingw32/include/QtWidgets/qstyleoption.h \
+		../../../msys32/mingw32/include/QtWidgets/QGraphicsTextItem \
+		../../../msys32/mingw32/include/QtWidgets/qgraphicsitem.h \
 		mainwindow.h
 	/C/msys32/mingw32/bin/moc.exe $(DEFINES) -D__GNUC__ -DWIN32 -IC:/msys32/mingw32/share/qt5/mkspecs/win32-g++ -IC:/qtproject/alltest/drawtext -IC:/msys32/mingw32/include/QtMultimediaWidgets -IC:/msys32/mingw32/include/QtWidgets -IC:/msys32/mingw32/include/QtMultimedia -IC:/msys32/mingw32/include/QtGui -IC:/msys32/mingw32/include/QtNetwork -IC:/msys32/mingw32/include/QtCore -IC:/msys32/mingw32/include/c++/5.4.0 -IC:/msys32/mingw32/include/c++/5.4.0/i686-w64-mingw32 -IC:/msys32/mingw32/include/c++/5.4.0/backward -IC:/msys32/mingw32/lib/gcc/i686-w64-mingw32/5.4.0/include -IC:/msys32/mingw32/include -IC:/msys32/mingw32/lib/gcc/i686-w64-mingw32/5.4.0/include-fixed -IC:/msys32/mingw32/i686-w64-mingw32/include mainwindow.h -o debug/moc_mainwindow.cpp
 
@@ -253,10 +259,13 @@ debug/mainwindow.o: mainwindow.cpp ../../../msys32/mingw32/include/QtWidgets/QtW
 		../../../msys32/mingw32/include/QtMultimedia/qvideosurfaceformat.h \
 		../../../msys32/mingw32/include/QtMultimediaWidgets/QGraphicsVideoItem \
 		../../../msys32/mingw32/include/QtMultimediaWidgets/qgraphicsvideoitem.h \
+		../../../msys32/mingw32/include/QtWidgets/QLineEdit \
 		mainwindow.h \
 		../../../msys32/mingw32/include/QtWidgets/QMainWindow \
 		../../../msys32/mingw32/include/QtCore/QString \
-		../../../msys32/mingw32/include/QtCore/qstring.h
+		../../../msys32/mingw32/include/QtCore/qstring.h \
+		../../../msys32/mingw32/include/QtWidgets/QStyleOptionGraphicsItem \
+		../../../msys32/mingw32/include/QtWidgets/QGraphicsTextItem
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/mainwindow.o mainwindow.cpp
 
 debug/main.o: main.cpp ../../../msys32/mingw32/include/QtWidgets/QApplication \
@@ -267,7 +276,13 @@ debug/main.o: main.cpp ../../../msys32/mingw32/include/QtWidgets/QApplication \
 		../../../msys32/mingw32/include/QtCore/QString \
 		../../../msys32/mingw32/include/QtCore/qstring.h \
 		../../../msys32/mingw32/include/QtWidgets/QGraphicsScene \
-		../../../msys32/mingw32/include/QtWidgets/qgraphicsscene.h
+		../../../msys32/mingw32/include/QtWidgets/qgraphicsscene.h \
+		../../../msys32/mingw32/include/QtWidgets/QLineEdit \
+		../../../msys32/mingw32/include/QtWidgets/qlineedit.h \
+		../../../msys32/mingw32/include/QtWidgets/QStyleOptionGraphicsItem \
+		../../../msys32/mingw32/include/QtWidgets/qstyleoption.h \
+		../../../msys32/mingw32/include/QtWidgets/QGraphicsTextItem \
+		../../../msys32/mingw32/include/QtWidgets/qgraphicsitem.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/main.o main.cpp
 
 debug/moc_mainwindow.o: debug/moc_mainwindow.cpp 
