@@ -1,0 +1,153 @@
+Starting C:\qtproject\alltest\spectrum\debug\spectrum.exe...
+Engine::initialize frequenciesList (8000, 11025, 16000, 22050, 32000, 44100, 48000, 88200, 96000, 192000)
+Engine::initialize channelsList (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18)
+Engine::initialize checking  QAudioFormat(8000Hz, 16bit, channelCount=1, sampleType=SignedInt, byteOrder=LittleEndian, codec="audio/pcm") input true output true
+Engine::initialize m_bufferLength 160000
+Engine::initialize m_dataLength 0
+Engine::initialize format QAudioFormat(8000Hz, 16bit, channelCount=1, sampleType=SignedInt, byteOrder=LittleEndian, codec="audio/pcm")
+Waveform::initialize audioBufferSize 4096 windowDurationUs 500000
+Waveform::reset
+Waveform::initialize tileLength 4096 windowLength 88192 nTiles 23
+Waveform::createPixmaps widgetSize QSize(100, 50) pixmapSize QSize(4, 50)
+Waveform::createPixmaps widgetSize QSize(0, 50) pixmapSize QSize(0, 50)
+Waveform::audioNotify [0] bufferLength 141198 playPosition 42336 levelPosition 24704 m_levelBufferLength 17632 m_spectrumBufferLength 16384 spectrumPosition 25952 analysisFileSize 141198 readPos 24704 readLen 105824
+Waveform::audioNotify [2] bufferPosition 24704 dataLength 105824
+Waveform::bufferChanged audioPosition 0 bufferPosition 24704 bufferLength 105824
+Waveform::paintTiles
+Waveform::paintTile index 7 bufferPosition 24704 bufferLength 105824 start 28672 end 32768
+QPainter::begin: Paint device returned engine == 0, type: 2
+QPainter::setPen: Painter not active
+Waveform::paintTile index 8 bufferPosition 24704 bufferLength 105824 start 32768 end 36864
+QPainter::begin: Paint device returned engine == 0, type: 2
+QPainter::setPen: Painter not active
+Waveform::paintTile index 9 bufferPosition 24704 bufferLength 105824 start 36864 end 40960
+QPainter::begin: Paint device returned engine == 0, type: 2
+QPainter::setPen: Painter not active
+Waveform::paintTile index 10 bufferPosition 24704 bufferLength 105824 start 40960 end 45056
+QPainter::begin: Paint device returned engine == 0, type: 2
+QPainter::setPen: Painter not active
+Waveform::paintTile index 11 bufferPosition 24704 bufferLength 105824 start 45056 end 49152
+QPainter::begin: Paint device returned engine == 0, type: 2
+QPainter::setPen: Painter not active
+Waveform::paintTile index 12 bufferPosition 24704 bufferLength 105824 start 49152 end 53248
+QPainter::begin: Paint device returned engine == 0, type: 2
+QPainter::setPen: Painter not active
+Waveform::paintTile index 13 bufferPosition 24704 bufferLength 105824 start 53248 end 57344
+QPainter::begin: Paint device returned engine == 0, type: 2
+QPainter::setPen: Painter not active
+Waveform::paintTile index 14 bufferPosition 24704 bufferLength 105824 start 57344 end 61440
+QPainter::begin: Paint device returned engine == 0, type: 2
+QPainter::setPen: Painter not active
+Waveform::paintTile index 15 bufferPosition 24704 bufferLength 105824 start 61440 end 65536
+QPainter::begin: Paint device returned engine == 0, type: 2
+QPainter::setPen: Painter not active
+Waveform::paintTile index 16 bufferPosition 24704 bufferLength 105824 start 65536 end 69632
+QPainter::begin: Paint device returned engine == 0, type: 2
+QPainter::setPen: Painter not active
+Waveform::paintTile index 17 bufferPosition 24704 bufferLength 105824 start 69632 end 73728
+QPainter::begin: Paint device returned engine == 0, type: 2
+QPainter::setPen: Painter not active
+Waveform::paintTile index 18 bufferPosition 24704 bufferLength 105824 start 73728 end 77824
+QPainter::begin: Paint device returned engine == 0, type: 2
+QPainter::setPen: Painter not active
+Waveform::paintTile index 19 bufferPosition 24704 bufferLength 105824 start 77824 end 81920
+QPainter::begin: Paint device returned engine == 0, type: 2
+QPainter::setPen: Painter not active
+Waveform::paintTile index 20 bufferPosition 24704 bufferLength 105824 start 81920 end 86016
+QPainter::begin: Paint device returned engine == 0, type: 2
+QPainter::setPen: Painter not active
+Waveform::paintTile index 21 bufferPosition 24704 bufferLength 105824 start 86016 end 90112
+QPainter::begin: Paint device returned engine == 0, type: 2
+QPainter::setPen: Painter not active
+Waveform::paintTile index 22 bufferPosition 24704 bufferLength 105824 start 90112 end 94208
+QPainter::begin: Paint device returned engine == 0, type: 2
+QPainter::setPen: Painter not active
+setGeometry: Unable to set geometry 42x92+900+446 on QWidgetWindow/'MainWidgetClassWindow'. Resulting geometry:  228x92+900+446 (frame: 13, 56, 13, 13, custom margin: 0, 0, 0, 0, minimum size: 42x92, maximum size: 16777215x16777215).
+Waveform::audioNotify [0] bufferLength 141198 playPosition 42336 levelPosition 24704 m_levelBufferLength 17632 m_spectrumBufferLength 16384 spectrumPosition 25952 analysisFileSize 141198 readPos 24704 readLen 105824
+Waveform::audioNotify [2] bufferPosition 24704 dataLength 105824
+Waveform::bufferChanged audioPosition 0 bufferPosition 24704 bufferLength 105824
+Waveform::paintTiles
+Waveform::paintTile index 7 bufferPosition 24704 bufferLength 105824 start 28672 end 32768
+Waveform::paintTile index 8 bufferPosition 24704 bufferLength 105824 start 32768 end 36864
+Waveform::paintTile index 9 bufferPosition 24704 bufferLength 105824 start 36864 end 40960
+Waveform::paintTile index 10 bufferPosition 24704 bufferLength 105824 start 40960 end 45056
+Waveform::paintTile index 11 bufferPosition 24704 bufferLength 105824 start 45056 end 49152
+Waveform::paintTile index 12 bufferPosition 24704 bufferLength 105824 start 49152 end 53248
+Waveform::paintTile index 13 bufferPosition 24704 bufferLength 105824 start 53248 end 57344
+Waveform::paintTile index 14 bufferPosition 24704 bufferLength 105824 start 57344 end 61440
+Waveform::paintTile index 15 bufferPosition 24704 bufferLength 105824 start 61440 end 65536
+Waveform::paintTile index 16 bufferPosition 24704 bufferLength 105824 start 65536 end 69632
+Waveform::paintTile index 17 bufferPosition 24704 bufferLength 105824 start 69632 end 73728
+Waveform::paintTile index 18 bufferPosition 24704 bufferLength 105824 start 73728 end 77824
+Waveform::paintTile index 19 bufferPosition 24704 bufferLength 105824 start 77824 end 81920
+Waveform::paintTile index 20 bufferPosition 24704 bufferLength 105824 start 81920 end 86016
+Waveform::paintTile index 21 bufferPosition 24704 bufferLength 105824 start 86016 end 90112
+Waveform::paintTile index 22 bufferPosition 24704 bufferLength 105824 start 90112 end 94208
+Waveform::paintEvent windowPosition 0 windowLength 88192
+Waveform::paintEvent pos 0 tileIndex 0 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 0 not painted
+Waveform::paintEvent pos -> 4096
+Waveform::paintEvent pos 4096 tileIndex 1 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 1 not painted
+Waveform::paintEvent pos -> 8192
+Waveform::paintEvent pos 8192 tileIndex 2 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 2 not painted
+Waveform::paintEvent pos -> 12288
+Waveform::paintEvent pos 12288 tileIndex 3 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 3 not painted
+Waveform::paintEvent pos -> 16384
+Waveform::paintEvent pos 16384 tileIndex 4 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 4 not painted
+Waveform::paintEvent pos -> 20480
+Waveform::paintEvent pos 20480 tileIndex 5 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 5 not painted
+Waveform::paintEvent pos -> 24576
+Waveform::paintEvent pos 24576 tileIndex 6 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 6 not painted
+Waveform::paintEvent pos -> 28672
+Waveform::paintEvent pos 28672 tileIndex 7 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 7 source 0 8 dest 0 69
+Waveform::paintEvent pos -> 32768
+Waveform::paintEvent pos 32768 tileIndex 8 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 8 source 0 8 dest 69 77
+Waveform::paintEvent pos -> 36864
+Waveform::paintEvent pos 36864 tileIndex 9 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 9 source 0 8 dest 77 86
+Waveform::paintEvent pos -> 40960
+Waveform::paintEvent pos 40960 tileIndex 10 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 10 source 0 8 dest 86 95
+Waveform::paintEvent pos -> 45056
+Waveform::paintEvent pos 45056 tileIndex 11 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 11 source 0 8 dest 95 103
+Waveform::paintEvent pos -> 49152
+Waveform::paintEvent pos 49152 tileIndex 12 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 12 source 0 8 dest 103 112
+Waveform::paintEvent pos -> 53248
+Waveform::paintEvent pos 53248 tileIndex 13 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 13 source 0 8 dest 112 120
+Waveform::paintEvent pos -> 57344
+Waveform::paintEvent pos 57344 tileIndex 14 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 14 source 0 8 dest 120 129
+Waveform::paintEvent pos -> 61440
+Waveform::paintEvent pos 61440 tileIndex 15 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 15 source 0 8 dest 129 138
+Waveform::paintEvent pos -> 65536
+Waveform::paintEvent pos 65536 tileIndex 16 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 16 source 0 8 dest 138 146
+Waveform::paintEvent pos -> 69632
+Waveform::paintEvent pos 69632 tileIndex 17 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 17 source 0 8 dest 146 155
+Waveform::paintEvent pos -> 73728
+Waveform::paintEvent pos 73728 tileIndex 18 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 18 source 0 8 dest 155 164
+Waveform::paintEvent pos -> 77824
+Waveform::paintEvent pos 77824 tileIndex 19 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 19 source 0 8 dest 164 172
+Waveform::paintEvent pos -> 81920
+Waveform::paintEvent pos 81920 tileIndex 20 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 20 source 0 8 dest 172 181
+Waveform::paintEvent pos -> 86016
+Waveform::paintEvent pos 86016 tileIndex 21 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 21 source 0 4 dest 181 186
+Waveform::paintEvent pos -> 90112
+Waveform::paintEvent final pos 90112 final x 186

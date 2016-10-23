@@ -1,0 +1,18 @@
+pointer：
+
+m_tileArrayStart(0)
+            tileStart(ts)   tileend(te)                         ts(28672)te
+            |       idx0    |  idx1 |   idx2|  idx3|    | idx6  |  idx7 |   |idx22  |
+            |---------------|-------|-------|------|....|-|--|--|-------|...|-------|
+            |m_tileLen(4096)|       |       |      |    | |  |  |       |   |       |
+			|                    m_windowLength(88192)                              |
+File：                                                    |  |buffer: (tileStart - m_bufferPosition) / 2
+                                                          |base
+                                                          |m_buffer                 
+|-----------|---------------------------------------------|-----------------|------
+|headlen(44)|          m_bufPos(24704) 24704/4096=6.03    | m_bufLen(105824)|
+                                            
+对应关系：
+m_bufferPosition <= tileStart
+m_bufferPosition + m_bufferLength >= tileStart + m_tileLength
+const qint16* buffer = base + ((tileStart - m_bufferPosition) / 2) = base+((28672-24704)/2) = base+1984

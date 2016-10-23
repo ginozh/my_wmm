@@ -1,0 +1,232 @@
+Starting C:\QtProjects\QtExamples\multimedia\spectrum\debug\spectrum.exe...
+Engine::initialize frequenciesList (8000, 11025, 16000, 22050, 32000, 44100, 48000, 88200, 96000, 192000)
+Engine::initialize channelsList (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18)
+Engine::initialize checking  QAudioFormat(8000Hz, 16bit, channelCount=1, sampleType=SignedInt, byteOrder=LittleEndian, codec="audio/pcm") input true output true
+Engine::initialize m_bufferLength 160000
+Engine::initialize m_dataLength 0
+Engine::initialize format QAudioFormat(8000Hz, 16bit, channelCount=1, sampleType=SignedInt, byteOrder=LittleEndian, codec="audio/pcm")
+libpng warning: iCCP: known incorrect sRGB profile
+Waveform::createPixmaps widgetSize QSize(419, 50) pixmapSize QSize(-2147483648, 50)
+Waveform::reset
+Waveform::initialize audioBufferSize 4096 windowDurationUs 500000
+Waveform::reset
+Waveform::initialize tileLength 4096 windowLength 88192 nTiles 23
+Waveform::createPixmaps widgetSize QSize(419, 50) pixmapSize QSize(19, 50)
+Waveform::paintEvent windowPosition 0 windowLength 88192
+Waveform::paintEvent pos 0 tileIndex 0 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 0 not painted
+Waveform::paintEvent final pos 0 final x 0
+Waveform::bufferChanged audioPosition 0 bufferPosition 0 bufferLength 0
+Waveform::paintTiles
+Waveform::paintEvent windowPosition 0 windowLength 88192
+Waveform::paintEvent pos 0 tileIndex 0 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 0 not painted
+Waveform::paintEvent final pos 0 final x 0
+Waveform::audioPositionChanged audioPosition 141198 bufferPosition 0 bufferLength 0
+Waveform::setWindowPosition old 0 new 0 tileArrayStart 0
+Waveform::shuffleTiles n 0
+Waveform::shuffleTiles tileArrayStart 0
+Waveform::paintTiles
+Engine::initialize m_bufferLength 0
+Engine::initialize m_dataLength 0
+Engine::initialize format QAudioFormat(44100Hz, 16bit, channelCount=2, sampleType=SignedInt, byteOrder=LittleEndian, codec="audio/pcm")
+Waveform::paintEvent windowPosition 0 windowLength 88192
+Waveform::paintEvent pos 0 tileIndex 0 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 0 not painted
+Waveform::paintEvent final pos 0 final x 0
+Waveform::paintEvent windowPosition 0 windowLength 88192
+Waveform::paintEvent pos 0 tileIndex 0 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 0 not painted
+Waveform::paintEvent final pos 0 final x 0
+Waveform::audioPositionChanged audioPosition 0 bufferPosition 0 bufferLength 0
+Waveform::setWindowPosition old 0 new 0 tileArrayStart 0
+Waveform::shuffleTiles n 0
+Waveform::shuffleTiles tileArrayStart 0
+Waveform::paintTiles
+Engine::audioStateChanged from StoppedState to ActiveState
+Waveform::paintEvent windowPosition 0 windowLength 88192
+Waveform::paintEvent pos 0 tileIndex 0 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 0 not painted
+Waveform::paintEvent final pos 0 final x 0
+Waveform::audioPositionChanged audioPosition 42336 bufferPosition 0 bufferLength 0
+Waveform::setWindowPosition old 0 new 0 tileArrayStart 0
+Waveform::shuffleTiles n 0
+Waveform::shuffleTiles tileArrayStart 0
+Waveform::paintTiles
+Engine::audioNotify [0] processedUSecs 240000 bufferLength 141198 playPosition 42336 levelPosition 24704 m_levelBufferLength 17632 m_spectrumBufferLength 16384 spectrumPosition 25952
+Engine::audioNotify [1] analysisFileSize 141198 readPos 24704 readLen 105824
+Engine::audioNotify [2] bufferPosition 24704 dataLength 105824
+Waveform::bufferChanged audioPosition 0 bufferPosition 24704 bufferLength 105824
+Waveform::paintTiles
+Waveform::paintTile index 7 bufferPosition 24704 bufferLength 105824 start 28672 end 32768
+Waveform::paintTile index 8 bufferPosition 24704 bufferLength 105824 start 32768 end 36864
+Waveform::paintTile index 9 bufferPosition 24704 bufferLength 105824 start 36864 end 40960
+Waveform::paintTile index 10 bufferPosition 24704 bufferLength 105824 start 40960 end 45056
+Waveform::paintTile index 11 bufferPosition 24704 bufferLength 105824 start 45056 end 49152
+Waveform::paintTile index 12 bufferPosition 24704 bufferLength 105824 start 49152 end 53248
+Waveform::paintTile index 13 bufferPosition 24704 bufferLength 105824 start 53248 end 57344
+Waveform::paintTile index 14 bufferPosition 24704 bufferLength 105824 start 57344 end 61440
+Waveform::paintTile index 15 bufferPosition 24704 bufferLength 105824 start 61440 end 65536
+Waveform::paintTile index 16 bufferPosition 24704 bufferLength 105824 start 65536 end 69632
+Waveform::paintTile index 17 bufferPosition 24704 bufferLength 105824 start 69632 end 73728
+Waveform::paintTile index 18 bufferPosition 24704 bufferLength 105824 start 73728 end 77824
+Waveform::paintTile index 19 bufferPosition 24704 bufferLength 105824 start 77824 end 81920
+Waveform::paintTile index 20 bufferPosition 24704 bufferLength 105824 start 81920 end 86016
+Waveform::paintTile index 21 bufferPosition 24704 bufferLength 105824 start 86016 end 90112
+Waveform::paintTile index 22 bufferPosition 24704 bufferLength 105824 start 90112 end 94208
+Waveform::paintEvent windowPosition 0 windowLength 88192
+Waveform::paintEvent pos 0 tileIndex 0 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 0 not painted
+Waveform::paintEvent final pos 0 final x 0
+Waveform::paintEvent windowPosition 0 windowLength 88192
+Waveform::paintEvent pos 0 tileIndex 0 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 0 not painted
+Waveform::paintEvent final pos 0 final x 0
+Waveform::audioPositionChanged audioPosition 63488 bufferPosition 24704 bufferLength 105824
+Waveform::setWindowPosition old 0 new 42336 tileArrayStart 0
+Waveform::shuffleTiles n 10
+Waveform::shuffleTiles tileArrayStart 40960
+Waveform::paintTiles
+Waveform::paintTile index 13 bufferPosition 24704 bufferLength 105824 start 94208 end 98304
+Waveform::paintTile index 14 bufferPosition 24704 bufferLength 105824 start 98304 end 102400
+Waveform::paintTile index 15 bufferPosition 24704 bufferLength 105824 start 102400 end 106496
+Waveform::paintTile index 16 bufferPosition 24704 bufferLength 105824 start 106496 end 110592
+Waveform::paintTile index 17 bufferPosition 24704 bufferLength 105824 start 110592 end 114688
+Waveform::paintTile index 18 bufferPosition 24704 bufferLength 105824 start 114688 end 118784
+Waveform::paintTile index 19 bufferPosition 24704 bufferLength 105824 start 118784 end 122880
+Waveform::paintTile index 20 bufferPosition 24704 bufferLength 105824 start 122880 end 126976
+Engine::audioNotify [0] processedUSecs 360000 bufferLength 141198 playPosition 63488 levelPosition 45856 m_levelBufferLength 17632 m_spectrumBufferLength 16384 spectrumPosition 47104
+Engine::audioNotify [1] analysisFileSize 141198 readPos 45856 readLen 105824
+Engine::audioNotify [2] bufferPosition 45856 dataLength 95298
+Waveform::bufferChanged audioPosition 42336 bufferPosition 45856 bufferLength 95298
+Waveform::paintTiles
+Waveform::paintTile index 21 bufferPosition 45856 bufferLength 95298 start 126976 end 131072
+Waveform::paintTile index 22 bufferPosition 45856 bufferLength 95298 start 131072 end 135168
+Waveform::paintEvent windowPosition 42336 windowLength 88192
+Waveform::paintEvent pos 42336 tileIndex 0 positionOffset 1376 pixelOffset 6
+Waveform::paintEvent tileIndex 0 source 6 19 dest 0 12
+Waveform::paintEvent pos -> 45056
+Waveform::paintEvent pos 45056 tileIndex 1 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 1 source 0 19 dest 12 32
+Waveform::paintEvent pos -> 49152
+Waveform::paintEvent pos 49152 tileIndex 2 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 2 source 0 19 dest 32 51
+Waveform::paintEvent pos -> 53248
+Waveform::paintEvent pos 53248 tileIndex 3 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 3 source 0 19 dest 51 71
+Waveform::paintEvent pos -> 57344
+Waveform::paintEvent pos 57344 tileIndex 4 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 4 source 0 19 dest 71 90
+Waveform::paintEvent pos -> 61440
+Waveform::paintEvent pos 61440 tileIndex 5 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 5 source 0 19 dest 90 110
+Waveform::paintEvent pos -> 65536
+Waveform::paintEvent pos 65536 tileIndex 6 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 6 source 0 19 dest 110 129
+Waveform::paintEvent pos -> 69632
+Waveform::paintEvent pos 69632 tileIndex 7 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 7 source 0 19 dest 129 149
+Waveform::paintEvent pos -> 73728
+Waveform::paintEvent pos 73728 tileIndex 8 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 8 source 0 19 dest 149 168
+Waveform::paintEvent pos -> 77824
+Waveform::paintEvent pos 77824 tileIndex 9 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 9 source 0 19 dest 168 188
+Waveform::paintEvent pos -> 81920
+Waveform::paintEvent pos 81920 tileIndex 10 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 10 source 0 19 dest 188 207
+Waveform::paintEvent pos -> 86016
+Waveform::paintEvent pos 86016 tileIndex 11 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 11 source 0 19 dest 207 226
+Waveform::paintEvent pos -> 90112
+Waveform::paintEvent pos 90112 tileIndex 12 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 12 source 0 19 dest 226 246
+Waveform::paintEvent pos -> 94208
+Waveform::paintEvent pos 94208 tileIndex 13 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 13 source 0 19 dest 246 265
+Waveform::paintEvent pos -> 98304
+Waveform::paintEvent pos 98304 tileIndex 14 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 14 source 0 19 dest 265 285
+Waveform::paintEvent pos -> 102400
+Waveform::paintEvent pos 102400 tileIndex 15 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 15 source 0 19 dest 285 304
+Waveform::paintEvent pos -> 106496
+Waveform::paintEvent pos 106496 tileIndex 16 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 16 source 0 19 dest 304 324
+Waveform::paintEvent pos -> 110592
+Waveform::paintEvent pos 110592 tileIndex 17 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 17 source 0 19 dest 324 343
+Waveform::paintEvent pos -> 114688
+Waveform::paintEvent pos 114688 tileIndex 18 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 18 source 0 19 dest 343 363
+Waveform::paintEvent pos -> 118784
+Waveform::paintEvent pos 118784 tileIndex 19 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 19 source 0 19 dest 363 382
+Waveform::paintEvent pos -> 122880
+Waveform::paintEvent pos 122880 tileIndex 20 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 20 source 0 19 dest 382 402
+Waveform::paintEvent pos -> 126976
+Waveform::paintEvent pos 126976 tileIndex 21 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 21 source 0 16 dest 402 419
+Waveform::paintEvent pos -> 131072
+Waveform::paintEvent final pos 131072 final x 419
+Waveform::audioPositionChanged audioPosition 77600 bufferPosition 45856 bufferLength 95298
+Waveform::setWindowPosition old 42336 new 52962 tileArrayStart 40960
+Waveform::shuffleTiles n 2
+Waveform::shuffleTiles tileArrayStart 49152
+Waveform::paintTiles
+Waveform::paintTile index 21 bufferPosition 45856 bufferLength 95298 start 135168 end 139264
+Engine::audioNotify [0] processedUSecs 440000 bufferLength 141198 playPosition 77600 levelPosition 59968 m_levelBufferLength 17632 m_spectrumBufferLength 16384 spectrumPosition 61216
+Engine::audioNotify [1] analysisFileSize 141198 readPos 59968 readLen 105824
+Engine::audioNotify [2] bufferPosition 59968 dataLength 81186
+Waveform::bufferChanged audioPosition 52962 bufferPosition 59968 bufferLength 81186
+Waveform::paintTiles
+Waveform::audioPositionChanged audioPosition 98784 bufferPosition 59968 bufferLength 81186
+Waveform::setWindowPosition old 52962 new 52962 tileArrayStart 49152
+Waveform::shuffleTiles n 0
+Waveform::shuffleTiles tileArrayStart 49152
+Waveform::paintTiles
+Engine::audioNotify [0] processedUSecs 560000 bufferLength 141198 playPosition 98784 levelPosition 81152 m_levelBufferLength 17632 m_spectrumBufferLength 16384 spectrumPosition 82400
+Engine::audioNotify [1] analysisFileSize 141198 readPos 81152 readLen 105824
+Engine::audioNotify [2] bufferPosition 81152 dataLength 60002
+Waveform::bufferChanged audioPosition 52962 bufferPosition 81152 bufferLength 60002
+Waveform::paintTiles
+Waveform::audioPositionChanged audioPosition 112896 bufferPosition 81152 bufferLength 60002
+Waveform::setWindowPosition old 52962 new 52962 tileArrayStart 49152
+Waveform::shuffleTiles n 0
+Waveform::shuffleTiles tileArrayStart 49152
+Waveform::paintTiles
+Engine::audioNotify [0] processedUSecs 640000 bufferLength 141198 playPosition 112896 levelPosition 95264 m_levelBufferLength 17632 m_spectrumBufferLength 16384 spectrumPosition 96512
+Engine::audioNotify [1] analysisFileSize 141198 readPos 95264 readLen 105824
+Engine::audioNotify [2] bufferPosition 95264 dataLength 45890
+Waveform::bufferChanged audioPosition 52962 bufferPosition 95264 bufferLength 45890
+Waveform::paintTiles
+Waveform::audioPositionChanged audioPosition 134048 bufferPosition 95264 bufferLength 45890
+Waveform::setWindowPosition old 52962 new 52962 tileArrayStart 49152
+Waveform::shuffleTiles n 0
+Waveform::shuffleTiles tileArrayStart 49152
+Waveform::paintTiles
+Engine::audioNotify [0] processedUSecs 760000 bufferLength 141198 playPosition 134048 levelPosition 116416 m_levelBufferLength 17632 m_spectrumBufferLength 16384 spectrumPosition 117664
+Engine::audioNotify [1] analysisFileSize 141198 readPos 116416 readLen 105824
+Engine::audioNotify [2] bufferPosition 116416 dataLength 24738
+Waveform::bufferChanged audioPosition 52962 bufferPosition 116416 bufferLength 24738
+Waveform::paintTiles
+Waveform::audioPositionChanged audioPosition 141184 bufferPosition 116416 bufferLength 24738
+Waveform::setWindowPosition old 52962 new 52962 tileArrayStart 49152
+Waveform::shuffleTiles n 0
+Waveform::shuffleTiles tileArrayStart 49152
+Waveform::paintTiles
+Engine::audioNotify [0] processedUSecs 800442 bufferLength 141198 playPosition 141184 levelPosition 123552 m_levelBufferLength 17632 m_spectrumBufferLength 16384 spectrumPosition 124800
+Engine::audioNotify [1] analysisFileSize 141198 readPos 123552 readLen 105824
+Engine::audioNotify [2] bufferPosition 123552 dataLength 17602
+Waveform::bufferChanged audioPosition 52962 bufferPosition 123552 bufferLength 17602
+Waveform::paintTiles
+Engine::audioNotify [0] processedUSecs 800442 bufferLength 141198 playPosition 141184 levelPosition 123552 m_levelBufferLength 17632 m_spectrumBufferLength 16384 spectrumPosition 124800
+Engine::audioNotify [1] analysisFileSize 141198 readPos 123552 readLen 105824
+Engine::audioNotify [2] bufferPosition 123552 dataLength 17602
+Waveform::bufferChanged audioPosition 52962 bufferPosition 123552 bufferLength 17602
+Waveform::paintTiles
+Engine::audioStateChanged from ActiveState to IdleState
+Engine::audioStateChanged from ActiveState to StoppedState
+Waveform::audioPositionChanged audioPosition 0 bufferPosition 123552 bufferLength 17602
+C:\QtProjects\QtExamples\multimedia\spectrum\debug\spectrum.exe exited with code 0

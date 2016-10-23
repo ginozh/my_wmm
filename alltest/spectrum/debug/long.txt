@@ -1,0 +1,1314 @@
+Starting C:\QtProjects\QtExamples\multimedia\spectrum\debug\spectrum.exe...
+Engine::initialize frequenciesList (8000, 11025, 16000, 22050, 32000, 44100, 48000, 88200, 96000, 192000)
+Engine::initialize channelsList (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18)
+Engine::initialize checking  QAudioFormat(8000Hz, 16bit, channelCount=1, sampleType=SignedInt, byteOrder=LittleEndian, codec="audio/pcm") input true output true
+Engine::initialize m_bufferLength 160000
+Engine::initialize m_dataLength 0
+Engine::initialize format QAudioFormat(8000Hz, 16bit, channelCount=1, sampleType=SignedInt, byteOrder=LittleEndian, codec="audio/pcm")
+libpng warning: iCCP: known incorrect sRGB profile
+Waveform::createPixmaps widgetSize QSize(419, 50) pixmapSize QSize(-2147483648, 50)
+Waveform::reset
+Waveform::initialize audioBufferSize 4096 windowDurationUs 500000
+Waveform::reset
+Waveform::initialize tileLength 4096 windowLength 88192 nTiles 23
+Waveform::createPixmaps widgetSize QSize(419, 50) pixmapSize QSize(19, 50)
+Waveform::paintEvent windowPosition 0 windowLength 88192
+Waveform::paintEvent pos 0 tileIndex 0 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 0 not painted
+Waveform::paintEvent final pos 0 final x 0
+Waveform::bufferChanged audioPosition 0 bufferPosition 0 bufferLength 0
+Waveform::paintTiles
+Waveform::paintEvent windowPosition 0 windowLength 88192
+Waveform::paintEvent pos 0 tileIndex 0 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 0 not painted
+Waveform::paintEvent final pos 0 final x 0
+Waveform::audioPositionChanged audioPosition 141198 bufferPosition 0 bufferLength 0
+Waveform::setWindowPosition old 0 new 0 tileArrayStart 0
+Waveform::shuffleTiles n 0
+Waveform::shuffleTiles tileArrayStart 0
+Waveform::paintTiles
+Engine::initialize m_bufferLength 0
+Engine::initialize m_dataLength 0
+Engine::initialize format QAudioFormat(44100Hz, 16bit, channelCount=2, sampleType=SignedInt, byteOrder=LittleEndian, codec="audio/pcm")
+Waveform::createPixmaps widgetSize QSize(2398, 50) pixmapSize QSize(111, 50)
+Waveform::paintEvent windowPosition 0 windowLength 88192
+Waveform::paintEvent pos 0 tileIndex 0 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 0 not painted
+Waveform::paintEvent final pos 0 final x 0
+Waveform::paintEvent windowPosition 0 windowLength 88192
+Waveform::paintEvent pos 0 tileIndex 0 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 0 not painted
+Waveform::paintEvent final pos 0 final x 0
+Waveform::paintEvent windowPosition 0 windowLength 88192
+Waveform::paintEvent pos 0 tileIndex 0 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 0 not painted
+Waveform::paintEvent final pos 0 final x 0
+Waveform::audioPositionChanged audioPosition 0 bufferPosition 0 bufferLength 0
+Waveform::setWindowPosition old 0 new 0 tileArrayStart 0
+Waveform::shuffleTiles n 0
+Waveform::shuffleTiles tileArrayStart 0
+Waveform::paintTiles
+Engine::audioStateChanged from StoppedState to ActiveState
+Waveform::paintEvent windowPosition 0 windowLength 88192
+Waveform::paintEvent pos 0 tileIndex 0 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 0 not painted
+Waveform::paintEvent final pos 0 final x 0
+Waveform::audioPositionChanged audioPosition 42336 bufferPosition 0 bufferLength 0
+Waveform::setWindowPosition old 0 new 0 tileArrayStart 0
+Waveform::shuffleTiles n 0
+Waveform::shuffleTiles tileArrayStart 0
+Waveform::paintTiles
+Engine::audioNotify [0] processedUSecs 240000 bufferLength 141198 playPosition 42336 levelPosition 24704 m_levelBufferLength 17632 m_spectrumBufferLength 16384 spectrumPosition 25952
+Engine::audioNotify [1] analysisFileSize 141198 readPos 24704 readLen 105824
+Engine::audioNotify [2] bufferPosition 24704 dataLength 105824
+Waveform::bufferChanged audioPosition 0 bufferPosition 24704 bufferLength 105824
+Waveform::paintTiles
+Waveform::paintTile index 7 bufferPosition 24704 bufferLength 105824 start 28672 end 32768
+Waveform::paintTile index 8 bufferPosition 24704 bufferLength 105824 start 32768 end 36864
+Waveform::paintTile index 9 bufferPosition 24704 bufferLength 105824 start 36864 end 40960
+Waveform::paintTile index 10 bufferPosition 24704 bufferLength 105824 start 40960 end 45056
+Waveform::paintTile index 11 bufferPosition 24704 bufferLength 105824 start 45056 end 49152
+Waveform::paintTile index 12 bufferPosition 24704 bufferLength 105824 start 49152 end 53248
+Waveform::paintTile index 13 bufferPosition 24704 bufferLength 105824 start 53248 end 57344
+Waveform::paintTile index 14 bufferPosition 24704 bufferLength 105824 start 57344 end 61440
+Waveform::paintTile index 15 bufferPosition 24704 bufferLength 105824 start 61440 end 65536
+Waveform::paintTile index 16 bufferPosition 24704 bufferLength 105824 start 65536 end 69632
+Waveform::paintTile index 17 bufferPosition 24704 bufferLength 105824 start 69632 end 73728
+Waveform::paintTile index 18 bufferPosition 24704 bufferLength 105824 start 73728 end 77824
+Waveform::paintTile index 19 bufferPosition 24704 bufferLength 105824 start 77824 end 81920
+Waveform::paintTile index 20 bufferPosition 24704 bufferLength 105824 start 81920 end 86016
+Waveform::paintTile index 21 bufferPosition 24704 bufferLength 105824 start 86016 end 90112
+Waveform::paintTile index 22 bufferPosition 24704 bufferLength 105824 start 90112 end 94208
+Engine::calculateLevel pos 24704 len 17632 rms 0.0699959 peak 0.233978
+Engine::calculateSpectrum QThread(0x23068818) count 0 pos 25952 len 16384 spectrumAnalyser.isReady true
+Waveform::paintEvent windowPosition 0 windowLength 88192
+Waveform::paintEvent windowPosition 0 windowLength 88192
+Waveform::paintEvent pos 0 tileIndex 0 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 0 not painted
+Waveform::paintEvent final pos 0 final x 0
+Engine::spectrumChanged pos 25952
+Waveform::paintEvent windowPosition 0 windowLength 88192
+Waveform::paintEvent pos 0 tileIndex 0 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 0 not painted
+Waveform::paintEvent final pos 0 final x 0
+Waveform::paintEvent windowPosition 0 windowLength 88192
+Waveform::paintEvent pos 0 tileIndex 0 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 0 not painted
+Waveform::paintEvent final pos 0 final x 0
+Waveform::audioPositionChanged audioPosition 49376 bufferPosition 24704 bufferLength 105824
+Waveform::setWindowPosition old 0 new 42336 tileArrayStart 0
+Waveform::shuffleTiles n 10
+Waveform::shuffleTiles tileArrayStart 40960
+Waveform::paintTiles
+Waveform::paintTile index 13 bufferPosition 24704 bufferLength 105824 start 94208 end 98304
+Waveform::paintTile index 14 bufferPosition 24704 bufferLength 105824 start 98304 end 102400
+Waveform::paintTile index 15 bufferPosition 24704 bufferLength 105824 start 102400 end 106496
+Waveform::paintTile index 16 bufferPosition 24704 bufferLength 105824 start 106496 end 110592
+Waveform::paintTile index 17 bufferPosition 24704 bufferLength 105824 start 110592 end 114688
+Waveform::paintTile index 18 bufferPosition 24704 bufferLength 105824 start 114688 end 118784
+Waveform::paintTile index 19 bufferPosition 24704 bufferLength 105824 start 118784 end 122880
+Waveform::paintTile index 20 bufferPosition 24704 bufferLength 105824 start 122880 end 126976
+Engine::audioNotify [0] processedUSecs 280000 bufferLength 141198 playPosition 49376 levelPosition 31744 m_levelBufferLength 17632 m_spectrumBufferLength 16384 spectrumPosition 32992
+Engine::audioNotify [1] analysisFileSize 141198 readPos 31744 readLen 105824
+Engine::audioNotify [2] bufferPosition 31744 dataLength 105824
+Waveform::bufferChanged audioPosition 42336 bufferPosition 31744 bufferLength 105824
+Waveform::paintTiles
+Waveform::paintTile index 21 bufferPosition 31744 bufferLength 105824 start 126976 end 131072
+Waveform::paintTile index 22 bufferPosition 31744 bufferLength 105824 start 131072 end 135168
+Engine::calculateLevel pos 31744 len 17632 rms 0.0754277 peak 0.233978
+Engine::calculateSpectrum QThread(0x23068818) count 0 pos 32992 len 16384 spectrumAnalyser.isReady true
+SpectrumAnalyser::calculate QThread(0x23068818) state 0
+Waveform::paintEvent windowPosition 42336 windowLength 88192
+Waveform::paintEvent pos 42336 tileIndex 0 positionOffset 1376 pixelOffset 37
+Waveform::paintEvent tileIndex 0 source 37 111 dest 0 73
+Waveform::paintEvent pos -> 45056
+Waveform::paintEvent pos 45056 tileIndex 1 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 1 source 0 111 dest 73 185
+Waveform::paintEvent pos -> 49152
+Waveform::paintEvent pos 49152 tileIndex 2 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 2 source 0 111 dest 185 296
+Waveform::paintEvent pos -> 53248
+Waveform::paintEvent pos 53248 tileIndex 3 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 3 source 0 111 dest 296 408
+Waveform::paintEvent pos -> 57344
+Waveform::paintEvent pos 57344 tileIndex 4 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 4 source 0 111 dest 408 519
+Waveform::paintEvent pos -> 61440
+Waveform::paintEvent pos 61440 tileIndex 5 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 5 source 0 111 dest 519 630
+Waveform::paintEvent pos -> 65536
+Waveform::paintEvent pos 65536 tileIndex 6 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 6 source 0 111 dest 630 742
+Waveform::paintEvent pos -> 69632
+Waveform::paintEvent pos 69632 tileIndex 7 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 7 source 0 111 dest 742 853
+Waveform::paintEvent pos -> 73728
+Waveform::paintEvent pos 73728 tileIndex 8 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 8 source 0 111 dest 853 964
+Waveform::paintEvent pos -> 77824
+Waveform::paintEvent pos 77824 tileIndex 9 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 9 source 0 111 dest 964 1076
+Waveform::paintEvent pos -> 81920
+Waveform::paintEvent pos 81920 tileIndex 10 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 10 source 0 111 dest 1076 1187
+Waveform::paintEvent pos -> 86016
+Waveform::paintEvent pos 86016 tileIndex 11 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 11 source 0 111 dest 1187 1299
+Waveform::paintEvent pos -> 90112
+Waveform::paintEvent pos 90112 tileIndex 12 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 12 source 0 111 dest 1299 1410
+Waveform::paintEvent pos -> 94208
+Waveform::paintEvent pos 94208 tileIndex 13 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 13 source 0 111 dest 1410 1521
+Waveform::paintEvent pos -> 98304
+Waveform::paintEvent pos 98304 tileIndex 14 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 14 source 0 111 dest 1521 1633
+Waveform::paintEvent pos -> 102400
+Waveform::paintEvent pos 102400 tileIndex 15 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 15 source 0 111 dest 1633 1744
+Waveform::paintEvent pos -> 106496
+Waveform::paintEvent pos 106496 tileIndex 16 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 16 source 0 111 dest 1744 1855
+Waveform::paintEvent pos -> 110592
+Waveform::paintEvent pos 110592 tileIndex 17 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 17 source 0 111 dest 1855 1967
+Waveform::paintEvent pos -> 114688
+Waveform::paintEvent pos 114688 tileIndex 18 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 18 source 0 111 dest 1967 2078
+Waveform::paintEvent pos -> 118784
+Waveform::paintEvent pos 118784 tileIndex 19 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 19 source 0 111 dest 2078 2190
+Waveform::paintEvent pos -> 122880
+Waveform::paintEvent pos 122880 tileIndex 20 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 20 source 0 111 dest 2190 2301
+Waveform::paintEvent pos -> 126976
+Waveform::paintEvent pos 126976 tileIndex 21 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 21 source 0 96 dest 2301 2398
+Waveform::paintEvent pos -> 131072
+Waveform::paintEvent final pos 131072 final x 2398
+Engine::spectrumChanged pos 32992
+Waveform::paintEvent windowPosition 42336 windowLength 88192
+Waveform::paintEvent pos 42336 tileIndex 0 positionOffset 1376 pixelOffset 37
+Waveform::paintEvent tileIndex 0 source 37 111 dest 0 73
+Waveform::paintEvent pos -> 45056
+Waveform::paintEvent pos 45056 tileIndex 1 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 1 source 0 111 dest 73 185
+Waveform::paintEvent pos -> 49152
+Waveform::paintEvent pos 49152 tileIndex 2 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 2 source 0 111 dest 185 296
+Waveform::paintEvent pos -> 53248
+Waveform::paintEvent pos 53248 tileIndex 3 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 3 source 0 111 dest 296 408
+Waveform::paintEvent pos -> 57344
+Waveform::paintEvent pos 57344 tileIndex 4 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 4 source 0 111 dest 408 519
+Waveform::paintEvent pos -> 61440
+Waveform::paintEvent pos 61440 tileIndex 5 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 5 source 0 111 dest 519 630
+Waveform::paintEvent pos -> 65536
+Waveform::paintEvent pos 65536 tileIndex 6 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 6 source 0 111 dest 630 742
+Waveform::paintEvent pos -> 69632
+Waveform::paintEvent pos 69632 tileIndex 7 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 7 source 0 111 dest 742 853
+Waveform::paintEvent pos -> 73728
+Waveform::paintEvent pos 73728 tileIndex 8 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 8 source 0 111 dest 853 964
+Waveform::paintEvent pos -> 77824
+Waveform::paintEvent pos 77824 tileIndex 9 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 9 source 0 111 dest 964 1076
+Waveform::paintEvent pos -> 81920
+Waveform::paintEvent pos 81920 tileIndex 10 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 10 source 0 111 dest 1076 1187
+Waveform::paintEvent pos -> 86016
+Waveform::paintEvent pos 86016 tileIndex 11 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 11 source 0 111 dest 1187 1299
+Waveform::paintEvent pos -> 90112
+Waveform::paintEvent pos 90112 tileIndex 12 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 12 source 0 111 dest 1299 1410
+Waveform::paintEvent pos -> 94208
+Waveform::paintEvent pos 94208 tileIndex 13 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 13 source 0 111 dest 1410 1521
+Waveform::paintEvent pos -> 98304
+Waveform::paintEvent pos 98304 tileIndex 14 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 14 source 0 111 dest 1521 1633
+Waveform::paintEvent pos -> 102400
+Waveform::paintEvent pos 102400 tileIndex 15 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 15 source 0 111 dest 1633 1744
+Waveform::paintEvent pos -> 106496
+Waveform::paintEvent pos 106496 tileIndex 16 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 16 source 0 111 dest 1744 1855
+Waveform::paintEvent pos -> 110592
+Waveform::paintEvent pos 110592 tileIndex 17 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 17 source 0 111 dest 1855 1967
+Waveform::paintEvent pos -> 114688
+Waveform::paintEvent pos 114688 tileIndex 18 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 18 source 0 111 dest 1967 2078
+Waveform::paintEvent pos -> 118784
+Waveform::paintEvent pos 118784 tileIndex 19 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 19 source 0 111 dest 2078 2190
+Waveform::paintEvent pos -> 122880
+Waveform::paintEvent pos 122880 tileIndex 20 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 20 source 0 111 dest 2190 2301
+Waveform::paintEvent pos -> 126976
+Waveform::paintEvent pos 126976 tileIndex 21 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 21 source 0 96 dest 2301 2398
+Waveform::paintEvent pos -> 131072
+Waveform::paintEvent final pos 131072 final x 2398
+Waveform::paintEvent windowPosition 42336 windowLength 88192
+Waveform::paintEvent pos 42336 tileIndex 0 positionOffset 1376 pixelOffset 37
+Waveform::paintEvent tileIndex 0 source 37 111 dest 0 73
+Waveform::paintEvent pos -> 45056
+Waveform::paintEvent pos 45056 tileIndex 1 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 1 source 0 111 dest 73 185
+Waveform::paintEvent pos -> 49152
+Waveform::paintEvent pos 49152 tileIndex 2 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 2 source 0 111 dest 185 296
+Waveform::paintEvent pos -> 53248
+Waveform::paintEvent pos 53248 tileIndex 3 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 3 source 0 111 dest 296 408
+Waveform::paintEvent pos -> 57344
+Waveform::paintEvent pos 57344 tileIndex 4 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 4 source 0 111 dest 408 519
+Waveform::paintEvent pos -> 61440
+Waveform::paintEvent pos 61440 tileIndex 5 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 5 source 0 111 dest 519 630
+Waveform::paintEvent pos -> 65536
+Waveform::paintEvent pos 65536 tileIndex 6 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 6 source 0 111 dest 630 742
+Waveform::paintEvent pos -> 69632
+Waveform::paintEvent pos 69632 tileIndex 7 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 7 source 0 111 dest 742 853
+Waveform::paintEvent pos -> 73728
+Waveform::paintEvent pos 73728 tileIndex 8 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 8 source 0 111 dest 853 964
+Waveform::paintEvent pos -> 77824
+Waveform::paintEvent pos 77824 tileIndex 9 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 9 source 0 111 dest 964 1076
+Waveform::paintEvent pos -> 81920
+Waveform::paintEvent pos 81920 tileIndex 10 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 10 source 0 111 dest 1076 1187
+Waveform::paintEvent pos -> 86016
+Waveform::paintEvent pos 86016 tileIndex 11 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 11 source 0 111 dest 1187 1299
+Waveform::paintEvent pos -> 90112
+Waveform::paintEvent pos 90112 tileIndex 12 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 12 source 0 111 dest 1299 1410
+Waveform::paintEvent pos -> 94208
+Waveform::paintEvent pos 94208 tileIndex 13 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 13 source 0 111 dest 1410 1521
+Waveform::paintEvent pos -> 98304
+Waveform::paintEvent pos 98304 tileIndex 14 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 14 source 0 111 dest 1521 1633
+Waveform::paintEvent pos -> 102400
+Waveform::paintEvent pos 102400 tileIndex 15 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 15 source 0 111 dest 1633 1744
+Waveform::paintEvent pos -> 106496
+Waveform::paintEvent pos 106496 tileIndex 16 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 16 source 0 111 dest 1744 1855
+Waveform::paintEvent pos -> 110592
+Waveform::paintEvent pos 110592 tileIndex 17 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 17 source 0 111 dest 1855 1967
+Waveform::paintEvent pos -> 114688
+Waveform::paintEvent pos 114688 tileIndex 18 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 18 source 0 111 dest 1967 2078
+Waveform::paintEvent pos -> 118784
+Waveform::paintEvent pos 118784 tileIndex 19 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 19 source 0 111 dest 2078 2190
+Waveform::paintEvent pos -> 122880
+Waveform::paintEvent pos 122880 tileIndex 20 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 20 source 0 111 dest 2190 2301
+Waveform::paintEvent pos -> 126976
+Waveform::paintEvent pos 126976 tileIndex 21 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 21 source 0 96 dest 2301 2398
+Waveform::paintEvent pos -> 131072
+Waveform::paintEvent final pos 131072 final x 2398
+Waveform::audioPositionChanged audioPosition 70560 bufferPosition 31744 bufferLength 105824
+Waveform::setWindowPosition old 42336 new 49376 tileArrayStart 40960
+Waveform::shuffleTiles n 2
+Waveform::shuffleTiles tileArrayStart 49152
+Waveform::paintTiles
+Engine::audioNotify [0] processedUSecs 400000 bufferLength 141198 playPosition 70560 levelPosition 52928 m_levelBufferLength 17632 m_spectrumBufferLength 16384 spectrumPosition 54176
+Engine::audioNotify [1] analysisFileSize 141198 readPos 52928 readLen 105824
+Engine::audioNotify [2] bufferPosition 52928 dataLength 88226
+Waveform::bufferChanged audioPosition 49376 bufferPosition 52928 bufferLength 88226
+Waveform::paintTiles
+Waveform::paintTile index 21 bufferPosition 52928 bufferLength 88226 start 135168 end 139264
+Engine::calculateLevel pos 52928 len 17632 rms 0.190499 peak 0.686798
+Engine::calculateSpectrum QThread(0x23068818) count 0 pos 54176 len 16384 spectrumAnalyser.isReady true
+SpectrumAnalyser::calculate QThread(0x23068818) state 0
+Waveform::paintEvent windowPosition 49376 windowLength 88192
+Waveform::paintEvent pos 49376 tileIndex 0 positionOffset 224 pixelOffset 6
+Waveform::paintEvent tileIndex 0 source 6 111 dest 0 105
+Waveform::paintEvent pos -> 53248
+Waveform::paintEvent pos 53248 tileIndex 1 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 1 source 0 111 dest 105 216
+Waveform::paintEvent pos -> 57344
+Waveform::paintEvent pos 57344 tileIndex 2 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 2 source 0 111 dest 216 328
+Waveform::paintEvent pos -> 61440
+Waveform::paintEvent pos 61440 tileIndex 3 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 3 source 0 111 dest 328 439
+Waveform::paintEvent pos -> 65536
+Waveform::paintEvent pos 65536 tileIndex 4 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 4 source 0 111 dest 439 550
+Waveform::paintEvent pos -> 69632
+Waveform::paintEvent pos 69632 tileIndex 5 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 5 source 0 111 dest 550 662
+Waveform::paintEvent pos -> 73728
+Waveform::paintEvent pos 73728 tileIndex 6 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 6 source 0 111 dest 662 773
+Waveform::paintEvent pos -> 77824
+Waveform::paintEvent pos 77824 tileIndex 7 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 7 source 0 111 dest 773 884
+Waveform::paintEvent pos -> 81920
+Waveform::paintEvent pos 81920 tileIndex 8 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 8 source 0 111 dest 884 996
+Waveform::paintEvent pos -> 86016
+Waveform::paintEvent pos 86016 tileIndex 9 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 9 source 0 111 dest 996 1107
+Waveform::paintEvent pos -> 90112
+Waveform::paintEvent pos 90112 tileIndex 10 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 10 source 0 111 dest 1107 1219
+Waveform::paintEvent pos -> 94208
+Waveform::paintEvent pos 94208 tileIndex 11 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 11 source 0 111 dest 1219 1330
+Waveform::paintEvent pos -> 98304
+Waveform::paintEvent pos 98304 tileIndex 12 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 12 source 0 111 dest 1330 1441
+Waveform::paintEvent pos -> 102400
+Waveform::paintEvent pos 102400 tileIndex 13 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 13 source 0 111 dest 1441 1553
+Waveform::paintEvent pos -> 106496
+Waveform::paintEvent pos 106496 tileIndex 14 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 14 source 0 111 dest 1553 1664
+Waveform::paintEvent pos -> 110592
+Waveform::paintEvent pos 110592 tileIndex 15 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 15 source 0 111 dest 1664 1775
+Waveform::paintEvent pos -> 114688
+Waveform::paintEvent pos 114688 tileIndex 16 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 16 source 0 111 dest 1775 1887
+Waveform::paintEvent pos -> 118784
+Waveform::paintEvent pos 118784 tileIndex 17 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 17 source 0 111 dest 1887 1998
+Waveform::paintEvent pos -> 122880
+Waveform::paintEvent pos 122880 tileIndex 18 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 18 source 0 111 dest 1998 2109
+Waveform::paintEvent pos -> 126976
+Waveform::paintEvent pos 126976 tileIndex 19 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 19 source 0 111 dest 2109 2221
+Waveform::paintEvent pos -> 131072
+Waveform::paintEvent pos 131072 tileIndex 20 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 20 source 0 111 dest 2221 2332
+Waveform::paintEvent pos -> 135168
+Waveform::paintEvent pos 135168 tileIndex 21 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 21 source 0 65 dest 2332 2398
+Waveform::paintEvent pos -> 139264
+Waveform::paintEvent final pos 139264 final x 2398
+Engine::spectrumChanged pos 54176
+Waveform::paintEvent windowPosition 49376 windowLength 88192
+Waveform::paintEvent pos 49376 tileIndex 0 positionOffset 224 pixelOffset 6
+Waveform::paintEvent tileIndex 0 source 6 111 dest 0 105
+Waveform::paintEvent pos -> 53248
+Waveform::paintEvent pos 53248 tileIndex 1 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 1 source 0 111 dest 105 216
+Waveform::paintEvent pos -> 57344
+Waveform::paintEvent pos 57344 tileIndex 2 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 2 source 0 111 dest 216 328
+Waveform::paintEvent pos -> 61440
+Waveform::paintEvent pos 61440 tileIndex 3 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 3 source 0 111 dest 328 439
+Waveform::paintEvent pos -> 65536
+Waveform::paintEvent pos 65536 tileIndex 4 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 4 source 0 111 dest 439 550
+Waveform::paintEvent pos -> 69632
+Waveform::paintEvent pos 69632 tileIndex 5 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 5 source 0 111 dest 550 662
+Waveform::paintEvent pos -> 73728
+Waveform::paintEvent pos 73728 tileIndex 6 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 6 source 0 111 dest 662 773
+Waveform::paintEvent pos -> 77824
+Waveform::paintEvent pos 77824 tileIndex 7 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 7 source 0 111 dest 773 884
+Waveform::paintEvent pos -> 81920
+Waveform::paintEvent pos 81920 tileIndex 8 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 8 source 0 111 dest 884 996
+Waveform::paintEvent pos -> 86016
+Waveform::paintEvent pos 86016 tileIndex 9 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 9 source 0 111 dest 996 1107
+Waveform::paintEvent pos -> 90112
+Waveform::paintEvent pos 90112 tileIndex 10 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 10 source 0 111 dest 1107 1219
+Waveform::paintEvent pos -> 94208
+Waveform::paintEvent pos 94208 tileIndex 11 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 11 source 0 111 dest 1219 1330
+Waveform::paintEvent pos -> 98304
+Waveform::paintEvent pos 98304 tileIndex 12 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 12 source 0 111 dest 1330 1441
+Waveform::paintEvent pos -> 102400
+Waveform::paintEvent pos 102400 tileIndex 13 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 13 source 0 111 dest 1441 1553
+Waveform::paintEvent pos -> 106496
+Waveform::paintEvent pos 106496 tileIndex 14 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 14 source 0 111 dest 1553 1664
+Waveform::paintEvent pos -> 110592
+Waveform::paintEvent pos 110592 tileIndex 15 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 15 source 0 111 dest 1664 1775
+Waveform::paintEvent pos -> 114688
+Waveform::paintEvent pos 114688 tileIndex 16 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 16 source 0 111 dest 1775 1887
+Waveform::paintEvent pos -> 118784
+Waveform::paintEvent pos 118784 tileIndex 17 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 17 source 0 111 dest 1887 1998
+Waveform::paintEvent pos -> 122880
+Waveform::paintEvent pos 122880 tileIndex 18 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 18 source 0 111 dest 1998 2109
+Waveform::paintEvent pos -> 126976
+Waveform::paintEvent pos 126976 tileIndex 19 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 19 source 0 111 dest 2109 2221
+Waveform::paintEvent pos -> 131072
+Waveform::paintEvent pos 131072 tileIndex 20 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 20 source 0 111 dest 2221 2332
+Waveform::paintEvent pos -> 135168
+Waveform::paintEvent pos 135168 tileIndex 21 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 21 source 0 65 dest 2332 2398
+Waveform::paintEvent pos -> 139264
+Waveform::paintEvent final pos 139264 final x 2398
+Waveform::paintEvent windowPosition 49376 windowLength 88192
+Waveform::paintEvent pos 49376 tileIndex 0 positionOffset 224 pixelOffset 6
+Waveform::paintEvent tileIndex 0 source 6 111 dest 0 105
+Waveform::paintEvent pos -> 53248
+Waveform::paintEvent pos 53248 tileIndex 1 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 1 source 0 111 dest 105 216
+Waveform::paintEvent pos -> 57344
+Waveform::paintEvent pos 57344 tileIndex 2 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 2 source 0 111 dest 216 328
+Waveform::paintEvent pos -> 61440
+Waveform::paintEvent pos 61440 tileIndex 3 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 3 source 0 111 dest 328 439
+Waveform::paintEvent pos -> 65536
+Waveform::paintEvent pos 65536 tileIndex 4 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 4 source 0 111 dest 439 550
+Waveform::paintEvent pos -> 69632
+Waveform::paintEvent pos 69632 tileIndex 5 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 5 source 0 111 dest 550 662
+Waveform::paintEvent pos -> 73728
+Waveform::paintEvent pos 73728 tileIndex 6 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 6 source 0 111 dest 662 773
+Waveform::paintEvent pos -> 77824
+Waveform::paintEvent pos 77824 tileIndex 7 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 7 source 0 111 dest 773 884
+Waveform::paintEvent pos -> 81920
+Waveform::paintEvent pos 81920 tileIndex 8 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 8 source 0 111 dest 884 996
+Waveform::paintEvent pos -> 86016
+Waveform::paintEvent pos 86016 tileIndex 9 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 9 source 0 111 dest 996 1107
+Waveform::paintEvent pos -> 90112
+Waveform::paintEvent pos 90112 tileIndex 10 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 10 source 0 111 dest 1107 1219
+Waveform::paintEvent pos -> 94208
+Waveform::paintEvent pos 94208 tileIndex 11 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 11 source 0 111 dest 1219 1330
+Waveform::paintEvent pos -> 98304
+Waveform::paintEvent pos 98304 tileIndex 12 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 12 source 0 111 dest 1330 1441
+Waveform::paintEvent pos -> 102400
+Waveform::paintEvent pos 102400 tileIndex 13 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 13 source 0 111 dest 1441 1553
+Waveform::paintEvent pos -> 106496
+Waveform::paintEvent pos 106496 tileIndex 14 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 14 source 0 111 dest 1553 1664
+Waveform::paintEvent pos -> 110592
+Waveform::paintEvent pos 110592 tileIndex 15 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 15 source 0 111 dest 1664 1775
+Waveform::paintEvent pos -> 114688
+Waveform::paintEvent pos 114688 tileIndex 16 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 16 source 0 111 dest 1775 1887
+Waveform::paintEvent pos -> 118784
+Waveform::paintEvent pos 118784 tileIndex 17 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 17 source 0 111 dest 1887 1998
+Waveform::paintEvent pos -> 122880
+Waveform::paintEvent pos 122880 tileIndex 18 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 18 source 0 111 dest 1998 2109
+Waveform::paintEvent pos -> 126976
+Waveform::paintEvent pos 126976 tileIndex 19 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 19 source 0 111 dest 2109 2221
+Waveform::paintEvent pos -> 131072
+Waveform::paintEvent pos 131072 tileIndex 20 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 20 source 0 111 dest 2221 2332
+Waveform::paintEvent pos -> 135168
+Waveform::paintEvent pos 135168 tileIndex 21 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 21 source 0 65 dest 2332 2398
+Waveform::paintEvent pos -> 139264
+Waveform::paintEvent final pos 139264 final x 2398
+Waveform::audioPositionChanged audioPosition 91712 bufferPosition 52928 bufferLength 88226
+Waveform::setWindowPosition old 49376 new 52962 tileArrayStart 49152
+Waveform::shuffleTiles n 0
+Waveform::shuffleTiles tileArrayStart 49152
+Waveform::paintTiles
+Engine::audioNotify [0] processedUSecs 520000 bufferLength 141198 playPosition 91712 levelPosition 74080 m_levelBufferLength 17632 m_spectrumBufferLength 16384 spectrumPosition 75328
+Engine::audioNotify [1] analysisFileSize 141198 readPos 74080 readLen 105824
+Engine::audioNotify [2] bufferPosition 74080 dataLength 67074
+Waveform::bufferChanged audioPosition 52962 bufferPosition 74080 bufferLength 67074
+Waveform::paintTiles
+Engine::calculateLevel pos 74080 len 17632 rms 0.275684 peak 0.90921
+Engine::calculateSpectrum QThread(0x23068818) count 0 pos 75328 len 16384 spectrumAnalyser.isReady true
+SpectrumAnalyser::calculate QThread(0x23068818) state 0
+Waveform::paintEvent windowPosition 52962 windowLength 88192
+Waveform::paintEvent pos 52962 tileIndex 0 positionOffset 3810 pixelOffset 103
+Waveform::paintEvent tileIndex 0 source 103 111 dest 0 7
+Waveform::paintEvent pos -> 53248
+Waveform::paintEvent pos 53248 tileIndex 1 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 1 source 0 111 dest 7 119
+Waveform::paintEvent pos -> 57344
+Waveform::paintEvent pos 57344 tileIndex 2 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 2 source 0 111 dest 119 230
+Waveform::paintEvent pos -> 61440
+Waveform::paintEvent pos 61440 tileIndex 3 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 3 source 0 111 dest 230 341
+Waveform::paintEvent pos -> 65536
+Waveform::paintEvent pos 65536 tileIndex 4 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 4 source 0 111 dest 341 453
+Waveform::paintEvent pos -> 69632
+Waveform::paintEvent pos 69632 tileIndex 5 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 5 source 0 111 dest 453 564
+Waveform::paintEvent pos -> 73728
+Waveform::paintEvent pos 73728 tileIndex 6 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 6 source 0 111 dest 564 676
+Waveform::paintEvent pos -> 77824
+Waveform::paintEvent pos 77824 tileIndex 7 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 7 source 0 111 dest 676 787
+Waveform::paintEvent pos -> 81920
+Waveform::paintEvent pos 81920 tileIndex 8 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 8 source 0 111 dest 787 898
+Waveform::paintEvent pos -> 86016
+Waveform::paintEvent pos 86016 tileIndex 9 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 9 source 0 111 dest 898 1010
+Waveform::paintEvent pos -> 90112
+Waveform::paintEvent pos 90112 tileIndex 10 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 10 source 0 111 dest 1010 1121
+Waveform::paintEvent pos -> 94208
+Waveform::paintEvent pos 94208 tileIndex 11 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 11 source 0 111 dest 1121 1232
+Waveform::paintEvent pos -> 98304
+Waveform::paintEvent pos 98304 tileIndex 12 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 12 source 0 111 dest 1232 1344
+Waveform::paintEvent pos -> 102400
+Waveform::paintEvent pos 102400 tileIndex 13 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 13 source 0 111 dest 1344 1455
+Waveform::paintEvent pos -> 106496
+Waveform::paintEvent pos 106496 tileIndex 14 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 14 source 0 111 dest 1455 1566
+Waveform::paintEvent pos -> 110592
+Waveform::paintEvent pos 110592 tileIndex 15 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 15 source 0 111 dest 1566 1678
+Waveform::paintEvent pos -> 114688
+Waveform::paintEvent pos 114688 tileIndex 16 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 16 source 0 111 dest 1678 1789
+Waveform::paintEvent pos -> 118784
+Waveform::paintEvent pos 118784 tileIndex 17 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 17 source 0 111 dest 1789 1901
+Waveform::paintEvent pos -> 122880
+Waveform::paintEvent pos 122880 tileIndex 18 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 18 source 0 111 dest 1901 2012
+Waveform::paintEvent pos -> 126976
+Waveform::paintEvent pos 126976 tileIndex 19 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 19 source 0 111 dest 2012 2123
+Waveform::paintEvent pos -> 131072
+Waveform::paintEvent pos 131072 tileIndex 20 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 20 source 0 111 dest 2123 2235
+Waveform::paintEvent pos -> 135168
+Waveform::paintEvent pos 135168 tileIndex 21 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 21 source 0 111 dest 2235 2346
+Waveform::paintEvent pos -> 139264
+Waveform::paintEvent pos 139264 tileIndex 22 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 22 not painted
+Waveform::paintEvent final pos 139264 final x 2346
+Engine::spectrumChanged pos 75328
+Waveform::paintEvent windowPosition 52962 windowLength 88192
+Waveform::paintEvent pos 52962 tileIndex 0 positionOffset 3810 pixelOffset 103
+Waveform::paintEvent tileIndex 0 source 103 111 dest 0 7
+Waveform::paintEvent pos -> 53248
+Waveform::paintEvent pos 53248 tileIndex 1 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 1 source 0 111 dest 7 119
+Waveform::paintEvent pos -> 57344
+Waveform::paintEvent pos 57344 tileIndex 2 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 2 source 0 111 dest 119 230
+Waveform::paintEvent pos -> 61440
+Waveform::paintEvent pos 61440 tileIndex 3 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 3 source 0 111 dest 230 341
+Waveform::paintEvent pos -> 65536
+Waveform::paintEvent pos 65536 tileIndex 4 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 4 source 0 111 dest 341 453
+Waveform::paintEvent pos -> 69632
+Waveform::paintEvent pos 69632 tileIndex 5 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 5 source 0 111 dest 453 564
+Waveform::paintEvent pos -> 73728
+Waveform::paintEvent pos 73728 tileIndex 6 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 6 source 0 111 dest 564 676
+Waveform::paintEvent pos -> 77824
+Waveform::paintEvent pos 77824 tileIndex 7 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 7 source 0 111 dest 676 787
+Waveform::paintEvent pos -> 81920
+Waveform::paintEvent pos 81920 tileIndex 8 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 8 source 0 111 dest 787 898
+Waveform::paintEvent pos -> 86016
+Waveform::paintEvent pos 86016 tileIndex 9 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 9 source 0 111 dest 898 1010
+Waveform::paintEvent pos -> 90112
+Waveform::paintEvent pos 90112 tileIndex 10 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 10 source 0 111 dest 1010 1121
+Waveform::paintEvent pos -> 94208
+Waveform::paintEvent pos 94208 tileIndex 11 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 11 source 0 111 dest 1121 1232
+Waveform::paintEvent pos -> 98304
+Waveform::paintEvent pos 98304 tileIndex 12 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 12 source 0 111 dest 1232 1344
+Waveform::paintEvent pos -> 102400
+Waveform::paintEvent pos 102400 tileIndex 13 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 13 source 0 111 dest 1344 1455
+Waveform::paintEvent pos -> 106496
+Waveform::paintEvent pos 106496 tileIndex 14 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 14 source 0 111 dest 1455 1566
+Waveform::paintEvent pos -> 110592
+Waveform::paintEvent pos 110592 tileIndex 15 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 15 source 0 111 dest 1566 1678
+Waveform::paintEvent pos -> 114688
+Waveform::paintEvent pos 114688 tileIndex 16 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 16 source 0 111 dest 1678 1789
+Waveform::paintEvent pos -> 118784
+Waveform::paintEvent pos 118784 tileIndex 17 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 17 source 0 111 dest 1789 1901
+Waveform::paintEvent pos -> 122880
+Waveform::paintEvent pos 122880 tileIndex 18 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 18 source 0 111 dest 1901 2012
+Waveform::paintEvent pos -> 126976
+Waveform::paintEvent pos 126976 tileIndex 19 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 19 source 0 111 dest 2012 2123
+Waveform::paintEvent pos -> 131072
+Waveform::paintEvent pos 131072 tileIndex 20 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 20 source 0 111 dest 2123 2235
+Waveform::paintEvent pos -> 135168
+Waveform::paintEvent pos 135168 tileIndex 21 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 21 source 0 111 dest 2235 2346
+Waveform::paintEvent pos -> 139264
+Waveform::paintEvent pos 139264 tileIndex 22 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 22 not painted
+Waveform::paintEvent final pos 139264 final x 2346
+Waveform::paintEvent windowPosition 52962 windowLength 88192
+Waveform::paintEvent pos 52962 tileIndex 0 positionOffset 3810 pixelOffset 103
+Waveform::paintEvent tileIndex 0 source 103 111 dest 0 7
+Waveform::paintEvent pos -> 53248
+Waveform::paintEvent pos 53248 tileIndex 1 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 1 source 0 111 dest 7 119
+Waveform::paintEvent pos -> 57344
+Waveform::paintEvent pos 57344 tileIndex 2 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 2 source 0 111 dest 119 230
+Waveform::paintEvent pos -> 61440
+Waveform::paintEvent pos 61440 tileIndex 3 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 3 source 0 111 dest 230 341
+Waveform::paintEvent pos -> 65536
+Waveform::paintEvent pos 65536 tileIndex 4 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 4 source 0 111 dest 341 453
+Waveform::paintEvent pos -> 69632
+Waveform::paintEvent pos 69632 tileIndex 5 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 5 source 0 111 dest 453 564
+Waveform::paintEvent pos -> 73728
+Waveform::paintEvent pos 73728 tileIndex 6 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 6 source 0 111 dest 564 676
+Waveform::paintEvent pos -> 77824
+Waveform::paintEvent pos 77824 tileIndex 7 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 7 source 0 111 dest 676 787
+Waveform::paintEvent pos -> 81920
+Waveform::paintEvent pos 81920 tileIndex 8 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 8 source 0 111 dest 787 898
+Waveform::paintEvent pos -> 86016
+Waveform::paintEvent pos 86016 tileIndex 9 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 9 source 0 111 dest 898 1010
+Waveform::paintEvent pos -> 90112
+Waveform::paintEvent pos 90112 tileIndex 10 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 10 source 0 111 dest 1010 1121
+Waveform::paintEvent pos -> 94208
+Waveform::paintEvent pos 94208 tileIndex 11 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 11 source 0 111 dest 1121 1232
+Waveform::paintEvent pos -> 98304
+Waveform::paintEvent pos 98304 tileIndex 12 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 12 source 0 111 dest 1232 1344
+Waveform::paintEvent pos -> 102400
+Waveform::paintEvent pos 102400 tileIndex 13 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 13 source 0 111 dest 1344 1455
+Waveform::paintEvent pos -> 106496
+Waveform::paintEvent pos 106496 tileIndex 14 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 14 source 0 111 dest 1455 1566
+Waveform::paintEvent pos -> 110592
+Waveform::paintEvent pos 110592 tileIndex 15 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 15 source 0 111 dest 1566 1678
+Waveform::paintEvent pos -> 114688
+Waveform::paintEvent pos 114688 tileIndex 16 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 16 source 0 111 dest 1678 1789
+Waveform::paintEvent pos -> 118784
+Waveform::paintEvent pos 118784 tileIndex 17 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 17 source 0 111 dest 1789 1901
+Waveform::paintEvent pos -> 122880
+Waveform::paintEvent pos 122880 tileIndex 18 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 18 source 0 111 dest 1901 2012
+Waveform::paintEvent pos -> 126976
+Waveform::paintEvent pos 126976 tileIndex 19 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 19 source 0 111 dest 2012 2123
+Waveform::paintEvent pos -> 131072
+Waveform::paintEvent pos 131072 tileIndex 20 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 20 source 0 111 dest 2123 2235
+Waveform::paintEvent pos -> 135168
+Waveform::paintEvent pos 135168 tileIndex 21 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 21 source 0 111 dest 2235 2346
+Waveform::paintEvent pos -> 139264
+Waveform::paintEvent pos 139264 tileIndex 22 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 22 not painted
+Waveform::paintEvent final pos 139264 final x 2346
+Waveform::audioPositionChanged audioPosition 105824 bufferPosition 74080 bufferLength 67074
+Waveform::setWindowPosition old 52962 new 52962 tileArrayStart 49152
+Waveform::shuffleTiles n 0
+Waveform::shuffleTiles tileArrayStart 49152
+Waveform::paintTiles
+Engine::audioNotify [0] processedUSecs 600000 bufferLength 141198 playPosition 105824 levelPosition 88192 m_levelBufferLength 17632 m_spectrumBufferLength 16384 spectrumPosition 89440
+Engine::audioNotify [1] analysisFileSize 141198 readPos 88192 readLen 105824
+Engine::audioNotify [2] bufferPosition 88192 dataLength 52962
+Waveform::bufferChanged audioPosition 52962 bufferPosition 88192 bufferLength 52962
+Waveform::paintTiles
+Engine::calculateLevel pos 88192 len 17632 rms 0.332747 peak 0.999969
+Engine::calculateSpectrum QThread(0x23068818) count 0 pos 89440 len 16384 spectrumAnalyser.isReady true
+SpectrumAnalyser::calculate QThread(0x23068818) state 0
+Engine::spectrumChanged pos 89440
+Waveform::paintEvent windowPosition 52962 windowLength 88192
+Waveform::paintEvent pos 52962 tileIndex 0 positionOffset 3810 pixelOffset 103
+Waveform::paintEvent tileIndex 0 source 103 111 dest 0 7
+Waveform::paintEvent pos -> 53248
+Waveform::paintEvent pos 53248 tileIndex 1 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 1 source 0 111 dest 7 119
+Waveform::paintEvent pos -> 57344
+Waveform::paintEvent pos 57344 tileIndex 2 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 2 source 0 111 dest 119 230
+Waveform::paintEvent pos -> 61440
+Waveform::paintEvent pos 61440 tileIndex 3 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 3 source 0 111 dest 230 341
+Waveform::paintEvent pos -> 65536
+Waveform::paintEvent pos 65536 tileIndex 4 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 4 source 0 111 dest 341 453
+Waveform::paintEvent pos -> 69632
+Waveform::paintEvent pos 69632 tileIndex 5 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 5 source 0 111 dest 453 564
+Waveform::paintEvent pos -> 73728
+Waveform::paintEvent pos 73728 tileIndex 6 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 6 source 0 111 dest 564 676
+Waveform::paintEvent pos -> 77824
+Waveform::paintEvent pos 77824 tileIndex 7 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 7 source 0 111 dest 676 787
+Waveform::paintEvent pos -> 81920
+Waveform::paintEvent pos 81920 tileIndex 8 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 8 source 0 111 dest 787 898
+Waveform::paintEvent pos -> 86016
+Waveform::paintEvent pos 86016 tileIndex 9 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 9 source 0 111 dest 898 1010
+Waveform::paintEvent pos -> 90112
+Waveform::paintEvent pos 90112 tileIndex 10 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 10 source 0 111 dest 1010 1121
+Waveform::paintEvent pos -> 94208
+Waveform::paintEvent pos 94208 tileIndex 11 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 11 source 0 111 dest 1121 1232
+Waveform::paintEvent pos -> 98304
+Waveform::paintEvent pos 98304 tileIndex 12 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 12 source 0 111 dest 1232 1344
+Waveform::paintEvent pos -> 102400
+Waveform::paintEvent pos 102400 tileIndex 13 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 13 source 0 111 dest 1344 1455
+Waveform::paintEvent pos -> 106496
+Waveform::paintEvent pos 106496 tileIndex 14 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 14 source 0 111 dest 1455 1566
+Waveform::paintEvent pos -> 110592
+Waveform::paintEvent pos 110592 tileIndex 15 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 15 source 0 111 dest 1566 1678
+Waveform::paintEvent pos -> 114688
+Waveform::paintEvent pos 114688 tileIndex 16 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 16 source 0 111 dest 1678 1789
+Waveform::paintEvent pos -> 118784
+Waveform::paintEvent pos 118784 tileIndex 17 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 17 source 0 111 dest 1789 1901
+Waveform::paintEvent pos -> 122880
+Waveform::paintEvent pos 122880 tileIndex 18 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 18 source 0 111 dest 1901 2012
+Waveform::paintEvent pos -> 126976
+Waveform::paintEvent pos 126976 tileIndex 19 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 19 source 0 111 dest 2012 2123
+Waveform::paintEvent pos -> 131072
+Waveform::paintEvent pos 131072 tileIndex 20 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 20 source 0 111 dest 2123 2235
+Waveform::paintEvent pos -> 135168
+Waveform::paintEvent pos 135168 tileIndex 21 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 21 source 0 111 dest 2235 2346
+Waveform::paintEvent pos -> 139264
+Waveform::paintEvent pos 139264 tileIndex 22 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 22 not painted
+Waveform::paintEvent final pos 139264 final x 2346
+Waveform::paintEvent windowPosition 52962 windowLength 88192
+Waveform::paintEvent pos 52962 tileIndex 0 positionOffset 3810 pixelOffset 103
+Waveform::paintEvent tileIndex 0 source 103 111 dest 0 7
+Waveform::paintEvent pos -> 53248
+Waveform::paintEvent pos 53248 tileIndex 1 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 1 source 0 111 dest 7 119
+Waveform::paintEvent pos -> 57344
+Waveform::paintEvent pos 57344 tileIndex 2 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 2 source 0 111 dest 119 230
+Waveform::paintEvent pos -> 61440
+Waveform::paintEvent pos 61440 tileIndex 3 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 3 source 0 111 dest 230 341
+Waveform::paintEvent pos -> 65536
+Waveform::paintEvent pos 65536 tileIndex 4 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 4 source 0 111 dest 341 453
+Waveform::paintEvent pos -> 69632
+Waveform::paintEvent pos 69632 tileIndex 5 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 5 source 0 111 dest 453 564
+Waveform::paintEvent pos -> 73728
+Waveform::paintEvent pos 73728 tileIndex 6 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 6 source 0 111 dest 564 676
+Waveform::paintEvent pos -> 77824
+Waveform::paintEvent pos 77824 tileIndex 7 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 7 source 0 111 dest 676 787
+Waveform::paintEvent pos -> 81920
+Waveform::paintEvent pos 81920 tileIndex 8 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 8 source 0 111 dest 787 898
+Waveform::paintEvent pos -> 86016
+Waveform::paintEvent pos 86016 tileIndex 9 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 9 source 0 111 dest 898 1010
+Waveform::paintEvent pos -> 90112
+Waveform::paintEvent pos 90112 tileIndex 10 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 10 source 0 111 dest 1010 1121
+Waveform::paintEvent pos -> 94208
+Waveform::paintEvent pos 94208 tileIndex 11 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 11 source 0 111 dest 1121 1232
+Waveform::paintEvent pos -> 98304
+Waveform::paintEvent pos 98304 tileIndex 12 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 12 source 0 111 dest 1232 1344
+Waveform::paintEvent pos -> 102400
+Waveform::paintEvent pos 102400 tileIndex 13 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 13 source 0 111 dest 1344 1455
+Waveform::paintEvent pos -> 106496
+Waveform::paintEvent pos 106496 tileIndex 14 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 14 source 0 111 dest 1455 1566
+Waveform::paintEvent pos -> 110592
+Waveform::paintEvent pos 110592 tileIndex 15 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 15 source 0 111 dest 1566 1678
+Waveform::paintEvent pos -> 114688
+Waveform::paintEvent pos 114688 tileIndex 16 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 16 source 0 111 dest 1678 1789
+Waveform::paintEvent pos -> 118784
+Waveform::paintEvent pos 118784 tileIndex 17 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 17 source 0 111 dest 1789 1901
+Waveform::paintEvent pos -> 122880
+Waveform::paintEvent pos 122880 tileIndex 18 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 18 source 0 111 dest 1901 2012
+Waveform::paintEvent pos -> 126976
+Waveform::paintEvent pos 126976 tileIndex 19 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 19 source 0 111 dest 2012 2123
+Waveform::paintEvent pos -> 131072
+Waveform::paintEvent pos 131072 tileIndex 20 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 20 source 0 111 dest 2123 2235
+Waveform::paintEvent pos -> 135168
+Waveform::paintEvent pos 135168 tileIndex 21 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 21 source 0 111 dest 2235 2346
+Waveform::paintEvent pos -> 139264
+Waveform::paintEvent pos 139264 tileIndex 22 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 22 not painted
+Waveform::paintEvent final pos 139264 final x 2346
+Waveform::audioPositionChanged audioPosition 127008 bufferPosition 88192 bufferLength 52962
+Waveform::setWindowPosition old 52962 new 52962 tileArrayStart 49152
+Waveform::shuffleTiles n 0
+Waveform::shuffleTiles tileArrayStart 49152
+Waveform::paintTiles
+Engine::audioNotify [0] processedUSecs 720000 bufferLength 141198 playPosition 127008 levelPosition 109376 m_levelBufferLength 17632 m_spectrumBufferLength 16384 spectrumPosition 110624
+Engine::audioNotify [1] analysisFileSize 141198 readPos 109376 readLen 105824
+Engine::audioNotify [2] bufferPosition 109376 dataLength 31778
+Waveform::bufferChanged audioPosition 52962 bufferPosition 109376 bufferLength 31778
+Waveform::paintTiles
+Engine::calculateLevel pos 109376 len 17632 rms 0.390853 peak 0.999969
+Engine::calculateSpectrum QThread(0x23068818) count 0 pos 110624 len 16384 spectrumAnalyser.isReady true
+SpectrumAnalyser::calculate QThread(0x23068818) state 0
+Engine::spectrumChanged pos 110624
+Waveform::paintEvent windowPosition 52962 windowLength 88192
+Waveform::paintEvent pos 52962 tileIndex 0 positionOffset 3810 pixelOffset 103
+Waveform::paintEvent tileIndex 0 source 103 111 dest 0 7
+Waveform::paintEvent pos -> 53248
+Waveform::paintEvent pos 53248 tileIndex 1 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 1 source 0 111 dest 7 119
+Waveform::paintEvent pos -> 57344
+Waveform::paintEvent pos 57344 tileIndex 2 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 2 source 0 111 dest 119 230
+Waveform::paintEvent pos -> 61440
+Waveform::paintEvent pos 61440 tileIndex 3 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 3 source 0 111 dest 230 341
+Waveform::paintEvent pos -> 65536
+Waveform::paintEvent pos 65536 tileIndex 4 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 4 source 0 111 dest 341 453
+Waveform::paintEvent pos -> 69632
+Waveform::paintEvent pos 69632 tileIndex 5 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 5 source 0 111 dest 453 564
+Waveform::paintEvent pos -> 73728
+Waveform::paintEvent pos 73728 tileIndex 6 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 6 source 0 111 dest 564 676
+Waveform::paintEvent pos -> 77824
+Waveform::paintEvent pos 77824 tileIndex 7 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 7 source 0 111 dest 676 787
+Waveform::paintEvent pos -> 81920
+Waveform::paintEvent pos 81920 tileIndex 8 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 8 source 0 111 dest 787 898
+Waveform::paintEvent pos -> 86016
+Waveform::paintEvent pos 86016 tileIndex 9 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 9 source 0 111 dest 898 1010
+Waveform::paintEvent pos -> 90112
+Waveform::paintEvent pos 90112 tileIndex 10 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 10 source 0 111 dest 1010 1121
+Waveform::paintEvent pos -> 94208
+Waveform::paintEvent pos 94208 tileIndex 11 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 11 source 0 111 dest 1121 1232
+Waveform::paintEvent pos -> 98304
+Waveform::paintEvent pos 98304 tileIndex 12 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 12 source 0 111 dest 1232 1344
+Waveform::paintEvent pos -> 102400
+Waveform::paintEvent pos 102400 tileIndex 13 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 13 source 0 111 dest 1344 1455
+Waveform::paintEvent pos -> 106496
+Waveform::paintEvent pos 106496 tileIndex 14 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 14 source 0 111 dest 1455 1566
+Waveform::paintEvent pos -> 110592
+Waveform::paintEvent pos 110592 tileIndex 15 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 15 source 0 111 dest 1566 1678
+Waveform::paintEvent pos -> 114688
+Waveform::paintEvent pos 114688 tileIndex 16 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 16 source 0 111 dest 1678 1789
+Waveform::paintEvent pos -> 118784
+Waveform::paintEvent pos 118784 tileIndex 17 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 17 source 0 111 dest 1789 1901
+Waveform::paintEvent pos -> 122880
+Waveform::paintEvent pos 122880 tileIndex 18 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 18 source 0 111 dest 1901 2012
+Waveform::paintEvent pos -> 126976
+Waveform::paintEvent pos 126976 tileIndex 19 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 19 source 0 111 dest 2012 2123
+Waveform::paintEvent pos -> 131072
+Waveform::paintEvent pos 131072 tileIndex 20 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 20 source 0 111 dest 2123 2235
+Waveform::paintEvent pos -> 135168
+Waveform::paintEvent pos 135168 tileIndex 21 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 21 source 0 111 dest 2235 2346
+Waveform::paintEvent pos -> 139264
+Waveform::paintEvent pos 139264 tileIndex 22 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 22 not painted
+Waveform::paintEvent final pos 139264 final x 2346
+Waveform::paintEvent windowPosition 52962 windowLength 88192
+Waveform::paintEvent pos 52962 tileIndex 0 positionOffset 3810 pixelOffset 103
+Waveform::paintEvent tileIndex 0 source 103 111 dest 0 7
+Waveform::paintEvent pos -> 53248
+Waveform::paintEvent pos 53248 tileIndex 1 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 1 source 0 111 dest 7 119
+Waveform::paintEvent pos -> 57344
+Waveform::paintEvent pos 57344 tileIndex 2 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 2 source 0 111 dest 119 230
+Waveform::paintEvent pos -> 61440
+Waveform::paintEvent pos 61440 tileIndex 3 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 3 source 0 111 dest 230 341
+Waveform::paintEvent pos -> 65536
+Waveform::paintEvent pos 65536 tileIndex 4 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 4 source 0 111 dest 341 453
+Waveform::paintEvent pos -> 69632
+Waveform::paintEvent pos 69632 tileIndex 5 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 5 source 0 111 dest 453 564
+Waveform::paintEvent pos -> 73728
+Waveform::paintEvent pos 73728 tileIndex 6 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 6 source 0 111 dest 564 676
+Waveform::paintEvent pos -> 77824
+Waveform::paintEvent pos 77824 tileIndex 7 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 7 source 0 111 dest 676 787
+Waveform::paintEvent pos -> 81920
+Waveform::paintEvent pos 81920 tileIndex 8 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 8 source 0 111 dest 787 898
+Waveform::paintEvent pos -> 86016
+Waveform::paintEvent pos 86016 tileIndex 9 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 9 source 0 111 dest 898 1010
+Waveform::paintEvent pos -> 90112
+Waveform::paintEvent pos 90112 tileIndex 10 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 10 source 0 111 dest 1010 1121
+Waveform::paintEvent pos -> 94208
+Waveform::paintEvent pos 94208 tileIndex 11 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 11 source 0 111 dest 1121 1232
+Waveform::paintEvent pos -> 98304
+Waveform::paintEvent pos 98304 tileIndex 12 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 12 source 0 111 dest 1232 1344
+Waveform::paintEvent pos -> 102400
+Waveform::paintEvent pos 102400 tileIndex 13 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 13 source 0 111 dest 1344 1455
+Waveform::paintEvent pos -> 106496
+Waveform::paintEvent pos 106496 tileIndex 14 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 14 source 0 111 dest 1455 1566
+Waveform::paintEvent pos -> 110592
+Waveform::paintEvent pos 110592 tileIndex 15 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 15 source 0 111 dest 1566 1678
+Waveform::paintEvent pos -> 114688
+Waveform::paintEvent pos 114688 tileIndex 16 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 16 source 0 111 dest 1678 1789
+Waveform::paintEvent pos -> 118784
+Waveform::paintEvent pos 118784 tileIndex 17 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 17 source 0 111 dest 1789 1901
+Waveform::paintEvent pos -> 122880
+Waveform::paintEvent pos 122880 tileIndex 18 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 18 source 0 111 dest 1901 2012
+Waveform::paintEvent pos -> 126976
+Waveform::paintEvent pos 126976 tileIndex 19 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 19 source 0 111 dest 2012 2123
+Waveform::paintEvent pos -> 131072
+Waveform::paintEvent pos 131072 tileIndex 20 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 20 source 0 111 dest 2123 2235
+Waveform::paintEvent pos -> 135168
+Waveform::paintEvent pos 135168 tileIndex 21 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 21 source 0 111 dest 2235 2346
+Waveform::paintEvent pos -> 139264
+Waveform::paintEvent pos 139264 tileIndex 22 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 22 not painted
+Waveform::paintEvent final pos 139264 final x 2346
+Waveform::audioPositionChanged audioPosition 141120 bufferPosition 109376 bufferLength 31778
+Waveform::setWindowPosition old 52962 new 52962 tileArrayStart 49152
+Waveform::shuffleTiles n 0
+Waveform::shuffleTiles tileArrayStart 49152
+Waveform::paintTiles
+Engine::audioNotify [0] processedUSecs 800000 bufferLength 141198 playPosition 141120 levelPosition 123488 m_levelBufferLength 17632 m_spectrumBufferLength 16384 spectrumPosition 124736
+Engine::audioNotify [1] analysisFileSize 141198 readPos 123488 readLen 105824
+Engine::audioNotify [2] bufferPosition 123488 dataLength 17666
+Waveform::bufferChanged audioPosition 52962 bufferPosition 123488 bufferLength 17666
+Waveform::paintTiles
+Engine::calculateLevel pos 123488 len 17632 rms 0.425127 peak 0.999969
+Engine::calculateSpectrum QThread(0x23068818) count 0 pos 124736 len 16384 spectrumAnalyser.isReady true
+SpectrumAnalyser::calculate QThread(0x23068818) state 0
+Engine::spectrumChanged pos 124736
+Waveform::paintEvent windowPosition 52962 windowLength 88192
+Waveform::paintEvent pos 52962 tileIndex 0 positionOffset 3810 pixelOffset 103
+Waveform::paintEvent tileIndex 0 source 103 111 dest 0 7
+Waveform::paintEvent pos -> 53248
+Waveform::paintEvent pos 53248 tileIndex 1 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 1 source 0 111 dest 7 119
+Waveform::paintEvent pos -> 57344
+Waveform::paintEvent pos 57344 tileIndex 2 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 2 source 0 111 dest 119 230
+Waveform::paintEvent pos -> 61440
+Waveform::paintEvent pos 61440 tileIndex 3 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 3 source 0 111 dest 230 341
+Waveform::paintEvent pos -> 65536
+Waveform::paintEvent pos 65536 tileIndex 4 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 4 source 0 111 dest 341 453
+Waveform::paintEvent pos -> 69632
+Waveform::paintEvent pos 69632 tileIndex 5 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 5 source 0 111 dest 453 564
+Waveform::paintEvent pos -> 73728
+Waveform::paintEvent pos 73728 tileIndex 6 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 6 source 0 111 dest 564 676
+Waveform::paintEvent pos -> 77824
+Waveform::paintEvent pos 77824 tileIndex 7 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 7 source 0 111 dest 676 787
+Waveform::paintEvent pos -> 81920
+Waveform::paintEvent pos 81920 tileIndex 8 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 8 source 0 111 dest 787 898
+Waveform::paintEvent pos -> 86016
+Waveform::paintEvent pos 86016 tileIndex 9 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 9 source 0 111 dest 898 1010
+Waveform::paintEvent pos -> 90112
+Waveform::paintEvent pos 90112 tileIndex 10 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 10 source 0 111 dest 1010 1121
+Waveform::paintEvent pos -> 94208
+Waveform::paintEvent pos 94208 tileIndex 11 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 11 source 0 111 dest 1121 1232
+Waveform::paintEvent pos -> 98304
+Waveform::paintEvent pos 98304 tileIndex 12 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 12 source 0 111 dest 1232 1344
+Waveform::paintEvent pos -> 102400
+Waveform::paintEvent pos 102400 tileIndex 13 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 13 source 0 111 dest 1344 1455
+Waveform::paintEvent pos -> 106496
+Waveform::paintEvent pos 106496 tileIndex 14 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 14 source 0 111 dest 1455 1566
+Waveform::paintEvent pos -> 110592
+Waveform::paintEvent pos 110592 tileIndex 15 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 15 source 0 111 dest 1566 1678
+Waveform::paintEvent pos -> 114688
+Waveform::paintEvent pos 114688 tileIndex 16 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 16 source 0 111 dest 1678 1789
+Waveform::paintEvent pos -> 118784
+Waveform::paintEvent pos 118784 tileIndex 17 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 17 source 0 111 dest 1789 1901
+Waveform::paintEvent pos -> 122880
+Waveform::paintEvent pos 122880 tileIndex 18 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 18 source 0 111 dest 1901 2012
+Waveform::paintEvent pos -> 126976
+Waveform::paintEvent pos 126976 tileIndex 19 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 19 source 0 111 dest 2012 2123
+Waveform::paintEvent pos -> 131072
+Waveform::paintEvent pos 131072 tileIndex 20 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 20 source 0 111 dest 2123 2235
+Waveform::paintEvent pos -> 135168
+Waveform::paintEvent pos 135168 tileIndex 21 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 21 source 0 111 dest 2235 2346
+Waveform::paintEvent pos -> 139264
+Waveform::paintEvent pos 139264 tileIndex 22 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 22 not painted
+Waveform::paintEvent final pos 139264 final x 2346
+Waveform::paintEvent windowPosition 52962 windowLength 88192
+Waveform::paintEvent pos 52962 tileIndex 0 positionOffset 3810 pixelOffset 103
+Waveform::paintEvent tileIndex 0 source 103 111 dest 0 7
+Waveform::paintEvent pos -> 53248
+Waveform::paintEvent pos 53248 tileIndex 1 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 1 source 0 111 dest 7 119
+Waveform::paintEvent pos -> 57344
+Waveform::paintEvent pos 57344 tileIndex 2 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 2 source 0 111 dest 119 230
+Waveform::paintEvent pos -> 61440
+Waveform::paintEvent pos 61440 tileIndex 3 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 3 source 0 111 dest 230 341
+Waveform::paintEvent pos -> 65536
+Waveform::paintEvent pos 65536 tileIndex 4 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 4 source 0 111 dest 341 453
+Waveform::paintEvent pos -> 69632
+Waveform::paintEvent pos 69632 tileIndex 5 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 5 source 0 111 dest 453 564
+Waveform::paintEvent pos -> 73728
+Waveform::paintEvent pos 73728 tileIndex 6 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 6 source 0 111 dest 564 676
+Waveform::paintEvent pos -> 77824
+Waveform::paintEvent pos 77824 tileIndex 7 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 7 source 0 111 dest 676 787
+Waveform::paintEvent pos -> 81920
+Waveform::paintEvent pos 81920 tileIndex 8 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 8 source 0 111 dest 787 898
+Waveform::paintEvent pos -> 86016
+Waveform::paintEvent pos 86016 tileIndex 9 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 9 source 0 111 dest 898 1010
+Waveform::paintEvent pos -> 90112
+Waveform::paintEvent pos 90112 tileIndex 10 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 10 source 0 111 dest 1010 1121
+Waveform::paintEvent pos -> 94208
+Waveform::paintEvent pos 94208 tileIndex 11 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 11 source 0 111 dest 1121 1232
+Waveform::paintEvent pos -> 98304
+Waveform::paintEvent pos 98304 tileIndex 12 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 12 source 0 111 dest 1232 1344
+Waveform::paintEvent pos -> 102400
+Waveform::paintEvent pos 102400 tileIndex 13 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 13 source 0 111 dest 1344 1455
+Waveform::paintEvent pos -> 106496
+Waveform::paintEvent pos 106496 tileIndex 14 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 14 source 0 111 dest 1455 1566
+Waveform::paintEvent pos -> 110592
+Waveform::paintEvent pos 110592 tileIndex 15 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 15 source 0 111 dest 1566 1678
+Waveform::paintEvent pos -> 114688
+Waveform::paintEvent pos 114688 tileIndex 16 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 16 source 0 111 dest 1678 1789
+Waveform::paintEvent pos -> 118784
+Waveform::paintEvent pos 118784 tileIndex 17 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 17 source 0 111 dest 1789 1901
+Waveform::paintEvent pos -> 122880
+Waveform::paintEvent pos 122880 tileIndex 18 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 18 source 0 111 dest 1901 2012
+Waveform::paintEvent pos -> 126976
+Waveform::paintEvent pos 126976 tileIndex 19 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 19 source 0 111 dest 2012 2123
+Waveform::paintEvent pos -> 131072
+Waveform::paintEvent pos 131072 tileIndex 20 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 20 source 0 111 dest 2123 2235
+Waveform::paintEvent pos -> 135168
+Waveform::paintEvent pos 135168 tileIndex 21 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 21 source 0 111 dest 2235 2346
+Waveform::paintEvent pos -> 139264
+Waveform::paintEvent pos 139264 tileIndex 22 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 22 not painted
+Waveform::paintEvent final pos 139264 final x 2346
+Waveform::audioPositionChanged audioPosition 141184 bufferPosition 123488 bufferLength 17666
+Waveform::setWindowPosition old 52962 new 52962 tileArrayStart 49152
+Waveform::shuffleTiles n 0
+Waveform::shuffleTiles tileArrayStart 49152
+Waveform::paintTiles
+Engine::audioNotify [0] processedUSecs 800442 bufferLength 141198 playPosition 141184 levelPosition 123552 m_levelBufferLength 17632 m_spectrumBufferLength 16384 spectrumPosition 124800
+Engine::audioNotify [1] analysisFileSize 141198 readPos 123552 readLen 105824
+Engine::audioNotify [2] bufferPosition 123552 dataLength 17602
+Waveform::bufferChanged audioPosition 52962 bufferPosition 123552 bufferLength 17602
+Waveform::paintTiles
+Engine::audioStateChanged from ActiveState to IdleState
+Engine::audioStateChanged from ActiveState to StoppedState
+Waveform::paintEvent windowPosition 52962 windowLength 88192
+Waveform::paintEvent pos 52962 tileIndex 0 positionOffset 3810 pixelOffset 103
+Waveform::paintEvent tileIndex 0 source 103 111 dest 0 7
+Waveform::paintEvent pos -> 53248
+Waveform::paintEvent pos 53248 tileIndex 1 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 1 source 0 111 dest 7 119
+Waveform::paintEvent pos -> 57344
+Waveform::paintEvent pos 57344 tileIndex 2 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 2 source 0 111 dest 119 230
+Waveform::paintEvent pos -> 61440
+Waveform::paintEvent pos 61440 tileIndex 3 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 3 source 0 111 dest 230 341
+Waveform::paintEvent pos -> 65536
+Waveform::paintEvent pos 65536 tileIndex 4 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 4 source 0 111 dest 341 453
+Waveform::paintEvent pos -> 69632
+Waveform::paintEvent pos 69632 tileIndex 5 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 5 source 0 111 dest 453 564
+Waveform::paintEvent pos -> 73728
+Waveform::paintEvent pos 73728 tileIndex 6 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 6 source 0 111 dest 564 676
+Waveform::paintEvent pos -> 77824
+Waveform::paintEvent pos 77824 tileIndex 7 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 7 source 0 111 dest 676 787
+Waveform::paintEvent pos -> 81920
+Waveform::paintEvent pos 81920 tileIndex 8 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 8 source 0 111 dest 787 898
+Waveform::paintEvent pos -> 86016
+Waveform::paintEvent pos 86016 tileIndex 9 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 9 source 0 111 dest 898 1010
+Waveform::paintEvent pos -> 90112
+Waveform::paintEvent pos 90112 tileIndex 10 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 10 source 0 111 dest 1010 1121
+Waveform::paintEvent pos -> 94208
+Waveform::paintEvent pos 94208 tileIndex 11 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 11 source 0 111 dest 1121 1232
+Waveform::paintEvent pos -> 98304
+Waveform::paintEvent pos 98304 tileIndex 12 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 12 source 0 111 dest 1232 1344
+Waveform::paintEvent pos -> 102400
+Waveform::paintEvent pos 102400 tileIndex 13 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 13 source 0 111 dest 1344 1455
+Waveform::paintEvent pos -> 106496
+Waveform::paintEvent pos 106496 tileIndex 14 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 14 source 0 111 dest 1455 1566
+Waveform::paintEvent pos -> 110592
+Waveform::paintEvent pos 110592 tileIndex 15 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 15 source 0 111 dest 1566 1678
+Waveform::paintEvent pos -> 114688
+Waveform::paintEvent pos 114688 tileIndex 16 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 16 source 0 111 dest 1678 1789
+Waveform::paintEvent pos -> 118784
+Waveform::paintEvent pos 118784 tileIndex 17 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 17 source 0 111 dest 1789 1901
+Waveform::paintEvent pos -> 122880
+Waveform::paintEvent pos 122880 tileIndex 18 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 18 source 0 111 dest 1901 2012
+Waveform::paintEvent pos -> 126976
+Waveform::paintEvent pos 126976 tileIndex 19 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 19 source 0 111 dest 2012 2123
+Waveform::paintEvent pos -> 131072
+Waveform::paintEvent pos 131072 tileIndex 20 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 20 source 0 111 dest 2123 2235
+Waveform::paintEvent pos -> 135168
+Waveform::paintEvent pos 135168 tileIndex 21 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tileIndex 21 source 0 111 dest 2235 2346
+Waveform::paintEvent pos -> 139264
+Waveform::paintEvent pos 139264 tileIndex 22 positionOffset 0 pixelOffset 0
+Waveform::paintEvent tile 22 not painted
+Waveform::paintEvent final pos 139264 final x 2346
+Waveform::audioPositionChanged audioPosition 0 bufferPosition 123552 bufferLength 17602
+C:\QtProjects\QtExamples\multimedia\spectrum\debug\spectrum.exe exited with code 0
