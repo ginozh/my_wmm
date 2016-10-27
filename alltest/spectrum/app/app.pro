@@ -7,31 +7,11 @@ TARGET = spectrum
 QT       += multimedia widgets
 
 SOURCES  += main.cpp \
-            engine.cpp \
-            frequencyspectrum.cpp \
-            levelmeter.cpp \
-            mainwidget.cpp \
-            progressbar.cpp \
-            settingsdialog.cpp \
-            spectrograph.cpp \
-            spectrumanalyser.cpp \
-            tonegenerator.cpp \
-            tonegeneratordialog.cpp \
             utils.cpp \
             waveform.cpp \
             wavfile.cpp
 
-HEADERS  += engine.h \
-            frequencyspectrum.h \
-            levelmeter.h \
-            mainwidget.h \
-            progressbar.h \
-            settingsdialog.h \
-            spectrograph.h \
-            spectrum.h \
-            spectrumanalyser.h \
-            tonegenerator.h \
-            tonegeneratordialog.h \
+HEADERS  += spectrum.h \
             utils.h \
             waveform.h \
             wavfile.h

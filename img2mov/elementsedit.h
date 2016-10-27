@@ -54,6 +54,7 @@ public slots:
     //void selectedText(void*);
     //void handleContextMenuRequested(const QPoint &pos);
     void updatedText(const QString&);
+    void addMusic();
 private:
     FlowLayout *m_flowLayout;
     QVBoxLayout *m_firstLayout;
@@ -88,6 +89,12 @@ private:
     size_t m_textVideoMaxOutLen;
 
     GlobalContext* m_globalContext;
+
+    //
+    QByteArray m_qsInText;
+    QString m_qsAudioFilename;
+    int m_iAudioStart;
+    int m_iAudioDuration;
 };
 //! [0]
 

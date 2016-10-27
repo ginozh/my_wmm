@@ -97,6 +97,8 @@ TabWidget::TabWidget(QWidget *parent, GlobalContext* globalContext)
     addTab(tabNull, tr("   "));
     createTabHome();
     createTabAnimations();
+    createTabVisualEffects();
+    createTabMusic();
     createTabText();
 
     setTabEnabled(0, false);
@@ -130,20 +132,31 @@ void TabWidget::createTabHome()
             }
             {
                 QToolButton *addMusic = new QToolButton();
-                //hboxTop->addWidget(addMusic, Qt::AlignLeft);
+                hboxTop->addWidget(addMusic, Qt::AlignLeft);
                 addMusic->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
                 addMusic->setIcon(QIcon("images/addmusic.png"));
                 addMusic->setIconSize(m_iconSize);
                 addMusic->setText("Add music");
                 addMusic->setMinimumWidth(m_iconSize.width() + 100);
-                //connect(addMusic, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(load()));
+                connect(addMusic, SIGNAL(clicked()), (const QObject*)m_globalContext->m_elementsEdit, SLOT(addMusic()));
             }
             {
                 QVBoxLayout *vboxTopRightAdd = new QVBoxLayout;
                 hboxTop->addLayout(vboxTopRightAdd);
                 {
+                    QToolButton *addTitle = new QToolButton();
+                    vboxTopRightAdd->addWidget(addTitle, Qt::AlignLeft);
+
+                    addTitle->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+                    //addTitle->setIcon(QIcon("images/addTitle.png"));
+                    //addTitle->setIconSize(m_iconSize);
+                    addTitle->setText("Title");
+                    //connect(addTitle, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(load()));
+
+                }
+                {
                     QToolButton *addCaption = new QToolButton();
-                    //vboxTopRightAdd->addWidget(addCaption, Qt::AlignLeft);
+                    vboxTopRightAdd->addWidget(addCaption, Qt::AlignLeft);
 
                     addCaption->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
                     //addCaption->setIcon(QIcon("images/addCaption.png"));
@@ -155,6 +168,17 @@ void TabWidget::createTabHome()
                     //connect(addCaption, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(load()));
 
                 }
+                {
+                    QToolButton *addCredits = new QToolButton();
+                    vboxTopRightAdd->addWidget(addCredits, Qt::AlignLeft);
+
+                    addCredits->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+                    //addCredits->setIcon(QIcon("images/addCredits.png"));
+                    //addCredits->setIconSize(m_iconSize);
+                    addCredits->setText("Credits");
+                    //connect(addCredits, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(load()));
+
+                }
             }
         }
         {
@@ -162,6 +186,75 @@ void TabWidget::createTabHome()
             lbl->setAlignment(Qt::AlignCenter);
 
             vboxAdd->addWidget(lbl);
+        }
+    }
+    {
+        appendLine(hbox);
+    }
+    {
+        QVBoxLayout *vboxEditing = new QVBoxLayout;
+        hbox->addLayout(vboxEditing);
+        {
+            QHBoxLayout* hboxTop = new QHBoxLayout;
+            vboxEditing->addLayout(hboxTop);
+            {
+                QToolButton *addPhotos = new QToolButton();
+                hboxTop->addWidget(addPhotos, Qt::AlignLeft);
+
+                addPhotos->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+                addPhotos->setIcon(QIcon("images/addphotos.png"));
+                addPhotos->setIconSize(m_iconSize);
+                addPhotos->setText("Rotate Left");
+                //addPhotos->setMaximumHeight(m_iconSize.height() + 250);
+                addPhotos->setMinimumWidth(m_iconSize.width() + 100);
+                //addPhotos->setMinimumWidth(addPhotos->text().length());
+                //connect(addPhotos, SIGNAL(clicked()), (const QObject*)m_globalContext->m_elementsEdit, SLOT(load()));
+            }
+            {
+                QToolButton *addMusic = new QToolButton();
+                hboxTop->addWidget(addMusic, Qt::AlignLeft);
+                addMusic->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+                addMusic->setIcon(QIcon("images/addmusic.png"));
+                addMusic->setIconSize(m_iconSize);
+                addMusic->setText("Rotate Right");
+                addMusic->setMinimumWidth(m_iconSize.width() + 100);
+                //connect(addMusic, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(load()));
+            }
+            {
+                QVBoxLayout *vboxTopRightEditing = new QVBoxLayout;
+                hboxTop->addLayout(vboxTopRightEditing);
+                {
+                    QToolButton *remove = new QToolButton();
+                    vboxTopRightEditing->addWidget(remove, Qt::AlignLeft);
+
+                    remove->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+                    //remove->setIcon(QIcon("images/remove.png"));
+                    //remove->setIconSize(m_iconSize);
+                    remove->setText("Remove");
+                    //connect(remove, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(load()));
+
+                }
+                {
+                    QToolButton *selectAll = new QToolButton();
+                    vboxTopRightEditing->addWidget(selectAll, Qt::AlignLeft);
+
+                    selectAll->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+                    //selectAll->setIcon(QIcon("images/selectAll.png"));
+                    //selectAll->setIconSize(m_iconSize);
+                    selectAll->setText("Select all");
+                    //selectAll->setMaximumHeight(m_iconSize.height() + 250);
+                    //selectAll->setMinimumWidth(m_iconSize.width() + 100);
+                    //selectAll->setMinimumWidth(selectAll->text().length());
+                    //connect(selectAll, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(load()));
+
+                }
+            }
+        }
+        {
+            QLabel *lbl = new QLabel(tr("Editing"));
+            lbl->setAlignment(Qt::AlignCenter);
+
+            vboxEditing->addWidget(lbl);
         }
     }
     {
@@ -372,10 +465,10 @@ void TabWidget::createTabAnimations()
             vboxRightPanZoom->addLayout(hboxTopPanZoom);
         }
         {
-            QLabel *lblPanZoom = new QLabel(tr("Pan and zoom"));
-            lblPanZoom->setAlignment(Qt::AlignCenter);
+            QLabel *lbl = new QLabel(tr("Pan and zoom"));
+            lbl->setAlignment(Qt::AlignCenter);
 
-            vboxRightPanZoom->addWidget(lblPanZoom);
+            vboxRightPanZoom->addWidget(lbl);
         }
 
         hboxAnimations->addLayout(vboxRightPanZoom);
@@ -387,6 +480,105 @@ void TabWidget::createTabAnimations()
     m_tabAnimations->setLayout(hboxAnimations);
 
     addTab(m_tabAnimations, tr("&Animations"));
+}
+void TabWidget::createTabVisualEffects()
+{
+}
+/*
+-------------------------------
+|     |Start time:  ComboBox  | |
+|     |-----------------------| |
+|split|Start point: ComboBox  | |
+|     |-----------------------| |
+|     |End point:   ComboBox  | |
+|-----------------------------| |
+|           Editing           | |
+|-----------------------------| |
+*/
+void TabWidget::createTabMusic()
+{
+    m_tabMusic = new QWidget;
+    QHBoxLayout *hbox = new QHBoxLayout;
+    m_tabMusic->setLayout(hbox);
+    {
+        QVBoxLayout *vboxEditing = new QVBoxLayout;
+        hbox->addLayout(vboxEditing);
+
+        {
+            QHBoxLayout* hboxTop = new QHBoxLayout;
+            vboxEditing->addLayout(hboxTop);
+            {
+                // split
+            }
+
+            {
+                QVBoxLayout *vboxTimes = new QVBoxLayout;
+                hboxTop->addLayout(vboxTimes);
+                {
+                    QHBoxLayout* hboxStartTime = new QHBoxLayout;
+                    vboxTimes->addLayout(hboxStartTime);
+                    {
+                        QLabel *lbl = new QLabel(tr("Start time:"));
+
+                        hboxStartTime->addWidget(lbl);
+                    }
+                    {
+                        m_cbStartTimeMusic = new QComboBox();
+                        m_cbStartTimeMusic->setEditable(true);
+                        m_cbStartTimeMusic->addItem(QString(tr("0.00s")));
+
+                        hboxStartTime->addWidget(m_cbStartTimeMusic);
+                    }
+
+                }
+                {
+                    QHBoxLayout* hboxStartPoint = new QHBoxLayout;
+                    vboxTimes->addLayout(hboxStartPoint);
+                    {
+                        QLabel *lbl = new QLabel(tr("Start point:"));
+
+                        hboxStartPoint->addWidget(lbl);
+                    }
+                    {
+                        m_cbStartPointMusic = new QComboBox();
+                        m_cbStartPointMusic->setEditable(true);
+                        m_cbStartPointMusic->addItem(QString(tr("0.00s")));
+
+                        hboxStartPoint->addWidget(m_cbStartPointMusic);
+                    }
+
+                }
+                {
+                    QHBoxLayout* hboxEndPoint = new QHBoxLayout;
+                    vboxTimes->addLayout(hboxEndPoint);
+                    {
+                        QLabel *lbl = new QLabel(tr("End point:"));
+
+                        hboxEndPoint->addWidget(lbl);
+                    }
+                    {
+                        m_cbEndPointMusic = new QComboBox();
+                        m_cbEndPointMusic->setEditable(true);
+                        m_cbEndPointMusic->addItem(QString(tr("2.00s")));
+
+                        hboxEndPoint->addWidget(m_cbEndPointMusic);
+                    }
+
+                }
+            }
+        }
+        {
+            QLabel *lbl = new QLabel(tr("Editing"));
+            lbl->setAlignment(Qt::AlignCenter);
+
+            vboxEditing->addWidget(lbl);
+        }
+    }
+    {
+        appendLine(hbox);
+    }
+
+    addTab(m_tabMusic, tr("&MusicTools"));
 }
 /*
 /c/QtProjects/QtExamples/widgets/graphicsview/diagramscene/mainwindow.cpp
@@ -401,10 +593,10 @@ void TabWidget::createTabAnimations()
 void TabWidget::createTabText()
 {
     m_tabText = new QWidget;
-    QHBoxLayout *hboxText = new QHBoxLayout;
+    QHBoxLayout *hbox = new QHBoxLayout;
     {
         QVBoxLayout *vboxFont = new QVBoxLayout;
-        hboxText->addLayout(vboxFont);
+        hbox->addLayout(vboxFont);
         {
             QHBoxLayout* hboxTopFont = new QHBoxLayout;
             vboxFont->addLayout(hboxTopFont);
@@ -498,12 +690,12 @@ void TabWidget::createTabText()
 
     }
     {
-        appendLine(hboxText);
+        appendLine(hbox);
     }
     {
         // /c/QtProjects/QtExamples/widgets/richtext/textedit/textedit.cpp
         QVBoxLayout *vboxParagraph = new QVBoxLayout;
-        hboxText->addLayout(vboxParagraph);
+        hbox->addLayout(vboxParagraph);
         {
             //QHBoxLayout* hboxTopParagraph = new QHBoxLayout;
             QLabel *lbl = new QLabel(tr("Transparency"));
@@ -579,11 +771,11 @@ void TabWidget::createTabText()
 
     }
     {
-        appendLine(hboxText);
+        appendLine(hbox);
     }
     {
         QVBoxLayout *vboxAdjust = new QVBoxLayout;
-        hboxText->addLayout(vboxAdjust);
+        hbox->addLayout(vboxAdjust);
         {
             QHBoxLayout* hboxAdjust = new QHBoxLayout;
             vboxAdjust->addLayout(hboxAdjust);
@@ -644,11 +836,11 @@ void TabWidget::createTabText()
         }
     }
     {
-        appendLine(hboxText);
+        appendLine(hbox);
     }
     {
         QVBoxLayout *vboxEffects = new QVBoxLayout;
-        hboxText->addLayout(vboxEffects);
+        hbox->addLayout(vboxEffects);
         {
             QScrollArea *scrollArea = new QScrollArea;
             initialScrollArea(scrollArea);
@@ -691,10 +883,10 @@ void TabWidget::createTabText()
         }
     }
     {
-        appendLine(hboxText);
+        appendLine(hbox);
     }
 
-    m_tabText->setLayout(hboxText);
+    m_tabText->setLayout(hbox);
 
     addTab(m_tabText, tr("&TextTools"));
 }

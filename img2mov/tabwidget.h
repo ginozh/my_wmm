@@ -66,6 +66,8 @@ public slots:
 private:
     void createTabHome();
     void createTabAnimations();
+    void createTabVisualEffects();
+    void createTabMusic();
     void createTabText();
     void initialScrollArea(QScrollArea *scrollArea);
     void appendLine(QHBoxLayout *hbox);
@@ -84,6 +86,11 @@ private:
 
     QWidget *m_tabHome;
     QWidget *m_tabAnimations;
+    //music
+    QWidget *m_tabMusic;
+    QComboBox* m_cbStartTimeMusic;
+    QComboBox* m_cbStartPointMusic;
+    QComboBox* m_cbEndPointMusic;
 
     //text
     QWidget *m_tabText;

@@ -170,13 +170,83 @@ void ElementsEdit::scaleImage(Element *element)
     element->m_fbInputScaleFile.out_len=NULL;
 }
 //! [1]
+void ElementsEdit::addMusic()
+{
+    QString file = QFileDialog::getOpenFileName(this, tr("Add music"),
+            /*QDir::currentPath()*/QStandardPaths::writableLocation(QStandardPaths::MusicLocation),
+            tr("Audio and Music (*.wma *.mp3 *.wav *.aif *.aiff *.m4a *.ogg)"));
+    if (file.isEmpty() )
+        return;
+    QFileInfo fi(file);
+    QString ext = fi.suffix();  // ext = "gz"
+
+    setCursor(QCursor(Qt::WaitCursor));
+    m_qsAudioFilename = file;
+    m_iAudioStart = 0;
+    m_iAudioDuration = 2;
+
+
+    QVector<QString> vqsArgv;
+    vqsArgv.push_back("ffmpeg");
+    vqsArgv.push_back("-y");
+#ifdef DEBUG_FFMPEG
+    vqsArgv.push_back("-v");
+    vqsArgv.push_back("debug");
+#endif
+    //vqsArgv.push_back(QString(tr("-f")));
+    //vqsArgv.push_back(QString(tr("%1")).arg(ext));
+    vqsArgv.push_back(QString(tr("-ss")));
+    vqsArgv.push_back(QString(tr("%1")).arg(m_iAudioStart));
+    vqsArgv.push_back(QString(tr("-t")));
+    vqsArgv.push_back(QString(tr("%1")).arg(m_iAudioDuration));
+    vqsArgv.push_back(QString(tr("-i")));
+    vqsArgv.push_back(m_qsAudioFilename);
+
+    vqsArgv.push_back("-i");
+    struct to_buffer sinbuffer;
+    sinbuffer.ptr = (uint8_t*)m_pOutBuffer;
+    sinbuffer.in_len = m_outlen;
+    sinbuffer.out_len = NULL;
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&sinbuffer));
+    //./ffmpeg_r.exe -y -i jpg/mp3.512.5.avi -vf ass=jpg/subtitle.ass jpg/subt.mp3.512.5.avi
+    if(!m_qsInText.isEmpty())
+    {
+        vqsArgv.push_back(QString(tr("-vf")));
+        struct to_buffer sintxtbuffer;
+        sintxtbuffer.ptr = (uint8_t*)m_qsInText.data();
+        sintxtbuffer.in_len = m_qsInText.length();
+        sintxtbuffer.out_len = NULL;
+        vqsArgv.push_back(QString(tr("ass=buffer|%1")).arg((size_t)&sintxtbuffer));
+    }
+#if 1
+    vqsArgv.push_back(QString(tr("-f")));
+    vqsArgv.push_back(QString(tr("avi")));
+    struct to_buffer soutbuffer;
+    soutbuffer.ptr = m_pTextVideoOutBuffer;
+    soutbuffer.in_len = m_textVideoMaxOutLen;
+    soutbuffer.out_len = &m_textVideoOutLen;
+    vqsArgv.push_back(QString(tr("buffer:video/avi;nobase64,%1")).arg((size_t)&soutbuffer));
+#else
+    vqsArgv.push_back(QString(tr("txt.avi")));
+#endif
+    int ret;
+    if((ret=callFfmpeg(vqsArgv)))
+    {
+        QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
+    }
+    setCursor(QCursor(Qt::ArrowCursor));
+    //5, 播放视频
+    QByteArray tmp=QByteArray((const char*)soutbuffer.ptr, (int)*soutbuffer.out_len);
+    emit readyVideo("tmp.avi", tmp, m_imgPlayPosition);
+    emit changePlayPosition(m_imgPlayPosition);
+}
 void ElementsEdit::load()
 {
     QWidget *currWidget = qobject_cast<QWidget *>(sender());
     //只有image过来的insert事件，它的父类(element)才会是m_flowLayout的元素
     QStringList files = QFileDialog::getOpenFileNames(this, tr("Select Images"),
             /*QDir::currentPath()*/QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
-            "*.jpg *.png");
+            tr("Photos (*.jpg *.png *.bmp *.dib *.rle *.gif *.ico *.icon *.jpeg *.jpe *.jfif *.exif *.tiff *.tif *wdp *.jxr)"));
     if (files.count() == 0)
         return;
     setCursor(QCursor(Qt::WaitCursor));
@@ -325,6 +395,18 @@ void ElementsEdit::updatedText(const QString& qsAss)
     vqsArgv.push_back("-v");
     vqsArgv.push_back("debug");
 #endif
+    if(!m_qsAudioFilename.isEmpty())
+    {
+        //vqsArgv.push_back(QString(tr("-f")));
+        //vqsArgv.push_back(QString(tr("%1")).arg(ext));
+        vqsArgv.push_back(QString(tr("-ss")));
+        vqsArgv.push_back(QString(tr("%1")).arg(m_iAudioStart));
+        vqsArgv.push_back(QString(tr("-t")));
+        vqsArgv.push_back(QString(tr("%1")).arg(m_iAudioDuration));
+        vqsArgv.push_back(QString(tr("-i")));
+        vqsArgv.push_back(m_qsAudioFilename);
+    }
+
     vqsArgv.push_back("-i");
     struct to_buffer sinbuffer;
     sinbuffer.ptr = (uint8_t*)m_pOutBuffer;
@@ -334,11 +416,11 @@ void ElementsEdit::updatedText(const QString& qsAss)
     //./ffmpeg_r.exe -y -i jpg/mp3.512.5.avi -vf ass=jpg/subtitle.ass jpg/subt.mp3.512.5.avi
     vqsArgv.push_back(QString(tr("-vf")));
     //QByteArray qsInTxt = createAss(stTextAttr, qsText);
-    QByteArray qsInTxt = qsAss.toUtf8();
-    QMessageBox::information(this, "info", QString(tr("qsAss: %1")).arg(qsAss));
+    m_qsInText = qsAss.toUtf8();
+    //QMessageBox::information(this, "info", QString(tr("qsAss: %1")).arg(qsAss));
     struct to_buffer sintxtbuffer;
-    sintxtbuffer.ptr = (uint8_t*)qsInTxt.data();
-    sintxtbuffer.in_len = qsInTxt.length();
+    sintxtbuffer.ptr = (uint8_t*)m_qsInText.data();
+    sintxtbuffer.in_len = m_qsInText.length();
     sintxtbuffer.out_len = NULL;
     vqsArgv.push_back(QString(tr("ass=buffer|%1")).arg((size_t)&sintxtbuffer));
     vqsArgv.push_back(QString(tr("-f")));
