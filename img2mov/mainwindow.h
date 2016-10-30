@@ -24,7 +24,7 @@ public:
     GlobalContext* globalContext(){return m_globalContext;}
 #if 0
 private slots:
-    void load();
+    void addImages();
 #endif
 protected:
     //void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;

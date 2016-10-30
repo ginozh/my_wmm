@@ -1,6 +1,8 @@
 #include <QCoreApplication>
 #include <QtCore>
 #include <QDebug>
+#include <QString>
+#include <QObject> 
 
 QString createAss()
 {
@@ -55,7 +57,7 @@ signals:
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-
+#if 0
 	// Task parented to the application so that it
     // will be deleted by the application.
     Task *task = new Task(&a);
@@ -67,6 +69,18 @@ int main(int argc, char *argv[])
     // This will run the task from the application event loop.
     QTimer::singleShot(0, task, SLOT(run()));
 
-
+#endif
+    int m_iStartTime = 1212;
+    int m_iStartPoint = 0;
+    int m_iEntPoint = 31233;
+    int m_duration = 5000;
+    int iRealLength = m_iEntPoint - m_iStartPoint+m_iStartTime;
+    QString test = QString("[1:a]atrim=0:%1,asetpts=PTS-STARTPTS[aud1];"
+                    "[2:a]atrim=%2:%3,asetpts=PTS-STARTPTS[aud2];"
+                    "[aud1][aud2]concat=n=2:v=0:a=1[aout]").
+            arg(QString::number((float)m_iStartTime/1000, 'f',2)).
+            arg((float)m_iStartPoint/1000).
+            arg(iRealLength<=m_duration?((float)m_iEntPoint/1000):((float)(m_duration-m_iStartTime+m_iStartPoint)/1000));
+    qDebug() << test;
     return a.exec();
 }

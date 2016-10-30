@@ -10,6 +10,7 @@ class GraphicsScene;
 class VideoPlayer;
 class TabWidget;
 
+//elementsedit.cpp
 typedef struct stTextAttr{
 public:
     stTextAttr(const QString& qsStartTimeText="2.00s", const QString& qsDurationText="2.00")
@@ -53,6 +54,45 @@ public:
 
 }stTextAttr;
 
+//new in element.cpp
+class GlobalVideoAttr
+{
+public:
+    GlobalVideoAttr()
+    {
+        //毫秒
+        m_iDuration = 2000;
+    }
+    ~GlobalVideoAttr(){}
+public:
+    int m_iDuration;
+};
+
+//new in elementsedit.cpp
+class GlobalMusicAttr
+{
+public:
+    GlobalMusicAttr()
+    {
+        //毫秒
+        m_iStartTime = 0;//1200; 
+        m_iStartPoint = 0;
+        m_iEntPoint = 0;
+        m_iAudioDuration = 0;
+    }
+    ~GlobalMusicAttr()
+    {
+    }
+public:
+    QString m_qsAudioFilename;
+    int m_iStartTime;
+    int m_iStartPoint;
+    int m_iEntPoint;
+    int m_iAudioDuration;
+};
+
+
+//new in mainwindow.cpp
 class GlobalContext
 {
 public:
@@ -62,6 +102,7 @@ public:
         m_player=NULL;
         m_tabWidget=NULL;
     }
+    ~GlobalContext(){}
 public:
     ElementsEdit* m_elementsEdit;
     GraphicsScene* m_scene;

@@ -9,6 +9,7 @@
 #include <QFontComboBox>
 #include <QComboBox>
 #include "comm.h"
+#include "combobox.h"
 
 QT_BEGIN_NAMESPACE
 class QHBoxLayout;
@@ -55,6 +56,8 @@ public:
     TabWidget(QWidget *parent, GlobalContext* globalContext);
 public slots:
     void activeTabText(void* element);
+    void activeTabVideo(void* element, GlobalVideoAttr* globalVideoAttr);
+    void activeTabMusic(GlobalMusicAttr* musicAttr);
 #if 0
     void fontSizeChanged(const QString &);
     void currentFontChanged();
@@ -62,11 +65,14 @@ public slots:
 #endif
     void textColorChanged();
     void handleFontChange();
-
+    void handleVideoAttrChange();
+private slots:
+    void currentChanged(int index);
 private:
     void createTabHome();
     void createTabAnimations();
     void createTabVisualEffects();
+    void createTabVideo();
     void createTabMusic();
     void createTabText();
     void initialScrollArea(QScrollArea *scrollArea);
@@ -75,6 +81,7 @@ private:
     QIcon createColorToolButtonIcon(const QString &imageFile, QColor color);
     QIcon createColorIcon(QColor color);
     void assignTabWidget(const stTextAttr *textItem);
+    void assignVideoInfo();
 private:
     QListWidget *contentsWidget;
     QSize m_iconSize;
@@ -86,6 +93,11 @@ private:
 
     QWidget *m_tabHome;
     QWidget *m_tabAnimations;
+    //video
+    QMap<void*, GlobalVideoAttr*> m_mapVieo;
+    QWidget *m_tabVideo;
+    QComboBox* m_cbSpeedVideo;
+    ComboBox* m_cbDurationVieo;
     //music
     QWidget *m_tabMusic;
     QComboBox* m_cbStartTimeMusic;

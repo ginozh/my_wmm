@@ -9,7 +9,7 @@ class LineEdit : public QLineEdit
     Q_OBJECT
 public:
     //LineEdit(int idx, QWidget *parent = 0);
-    LineEdit(GraphicsScene* scene, QWidget *parent = 0);
+    LineEdit(QSize size, GraphicsScene* scene, QWidget *parent = 0);
 signals:
     //void selectTextSignal(int idx);
     void selectedTextSignal(const QString&);

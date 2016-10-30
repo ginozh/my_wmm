@@ -44,7 +44,9 @@ SOURCES += main.cpp \
     videoscene.cpp \
     videotextitem.cpp \
     lineedit.cpp \
-    videorectitem.cpp
+    videorectitem.cpp \
+    musiclabel.cpp \
+    combobox.cpp
 
 HEADERS  += mainwindow.h \
     ffmpeg.h \
@@ -65,4 +67,6 @@ HEADERS  += mainwindow.h \
     videotextitem.h \
     lineedit.h \
     comm.h \
-    videorectitem.h
+    videorectitem.h \
+    musiclabel.h \
+    combobox.h

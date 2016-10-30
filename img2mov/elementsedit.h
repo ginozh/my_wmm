@@ -8,6 +8,7 @@
 #include <QBuffer>
 #include <QToolButton>
 #include "comm.h"
+#include <QMediaPlayer>
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -22,9 +23,11 @@ class ElementsEdit : public QWidget
 public:
     ElementsEdit(QWidget *parent, GlobalContext* globalContext);
     ~ElementsEdit();
+    Element* currentElement();
 private:
     int callFfmpeg(const QVector<QString>& vqsArgv);
-    void createFinalVideoAndPlay(bool bPlay=false);
+    void createFinalVideo(bool bPlay);
+    void createFinalVideoMusicTxt(bool bPlay);
     void scaleImage(Element *element);
     void createVideo(Element *element);
     bool createAnimation(Element *firstElement, Element *secondElement
@@ -41,20 +44,24 @@ signals:
     void displayTextSignal(void*, bool);
     void activeVideoTextSignal(void*, const QString&);
     void activeTabTextSignal(void*);
+    void activeTabMusicSignal(GlobalMusicAttr*);
 protected:
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void resizeEvent(QResizeEvent * event) Q_DECL_OVERRIDE;
 public slots:
-    void load();
+    void addImages();
+    void addMusic();
     void selectedImage();
     void selectedText(const QString&);
+    void selectedMusic();
     void selectedTransition(const QString& animation);
+    void elementAttrChanged(bool bPlay);
     void durationChanged(qint64 duration);
+    void audioDurationChanged(qint64 duration);
     void positionChanged(qint64 position);
     //void selectedText(void*);
     //void handleContextMenuRequested(const QPoint &pos);
     void updatedText(const QString&);
-    void addMusic();
 private:
     FlowLayout *m_flowLayout;
     QVBoxLayout *m_firstLayout;
@@ -90,11 +97,18 @@ private:
 
     GlobalContext* m_globalContext;
 
-    //
     QByteArray m_qsInText;
-    QString m_qsAudioFilename;
-    int m_iAudioStart;
-    int m_iAudioDuration;
+
+
+    //audio
+    QMediaPlayer m_audioMediaPlayer;
+    GlobalMusicAttr* m_globalMusicAttr;
+    bool m_isFirstMusic;
+    //QString m_qsAudioFilename;
+    //int m_iAudioStart;
+    //int m_iAudioDuration;
+    
+    //video
 };
 //! [0]
 

@@ -10,6 +10,9 @@
 #include "videoscene.h"
 #include <QScrollBar>
 #include <QToolButton>
+#include "element.h"
+#include "elementsedit.h"
+#include <QDebug>
 
 
 //tmp
@@ -28,64 +31,6 @@ const QString rsrcPath = "images/mac";
 #else
 const QString rsrcPath = "images/win";
 #endif
-//============================================================================//
-//                                  ColorEdit                                 //
-//============================================================================//
-
-ColorEdit::ColorEdit(QRgb initialColor, int id)
-    : m_color(initialColor), m_id(id)
-{
-    //QHBoxLayout *layout = new QHBoxLayout;
-    //setLayout(layout);
-    //layout->setContentsMargins(0, 0, 0, 0);
-    //m_button = new QFrame(this);
-    m_button = new QFrame(this);
-    QPalette palette = m_button->palette();
-    palette.setColor(QPalette::Window, QColor(m_color));
-    m_button->setPalette(palette);
-    m_button->setAutoFillBackground(true);
-    m_button->setMinimumSize(32, 0);
-    m_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-    m_button->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-    //layout->addWidget(m_button);
-
-    //connect(m_lineEdit, SIGNAL(editingFinished()), this, SLOT(editDone()));
-    setMinimumSize(50, 50);
-    setMaximumSize(50, 50);
-    //setAlignment(Qt::AlignVCenter);
-}
-void ColorEdit::editDone()
-{
-}
-void ColorEdit::mousePressEvent(QMouseEvent *event)
-{
-    if (event->button() == Qt::LeftButton) {
-        QColor color(m_color);
-        QColorDialog dialog(color, 0);
-        dialog.setOption(QColorDialog::ShowAlphaChannel, true);
-// The ifdef block is a workaround for the beta, TODO: remove when bug 238525 is fixed
-#ifdef Q_DEAD_CODE_FROM_QT4_MAC
-        dialog.setOption(QColorDialog::DontUseNativeDialog, true);
-#endif
-        dialog.move(280, 120);
-        if (dialog.exec() == QDialog::Rejected)
-            return;
-        QRgb newColor = dialog.selectedColor().rgba();
-        if (newColor == m_color)
-            return;
-        setColor(newColor);
-    }
-}
-
-void ColorEdit::setColor(QRgb color)
-{
-    m_color = color;
-    QPalette palette = m_button->palette();
-    palette.setColor(QPalette::Window, QColor(m_color));
-    m_button->setPalette(palette);
-    emit colorChanged(m_color, m_id);
-}
-
 
 TabWidget::TabWidget(QWidget *parent, GlobalContext* globalContext)
     : QTabWidget(parent)
@@ -98,6 +43,7 @@ TabWidget::TabWidget(QWidget *parent, GlobalContext* globalContext)
     createTabHome();
     createTabAnimations();
     createTabVisualEffects();
+    createTabVideo();
     createTabMusic();
     createTabText();
 
@@ -105,7 +51,69 @@ TabWidget::TabWidget(QWidget *parent, GlobalContext* globalContext)
     //setCurrentWidget(contentsWidget);
     setCurrentWidget(m_tabHome);
     setMaximumHeight(m_iconSize.height() + 120);
+
+    connect(this, SIGNAL(currentChanged(int)), this, SLOT(currentChanged(int)));
 }
+void TabWidget::assignVideoInfo()
+{
+    Element* element;
+    if(m_globalContext && (element=m_globalContext->m_elementsEdit->currentElement()))
+    {
+        GlobalVideoAttr* globalVideoAttr = element->globalVideoAttr();
+        if(globalVideoAttr)
+        { 
+            m_cbDurationVieo->setCurrentText(QString(tr("%1s")).
+                    arg(QString::number((float)globalVideoAttr->m_iDuration/1000, 'f', 2)));
+        }
+    }
+}
+void TabWidget::currentChanged(int /*index*/)
+{
+    QWidget * widget= currentWidget();
+    if(widget == m_tabVideo)
+    {
+        //QMessageBox::information(NULL, "info", QString(tr("video")));
+        assignVideoInfo();
+    }
+}
+void TabWidget::handleVideoAttrChange()
+{
+    qDebug() << "handleVideoAttrChange";
+    bool isChange = false;
+    if(m_globalContext && m_globalContext->m_elementsEdit->currentElement())
+    {
+        GlobalVideoAttr* globalVideoAttr = m_globalContext->m_elementsEdit->currentElement()->globalVideoAttr();
+        if(globalVideoAttr)
+        { 
+            QString qsText = m_cbDurationVieo->currentText();
+            QStringList sl = qsText.split("s");
+            int duration = 1000*sl.at(0).toFloat(); 
+            qDebug() << "handleVideoAttrChange. qsText: " << qsText << " duration: " << duration;
+            if(duration != globalVideoAttr->m_iDuration)
+            {
+                globalVideoAttr->m_iDuration = duration;
+                isChange = true;
+            }
+            //QMessageBox::information(this, "info", QString(tr("handleVideoAttrChange value: %1 duration: %2")).arg(qsText).arg(duration));
+
+            //m_cbDurationVieo->setCurrentText(QString(tr("%1s")).
+            //        arg(QString::number((float)globalVideoAttr->m_iDuration/1000, 'f', 2)));
+        }
+        else
+        {
+            QMessageBox::information(this, "error", QString(tr("handleVideoAttrChange no globalVideoAttr")));
+        }
+    }
+    else
+    {
+        QMessageBox::information(this, "error", QString(tr("handleVideoAttrChange no currentElement")));
+    }
+    if(isChange)
+    {
+        // 通知
+    }
+}
+
 void TabWidget::createTabHome()
 {
     m_tabHome = new QWidget;
@@ -128,7 +136,7 @@ void TabWidget::createTabHome()
                 //addPhotos->setMaximumHeight(m_iconSize.height() + 250);
                 addPhotos->setMinimumWidth(m_iconSize.width() + 100);
                 //addPhotos->setMinimumWidth(addPhotos->text().length());
-                connect(addPhotos, SIGNAL(clicked()), (const QObject*)m_globalContext->m_elementsEdit, SLOT(load()));
+                connect(addPhotos, SIGNAL(clicked()), (const QObject*)m_globalContext->m_elementsEdit, SLOT(addImages()));
             }
             {
                 QToolButton *addMusic = new QToolButton();
@@ -151,7 +159,7 @@ void TabWidget::createTabHome()
                     //addTitle->setIcon(QIcon("images/addTitle.png"));
                     //addTitle->setIconSize(m_iconSize);
                     addTitle->setText("Title");
-                    //connect(addTitle, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(load()));
+                    //connect(addTitle, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(addImages()));
 
                 }
                 {
@@ -165,7 +173,7 @@ void TabWidget::createTabHome()
                     //addCaption->setMaximumHeight(m_iconSize.height() + 250);
                     //addCaption->setMinimumWidth(m_iconSize.width() + 100);
                     //addCaption->setMinimumWidth(addCaption->text().length());
-                    //connect(addCaption, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(load()));
+                    //connect(addCaption, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(addImages()));
 
                 }
                 {
@@ -176,7 +184,7 @@ void TabWidget::createTabHome()
                     //addCredits->setIcon(QIcon("images/addCredits.png"));
                     //addCredits->setIconSize(m_iconSize);
                     addCredits->setText("Credits");
-                    //connect(addCredits, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(load()));
+                    //connect(addCredits, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(addImages()));
 
                 }
             }
@@ -208,7 +216,7 @@ void TabWidget::createTabHome()
                 //addPhotos->setMaximumHeight(m_iconSize.height() + 250);
                 addPhotos->setMinimumWidth(m_iconSize.width() + 100);
                 //addPhotos->setMinimumWidth(addPhotos->text().length());
-                //connect(addPhotos, SIGNAL(clicked()), (const QObject*)m_globalContext->m_elementsEdit, SLOT(load()));
+                //connect(addPhotos, SIGNAL(clicked()), (const QObject*)m_globalContext->m_elementsEdit, SLOT(addImages()));
             }
             {
                 QToolButton *addMusic = new QToolButton();
@@ -218,7 +226,7 @@ void TabWidget::createTabHome()
                 addMusic->setIconSize(m_iconSize);
                 addMusic->setText("Rotate Right");
                 addMusic->setMinimumWidth(m_iconSize.width() + 100);
-                //connect(addMusic, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(load()));
+                //connect(addMusic, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(addImages()));
             }
             {
                 QVBoxLayout *vboxTopRightEditing = new QVBoxLayout;
@@ -231,7 +239,7 @@ void TabWidget::createTabHome()
                     //remove->setIcon(QIcon("images/remove.png"));
                     //remove->setIconSize(m_iconSize);
                     remove->setText("Remove");
-                    //connect(remove, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(load()));
+                    //connect(remove, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(addImages()));
 
                 }
                 {
@@ -245,7 +253,7 @@ void TabWidget::createTabHome()
                     //selectAll->setMaximumHeight(m_iconSize.height() + 250);
                     //selectAll->setMinimumWidth(m_iconSize.width() + 100);
                     //selectAll->setMinimumWidth(selectAll->text().length());
-                    //connect(selectAll, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(load()));
+                    //connect(selectAll, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(addImages()));
 
                 }
             }
@@ -269,7 +277,7 @@ void TabWidget::createTabHome()
     //addPhotos->setMaximumHeight(m_iconSize.height() + 250);
     addPhotos->setMinimumWidth(m_iconSize.width() + 100);
     //addPhotos->setMinimumWidth(addPhotos->text().length());
-    connect(addPhotos, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(load()));
+    connect(addPhotos, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(addImages()));
 
     QToolButton *addMusic = new QToolButton(this);
     addMusic->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -483,6 +491,85 @@ void TabWidget::createTabAnimations()
 }
 void TabWidget::createTabVisualEffects()
 {
+}
+/*
+------------------------------------ |
+|          |Speed:       ComboBox  | |
+|Backgroup |-----------------------| |
+|Color     |Duration :   ComboBox  | |
+|----------------------------------| |
+|              Adjust              | |
+|----------------------------------| |
+*/
+void TabWidget::createTabVideo()
+{
+    m_tabVideo = new QWidget;
+    QHBoxLayout *hbox = new QHBoxLayout;
+    m_tabVideo->setLayout(hbox);
+    {
+        QVBoxLayout *vboxAdjust = new QVBoxLayout;
+        hbox->addLayout(vboxAdjust);
+
+        {
+            QHBoxLayout* hboxTop = new QHBoxLayout;
+            vboxAdjust->addLayout(hboxTop);
+            {
+                // Backgroup color
+            }
+
+            {
+                QVBoxLayout *vboxTopright = new QVBoxLayout;
+                hboxTop->addLayout(vboxTopright);
+                {
+                    QHBoxLayout* hboxSpeed = new QHBoxLayout;
+                    vboxTopright->addLayout(hboxSpeed);
+                    {
+                        QLabel *lbl = new QLabel(tr("Speed:"));
+                        lbl->setEnabled(false);
+
+                        hboxSpeed->addWidget(lbl);
+                    }
+                    {
+                        m_cbSpeedVideo = new QComboBox();
+                        m_cbSpeedVideo->setEnabled(false);
+
+                        hboxSpeed->addWidget(m_cbSpeedVideo);
+                    }
+
+                }
+                {
+                    QHBoxLayout* hboxDuration = new QHBoxLayout;
+                    vboxTopright->addLayout(hboxDuration);
+                    {
+                        QLabel *lbl = new QLabel(tr("Duration:"));
+
+                        hboxDuration->addWidget(lbl);
+                    }
+                    {
+                        m_cbDurationVieo = new ComboBox();
+                        m_cbDurationVieo->setEditable(true);
+                        m_cbDurationVieo->addItem(QString(tr("0.00s")));
+                        connect(m_cbDurationVieo, SIGNAL(textChangedSignal(QString)),
+                                this, SLOT(handleVideoAttrChange()));
+
+                        hboxDuration->addWidget(m_cbDurationVieo);
+                    }
+
+                }
+            }
+        }
+        {
+            QLabel *lbl = new QLabel(tr("Adjust"));
+            lbl->setAlignment(Qt::AlignCenter);
+
+            vboxAdjust->addWidget(lbl);
+        }
+    }
+    {
+        appendLine(hbox);
+    }
+
+    addTab(m_tabVideo, tr("&VideoTools"));
 }
 /*
 -------------------------------
@@ -954,6 +1041,11 @@ QIcon TabWidget::createColorIcon(QColor color)
 
     return QIcon(pixmap);
 }
+void TabWidget::activeTabVideo(void* element, GlobalVideoAttr* globalVideoAttr)
+{
+    m_element = element;
+    setCurrentWidget(m_tabVideo);
+}
 void TabWidget::activeTabText(void* element)
 {
     m_element = element;
@@ -971,6 +1063,14 @@ void TabWidget::activeTabText(void* element)
     }
     //赋值. 将element对应的保存的text值填充到各个控件中
     assignTabWidget(textItem);
+}
+void TabWidget::activeTabMusic(GlobalMusicAttr* musicAttr)
+{
+    setCurrentWidget(m_tabMusic);
+    if(!musicAttr)
+        return;
+    m_cbEndPointMusic->setCurrentText(QString(tr("%1s")).
+            arg(QString::number((float)musicAttr->m_iEntPoint/1000, 'f', 2)));
 }
 void TabWidget::assignTabWidget(const stTextAttr *textItem)
 {
@@ -1041,4 +1141,61 @@ void TabWidget::textColorChanged()
     fontColorToolButton->setAutoFillBackground(true);
     //textButtonTriggered();
     handleFontChange();
+}
+//============================================================================//
+//                                  ColorEdit                                 //
+//============================================================================//
+
+ColorEdit::ColorEdit(QRgb initialColor, int id)
+    : m_color(initialColor), m_id(id)
+{
+    //QHBoxLayout *layout = new QHBoxLayout;
+    //setLayout(layout);
+    //layout->setContentsMargins(0, 0, 0, 0);
+    //m_button = new QFrame(this);
+    m_button = new QFrame(this);
+    QPalette palette = m_button->palette();
+    palette.setColor(QPalette::Window, QColor(m_color));
+    m_button->setPalette(palette);
+    m_button->setAutoFillBackground(true);
+    m_button->setMinimumSize(32, 0);
+    m_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    m_button->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+    //layout->addWidget(m_button);
+
+    //connect(m_lineEdit, SIGNAL(editingFinished()), this, SLOT(editDone()));
+    setMinimumSize(50, 50);
+    setMaximumSize(50, 50);
+    //setAlignment(Qt::AlignVCenter);
+}
+void ColorEdit::editDone()
+{
+}
+void ColorEdit::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        QColor color(m_color);
+        QColorDialog dialog(color, 0);
+        dialog.setOption(QColorDialog::ShowAlphaChannel, true);
+// The ifdef block is a workaround for the beta, TODO: remove when bug 238525 is fixed
+#ifdef Q_DEAD_CODE_FROM_QT4_MAC
+        dialog.setOption(QColorDialog::DontUseNativeDialog, true);
+#endif
+        dialog.move(280, 120);
+        if (dialog.exec() == QDialog::Rejected)
+            return;
+        QRgb newColor = dialog.selectedColor().rgba();
+        if (newColor == m_color)
+            return;
+        setColor(newColor);
+    }
+}
+
+void ColorEdit::setColor(QRgb color)
+{
+    m_color = color;
+    QPalette palette = m_button->palette();
+    palette.setColor(QPalette::Window, QColor(m_color));
+    m_button->setPalette(palette);
+    emit colorChanged(m_color, m_id);
 }

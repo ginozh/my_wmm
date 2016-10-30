@@ -13,7 +13,7 @@ Menu::Menu(QWidget *parent, QWidget *elementsEdit, int x, int y)
     raise();
 
     //m_menu->setScaledContents(true);
-    m_menu->addAction(tr("Add Image"), m_elementsEdit, SLOT(load())  );
+    m_menu->addAction(tr("Add Image"), m_elementsEdit, SLOT(addImages())  );
     m_menu->addSeparator();
     m_menu->addAction(tr("E&xit"), parent, SLOT());
     //QWidget* widget = new QWidget( m_menu );

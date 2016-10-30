@@ -36,8 +36,8 @@ MainWindow::MainWindow(QWidget *parent)
 #if 0
     //widgets/widgets/tablet
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
-    //fileMenu->addAction(tr("&Open..."), m_elementsEdit, &ElementsEdit::load, QKeySequence::Open);
-    fileMenu->addAction(tr("&Open..."), m_elementsEdit, SLOT(load()), QKeySequence::Open);
+    //fileMenu->addAction(tr("&Open..."), m_elementsEdit, &ElementsEdit::addImages, QKeySequence::Open);
+    fileMenu->addAction(tr("&Open..."), m_elementsEdit, SLOT(addImages()), QKeySequence::Open);
     QAction *exitAction = fileMenu->addAction(tr("E&xit"), qApp, &QApplication::closeAllWindows);
     exitAction->setShortcuts(QKeySequence::Quit);
 
@@ -96,10 +96,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     // tab
     connect(m_globalContext->m_elementsEdit, SIGNAL(activeTabTextSignal(void*)), m_globalContext->m_tabWidget, SLOT(activeTabText(void*)));
+    connect(m_globalContext->m_elementsEdit, SIGNAL(activeTabMusicSignal(GlobalMusicAttr*)), m_globalContext->m_tabWidget, SLOT(activeTabMusic(GlobalMusicAttr*)));
 
 }
 #if 0
-void MainWindow::load()
+void MainWindow::addImages()
 {
     //qtconcurrent/imagescaling
     QStringList files = QFileDialog::getOpenFileNames(this, tr("Select Images"),

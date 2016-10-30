@@ -5,6 +5,8 @@
 #include <QVBoxLayout>
 #include "image.h"
 #include "lineedit.h"
+#include "musiclabel.h"
+#include "comm.h"
 extern "C"{
 #include "ffmpeg.h"
 }
@@ -26,6 +28,7 @@ public:
     const QString& getImageName(){return m_qsImageName;}
     void unselectedImage(){if(m_pimage){m_pimage->unselectedImage();}}
     void doSelectImage(){if(m_pimage){m_pimage->doSelectImage();}}
+    GlobalVideoAttr* globalVideoAttr(){return m_globalVideoAttr;}
 signals:
     void insertImage();
     void selectedImageSignal();
@@ -51,7 +54,11 @@ public: // uncomplete
     size_t m_iOutVidow; 
 
     QPushButton* m_pushBtn;
+    MusicLabel* m_musicLabel;
     LineEdit* m_lineEdit;
+
+    //video attr
+    GlobalVideoAttr* m_globalVideoAttr;
 };
 //! [0]
 

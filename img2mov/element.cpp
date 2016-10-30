@@ -8,6 +8,7 @@ Element::Element(QWidget *parent, const QString& qsImageName,GraphicsScene* scen
     , m_elementLayout(new QVBoxLayout(this))
     , m_pimage(0)
     , m_qsImageName(qsImageName)
+    , m_globalVideoAttr(new GlobalVideoAttr)
 {
     //setWindowFlags(Qt::WindowStaysOnBottomHint);
     memset(&m_fbOriFile, 0, sizeof(m_fbOriFile));
@@ -27,7 +28,7 @@ Element::Element(QWidget *parent, const QString& qsImageName,GraphicsScene* scen
         //webenginewidgets/simplebrowser/tabwidget.cpp
         m_elementLayout->addWidget(m_pimage);
 
-        connect(this, SIGNAL(insertImage()), parentWidget(), SLOT(load()) );
+        connect(this, SIGNAL(insertImage()), parentWidget(), SLOT(addImages()) );
 
         //connect(parentWidget(), SIGNAL(focusImageSignal()), m_pimage(), SLOT(focusImage()) );
         //必须要二层，因为elementsedit是根据send(即element)来确定哪个element的
@@ -67,9 +68,14 @@ Element::Element(QWidget *parent, const QString& qsImageName,GraphicsScene* scen
         //connect(this, &QLabel::customContextMenuRequested, parent()->parent(), &ElementsEdit::handleContextMenuRequested);
 
     }
-    m_pushBtn = new QPushButton(tr(""));
-    m_elementLayout->addWidget(m_pushBtn);
-    m_lineEdit =  new LineEdit(scene);
+    //m_pushBtn = new QPushButton(tr(""));
+    //m_elementLayout->addWidget(m_pushBtn);
+    m_musicLabel = new MusicLabel(QSize(iMaxWidth, iMaxWidth/6));
+    m_elementLayout->addWidget(m_musicLabel);
+    connect(m_musicLabel, SIGNAL(selectedMusicSignal()), parent, SLOT(selectedMusic()) );
+
+
+    m_lineEdit =  new LineEdit(QSize(iMaxWidth, iMaxWidth/6), scene);
     //m_elementLayout->addWidget(new QLabel(tr("input text")));
     m_elementLayout->addWidget(m_lineEdit);
     //connect(this, SIGNAL(selectedTextSignal()), parentWidget(), SLOT(selectedText()) );

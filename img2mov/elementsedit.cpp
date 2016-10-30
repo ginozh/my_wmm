@@ -24,6 +24,7 @@ ElementsEdit::ElementsEdit(QWidget *parent, GlobalContext* globalContext)
       , m_lastSelectedElement(0)
       , m_idxCurrentElement(-1)
       , m_isFirstClick(true)
+      , m_globalMusicAttr(new GlobalMusicAttr)
 {   
     m_globalContext = globalContext;
     //m_tmpdir=QDir::currentPath().append(tr("/tmp"));
@@ -78,6 +79,10 @@ ElementsEdit::ElementsEdit(QWidget *parent, GlobalContext* globalContext)
 #endif
 
     setWindowTitle(tr("Flow Layout"));
+}
+Element* ElementsEdit::currentElement()
+{
+    return qobject_cast<Element *>(m_lastSelectedElement);
 }
 int ElementsEdit::callFfmpeg(const QVector<QString>& vqsArgv)
 {
@@ -170,6 +175,81 @@ void ElementsEdit::scaleImage(Element *element)
     element->m_fbInputScaleFile.out_len=NULL;
 }
 //! [1]
+void ElementsEdit::addImages()
+{
+    QWidget *currWidget = qobject_cast<QWidget *>(sender());
+    //只有image过来的insert事件，它的父类(element)才会是m_flowLayout的元素
+    QStringList files = QFileDialog::getOpenFileNames(this, tr("Select Images"),
+            /*QDir::currentPath()*/QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
+            tr("Photos (*.jpg *.png *.bmp *.dib *.rle *.gif *.ico *.icon *.jpeg *.jpe *.jfif *.exif *.tiff *.tif *wdp *.jxr)"));
+    if (files.count() == 0)
+        return;
+    setCursor(QCursor(Qt::WaitCursor));
+    if(m_isFirstClick)
+    {
+        m_isFirstClick=false;
+
+        //qDeleteAll(children());
+        delete m_firstLayout;
+        m_flowLayout = new FlowLayout(this);
+        setLayout(m_flowLayout);
+        delete m_firstLabel;
+    }
+    int idx = -1;
+    if((idx=m_flowLayout->indexOf(currWidget))>=0)
+        idx++;
+    int oldIdx = idx;
+    QString qsFileType;
+    for (int i = 0; i < files.count(); ++i) {
+        // 1, 读取文件，生成image
+        Element *element=new Element(this, files[i], m_globalContext->m_scene);
+        emit createTextSignal((void*)element); 
+        m_flowLayout->insertWidget(idx, element);
+        QFileInfo fi(files[i]);
+        QString ext = fi.suffix();  // ext = "gz"
+        if(qsFileType.isEmpty())
+        {
+            qsFileType = ext;
+        }
+        else if(qsFileType.compare(ext)!=0)
+        {
+            QMessageBox::information(this, "error", QString(tr("need same file type(%1). current file: %2")).arg(qsFileType, files[i]));
+            break;
+        }
+        if(idx>=0)
+            idx++;
+        //2, 转化为小图片
+        //QImage.scale: 1,是否支持内存读入文件内容。2，是否可以输出文件内容到buffer
+        //or ffmpeg
+        scaleImage(element);
+        //3, 图片视频
+        createVideo(element);
+    }
+    //4, 生成总视频
+    //./ffmpeg_gr -y -f avi -i jpg/mi2.avi -f avi -i jpg/mm.avi -f avi jpg/all.avi
+    //uncomplete
+    createFinalVideo(false);
+    //5, 设置播放进度条
+    //计算长度 for 进度条 ，需要在当前线程渲染之后，否则不对。放在duration信号槽内处理
+    // 
+    
+    //6, 选中合适的image
+    //oldIdx = oldIdx > 0? oldIdx: 0;
+    //emit focusImageSignal();
+
+    //7, 第一次选择
+    if(!m_lastSelectedElement)
+    {
+        m_idxCurrentElement = 0;
+        m_lastSelectedElement = qobject_cast<QWidget *>(m_flowLayout->itemAt(m_idxCurrentElement)->widget());
+        (qobject_cast<Element *>(m_lastSelectedElement))->doSelectImage();
+        emit displayTextSignal((void*)m_lastSelectedElement, true);
+    }
+
+
+    m_vecticalLine->raise(); // top level, Raises this widget to the top of the parent widget's stack.
+    setCursor(QCursor(Qt::ArrowCursor));
+}
 void ElementsEdit::addMusic()
 {
     QString file = QFileDialog::getOpenFileName(this, tr("Add music"),
@@ -177,14 +257,20 @@ void ElementsEdit::addMusic()
             tr("Audio and Music (*.wma *.mp3 *.wav *.aif *.aiff *.m4a *.ogg)"));
     if (file.isEmpty() )
         return;
-    QFileInfo fi(file);
-    QString ext = fi.suffix();  // ext = "gz"
+    //QFileInfo fi(file);
+    //QString ext = fi.suffix();  // ext = "gz"
+    m_audioMediaPlayer.setMedia(QUrl::fromLocalFile(file));
+    connect(&m_audioMediaPlayer, SIGNAL(durationChanged(qint64)), this,
+            SLOT(audioDurationChanged(qint64)));
+
+    m_isFirstMusic = true;
+    m_globalMusicAttr->m_qsAudioFilename = file;
 
     setCursor(QCursor(Qt::WaitCursor));
+#if 0
     m_qsAudioFilename = file;
     m_iAudioStart = 0;
     m_iAudioDuration = 2;
-
 
     QVector<QString> vqsArgv;
     vqsArgv.push_back("ffmpeg");
@@ -239,81 +325,7 @@ void ElementsEdit::addMusic()
     QByteArray tmp=QByteArray((const char*)soutbuffer.ptr, (int)*soutbuffer.out_len);
     emit readyVideo("tmp.avi", tmp, m_imgPlayPosition);
     emit changePlayPosition(m_imgPlayPosition);
-}
-void ElementsEdit::load()
-{
-    QWidget *currWidget = qobject_cast<QWidget *>(sender());
-    //只有image过来的insert事件，它的父类(element)才会是m_flowLayout的元素
-    QStringList files = QFileDialog::getOpenFileNames(this, tr("Select Images"),
-            /*QDir::currentPath()*/QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
-            tr("Photos (*.jpg *.png *.bmp *.dib *.rle *.gif *.ico *.icon *.jpeg *.jpe *.jfif *.exif *.tiff *.tif *wdp *.jxr)"));
-    if (files.count() == 0)
-        return;
-    setCursor(QCursor(Qt::WaitCursor));
-    if(m_isFirstClick)
-    {
-        m_isFirstClick=false;
-
-        //qDeleteAll(children());
-        delete m_firstLayout;
-        m_flowLayout = new FlowLayout(this);
-        setLayout(m_flowLayout);
-        delete m_firstLabel;
-    }
-    int idx = -1;
-    if((idx=m_flowLayout->indexOf(currWidget))>=0)
-        idx++;
-    int oldIdx = idx;
-    QString qsFileType;
-    for (int i = 0; i < files.count(); ++i) {
-        // 1, 读取文件，生成image
-        Element *element=new Element(this, files[i], m_globalContext->m_scene);
-        emit createTextSignal((void*)element); 
-        m_flowLayout->insertWidget(idx, element);
-        QFileInfo fi(files[i]);
-        QString ext = fi.suffix();  // ext = "gz"
-        if(qsFileType.isEmpty())
-        {
-            qsFileType = ext;
-        }
-        else if(qsFileType.compare(ext)!=0)
-        {
-            QMessageBox::information(this, "error", QString(tr("need same file type(%1). current file: %2")).arg(qsFileType, files[i]));
-            break;
-        }
-        if(idx>=0)
-            idx++;
-        //2, 转化为小图片
-        //QImage.scale: 1,是否支持内存读入文件内容。2，是否可以输出文件内容到buffer
-        //or ffmpeg
-        scaleImage(element);
-        //3, 图片视频
-        createVideo(element);
-    }
-    //4, 生成总视频
-    //./ffmpeg_gr -y -f avi -i jpg/mi2.avi -f avi -i jpg/mm.avi -f avi jpg/all.avi
-    //uncomplete
-    createFinalVideoAndPlay();
-    //5, 设置播放进度条
-    //计算长度 for 进度条 ，需要在当前线程渲染之后，否则不对。放在duration信号槽内处理
-    // 
-    
-    //6, 选中合适的image
-    //oldIdx = oldIdx > 0? oldIdx: 0;
-    //emit focusImageSignal();
-
-    //7, 第一次选择
-    if(!m_lastSelectedElement)
-    {
-        m_idxCurrentElement = 0;
-        m_lastSelectedElement = qobject_cast<QWidget *>(m_flowLayout->itemAt(m_idxCurrentElement)->widget());
-        (qobject_cast<Element *>(m_lastSelectedElement))->doSelectImage();
-        emit displayTextSignal((void*)m_lastSelectedElement, true);
-    }
-
-
-    m_vecticalLine->raise(); // top level, Raises this widget to the top of the parent widget's stack.
-    setCursor(QCursor(Qt::ArrowCursor));
+#endif
 }
 void ElementsEdit::selectedText(const QString& oritxt)
 {
@@ -330,6 +342,10 @@ void ElementsEdit::selectedText(const QString& oritxt)
         //2, 激活对应tabTextTool
         emit activeTabTextSignal((void*)send);
     }
+}
+void ElementsEdit::selectedMusic()
+{
+    emit activeTabMusicSignal(NULL);
 }
 void ElementsEdit::selectedImage()
 {
@@ -388,6 +404,9 @@ void ElementsEdit::selectedImage()
 //void ElementsEdit::updatedText(stTextAttr* stTextAttr, const QString& qsText)
 void ElementsEdit::updatedText(const QString& qsAss)
 {
+    m_qsInText = qsAss.toUtf8();
+    createFinalVideoMusicTxt(false);
+#if 0
     QVector<QString> vqsArgv;
     vqsArgv.push_back("ffmpeg");
     vqsArgv.push_back("-y");
@@ -447,6 +466,17 @@ void ElementsEdit::updatedText(const QString& qsAss)
     {
         //emit playVideo();
     }
+#endif
+}
+//当前element的属性变化，包括：
+//动画
+//视屏参数：时长
+//文字
+void ElementsEdit::elementAttrChanged(bool bPlay)
+{
+    //1, 生成单独的视频
+    //2, 合成声音、文字
+    createFinalVideo(bPlay);
 }
 void ElementsEdit::selectedTransition(const QString& animation)
 {
@@ -463,7 +493,7 @@ void ElementsEdit::selectedTransition(const QString& animation)
             }
         }
         //4, 生成总视频
-        createFinalVideoAndPlay(true);
+        createFinalVideo(true);
     }
 }
 bool ElementsEdit::createAnimation(Element *firstElement, Element *secondElement
@@ -529,7 +559,100 @@ bool ElementsEdit::createAnimation(Element *firstElement, Element *secondElement
     //emit playVideo(vfileName);
     return true;
 }
-void ElementsEdit::createFinalVideoAndPlay(bool bPlay)
+void ElementsEdit::createFinalVideoMusicTxt(bool bPlay)
+{
+    QVector<QString> vqsArgv;
+    vqsArgv.push_back("ffmpeg");
+    vqsArgv.push_back("-y");
+#ifdef DEBUG_FFMPEG
+    vqsArgv.push_back("-v");
+    vqsArgv.push_back("debug");
+#endif
+    vqsArgv.push_back("-i");
+    struct to_buffer sinbuffer;
+    sinbuffer.ptr = (uint8_t*)m_pOutBuffer;
+    sinbuffer.in_len = m_outlen;
+    sinbuffer.out_len = NULL;
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&sinbuffer));
+
+    if(!m_globalMusicAttr->m_qsAudioFilename.isEmpty())
+    {
+        //vqsArgv.push_back(QString(tr("-f")));
+        //vqsArgv.push_back(QString(tr("%1")).arg(ext));
+        if(m_globalMusicAttr->m_iStartTime)
+        {
+            vqsArgv.push_back(QString(tr("-f")));
+            vqsArgv.push_back(QString(tr("lavfi")));
+            vqsArgv.push_back(QString(tr("-i")));
+            vqsArgv.push_back(QString(tr("anullsrc=channel_layout=5.1:sample_rate=48000")));
+            vqsArgv.push_back(QString(tr("-i")));
+            vqsArgv.push_back(m_globalMusicAttr->m_qsAudioFilename);
+            vqsArgv.push_back(QString(tr("-filter_complex")));
+            int iRealLength = m_globalMusicAttr->m_iEntPoint - m_globalMusicAttr->m_iStartPoint+m_globalMusicAttr->m_iStartTime;
+            /*QMessageBox::information(NULL, "info", QString(tr("vduration: %1 starttime: %2 startpoint: %3 endpoint: %4")).
+                    arg(m_duration).arg(m_globalMusicAttr->m_iStartTime).
+                    arg(m_globalMusicAttr->m_iStartPoint).arg(m_globalMusicAttr->m_iEntPoint));*/
+            vqsArgv.push_back(QString(tr("[1:a]atrim=0:%1,asetpts=PTS-STARTPTS[aud1];"
+                            "[2:a]atrim=%2:%3,asetpts=PTS-STARTPTS[aud2];"
+                            "[aud1][aud2]concat=n=2:v=0:a=1[aout]")).
+                    arg((float)m_globalMusicAttr->m_iStartTime/1000).
+                    arg((float)m_globalMusicAttr->m_iStartPoint/1000).
+                    arg(iRealLength<=m_duration?((float)m_globalMusicAttr->m_iEntPoint/1000):((float)(m_duration-m_globalMusicAttr->m_iStartTime+m_globalMusicAttr->m_iStartPoint)/1000)));
+            vqsArgv.push_back(QString(tr("-map")));
+            vqsArgv.push_back(QString(tr("0:v")));
+            vqsArgv.push_back(QString(tr("-map")));
+            vqsArgv.push_back(QString(tr("[aout]")));
+        }
+        else
+        {
+            vqsArgv.push_back(QString(tr("-ss")));
+            vqsArgv.push_back(QString(tr("%1")).arg((float)m_globalMusicAttr->m_iStartPoint/1000));
+            vqsArgv.push_back(QString(tr("-t")));
+            int iRealDuration = m_globalMusicAttr->m_iEntPoint - m_globalMusicAttr->m_iStartPoint;
+            vqsArgv.push_back(QString(tr("%1")).arg(iRealDuration<m_duration?((float)iRealDuration/1000):(float)(m_duration/1000)));
+            vqsArgv.push_back(QString(tr("-i")));
+            vqsArgv.push_back(m_globalMusicAttr->m_qsAudioFilename);
+        }
+    }
+
+    //./ffmpeg_r.exe -y -i jpg/mp3.512.5.avi -vf ass=jpg/subtitle.ass jpg/subt.mp3.512.5.avi
+    if(!m_qsInText.isEmpty())
+    {
+        vqsArgv.push_back(QString(tr("-vf")));
+        struct to_buffer sintxtbuffer;
+        sintxtbuffer.ptr = (uint8_t*)m_qsInText.data();
+        sintxtbuffer.in_len = m_qsInText.length();
+        sintxtbuffer.out_len = NULL;
+        vqsArgv.push_back(QString(tr("ass=buffer|%1")).arg((size_t)&sintxtbuffer));
+    }
+#if 1
+    vqsArgv.push_back(QString(tr("-f")));
+    vqsArgv.push_back(QString(tr("avi")));
+    struct to_buffer soutbuffer;
+    soutbuffer.ptr = m_pTextVideoOutBuffer;
+    soutbuffer.in_len = m_textVideoMaxOutLen;
+    soutbuffer.out_len = &m_textVideoOutLen;
+    vqsArgv.push_back(QString(tr("buffer:video/avi;nobase64,%1")).arg((size_t)&soutbuffer));
+#else
+    vqsArgv.push_back(QString(tr("txt.avi")));
+#endif
+    int ret;
+    if((ret=callFfmpeg(vqsArgv)))
+    {
+        QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
+    }
+    setCursor(QCursor(Qt::ArrowCursor));
+    //5, 播放视频
+    QByteArray tmp=QByteArray((const char*)soutbuffer.ptr, (int)*soutbuffer.out_len);
+    emit readyVideo("tmp.avi", tmp, m_imgPlayPosition);
+    emit changePlayPosition(m_imgPlayPosition);
+
+    if(bPlay)
+    {
+        //emit playVideo();
+    }
+}
+void ElementsEdit::createFinalVideo(bool bPlay)
 {
     QVector<QString> vqsArgv;
     vqsArgv.push_back("ffmpeg");
@@ -540,8 +663,6 @@ void ElementsEdit::createFinalVideoAndPlay(bool bPlay)
 #endif
     //vqsArgv.push_back("-framerate");
     //vqsArgv.push_back("25"); //uncomplete
-    vqsArgv.push_back("-f");
-    vqsArgv.push_back("concat"); //uncomplete
     struct to_buffer sinbuffer;
     QByteArray sinString;
     for (int i = 0; i < m_flowLayout->count(); ++i)
@@ -563,6 +684,132 @@ void ElementsEdit::createFinalVideoAndPlay(bool bPlay)
     sinbuffer.ptr = (uint8_t*)sinString.data();
     sinbuffer.in_len = sinString.length();
     sinbuffer.out_len = NULL;
+    vqsArgv.push_back("-f");
+    vqsArgv.push_back("concat"); //uncomplete
+    vqsArgv.push_back(QString(tr("-i")));
+    vqsArgv.push_back(QString(tr("buffer:video/avi;nobase64,%1")).arg((size_t)&sinbuffer));
+    if(m_globalMusicAttr->m_qsAudioFilename.isEmpty() && m_qsInText.isEmpty())
+    {
+        vqsArgv.push_back(QString(tr("-c")));
+        vqsArgv.push_back(QString(tr("copy")));
+    }
+    else
+    {
+        if(!m_globalMusicAttr->m_qsAudioFilename.isEmpty())
+        {
+            //vqsArgv.push_back(QString(tr("-f")));
+            //vqsArgv.push_back(QString(tr("%1")).arg(ext));
+            if(m_globalMusicAttr->m_iStartTime)
+            {
+                vqsArgv.push_back(QString(tr("-f")));
+                vqsArgv.push_back(QString(tr("lavfi")));
+                vqsArgv.push_back(QString(tr("-i")));
+                vqsArgv.push_back(QString(tr("anullsrc=channel_layout=5.1:sample_rate=48000")));
+                vqsArgv.push_back(QString(tr("-i")));
+                vqsArgv.push_back(m_globalMusicAttr->m_qsAudioFilename);
+                vqsArgv.push_back(QString(tr("-filter_complex")));
+                int iRealLength = m_globalMusicAttr->m_iEntPoint - m_globalMusicAttr->m_iStartPoint+m_globalMusicAttr->m_iStartTime;
+                /*QMessageBox::information(NULL, "info", QString(tr("vduration: %1 starttime: %2 startpoint: %3 endpoint: %4")).
+                  arg(m_duration).arg(m_globalMusicAttr->m_iStartTime).
+                  arg(m_globalMusicAttr->m_iStartPoint).arg(m_globalMusicAttr->m_iEntPoint));*/
+                vqsArgv.push_back(QString(tr("[1:a]atrim=0:%1,asetpts=PTS-STARTPTS[aud1];"
+                                "[2:a]atrim=%2:%3,asetpts=PTS-STARTPTS[aud2];"
+                                "[aud1][aud2]concat=n=2:v=0:a=1[aout]")).
+                        arg((float)m_globalMusicAttr->m_iStartTime/1000).
+                        arg((float)m_globalMusicAttr->m_iStartPoint/1000).
+                        arg(iRealLength<=m_duration?((float)m_globalMusicAttr->m_iEntPoint/1000):((float)(m_duration-m_globalMusicAttr->m_iStartTime+m_globalMusicAttr->m_iStartPoint)/1000)));
+                vqsArgv.push_back(QString(tr("-map")));
+                vqsArgv.push_back(QString(tr("0:v")));
+                vqsArgv.push_back(QString(tr("-map")));
+                vqsArgv.push_back(QString(tr("[aout]")));
+            }
+            else
+            {
+                vqsArgv.push_back(QString(tr("-ss")));
+                vqsArgv.push_back(QString(tr("%1")).arg((float)m_globalMusicAttr->m_iStartPoint/1000));
+                vqsArgv.push_back(QString(tr("-t")));
+                int iRealDuration = m_globalMusicAttr->m_iEntPoint - m_globalMusicAttr->m_iStartPoint;
+                vqsArgv.push_back(QString(tr("%1")).arg(iRealDuration<m_duration?((float)iRealDuration/1000):(float)(m_duration/1000)));
+                vqsArgv.push_back(QString(tr("-i")));
+                vqsArgv.push_back(m_globalMusicAttr->m_qsAudioFilename);
+            }
+        }
+
+        //./ffmpeg_r.exe -y -i jpg/mp3.512.5.avi -vf ass=jpg/subtitle.ass jpg/subt.mp3.512.5.avi
+        if(!m_qsInText.isEmpty())
+        {
+            vqsArgv.push_back(QString(tr("-vf")));
+            struct to_buffer sintxtbuffer;
+            sintxtbuffer.ptr = (uint8_t*)m_qsInText.data();
+            sintxtbuffer.in_len = m_qsInText.length();
+            sintxtbuffer.out_len = NULL;
+            vqsArgv.push_back(QString(tr("ass=buffer|%1")).arg((size_t)&sintxtbuffer));
+        }
+    }
+    //printf("video input. stbuf: %p buf.ptr: %p in_len: %zu\n", &sinbuffer, sinbuffer.ptr, sinbuffer.in_len);
+
+    uint8_t* out_buffer = m_pOutBuffer;
+    m_outlen = m_outMaxLen;
+
+    struct to_buffer soutbuffer;
+    soutbuffer.ptr = out_buffer;
+    soutbuffer.in_len = m_outMaxLen;
+    soutbuffer.out_len = &m_outlen;
+    vqsArgv.push_back(QString(tr("-f")));
+    vqsArgv.push_back(QString(tr("avi")));
+    vqsArgv.push_back(QString(tr("buffer:video/avi;nobase64,%1")).arg((size_t)&soutbuffer));
+    //vqsArgv.push_back(QString(tr("mm.avi")));
+    //printf("video out. stbuf: %p buf.ptr: %p in_len: %zu out_len: %zu\n", &soutbuffer, soutbuffer.ptr, soutbuffer.in_len, *soutbuffer.out_len);
+    int ret;
+    if((ret=callFfmpeg(vqsArgv)))
+    {
+        QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
+    }
+
+    //5, 播放视频
+    QByteArray tmp=QByteArray((const char*)soutbuffer.ptr, (int)m_outlen);
+    emit readyVideo("tmp.avi", tmp, m_imgPlayPosition);
+    emit changePlayPosition(m_imgPlayPosition);
+    if(bPlay)
+    {
+        emit playVideo();
+    }
+}
+#if 0
+void ElementsEdit::createFinalVideo(bool bPlay)
+{
+    QVector<QString> vqsArgv;
+    vqsArgv.push_back("ffmpeg");
+    vqsArgv.push_back("-y");
+#ifdef DEBUG_FFMPEG
+    vqsArgv.push_back("-v");
+    vqsArgv.push_back("debug");
+#endif
+    //vqsArgv.push_back("-framerate");
+    //vqsArgv.push_back("25"); //uncomplete
+    struct to_buffer sinbuffer;
+    QByteArray sinString;
+    for (int i = 0; i < m_flowLayout->count(); ++i)
+    {
+        Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(i)->widget());
+        if (!element)
+        {
+            // err uncomplete
+            continue;
+        }
+        if(!element->m_fbInputAniVideo.ptr)
+        {
+            // err uncomplete
+            continue;
+        }
+        //snprintf(in_buffer, len, "file buffer:video/avi;nobase64,%zu\n
+        sinString.append(QString(tr("file buffer:video/avi;nobase64,%1\n")).arg((size_t)&element->m_fbInputAniVideo));
+    }
+    sinbuffer.ptr = (uint8_t*)sinString.data();
+    sinbuffer.in_len = sinString.length();
+    sinbuffer.out_len = NULL;
+    vqsArgv.push_back("-f");
+    vqsArgv.push_back("concat"); //uncomplete
     vqsArgv.push_back(QString(tr("-i")));
     vqsArgv.push_back(QString(tr("buffer:video/avi;nobase64,%1")).arg((size_t)&sinbuffer));
     vqsArgv.push_back(QString(tr("-c")));
@@ -586,20 +833,29 @@ void ElementsEdit::createFinalVideoAndPlay(bool bPlay)
     {
         QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
     }
-    //5, 播放视频
-    QByteArray tmp=QByteArray((const char*)soutbuffer.ptr, (int)m_outlen);
-    emit readyVideo("tmp.avi", tmp, m_imgPlayPosition);
-    emit changePlayPosition(m_imgPlayPosition);
+    if(m_globalMusicAttr->m_qsAudioFilename.isEmpty() && m_qsInText.isEmpty())
+    {
+        //5, 播放视频
+        QByteArray tmp=QByteArray((const char*)soutbuffer.ptr, (int)m_outlen);
+        emit readyVideo("tmp.avi", tmp, m_imgPlayPosition);
+        emit changePlayPosition(m_imgPlayPosition);
+    }
+    else
+    {
+        createFinalVideoMusicTxt(false);
+    }
+
     if(bPlay)
     {
         emit playVideo();
     }
 }
+#endif
 void ElementsEdit::mousePressEvent(QMouseEvent *event)
 {
     if(m_isFirstClick)
     {
-        load();
+        addImages();
     }
     QWidget::mousePressEvent(event);
 }
@@ -615,7 +871,7 @@ void ElementsEdit::handleContextMenuRequested(const QPoint &pos)
     QWidget *currWidget = qobject_cast<QWidget *>(sender());
     int idx = m_flowLayout->indexOf(currWidget);
     QString qstring = QString(tr("handleContextMenuRequested index is %1")).arg(idx);
-    load();
+    addImages();
 }
 #endif
 ElementsEdit::~ElementsEdit()
@@ -642,7 +898,33 @@ ElementsEdit::~ElementsEdit()
 void ElementsEdit::durationChanged(qint64 duration)
 {
     m_duration=duration;
-    initialProgress(); //需要在load 图片渲染之后被调用，否则element的长宽不对
+    initialProgress(); //需要在addImages 图片渲染之后被调用，否则element的长宽不对
+}
+//用于加载音乐获取duration
+void ElementsEdit::audioDurationChanged(qint64 duration)
+{
+    if(m_isFirstMusic)
+    {
+        //1, create video
+        m_isFirstMusic = false;
+        m_globalMusicAttr->m_iAudioDuration = duration;
+        m_globalMusicAttr->m_iEntPoint = duration;
+        createFinalVideoMusicTxt(false);
+
+        //2, 显示music文件名和颜色
+        for (int i = 0; m_flowLayout && i < m_flowLayout->count(); ++i)
+        {
+            Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(i)->widget());
+            if (!element)
+            {
+                // err uncomplete
+                continue;
+            }
+        }
+
+        //3, update tabwidget
+        emit activeTabMusicSignal(m_globalMusicAttr);
+    }
 }
 //视频播放时被调用，m_vecticalLine也需要跟着变化
 void ElementsEdit::positionChanged(qint64 position)
