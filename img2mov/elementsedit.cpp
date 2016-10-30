@@ -14,7 +14,7 @@
 extern "C"{
 #include "ffmpeg.h"
 }
-#define DEBUG_FFMPEG
+//#define DEBUG_FFMPEG
 //! [1]
 ElementsEdit::ElementsEdit(QWidget *parent, GlobalContext* globalContext)
     : QWidget(parent)
@@ -118,36 +118,6 @@ int ElementsEdit::callFfmpeg(const QVector<QString>& vqsArgv)
 #endif
     return ret;
 }
-void ElementsEdit::createVideo(Element *element)
-{
-    QVector<QString> vqsArgv;
-    vqsArgv.push_back("ffmpeg");
-    vqsArgv.push_back("-y");
-#ifdef DEBUG_FFMPEG
-    vqsArgv.push_back("-v");
-    vqsArgv.push_back("debug");
-#endif
-    vqsArgv.push_back("-framerate");
-    vqsArgv.push_back(QString(tr("25"))); //uncomplete 
-    vqsArgv.push_back("-loop");
-    vqsArgv.push_back("1");
-    vqsArgv.push_back("-t");
-    vqsArgv.push_back(QString(tr("2"))); //uncomplete 2(s)
-    vqsArgv.push_back("-i");
-    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbInputScaleFile));//uncomplete
-    vqsArgv.push_back(QString(tr("-f")));
-    vqsArgv.push_back(QString(tr("avi")));
-    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbScaleAniVideo));
-    //vqsArgv.push_back(QString(tr("pic%1.avi")).arg(i));
-    int ret;
-    if((ret=callFfmpeg(vqsArgv)))
-    {
-        QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
-    }
-    element->m_fbInputAniVideo.ptr=element->m_fbScaleAniVideo.ptr;
-    element->m_fbInputAniVideo.in_len=*element->m_fbScaleAniVideo.out_len;
-    element->m_fbInputAniVideo.out_len=NULL;
-}
 void ElementsEdit::scaleImage(Element *element)
 {
     //./ffmpeg -y -i 'jpg/img001.jpg' -vf scale=512:384 jpg/512img001.jpg
@@ -223,7 +193,7 @@ void ElementsEdit::addImages()
         //or ffmpeg
         scaleImage(element);
         //3, 图片视频
-        createVideo(element);
+        createSimpleVideo(element);
     }
     //4, 生成总视频
     //./ffmpeg_gr -y -f avi -i jpg/mi2.avi -f avi -i jpg/mm.avi -f avi jpg/all.avi
@@ -475,89 +445,50 @@ void ElementsEdit::updatedText(const QString& qsAss)
 void ElementsEdit::elementAttrChanged(bool bPlay)
 {
     //1, 生成单独的视频
+    if(m_idxCurrentElement >= 1)
+    {
+    }
+    else
+    {
+    }
+
     //2, 合成声音、文字
     createFinalVideo(bPlay);
 }
 void ElementsEdit::selectedTransition(const QString& animation)
 {
+#if 1
+    currentElement()->globalAnimationAttr()->m_qsTransitionName = animation;
+    createSingleVideo(m_idxCurrentElement);
+#else
     if(m_idxCurrentElement >= 1)
     {
         Element *firstElement = qobject_cast<Element *>(m_flowLayout->itemAt(m_idxCurrentElement-1)->widget());
         Element *secondElement = qobject_cast<Element *>(m_flowLayout->itemAt(m_idxCurrentElement)->widget());
-        if (firstElement && secondElement)
+        if (firstElement && secondElement && secondElement->globalAnimationAttr()
+                && animation.compare(secondElement->globalAnimationAttr()->m_qsTransitionName)!=0 )
         {
-            if(!createAnimation(firstElement, secondElement ,animation))
+            if(createAnimation(firstElement, secondElement ,animation))
+            {
+                secondElement->globalAnimationAttr()->m_qsTransitionName = animation;
+            }
+            else
             {
                 // uncomplete
                 return;
             }
         }
+        else
+        {
+            // uncomplete
+            return;
+        }
         //4, 生成总视频
         createFinalVideo(true);
     }
-}
-bool ElementsEdit::createAnimation(Element *firstElement, Element *secondElement
-        , const QString& animationName)
-{
-    //const QString& firstImageName = firstElement->getImageName();
-    //const QString& secondImageName = secondElement->getImageName();
-    //char **charlist;
-    int iSecond=2;
-    QVector<QString> vqsArgv;
-    // blend="  crossfade";gdb --args ./ffmpeg_g   -y -framerate 25 -loop 1  -t 2 -i jpg/512img001.jpg -loop 1  -t 2 -i jpg/512img003.jpg     -filter_complex "blend=all_expr='if( $blend,1.5,2)'"    -pix_fmt yuv420p   jpg/mi.avi
-    vqsArgv.push_back("ffmpeg");
-    vqsArgv.push_back("-y");
-#ifdef DEBUG_FFMPEG
-    vqsArgv.push_back("-v");
-    vqsArgv.push_back("debug");
 #endif
-    vqsArgv.push_back("-framerate");
-    vqsArgv.push_back("25");
-    vqsArgv.push_back("-loop");
-    vqsArgv.push_back("1");
-    vqsArgv.push_back("-t");
-    vqsArgv.push_back(QString(tr("%1")).arg(iSecond));
-    vqsArgv.push_back("-i");
-    //vqsArgv.push_back(firstImageName);
-    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&firstElement->m_fbInputScaleFile));//uncomplete
-    vqsArgv.push_back("-loop");
-    vqsArgv.push_back("1");
-    vqsArgv.push_back("-t");
-    vqsArgv.push_back(QString(tr("%1")).arg(iSecond));
-    vqsArgv.push_back("-i");
-    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&secondElement->m_fbInputScaleFile));//uncomplete
-    //vqsArgv.push_back(secondImageName);
-    //ffmpeg -y -framerate 25 -loop 1 -t 1 -i img001.jpg -loop 1 -t 1 -i img002.jpg -filter_complex "blend=all_expr='if(gte(N*SW*50+X,W),B,A)'" -pix_fmt yuv420p  out.mkv
-    vqsArgv.push_back("-filter_complex");
-    //vqsArgv.push_back("blend=all_expr='if(gte(N*SW*50+X,W),B,A)'");
-    vqsArgv.push_back(QString(tr("blend=all_expr='if(%1,1.5,%2)'")).arg(animationName).arg(iSecond));
-    vqsArgv.push_back("-pix_fmt");
-    vqsArgv.push_back("yuv420p");
-#if 0
-    QString vfileName("C:\\qtproject\\img2mov\\debug\\transition.avi");
-    vqsArgv.push_back(vfileName);
-#else
-    vqsArgv.push_back(QString(tr("-f")));
-    vqsArgv.push_back(QString(tr("avi")));
-    secondElement->m_fbScaleAniVideo.in_len = 10*1024*1024;
-    *secondElement->m_fbScaleAniVideo.out_len = 10*1024*1024;
-    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&secondElement->m_fbScaleAniVideo));
-#endif
-    // -y -framerate 1 -i "C:\QtProjects\qtmovie\jpg\img%3d.jpg" myoutput.avi
-    //QTime startTime = QTime::currentTime();
-    int ret;
-    if((ret=callFfmpeg(vqsArgv)))
-    {
-        QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
-    }
-    secondElement->m_fbInputAniVideo.ptr=secondElement->m_fbScaleAniVideo.ptr;
-    secondElement->m_fbInputAniVideo.in_len=*secondElement->m_fbScaleAniVideo.out_len;
-    secondElement->m_fbInputAniVideo.out_len=NULL;
-    //int dt = startTime.msecsTo(QTime::currentTime());
-    //qDebug()<< "ffmpeg waste: " << dt;
-    //QMessageBox::information(this, "info", QString(tr("ffmpeg waste: %1")).arg(dt));
-    //emit playVideo(vfileName);
-    return true;
+    //4, 生成总视频
+    createFinalVideo(true);
 }
 void ElementsEdit::createFinalVideoMusicTxt(bool bPlay)
 {
@@ -678,8 +609,19 @@ void ElementsEdit::createFinalVideo(bool bPlay)
             // err uncomplete
             continue;
         }
+        if(element->m_fbInputTransitionVideo.ptr)
+        {
+            sinString.append(QString(tr("file buffer:video/avi;nobase64,%1\n")).arg((size_t)&element->m_fbInputTransitionVideo));
+        }
+        else if(element->m_fbInputPanzoomVideo.ptr)
+        {
+            sinString.append(QString(tr("file buffer:video/avi;nobase64,%1\n")).arg((size_t)&element->m_fbInputPanzoomVideo));
+        }
+        else
+        {
         //snprintf(in_buffer, len, "file buffer:video/avi;nobase64,%zu\n
-        sinString.append(QString(tr("file buffer:video/avi;nobase64,%1\n")).arg((size_t)&element->m_fbInputAniVideo));
+            sinString.append(QString(tr("file buffer:video/avi;nobase64,%1\n")).arg((size_t)&element->m_fbInputAniVideo));
+        }
     }
     sinbuffer.ptr = (uint8_t*)sinString.data();
     sinbuffer.in_len = sinString.length();
@@ -1002,4 +944,245 @@ QByteArray ElementsEdit::createAss(stTextAttr* stTextAttr, const QString& qsText
 ";Dialogue: 0,     0:00:01.01, 0:00:01.99, Default,    , 0,       0,       0,             , Go kill something.\n"
 );
     return qs;
+}
+void ElementsEdit::createSingleVideo(int idxElement)
+{
+    if(idxElement<0)
+    {
+        //error uncomplete 
+        return;
+    }
+    Element *secondElement = qobject_cast<Element *>(m_flowLayout->itemAt(idxElement)->widget());
+    if(!secondElement)
+    {
+        //error uncomplete 
+        return;
+    }
+
+    //transition, transition&zoom
+    GlobalAnimationAttr * globalAnimationAttr = secondElement->globalAnimationAttr();
+    GlobalVideoAttr* globalVideoAttr = secondElement->globalVideoAttr();
+    QString duration = QString::number((float)globalVideoAttr->m_iDuration/1000, 'f', 2);
+    if(idxElement >= 1 && globalAnimationAttr && !globalAnimationAttr->m_qsTransitionName.isEmpty())
+    {
+        Element *firstElement = qobject_cast<Element *>(m_flowLayout->itemAt(m_idxCurrentElement-1)->widget());
+        if(firstElement)
+        {
+            if(globalAnimationAttr->m_qsPanZoom.isEmpty())
+            {
+                //./ffmpeg_r.exe -y -i jpg/512.3.avi -i jpg/512.2.avi -filter_complex     "blend=all_expr='if(crossfade,1.5,2)'"  jpg/transition.avi
+                createPanzoomVideo(secondElement,globalVideoAttr->m_iFramerate, duration,globalAnimationAttr->m_qsPanZoom);
+            }
+            else
+            {
+            // pan & zoom
+                //./ffmpeg_r.exe -y  -framerate 24 -i jpg/512img003.jpg -vf "zoompan=z='zoom+0.001':s=512x384"  -t 2 jpg/zoom.512.3.avi;
+                //./ffmpeg_r.exe -y -i jpg/zoom.512.3.avi -i jpg/zoom.512.2.avi -filter_complex     "blend=all_expr='if(crossfade,1.5,2)'"  jpg/transition_zoom.avi
+                createAnimationPanzoom(firstElement, secondElement);
+            }
+        }
+        else
+        {
+            //error uncomplete 
+            return;
+        }
+    }
+    else if(!globalAnimationAttr->m_qsPanZoom.isEmpty())
+    {
+        //./ffmpeg_r.exe -y  -framerate 24 -i jpg/512img003.jpg -vf "zoompan=z='zoom+0.001':s=512x384"  -t 2 jpg/zoom.512.3.avi;
+        createPanzoomVideo(secondElement, globalVideoAttr->m_iFramerate, duration, globalAnimationAttr->m_qsPanZoom);
+    }
+    else
+    {
+        //./ffmpeg_r.exe -y  -framerate 24 -loop 1 -t 2 -i jpg/512img003.jpg -f avi jpg/loop.512.3.avi;
+        createSimpleVideo(secondElement);
+    }
+}
+void ElementsEdit::createSimpleVideo(Element *element)
+{
+    GlobalVideoAttr* globalVideoAttr = element->globalVideoAttr();
+    QString duration = QString::number((float)globalVideoAttr->m_iDuration/1000, 'f', 2);
+
+    QVector<QString> vqsArgv;
+    vqsArgv.push_back("ffmpeg");
+    vqsArgv.push_back("-y");
+#ifdef DEBUG_FFMPEG
+    vqsArgv.push_back("-v");
+    vqsArgv.push_back("debug");
+#endif
+    vqsArgv.push_back("-framerate");
+    vqsArgv.push_back(QString(tr("%1")).arg(globalVideoAttr->m_iFramerate));
+    vqsArgv.push_back("-loop");
+    vqsArgv.push_back("1");
+    vqsArgv.push_back("-t");
+    vqsArgv.push_back(QString(tr("%1")).arg(duration));
+    vqsArgv.push_back("-i");
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbInputScaleFile));//uncomplete
+    vqsArgv.push_back(QString(tr("-f")));
+    vqsArgv.push_back(QString(tr("avi")));
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbScaleAniVideo));
+    //vqsArgv.push_back(QString(tr("pic%1.avi")).arg(i));
+    int ret;
+    if((ret=callFfmpeg(vqsArgv)))
+    {
+        QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
+    }
+    element->m_fbInputAniVideo.ptr=element->m_fbScaleAniVideo.ptr;
+    element->m_fbInputAniVideo.in_len=*element->m_fbScaleAniVideo.out_len;
+    element->m_fbInputAniVideo.out_len=NULL;
+}
+#if 0
+bool ElementsEdit::createAnimation(Element *firstElement, Element *secondElement
+        , const QString& animationName)
+#else
+bool ElementsEdit::createAnimation(Element *firstElement, Element *secondElement, bool isFromPanzoom)
+#endif
+{
+    qDebug()<< "createAnimation";
+    //const QString& firstImageName = firstElement->getImageName();
+    //const QString& secondImageName = secondElement->getImageName();
+    //char **charlist;
+    GlobalVideoAttr* globalVideoAttr = secondElement->globalVideoAttr();
+    GlobalAnimationAttr* globalAnimationAttr = secondElement->globalAnimationAttr();
+    QString duration = QString::number((float)globalVideoAttr->m_iDuration/1000, 'f', 2);
+    QString animationDuration = QString::number((float)globalAnimationAttr->m_iTransitionDuration/1000, 'f', 2);
+
+    QVector<QString> vqsArgv;
+    // blend="  crossfade";gdb --args ./ffmpeg_g   -y -framerate 25 -loop 1  -t 2 -i jpg/512img001.jpg -loop 1  -t 2 -i jpg/512img003.jpg     -filter_complex "blend=all_expr='if( $blend,1.5,2)'"    -pix_fmt yuv420p   jpg/mi.avi
+    vqsArgv.push_back("ffmpeg");
+    vqsArgv.push_back("-y");
+#ifdef DEBUG_FFMPEG
+    vqsArgv.push_back("-v");
+    vqsArgv.push_back("debug");
+#endif
+
+#if 0
+    vqsArgv.push_back("-framerate");
+    vqsArgv.push_back(QString(tr("%1")).arg(globalVideoAttr->m_iFramerate));
+    vqsArgv.push_back("-loop");
+    vqsArgv.push_back("1");
+    vqsArgv.push_back("-t");
+    vqsArgv.push_back(QString(tr("%1")).arg(duration));
+    vqsArgv.push_back("-i");
+    //vqsArgv.push_back(firstImageName);
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&firstElement->m_fbInputScaleFile));//uncomplete
+#endif
+    vqsArgv.push_back("-i");
+    if(isFromPanzoom)
+    {
+        vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&firstElement->m_fbInputPanzoomVideo));
+    }
+    else
+    {
+        vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&firstElement->m_fbInputAniVideo));
+    }
+
+#if 0
+    vqsArgv.push_back("-loop");
+    vqsArgv.push_back("1");
+    vqsArgv.push_back("-t");
+    vqsArgv.push_back(QString(tr("%1")).arg(duration));
+    vqsArgv.push_back("-i");
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&secondElement->m_fbInputScaleFile));//uncomplete
+#endif
+    vqsArgv.push_back("-i");
+    if(isFromPanzoom)
+    {
+        vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&secondElement->m_fbInputPanzoomVideo));
+    }
+    else
+    {
+        vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&secondElement->m_fbInputAniVideo));
+    }
+    //vqsArgv.push_back(secondImageName);
+    //ffmpeg -y -framerate 25 -loop 1 -t 1 -i img001.jpg -loop 1 -t 1 -i img002.jpg -filter_complex "blend=all_expr='if(gte(N*SW*50+X,W),B,A)'" -pix_fmt yuv420p  out.mkv
+    vqsArgv.push_back("-filter_complex");
+    //vqsArgv.push_back("blend=all_expr='if(gte(N*SW*50+X,W),B,A)'");
+    vqsArgv.push_back(QString(tr("blend=all_expr='if(%1,%2,%3)'")).arg(globalAnimationAttr->m_qsTransitionName).arg(animationDuration).arg(duration));
+    vqsArgv.push_back("-pix_fmt");
+    vqsArgv.push_back("yuv420p");
+#if 0
+    QString vfileName("C:\\qtproject\\img2mov\\debug\\transition.avi");
+    vqsArgv.push_back(vfileName);
+#else
+    vqsArgv.push_back(QString(tr("-f")));
+    vqsArgv.push_back(QString(tr("avi")));
+#if 0
+    secondElement->m_fbScaleAniVideo.in_len = 10*1024*1024;
+    *secondElement->m_fbScaleAniVideo.out_len = 10*1024*1024;
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&secondElement->m_fbScaleAniVideo));
+#endif
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&secondElement->m_fbTransitionVideo));
+#endif
+    // -y -framerate 1 -i "C:\QtProjects\qtmovie\jpg\img%3d.jpg" myoutput.avi
+    //QTime startTime = QTime::currentTime();
+    int ret;
+    if((ret=callFfmpeg(vqsArgv)))
+    {
+        QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
+    }
+#if 0
+    secondElement->m_fbInputAniVideo.ptr=secondElement->m_fbScaleAniVideo.ptr;
+    secondElement->m_fbInputAniVideo.in_len=*secondElement->m_fbScaleAniVideo.out_len;
+    secondElement->m_fbInputAniVideo.out_len=NULL;
+#endif
+    secondElement->m_fbInputTransitionVideo.ptr=secondElement->m_fbTransitionVideo.ptr;
+    secondElement->m_fbInputTransitionVideo.in_len=*secondElement->m_fbTransitionVideo.out_len;
+    secondElement->m_fbInputTransitionVideo.out_len=NULL;
+    //int dt = startTime.msecsTo(QTime::currentTime());
+    //qDebug()<< "ffmpeg waste: " << dt;
+    //QMessageBox::information(this, "info", QString(tr("ffmpeg waste: %1")).arg(dt));
+    //emit playVideo(vfileName);
+    return true;
+}
+void ElementsEdit::createPanzoomVideo(Element *element, int framerate, const QString& duration, const QString& panzoom)
+{
+
+    qDebug()<< "createPanzoomVideo";
+    QVector<QString> vqsArgv;
+    vqsArgv.push_back("ffmpeg");
+    vqsArgv.push_back("-y");
+#ifdef DEBUG_FFMPEG
+    vqsArgv.push_back("-v");
+    vqsArgv.push_back("debug");
+#endif
+    vqsArgv.push_back("-framerate");
+    vqsArgv.push_back(QString(tr("%1")).arg(framerate));
+    vqsArgv.push_back("-i");
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbInputScaleFile));
+    //-vf "zoompan=z='zoom+0.001':s=512x384" -t 2
+    vqsArgv.push_back(QString(tr("-vf")));
+    vqsArgv.push_back(QString(tr("%1")).arg(panzoom));
+    vqsArgv.push_back(QString(tr("-t")));
+    vqsArgv.push_back(QString(tr("%1")).arg(duration));
+    vqsArgv.push_back(QString(tr("-f")));
+    vqsArgv.push_back(QString(tr("avi")));
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbPanzoomVideo));
+    //vqsArgv.push_back(QString(tr("pic%1.avi")).arg(i));
+    int ret;
+    if((ret=callFfmpeg(vqsArgv)))
+    {
+        QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
+    }
+    element->m_fbInputPanzoomVideo.ptr=element->m_fbPanzoomVideo.ptr;
+    element->m_fbInputPanzoomVideo.in_len=*element->m_fbPanzoomVideo.out_len;
+    element->m_fbInputPanzoomVideo.out_len=NULL;
+}
+// pan & zoom
+//./ffmpeg_r.exe -y  -framerate 24 -i jpg/512img003.jpg -vf "zoompan=z='zoom+0.001':s=512x384"  -t 2 jpg/zoom.512.3.avi;
+//./ffmpeg_r.exe -y -i jpg/zoom.512.3.avi -i jpg/zoom.512.2.avi -filter_complex     "blend=all_expr='if(crossfade,1.5,2)'"  jpg/transition_zoom.avi
+bool ElementsEdit::createAnimationPanzoom(Element *firstElement, Element *secondElement)
+{
+    qDebug()<< "createAnimationPanzoom";
+    GlobalVideoAttr* globalVideoAttr = secondElement->globalVideoAttr();
+    GlobalAnimationAttr* globalAnimationAttr = secondElement->globalAnimationAttr();
+    QString duration = QString::number((float)globalVideoAttr->m_iDuration/1000, 'f', 2);
+    //float animationDuration = QString::number((float)globalAnimationAttr->m_iTransitionDuration/1000, 'f', 2);
+
+    createPanzoomVideo(firstElement, globalVideoAttr->m_iFramerate, duration, globalAnimationAttr->m_qsPanZoom);
+    createPanzoomVideo(secondElement, globalVideoAttr->m_iFramerate, duration, globalAnimationAttr->m_qsPanZoom);
+
+    createAnimation(firstElement, secondElement, true);
+
+    return true;
 }

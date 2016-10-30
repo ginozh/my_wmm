@@ -66,6 +66,8 @@ public slots:
     void textColorChanged();
     void handleFontChange();
     void handleVideoAttrChange();
+signals:
+    void elementAttrChanged(bool);
 private slots:
     void currentChanged(int index);
 private:

@@ -29,9 +29,13 @@ private:
     void createFinalVideo(bool bPlay);
     void createFinalVideoMusicTxt(bool bPlay);
     void scaleImage(Element *element);
-    void createVideo(Element *element);
-    bool createAnimation(Element *firstElement, Element *secondElement
-            , const QString& animationName);
+    void createSingleVideo(int idxElement);
+    void createSimpleVideo(Element *element);
+    void createPanzoomVideo(Element *element, int framerate, const QString& duration, const QString& panzoom);
+    /*bool createAnimation(Element *firstElement, Element *secondElement
+            , const QString& animationName);*/
+    bool createAnimation(Element *firstElement, Element *secondElement, bool isFromPanzoom);
+    bool createAnimationPanzoom(Element *firstElement, Element *secondElement);
     void initialProgress();
     void assignProgress();
     //QString createAss(stTextAttr* stTextAttr, const QString&);

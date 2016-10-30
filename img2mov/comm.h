@@ -55,6 +55,22 @@ public:
 }stTextAttr;
 
 //new in element.cpp
+class GlobalAnimationAttr
+{
+public:
+    GlobalAnimationAttr()
+    {
+        m_iTransitionDuration = 1500; //毫秒
+        m_qsPanZoom = "zoompan=z='zoom+0.001':s=512x384"; //for test
+    }
+    ~GlobalAnimationAttr(){}
+public:
+    QString m_qsTransitionName;
+    int m_iTransitionDuration;
+    QString m_qsPanZoom;
+};
+
+//new in element.cpp
 class GlobalVideoAttr
 {
 public:
@@ -62,10 +78,12 @@ public:
     {
         //毫秒
         m_iDuration = 2000;
+        m_iFramerate = 24;
     }
     ~GlobalVideoAttr(){}
 public:
     int m_iDuration;
+    int m_iFramerate;
 };
 
 //new in elementsedit.cpp

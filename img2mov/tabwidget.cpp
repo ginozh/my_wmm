@@ -53,6 +53,7 @@ TabWidget::TabWidget(QWidget *parent, GlobalContext* globalContext)
     setMaximumHeight(m_iconSize.height() + 120);
 
     connect(this, SIGNAL(currentChanged(int)), this, SLOT(currentChanged(int)));
+    connect(this, SIGNAL(elementAttrChanged(bool)), (const QObject*)m_globalContext->m_elementsEdit, SLOT(elementAttrChanged(bool)));
 }
 void TabWidget::assignVideoInfo()
 {
@@ -111,6 +112,7 @@ void TabWidget::handleVideoAttrChange()
     if(isChange)
     {
         // 通知
+        emit elementAttrChanged(false);
     }
 }
 

@@ -29,6 +29,7 @@ public:
     void unselectedImage(){if(m_pimage){m_pimage->unselectedImage();}}
     void doSelectImage(){if(m_pimage){m_pimage->doSelectImage();}}
     GlobalVideoAttr* globalVideoAttr(){return m_globalVideoAttr;}
+    GlobalAnimationAttr* globalAnimationAttr(){return m_globalAnimationAttr;}
 signals:
     void insertImage();
     void selectedImageSignal();
@@ -42,16 +43,27 @@ private:
     Image *m_pimage;
     QString m_qsImageName; //图片路径
 public: // uncomplete
-    FfmpegBuffer m_fbOriFile; // 原始文件(图片、视频)
+    FfmpegBuffer m_fbOriFile;        // 原始文件(图片、视频)
     QByteArray   m_baOriFile;
-    FfmpegBuffer m_fbScaleFile; // 缩放(像素缩小)文件
-    FfmpegBuffer m_fbInputScaleFile; // 缩放(像素缩小)文件
-    FfmpegBuffer m_fbScaleAniVideo; // 缩放后的动画视频
-    FfmpegBuffer m_fbInputAniVideo; // 缩放后的动画视频
+    FfmpegBuffer m_fbScaleFile;      //保存缩放(像素缩小)后文件内容
+    FfmpegBuffer m_fbInputScaleFile; //指向缩放(像素缩小)后文件内容,作为下一级的输入(例如生成视频)
     uint8_t* m_pBufferScaleFile;
     size_t m_iOutScaleFile; 
+
+    FfmpegBuffer m_fbScaleAniVideo;  // 保存缩小后的视频内容
+    FfmpegBuffer m_fbInputAniVideo;  // 指向缩小后的视频内容，作为下一级的输入(例如生成特效视频)
     uint8_t* m_pBufferVideo;
-    size_t m_iOutVidow; 
+    size_t m_iOutVideo; 
+
+    FfmpegBuffer m_fbPanzoomVideo;       // 保存视频内容
+    FfmpegBuffer m_fbInputPanzoomVideo;  // 指向视频内容，作为下一级的输入(例如生成特效视频)
+    uint8_t* m_pBufferPanzoomVideo;
+    size_t m_iOutPanzoomVideo; 
+
+    FfmpegBuffer m_fbTransitionVideo;  // 保存视频内容
+    FfmpegBuffer m_fbInputTransitionVideo;  // 指向视频内容，作为下一级的输入(例如生成特效视频)
+    uint8_t* m_pBufferTransitionVideo;
+    size_t m_iOutTransitionVideo; 
 
     QPushButton* m_pushBtn;
     MusicLabel* m_musicLabel;
@@ -59,6 +71,13 @@ public: // uncomplete
 
     //video attr
     GlobalVideoAttr* m_globalVideoAttr;
+
+    //animation attr
+    GlobalAnimationAttr* m_globalAnimationAttr;
+    
+    //text attr
+    
+    //visual effects attr
 };
 //! [0]
 
