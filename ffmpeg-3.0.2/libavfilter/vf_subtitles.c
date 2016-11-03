@@ -250,16 +250,16 @@ static av_cold int init_ass(AVFilterContext *ctx)
         data = ass->filename + prelen;
 
         sbuffer = (struct to_buffer*)atol(data);
-#if 0
-        av_log(ctx, AV_LOG_DEBUG,
+#if 1
+        av_log(ctx, AV_LOG_INFO,
                 "init_ass in_len: %d buffer: %s\n", sbuffer->in_len, (char*)sbuffer->ptr);
-        av_log(NULL, AV_LOG_DEBUG, "start\n");
+        av_log(NULL, AV_LOG_INFO, "start\n");
         for(int i=0; i<sbuffer->in_len; i++)
         {
-            av_log(NULL, AV_LOG_DEBUG,
+            av_log(NULL, AV_LOG_INFO,
                     "i:%d %c", i, (char)sbuffer->ptr[i]);
         }
-        av_log(NULL, AV_LOG_DEBUG, "\nend\n");
+        av_log(NULL, AV_LOG_INFO, "\nend\n");
 #endif
         ass->track = ass_read_memory(ass->library, sbuffer->ptr, sbuffer->in_len, NULL);
     }

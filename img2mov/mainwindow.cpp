@@ -84,9 +84,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_globalContext->m_elementsEdit, SIGNAL(playVideo()), m_globalContext->m_player, SLOT(play()));
 
     //创建videotext
-    connect(m_globalContext->m_elementsEdit, SIGNAL(createTextSignal(void*)), m_globalContext->m_scene, SLOT(createText(void*)));
+    //connect(m_globalContext->m_elementsEdit, SIGNAL(createVideoTextSignal(void*)), m_globalContext->m_scene, SLOT(createVideoText(void*)));
+    connect(m_globalContext->m_elementsEdit, SIGNAL(createVideoTextSignal(Element*)), m_globalContext->m_scene, SLOT(createVideoText(Element*)));
     //显示/隐藏videotext
-    connect(m_globalContext->m_elementsEdit, SIGNAL(displayTextSignal(void*, bool /*display*/)), m_globalContext->m_scene, SLOT(displayVideoText(void*, bool)));
+    connect(m_globalContext->m_elementsEdit, SIGNAL(displayVideoTextSignal(void*, bool /*display*/)), m_globalContext->m_scene, SLOT(displayVideoText(void*, bool)));
     //激活videotext
     connect(m_globalContext->m_elementsEdit, SIGNAL(activeVideoTextSignal(void*, const QString&)), m_globalContext->m_scene, SLOT(activeVideoText(void*, const QString&)));
     //更新videotext，生成2个视频：一个包含文字视频、一个未包含文字视频。

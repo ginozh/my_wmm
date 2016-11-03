@@ -173,7 +173,8 @@ void ElementsEdit::addImages()
     for (int i = 0; i < files.count(); ++i) {
         // 1, 读取文件，生成image
         Element *element=new Element(this, files[i], m_globalContext->m_scene);
-        emit createTextSignal((void*)element); 
+        //emit createVideoTextSignal((void*)element); 
+        emit createVideoTextSignal(element); 
         m_flowLayout->insertWidget(idx, element);
         QFileInfo fi(files[i]);
         QString ext = fi.suffix();  // ext = "gz"
@@ -213,7 +214,7 @@ void ElementsEdit::addImages()
         m_idxCurrentElement = 0;
         m_lastSelectedElement = qobject_cast<QWidget *>(m_flowLayout->itemAt(m_idxCurrentElement)->widget());
         (qobject_cast<Element *>(m_lastSelectedElement))->doSelectImage();
-        emit displayTextSignal((void*)m_lastSelectedElement, true);
+        emit displayVideoTextSignal((void*)m_lastSelectedElement, true);
     }
 
 
@@ -297,6 +298,16 @@ void ElementsEdit::addMusic()
     emit changePlayPosition(m_imgPlayPosition);
 #endif
 }
+void ElementsEdit::addText()
+{
+    Element* element = currentElement();
+    if(!element)
+    {
+        //uncomplete
+        return;
+    }
+    element->lineEdit()->addTextByTabCaption();
+}
 void ElementsEdit::selectedText(const QString& oritxt)
 {
     //只能先选定image，才能对text操作
@@ -362,12 +373,12 @@ void ElementsEdit::selectedImage()
         {
             (qobject_cast<Element *>(m_lastSelectedElement))->unselectedImage();
             //移除上一次的VideoText的显示
-            emit displayTextSignal((void*)m_lastSelectedElement, false);
+            emit displayVideoTextSignal((void*)m_lastSelectedElement, false);
         }
     }
     // 3, 显示本次VideoText
     m_lastSelectedElement=send;
-    emit displayTextSignal((void*)send, true);
+    emit displayVideoTextSignal((void*)send, true);
     // 4, 激活对应tabTextTool
     //emit activeTabTextSignal((void*)send);
 }

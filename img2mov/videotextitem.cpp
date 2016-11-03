@@ -9,8 +9,8 @@
 #include <QDebug>
 
 //! [0]
-GraphicsTextItem::GraphicsTextItem(QGraphicsItem *parent)
-    : QGraphicsTextItem(parent)
+GraphicsTextItem::GraphicsTextItem(QGraphicsScene *scene)
+    : QGraphicsTextItem()
     ,m_width(100),m_height(100),m_margin(8)
 {
     setFlag(QGraphicsItem::ItemIsMovable);
@@ -19,7 +19,8 @@ GraphicsTextItem::GraphicsTextItem(QGraphicsItem *parent)
     setAcceptDrops(true);
     setAcceptHoverEvents(true);
 
-    m_stTextAttr = 0;
+    //m_stTextAttr = 0;
+    m_globalTextAttr = 0;
 
     m_changed = false;
 
@@ -44,15 +45,20 @@ GraphicsTextItem::GraphicsTextItem(QGraphicsItem *parent)
     //setTextWidth(tdocument->idealWidth());
     ////setTextWidth(400);
 
+    setTextInteractionFlags(Qt::TextEditorInteraction);
+    setZValue(1000.0);
+    setPos(scene->width()/2,scene->height()*3/5); 
 
 	createGraphicsRectItem();
 }
+#if 0
 void GraphicsTextItem::setTextAttr(stTextAttr* stTextAttr)
 {
     m_stTextAttr=stTextAttr;
 
     if(m_stTextAttr)
     {
+        m_changed = true;
         setFont(m_stTextAttr->m_qfont);
         setDefaultTextColor(m_stTextAttr->m_fontColor);
 
@@ -61,6 +67,26 @@ void GraphicsTextItem::setTextAttr(stTextAttr* stTextAttr)
         if(m_stTextAttr->m_textAlign>=0)
         {
             option.setAlignment((Qt::AlignmentFlag)m_stTextAttr->m_textAlign);
+        }
+        tdocument->setDefaultTextOption(option);
+    }
+}
+#endif
+void GraphicsTextItem::setTextAttr(GlobalTextAttr* globalTextAttr)
+{
+    m_globalTextAttr=globalTextAttr;
+
+    if(m_globalTextAttr)
+    {
+        m_changed = true;
+        setFont(m_globalTextAttr->m_qfont);
+        setDefaultTextColor(m_globalTextAttr->m_fontColor);
+
+        QTextDocument *tdocument =  document();
+        QTextOption option = tdocument->defaultTextOption();
+        if(m_globalTextAttr->m_textAlign>=0)
+        {
+            option.setAlignment((Qt::AlignmentFlag)m_globalTextAttr->m_textAlign);
         }
         tdocument->setDefaultTextOption(option);
     }
@@ -449,12 +475,12 @@ void GraphicsTextItem::createGraphicsRectItem()
 #if 1
 void GraphicsTextItem::createAssInfo()
 {
-    if(m_stTextAttr)
+    if(m_globalTextAttr)
     {
-        QMessageBox::information(NULL, "info", QString(tr("GraphicsTextItem::createAssInfo. rgb: %1")).arg(m_stTextAttr->m_fontColor.name()));
+        //QMessageBox::information(NULL, "info", QString(tr("GraphicsTextItem::createAssInfo. rgb: %1")).arg(m_globalTextAttr->m_fontColor.name()));
         int iAlignment=8;
         int iMarginL=10, iMarginR=10, iMarginV=10;
-        switch((Qt::AlignmentFlag)m_stTextAttr->m_textAlign)
+        switch((Qt::AlignmentFlag)m_globalTextAttr->m_textAlign)
         {
             case Qt::AlignLeft:
                 iAlignment=7;
@@ -474,22 +500,27 @@ void GraphicsTextItem::createAssInfo()
             default:
                 break;
         }
+        QFontMetrics fm(m_globalTextAttr->m_qfont);
         //"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour,
         //Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline,
         //Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding\n"
-        m_stTextAttr->m_qsStyle = QString(tr(
+        m_globalTextAttr->m_qsStyle = QString(tr(
+        "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour,"
+        "Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline,"
+        "Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding\n"
         "Style: %1,      %2,       %3,       &Hffffff,      &Hffffff,        &H0,           &H0,       "
         "%4,    %5,      %6,         0,         100,    100,    0,       0,     1,           1,      "
         " 0,      %7,          %8,     %9,     %10,      0,          0\n")).
-            //arg((int)this).arg(m_stTextAttr->m_qfont.family()).arg(m_stTextAttr->m_qfont.pointSize()).
-            arg((int)this).arg(m_stTextAttr->m_qfont.family()).arg(m_stTextAttr->m_qfont.pixelSize()).
-            arg(m_stTextAttr->m_qfont.weight()==QFont::Bold?1:0).arg(m_stTextAttr->m_qfont.italic()?1:0).
-            arg(m_stTextAttr->m_qfont.underline()?1:0 ).arg(iAlignment).arg(iMarginL).arg(iMarginR).
+            //arg((int)this).arg(m_globalTextAttr->m_qfont.family()).arg(m_globalTextAttr->m_qfont.pointSize()).
+            //arg((int)this).arg(m_globalTextAttr->m_qfont.family()).arg(m_globalTextAttr->m_qfont.pixelSize()).
+            arg((int)this).arg(m_globalTextAttr->m_qfont.family()).arg(fm.height()).
+            arg(m_globalTextAttr->m_qfont.weight()==QFont::Bold?1:0).arg(m_globalTextAttr->m_qfont.italic()?1:0).
+            arg(m_globalTextAttr->m_qfont.underline()?1:0 ).arg(iAlignment).arg(iMarginL).arg(iMarginR).
             arg(iMarginV);
 
         document()->lineCount();
         //Format:   Layer, Start,      End,        Style,  Name, MarginL, MarginR, MarginV, Effect, Text
-        m_stTextAttr->m_qsEvent = QString(tr(
+        m_globalTextAttr->m_qsEvent = QString(tr(
         "Dialogue:  0,     0:00:00.00, 0:00:01.94, %1,         , 0,       0,       0,           , {\\q2}%2")).
             arg((int)this).arg(toPlainText());
     }

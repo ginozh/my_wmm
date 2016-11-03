@@ -175,7 +175,7 @@ void TabWidget::createTabHome()
                     //addCaption->setMaximumHeight(m_iconSize.height() + 250);
                     //addCaption->setMinimumWidth(m_iconSize.width() + 100);
                     //addCaption->setMinimumWidth(addCaption->text().length());
-                    //connect(addCaption, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(addImages()));
+                    connect(addCaption, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(addText()));
 
                 }
                 {
@@ -1048,6 +1048,28 @@ void TabWidget::activeTabVideo(void* element, GlobalVideoAttr* globalVideoAttr)
     m_element = element;
     setCurrentWidget(m_tabVideo);
 }
+void TabWidget::activeTabText(void* velement)
+{
+    setCurrentWidget(m_tabText);
+    Element* element = m_globalContext->m_elementsEdit->currentElement();
+    if(m_globalContext && ((void*)element==velement))
+    {
+        GlobalTextAttr* globalTextAttr = element->globalTextAttr();
+        if(globalTextAttr)
+        {
+            assignTabWidget(globalTextAttr);
+        }
+        else
+        {
+            //uncomplete
+        }
+    }
+    else
+    {
+        //uncomplete
+    }
+}
+#if 0
 void TabWidget::activeTabText(void* element)
 {
     m_element = element;
@@ -1066,6 +1088,7 @@ void TabWidget::activeTabText(void* element)
     //赋值. 将element对应的保存的text值填充到各个控件中
     assignTabWidget(textItem);
 }
+#endif
 void TabWidget::activeTabMusic(GlobalMusicAttr* musicAttr)
 {
     setCurrentWidget(m_tabMusic);
@@ -1073,6 +1096,27 @@ void TabWidget::activeTabMusic(GlobalMusicAttr* musicAttr)
         return;
     m_cbEndPointMusic->setCurrentText(QString(tr("%1s")).
             arg(QString::number((float)musicAttr->m_iEntPoint/1000, 'f', 2)));
+}
+void TabWidget::assignTabWidget(const GlobalTextAttr *globalTextAttr)
+{
+    if(!globalTextAttr)
+    {
+        //uncomplete
+        return;
+    }
+    m_fontCombo->setFont(globalTextAttr->m_qfont);
+    m_fontSizeCombo->setCurrentText(globalTextAttr->m_fontSize);
+    m_boldButton->setChecked(globalTextAttr->m_isBoldChecked);
+    m_italicButton->setChecked(globalTextAttr->m_isItalicChecked);
+    m_underlineButton->setChecked(globalTextAttr->m_isUnderlineChecked);
+    //m_colorEdit->setColor(globalTextAttr->m_fontColor.rgb());
+
+    m_leftTextButton->setChecked(globalTextAttr->m_textAlign == Qt::AlignLeft);
+    m_centerTextButton->setChecked(globalTextAttr->m_textAlign == Qt::AlignHCenter);
+    m_rightTextButton->setChecked(globalTextAttr->m_textAlign == Qt::AlignRight);
+
+    m_startTimeTextCombo->setCurrentText(globalTextAttr->m_qsStartTimeText);
+    m_durationTextCombo->setCurrentText(globalTextAttr->m_qsDurationText);
 }
 void TabWidget::assignTabWidget(const stTextAttr *textItem)
 {
@@ -1110,6 +1154,40 @@ void TabWidget::currentBoldChanged(bool)
 #endif
 void TabWidget::handleFontChange()
 {
+    Element* element;
+    if(m_globalContext && m_globalContext->m_elementsEdit && 
+            (element=m_globalContext->m_elementsEdit->currentElement()))
+    {
+        GlobalTextAttr* globalTextAttr = element->globalTextAttr();
+        if(globalTextAttr)
+        {
+            QFont font = m_fontCombo->currentFont();
+            //font.setPointSize(m_fontSizeCombo->currentText().toInt());
+            font.setPixelSize(m_fontSizeCombo->currentText().toInt());
+            font.setWeight(m_boldButton->isChecked() ? QFont::Bold : QFont::Normal);
+            font.setItalic(m_italicButton->isChecked());
+            font.setUnderline(m_underlineButton->isChecked());
+            globalTextAttr->m_textAlign = m_paragraphTextButtonG->checkedId();
+            globalTextAttr->m_qfont = font;
+            globalTextAttr->m_fontColor = qvariant_cast<QColor>(textAction->data());
+
+            m_globalContext->m_scene->setVideoTextAttr(m_element, globalTextAttr);
+
+        }
+        else
+        {
+            //uncomplete
+        }
+    }
+    else
+    {
+        //uncomplete
+
+    }
+}
+#if 0
+void TabWidget::handleFontChange()
+{
     if(!m_element || !m_mapText.contains(m_element))
         return;
 
@@ -1134,6 +1212,7 @@ void TabWidget::handleFontChange()
     m_globalContext->m_scene->setTextAttr(m_element, textItem);
 
 }
+#endif
 void TabWidget::textColorChanged()
 {
     textAction = qobject_cast<QAction *>(sender());

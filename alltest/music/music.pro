@@ -1,4 +1,4 @@
-QT += widgets multimedia multimediawidgets
+QT += widgets multimedia multimediawidgets gui
 
 HEADERS     = mainwindow.h
 SOURCES     = mainwindow.cpp \

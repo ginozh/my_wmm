@@ -83,6 +83,7 @@ private:
     QIcon createColorToolButtonIcon(const QString &imageFile, QColor color);
     QIcon createColorIcon(QColor color);
     void assignTabWidget(const stTextAttr *textItem);
+    void assignTabWidget(const GlobalTextAttr *globalTextAttr);
     void assignVideoInfo();
 private:
     QListWidget *contentsWidget;

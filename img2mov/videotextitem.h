@@ -22,12 +22,13 @@ class GraphicsTextItem : public QGraphicsTextItem
 public:
     enum MouseMode{MOVE,RESIZE};
     enum { Type = UserType + 100 };
-    GraphicsTextItem(QGraphicsItem *parent = 0);
-    stTextAttr* textAttr()
+    GraphicsTextItem(QGraphicsScene *scene);
+    GlobalTextAttr* textAttr()
     {
-        return m_stTextAttr;
+        return m_globalTextAttr;
     }
     void setTextAttr(stTextAttr* stTextAttr);
+    void setTextAttr(GlobalTextAttr* globalTextAttr);
     void setFirstTextPosWH(const QString& oritxt);
     bool getChanged(){return m_changed;}
 signals:
@@ -57,7 +58,8 @@ private:
     void createGraphicsRectItem();
     void createAssInfo();
 private:
-    stTextAttr* m_stTextAttr;
+    //stTextAttr* m_stTextAttr;
+    GlobalTextAttr* m_globalTextAttr;
     bool m_changed;
     QFont m_oldFont;
 

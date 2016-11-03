@@ -30,6 +30,8 @@ public:
     void doSelectImage(){if(m_pimage){m_pimage->doSelectImage();}}
     GlobalVideoAttr* globalVideoAttr(){return m_globalVideoAttr;}
     GlobalAnimationAttr* globalAnimationAttr(){return m_globalAnimationAttr;}
+    GlobalTextAttr* globalTextAttr(){return m_globalTextAttr;}
+    LineEdit* lineEdit(){return m_lineEdit;}
 signals:
     void insertImage();
     void selectedImageSignal();
@@ -76,6 +78,7 @@ public: // uncomplete
     GlobalAnimationAttr* m_globalAnimationAttr;
     
     //text attr
+    GlobalTextAttr* m_globalTextAttr;
     
     //visual effects attr
 };

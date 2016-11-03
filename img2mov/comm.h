@@ -55,6 +55,52 @@ public:
 }stTextAttr;
 
 //new in element.cpp
+class GlobalTextAttr
+{
+public:
+    GlobalTextAttr()
+    {
+        m_qsPreText = "A ";
+        m_qsInitialText = "[Enter text here]";
+
+        m_fontSize = "10";
+        m_isBoldChecked = false;
+        m_isItalicChecked = false;
+        m_isUnderlineChecked = false;
+        m_fontColor = Qt::white;
+
+        m_textAlign = Qt::AlignLeft; //Qt::AlignHCenter; //AlignRight;
+        m_idxEffects = 0;
+        m_qsStartTimeText = "0.00s";
+        m_qsDurationText = "2.00s";
+    }
+    ~GlobalTextAttr(){}
+public:
+    QString m_qsText;
+    QString m_qsPreText;
+    QString m_qsInitialText;
+    //font
+    QFont m_qfont;
+    QString m_fontSize;
+    bool m_isBoldChecked; //setChecked
+    bool m_isItalicChecked;
+    bool m_isUnderlineChecked;
+    QColor m_fontColor;
+    //Paragraph
+    //Qt::Alignment m_textAlign; 
+    int m_textAlign; 
+    //Adjust
+    QString m_qsStartTimeText;
+    QString m_qsDurationText;
+    //Effects
+    int m_idxEffects;
+    QString m_qsTextEffect;
+    //ass
+    QString m_qsStyle;
+    QString m_qsEvent;
+};
+
+//new in element.cpp
 class GlobalAnimationAttr
 {
 public:

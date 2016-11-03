@@ -44,8 +44,9 @@ signals:
     void readyVideo(const QString& fileName, const QByteArray& buffer, int position);
     void changePlayPosition(int);
     void playVideo();
-    void createTextSignal(void*);
-    void displayTextSignal(void*, bool);
+    //void createVideoTextSignal(void*);
+    void createVideoTextSignal(Element*);
+    void displayVideoTextSignal(void*, bool);
     void activeVideoTextSignal(void*, const QString&);
     void activeTabTextSignal(void*);
     void activeTabMusicSignal(GlobalMusicAttr*);
@@ -55,6 +56,7 @@ protected:
 public slots:
     void addImages();
     void addMusic();
+    void addText();
     void selectedImage();
     void selectedText(const QString&);
     void selectedMusic();

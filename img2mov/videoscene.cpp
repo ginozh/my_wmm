@@ -6,6 +6,8 @@
 #include <QList>
 #include <QGraphicsView>
 #include <QKeyEvent>
+#include "element.h"
+#include <QDebug>
 
 //! [0]
 GraphicsScene::GraphicsScene(QObject *parent)
@@ -15,6 +17,20 @@ GraphicsScene::GraphicsScene(QObject *parent)
 }
 //! [0]
 
+void GraphicsScene::setVideoTextAttr(void* element, GlobalTextAttr* globalTextAttr)
+{
+    if(!globalTextAttr)
+    {
+        //uncomplete
+        return;
+    }
+    if(element && m_mapText.contains(element))
+    {
+        GraphicsTextItem *textItem = m_mapText[element];
+        textItem->setTextAttr(globalTextAttr);
+    }
+}
+#if 0
 void GraphicsScene::setTextAttr(void* element, stTextAttr *textAttr)
 {
     if(!textAttr)
@@ -27,6 +43,7 @@ void GraphicsScene::setTextAttr(void* element, stTextAttr *textAttr)
         textItem->setTextAttr(textAttr);
     }
 }
+#endif
 
 //! [5]
 void GraphicsScene::editorLostFocus(GraphicsTextItem *item)
@@ -72,6 +89,7 @@ void GraphicsScene::editorLostFocus(GraphicsTextItem *item)
                 "[Events]\n"
                 );
         qsAss.append(qsEvents);
+        qDebug() << "GraphicsScene::editorLostFocus. qsAss: " << qsAss;
         emit updatedTextSignal(qsAss);
 #endif
     }
@@ -86,8 +104,41 @@ void GraphicsScene::editorLostFocus(GraphicsTextItem *item)
 //! [5]
 
 
+void GraphicsScene::createVideoText(Element* element)
+{
+    if(!m_mapText.contains(element))
+    {
+        GlobalTextAttr* globalTextAttr = element->globalTextAttr();
 
-void GraphicsScene::createText(void* element)
+        GraphicsTextItem *textItem = new GraphicsTextItem(this);
+        addItem(textItem);
+
+        textItem->setTextAttr(globalTextAttr);
+#if 0
+        textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
+        textItem->setZValue(1000.0);
+
+        textItem->setFont(globalTextAttr->m_qfont);
+        //textItem->setDefaultTextColor(Qt::white);
+        textItem->setDefaultTextColor(globalTextAttr->m_fontColor);
+        //textItem->setPos(mouseEvent->scenePos());
+        //QString qsContent = QString(tr("element: %1")).arg((size_t)element);
+        //textItem->setPlainText(qsContent);
+        //textItem->setPos(width()/2-qsContent.length()/2,height()*3/5);
+#endif
+        connect(textItem, SIGNAL(lostFocus(GraphicsTextItem*)),
+                this, SLOT(editorLostFocus(GraphicsTextItem*)));
+#if 0
+        connect(textItem, SIGNAL(selectedChange(QGraphicsItem*)),
+                this, SIGNAL(itemSelected(QGraphicsItem*)));
+#endif
+        //textItem->setFocus();
+
+        m_mapText.insert(element, textItem);
+    }
+}
+#if 0
+void GraphicsScene::createVideoText(void* element)
 {
     if(!m_mapText.contains(element))
     {
@@ -115,6 +166,7 @@ void GraphicsScene::createText(void* element)
         m_mapText.insert(element, textItem);
     }
 }
+#endif 
 void GraphicsScene::displayVideoText(void* element, bool isDisplay)
 {
     if(m_mapText.contains(element))

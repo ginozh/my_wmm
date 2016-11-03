@@ -10,6 +10,7 @@ Element::Element(QWidget *parent, const QString& qsImageName,GraphicsScene* scen
     , m_qsImageName(qsImageName)
     , m_globalVideoAttr(new GlobalVideoAttr)
     , m_globalAnimationAttr(new GlobalAnimationAttr)
+    , m_globalTextAttr(new GlobalTextAttr)
 {
     //setWindowFlags(Qt::WindowStaysOnBottomHint);
     memset(&m_fbOriFile, 0, sizeof(m_fbOriFile));
@@ -91,7 +92,7 @@ Element::Element(QWidget *parent, const QString& qsImageName,GraphicsScene* scen
     connect(m_musicLabel, SIGNAL(selectedMusicSignal()), parent, SLOT(selectedMusic()) );
 
 
-    m_lineEdit =  new LineEdit(QSize(iMaxWidth, iMaxWidth/6), scene);
+    m_lineEdit =  new LineEdit(QSize(iMaxWidth, iMaxWidth/6), scene, this);
     //m_elementLayout->addWidget(new QLabel(tr("input text")));
     m_elementLayout->addWidget(m_lineEdit);
     //connect(this, SIGNAL(selectedTextSignal()), parentWidget(), SLOT(selectedText()) );
@@ -100,6 +101,7 @@ Element::Element(QWidget *parent, const QString& qsImageName,GraphicsScene* scen
     //必须要二层，因为elementsedit是根据send(即element)来确定哪个element的
     connect(m_lineEdit, SIGNAL(selectedTextSignal(const QString&)), this, SLOT(selectedText(const QString&)) );
     connect(this, SIGNAL(selectedTextSignal(const QString&)), parent, SLOT(selectedText(const QString&)) );
+    //connect(parent, SIGNAL(addTextSignal()), m_lineEdit, SLOT(addText()) );
 
     setLayout(m_elementLayout);
 #if 0

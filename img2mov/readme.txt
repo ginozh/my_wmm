@@ -46,4 +46,9 @@
 其实只要看QString得赋值是否是指针赋值就ok了
 肯定不是指针赋值，因为函数返回参数的类型可以是QString
 
-三、
+三、文字属性同步
+element.cpp创建
+0、点击tabHome中的caption，类似于双击了linetext
+1、双击linetext,转到tabText，同时videotext获取焦点
+2、修改tabText，更新videotext，修改属性
+3、修改vdiotext，更新linetext，修改linetext内容超出范围省略号显示

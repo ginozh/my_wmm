@@ -2,6 +2,8 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include "mainwindow.h"
+#include <QFontMetrics>
+#include <QFont>
 MainWindow::MainWindow()
 {
     setWindowTitle(tr("Character Map"));
@@ -26,8 +28,13 @@ MainWindow::MainWindow()
 }
 void MainWindow::durationChanged(qint64 duration)
 {
+    QFont font;
+    font.setPointSize(8); 
+    QFontMetrics fm(font); 
+    int fw = fm.width("test");
+    int fh = fm.height();
     //QMessageBox::information(this, "info", QString(tr("file is not available")));
-    lblDurationTrans->setText(QString(tr("Duration: %1")).arg(duration));
+    lblDurationTrans->setText(QString(tr("Duration: %1 fh: %2")).arg(duration).arg(QString::number(fh)));
 }
 //! [6]
 

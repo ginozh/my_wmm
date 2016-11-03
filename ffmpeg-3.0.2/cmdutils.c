@@ -1071,8 +1071,8 @@ static int warned_cfg = 0;
                             indent);                                    \
                     warned_cfg = 1;                                     \
                 }                                                       \
-                av_log(NULL, level, "%s%-11s configuration: %s\n",      \
-                        indent, #libname, cfg);                         \
+                /*av_log(NULL, level, "%s%-11s configuration: %s\n",*/      \
+                        /*indent, #libname, cfg);*//*storm*/                         \
             }                                                           \
         }                                                               \
     }                                                                   \

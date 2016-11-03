@@ -3,6 +3,8 @@
 #include <QDebug>
 #include <QString>
 #include <QObject> 
+#include <QFontMetrics> 
+#include <QFont> 
 
 QString createAss()
 {
@@ -23,6 +25,7 @@ QString createAss()
     qDebug(qs.toLatin1());
     return qs;
 }
+#if 0
 class Task : public QObject
 {
     Q_OBJECT
@@ -53,10 +56,17 @@ signals:
     void finished();
 };
 #include "main.moc"
+#endif
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
+    QFont font;
+    font.setPointSize(8); 
+    QFontMetrics fm(font); 
+    int fw = fm.width("test");
+    int fh;// = fm.height();
+    qDebug() << "fw: " << fw <<" fh: " << fh ;
 #if 0
 	// Task parented to the application so that it
     // will be deleted by the application.
@@ -70,6 +80,8 @@ int main(int argc, char *argv[])
     QTimer::singleShot(0, task, SLOT(run()));
 
 #endif
+
+#if 0
     int m_iStartTime = 1212;
     int m_iStartPoint = 0;
     int m_iEntPoint = 31233;
@@ -82,5 +94,7 @@ int main(int argc, char *argv[])
             arg((float)m_iStartPoint/1000).
             arg(iRealLength<=m_duration?((float)m_iEntPoint/1000):((float)(m_duration-m_iStartTime+m_iStartPoint)/1000));
     qDebug() << test;
+#endif 
+
     return a.exec();
 }

@@ -16,6 +16,7 @@ class QFont;
 class QGraphicsTextItem;
 class QColor;
 QT_END_NAMESPACE
+class Element;
 
 //! [0]
 class GraphicsScene : public QGraphicsScene
@@ -25,13 +26,15 @@ class GraphicsScene : public QGraphicsScene
 public:
     explicit GraphicsScene(QObject *parent = 0);
     void setFont(void* element, const QFont &font);
-    void setTextAttr(void* element, stTextAttr *textAttr);
+    void setVideoTextAttr(void* element, GlobalTextAttr* globalTextAttr);
+    //void setTextAttr(void* element, stTextAttr *textAttr);
     GraphicsTextItem* getGraphicsTextItem(){return curtextItem;}
 
 public slots:
     //void setItemType(DiagramItem::DiagramType type);
     void editorLostFocus(GraphicsTextItem *item);
-    void createText(void*);
+    //void createVideoText(void*);
+    void createVideoText(Element*);
     void displayVideoText(void*, bool);
     void activeVideoText(void* element, const QString&);
 
