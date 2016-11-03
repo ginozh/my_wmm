@@ -10,7 +10,6 @@ class GraphicsScene;
 class VideoPlayer;
 class TabWidget;
 
-//elementsedit.cpp
 typedef struct stTextAttr{
 public:
     stTextAttr(const QString& qsStartTimeText="2.00s", const QString& qsDurationText="2.00")
@@ -54,16 +53,13 @@ public:
 
 }stTextAttr;
 
-//new in element.cpp
 class GlobalTextAttr
 {
 public:
     GlobalTextAttr()
     {
-        m_qsPreText = "A ";
-        m_qsInitialText = "[Enter text here]";
-
-        m_fontSize = "10";
+        //m_qfont = ;
+        m_fontSize = "8";
         m_isBoldChecked = false;
         m_isItalicChecked = false;
         m_isUnderlineChecked = false;
@@ -74,11 +70,8 @@ public:
         m_qsStartTimeText = "0.00s";
         m_qsDurationText = "2.00s";
     }
-    ~GlobalTextAttr(){}
 public:
-    QString m_qsText;
-    QString m_qsPreText;
-    QString m_qsInitialText;
+    //QString m_qsText;
     //font
     QFont m_qfont;
     QString m_fontSize;
@@ -94,58 +87,40 @@ public:
     QString m_qsDurationText;
     //Effects
     int m_idxEffects;
-    QString m_qsTextEffect;
     //ass
     QString m_qsStyle;
     QString m_qsEvent;
-};
 
-//new in element.cpp
-class GlobalAnimationAttr
+};
+class GlobalAnimationAttr 
 {
 public:
-    GlobalAnimationAttr()
-    {
-        m_iTransitionDuration = 1500; //毫秒
-        m_qsPanZoom = "zoompan=z='zoom+0.001':s=512x384"; //for test
+    GlobalAnimationAttr(){
+        m_iTransitionDuration = 1500;
     }
-    ~GlobalAnimationAttr(){}
 public:
     QString m_qsTransitionName;
-    int m_iTransitionDuration;
     QString m_qsPanZoom;
+    int m_iTransitionDuration;
 };
-
-//new in element.cpp
-class GlobalVideoAttr
+class GlobalVideoAttr 
 {
 public:
-    GlobalVideoAttr()
-    {
-        //毫秒
-        m_iDuration = 2000;
+    GlobalVideoAttr(){
         m_iFramerate = 24;
     }
-    ~GlobalVideoAttr(){}
 public:
-    int m_iDuration;
     int m_iFramerate;
+    int m_iDuration;
 };
 
-//new in elementsedit.cpp
 class GlobalMusicAttr
 {
 public:
-    GlobalMusicAttr()
-    {
-        //毫秒
-        m_iStartTime = 0;//1200; 
+    GlobalMusicAttr(){
+        m_iStartTime = 0;
         m_iStartPoint = 0;
-        m_iEntPoint = 0;
-        m_iAudioDuration = 0;
-    }
-    ~GlobalMusicAttr()
-    {
+        //m_iEntPoint = 2000;
     }
 public:
     QString m_qsAudioFilename;
@@ -154,9 +129,6 @@ public:
     int m_iEntPoint;
     int m_iAudioDuration;
 };
-
-
-//new in mainwindow.cpp
 class GlobalContext
 {
 public:
@@ -166,7 +138,6 @@ public:
         m_player=NULL;
         m_tabWidget=NULL;
     }
-    ~GlobalContext(){}
 public:
     ElementsEdit* m_elementsEdit;
     GraphicsScene* m_scene;
