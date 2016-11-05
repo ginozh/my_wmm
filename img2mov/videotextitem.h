@@ -27,10 +27,11 @@ public:
     {
         return m_globalTextAttr;
     }
-    void setTextAttr(stTextAttr* stTextAttr);
+    //void setTextAttr(stTextAttr* stTextAttr);
     void setTextAttr(GlobalTextAttr* globalTextAttr);
     void setFirstTextPosWH(const QString& oritxt);
     bool getChanged(){return m_changed;}
+    void createAssInfo();
 signals:
     void lostFocus(GraphicsTextItem *item);
     void selectedChange(QGraphicsItem *item);
@@ -56,7 +57,6 @@ protected:
 private:
     void hitFrame(QGraphicsSceneHoverEvent *event);
     void createGraphicsRectItem();
-    void createAssInfo();
 private:
     //stTextAttr* m_stTextAttr;
     GlobalTextAttr* m_globalTextAttr;

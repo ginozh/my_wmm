@@ -13,6 +13,7 @@
 #include <QTextEdit>
 #include <QTreeView>
 #include <QTableWidget>
+#include <QMediaPlayer>
 
 #include <QFileInfo>
 #include <QStandardPaths>
@@ -79,6 +80,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_globalContext->m_elementsEdit, SIGNAL(readyVideo(const QString&,const QByteArray&,int)), m_globalContext->m_player, SLOT(readyVideo(const QString&, const QByteArray&, int)));
     connect(m_globalContext->m_player->MediaPlayer(), SIGNAL(durationChanged(qint64)), m_globalContext->m_elementsEdit, SLOT(durationChanged(qint64)));
+    connect(m_globalContext->m_player->MediaPlayer(), SIGNAL(stateChanged(QMediaPlayer::State)), m_globalContext->m_elementsEdit, SLOT(videoStateChanged(QMediaPlayer::State)));
     connect(m_globalContext->m_player->MediaPlayer(), SIGNAL(positionChanged(qint64)), m_globalContext->m_elementsEdit, SLOT(positionChanged(qint64))); //播放条变更后，移动图片区的垂直条
     connect(m_globalContext->m_elementsEdit, SIGNAL(changePlayPosition(int)), m_globalContext->m_player, SLOT(setPosition(int)));
     connect(m_globalContext->m_elementsEdit, SIGNAL(playVideo()), m_globalContext->m_player, SLOT(play()));
@@ -87,9 +89,9 @@ MainWindow::MainWindow(QWidget *parent)
     //connect(m_globalContext->m_elementsEdit, SIGNAL(createVideoTextSignal(void*)), m_globalContext->m_scene, SLOT(createVideoText(void*)));
     connect(m_globalContext->m_elementsEdit, SIGNAL(createVideoTextSignal(Element*)), m_globalContext->m_scene, SLOT(createVideoText(Element*)));
     //显示/隐藏videotext
-    connect(m_globalContext->m_elementsEdit, SIGNAL(displayVideoTextSignal(void*, bool /*display*/)), m_globalContext->m_scene, SLOT(displayVideoText(void*, bool)));
+    connect(m_globalContext->m_elementsEdit, SIGNAL(displayVideoTextSignal(Element*, bool /*display*/)), m_globalContext->m_scene, SLOT(displayVideoText(Element*, bool)));
     //激活videotext
-    connect(m_globalContext->m_elementsEdit, SIGNAL(activeVideoTextSignal(void*, const QString&)), m_globalContext->m_scene, SLOT(activeVideoText(void*, const QString&)));
+    connect(m_globalContext->m_elementsEdit, SIGNAL(activeVideoTextSignal(Element*, const QString&)), m_globalContext->m_scene, SLOT(activeVideoText(Element*, const QString&)));
     //更新videotext，生成2个视频：一个包含文字视频、一个未包含文字视频。
     //编辑文字时显示无文字视频；播放时显示有文字视频？
     //connect(m_globalContext->m_scene, SIGNAL(updatedTextSignal(stTextAttr*, const QString&)), m_globalContext->m_elementsEdit, SLOT(updatedText(stTextAttr*, const QString&)));
@@ -98,6 +100,7 @@ MainWindow::MainWindow(QWidget *parent)
     // tab
     connect(m_globalContext->m_elementsEdit, SIGNAL(activeTabTextSignal(void*)), m_globalContext->m_tabWidget, SLOT(activeTabText(void*)));
     connect(m_globalContext->m_elementsEdit, SIGNAL(activeTabMusicSignal(GlobalMusicAttr*)), m_globalContext->m_tabWidget, SLOT(activeTabMusic(GlobalMusicAttr*)));
+    connect(m_globalContext->m_elementsEdit, SIGNAL(assignTabValueSignal()), m_globalContext->m_tabWidget, SLOT(assignTabValue()));
 
 }
 #if 0

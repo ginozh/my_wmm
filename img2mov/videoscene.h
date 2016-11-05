@@ -25,18 +25,19 @@ class GraphicsScene : public QGraphicsScene
 
 public:
     explicit GraphicsScene(QObject *parent = 0);
-    void setFont(void* element, const QFont &font);
-    void setVideoTextAttr(void* element, GlobalTextAttr* globalTextAttr);
+    //void setFont(void* element, const QFont &font);
+    void setVideoTextAttr(Element* element, GlobalTextAttr* globalTextAttr);
     //void setTextAttr(void* element, stTextAttr *textAttr);
     GraphicsTextItem* getGraphicsTextItem(){return curtextItem;}
+    QString createTotalAssInfo();
 
 public slots:
     //void setItemType(DiagramItem::DiagramType type);
     void editorLostFocus(GraphicsTextItem *item);
     //void createVideoText(void*);
     void createVideoText(Element*);
-    void displayVideoText(void*, bool);
-    void activeVideoText(void* element, const QString&);
+    void displayVideoText(Element*, bool);
+    void activeVideoText(Element* element, const QString&);
 
 signals:
     //void updatedTextSignal(stTextAttr*, const QString&);
@@ -48,7 +49,7 @@ protected:
 
 private:
     
-    QMap<void*, GraphicsTextItem*> m_mapText;
+    QMap<Element*, GraphicsTextItem*> m_mapText;
     GraphicsTextItem *curtextItem;
 
     QFont myFont;

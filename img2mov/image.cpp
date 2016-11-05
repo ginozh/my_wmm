@@ -6,7 +6,7 @@
 class ElementsEdit;
 Image::Image(const QString& path, QSize size, QWidget *parent)
     : QLabel(parent)
-    , m_pixMap(new QPixmap())
+    //, m_pixMap(new QPixmap())
 {
     m_focus=false;
     setMinimumSize(size);
@@ -22,13 +22,13 @@ Image::Image(const QString& path, QSize size, QWidget *parent)
 #else
     if(!path.isEmpty())
     {
-        m_pixMap->load(path);
-        QPixmap& image=*m_pixMap;
+        m_pixMap.load(path);
+        QPixmap& image=m_pixMap;
         const QSize maximumSize(size); // Reduce in case someone has large photo images.
         if (image.size().width() > maximumSize.width() || image.height() > maximumSize.height())
             image = image.scaled(maximumSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
-        setPixmap(*m_pixMap);
+        setPixmap(m_pixMap);
     }
 #endif
     setContextMenuPolicy(Qt::DefaultContextMenu);
@@ -44,13 +44,17 @@ void Image::contextMenuEvent(QContextMenuEvent * /*event*/)
     QMenu menu;
     //menu.addAction(tr("Open"), this, SLOT(open()));
     //menu.addAction(tr("Add images"), parentWidget()->parentWidget(), SLOT(addImages())  );
-    menu.addAction(tr("Add images"), parentWidget(), SLOT(insert())  );
+    menu.addAction(tr("Add photos"), parentWidget(), SLOT(insert())  );
+    menu.addAction(tr("Remove"), parentWidget(), SLOT(remove())  );
     menu.exec(QCursor::pos());
 }
+#if 0
+//replaced by doFocusImage
 void Image::focusImage()
 {
     mousePressEvent(NULL);
 }
+#endif
 #if 1
 void Image::mousePressEvent(QMouseEvent *event)
 {
@@ -87,7 +91,7 @@ void Image::unselectedImage()
     m_focus=false;
     update();
 }
-void Image::doSelectImage()
+void Image::doFocusImage()
 {
     m_focus=true;
     update();

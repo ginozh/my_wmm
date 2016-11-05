@@ -1,3 +1,27 @@
+一、原理
+1、三个重要对象elementsedit(管理element)、tabwidget、videoplay通过comm中的GlobalContext互相访问
+2、element对象保存每张图片的视频(GlobalVideoAttr)、文字(GlobalTextAttr)、特效(GlobalAnimationAtt)信息
+二、文字信息
+1、初始化
+when addimage, created in element.cpp, defined in comm.h
+2、激活
+click in tabHome's caption or double click line edit
+3、编辑
+三、视频信息
+1、初始化
+2、激活
+3、编辑
+四、特效
+1、初始化
+2、激活
+3、编辑
+五、音频
+1、初始化
+2、激活
+3、编辑
+
+六、播放视频
+
 一、主线程
 1、批量导入图片
 1.1、显示在当前图片索引后面，同时保存图片像素大小、文件位置

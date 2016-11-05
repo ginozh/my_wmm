@@ -7,6 +7,7 @@
 #include <QGraphicsSceneHoverEvent>
 #include <QTextDocument>
 #include <QDebug>
+#include <QDateTime>
 
 //! [0]
 GraphicsTextItem::GraphicsTextItem(QGraphicsScene *scene)
@@ -151,7 +152,7 @@ void GraphicsTextItem::focusOutEvent(QFocusEvent *event)
     }
     if(m_changed)
     {
-        createAssInfo();
+        //createAssInfo();
         emit lostFocus(this);
         m_changed = false;
     }
@@ -475,17 +476,20 @@ void GraphicsTextItem::createGraphicsRectItem()
 #if 1
 void GraphicsTextItem::createAssInfo()
 {
-    if(m_globalTextAttr)
+    if(m_globalTextAttr && m_globalTextAttr->m_iDurationText)
     {
         //QMessageBox::information(NULL, "info", QString(tr("GraphicsTextItem::createAssInfo. rgb: %1")).arg(m_globalTextAttr->m_fontColor.name()));
         int iAlignment=8;
-        int iMarginL=10, iMarginR=10, iMarginV=10;
+        int iMarginL=0, iMarginR=0, iMarginV=0;
+        QFont fontDeviation;
+        fontDeviation.setPointSize(1);
+        QFontMetrics fmDeviation(fontDeviation);
         switch((Qt::AlignmentFlag)m_globalTextAttr->m_textAlign)
         {
             case Qt::AlignLeft:
                 iAlignment=7;
-                iMarginL=pos().x();
-                iMarginV=pos().y();
+                iMarginL=pos().x()+fmDeviation.height();
+                iMarginV=pos().y()+fmDeviation.height();
                 break;
             case Qt::AlignHCenter:
                 iAlignment=7;
@@ -505,11 +509,8 @@ void GraphicsTextItem::createAssInfo()
         //Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline,
         //Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding\n"
         m_globalTextAttr->m_qsStyle = QString(tr(
-        "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour,"
-        "Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline,"
-        "Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding\n"
-        "Style: %1,      %2,       %3,       &Hffffff,      &Hffffff,        &H0,           &H0,       "
-        "%4,    %5,      %6,         0,         100,    100,    0,       0,     1,           1,      "
+        "Style:    %1,   %2,       %3,       &Hffffff,      &Hffffff,        &Hffffff,     &Hffffff,      "
+        "%4,    %5,      %6,         0,         100,    100,    0,       0,     0,           0,      "
         " 0,      %7,          %8,     %9,     %10,      0,          0\n")).
             //arg((int)this).arg(m_globalTextAttr->m_qfont.family()).arg(m_globalTextAttr->m_qfont.pointSize()).
             //arg((int)this).arg(m_globalTextAttr->m_qfont.family()).arg(m_globalTextAttr->m_qfont.pixelSize()).
@@ -518,11 +519,18 @@ void GraphicsTextItem::createAssInfo()
             arg(m_globalTextAttr->m_qfont.underline()?1:0 ).arg(iAlignment).arg(iMarginL).arg(iMarginR).
             arg(iMarginV);
 
-        document()->lineCount();
+        //document()->lineCount();
+        QString start = QDateTime(QDate::currentDate()).addMSecs(m_globalTextAttr->m_iStartTimeText + 10).toString("hh:mm:ss.zzz"); //+10: 为了防止编辑文字时同时出现字幕
+        //QString start = QDateTime(QDate::currentDate()).addMSecs(m_globalTextAttr->m_iStartTimeText ).toString("hh:mm:ss.zzz");
+        start.chop(1);
+        QString end = QDateTime(QDate::currentDate()).addMSecs(m_globalTextAttr->m_iStartTimeText+m_globalTextAttr->m_iDurationText).toString("hh:mm:ss.zzz");
+        end.chop(1);
+        qDebug() << "m_iStartTimeText: "<<m_globalTextAttr->m_iStartTimeText<<" start: "<< start;
+        qDebug() << "m_iDurationText: "<<m_globalTextAttr->m_iDurationText<<" end: "<< end; 
         //Format:   Layer, Start,      End,        Style,  Name, MarginL, MarginR, MarginV, Effect, Text
         m_globalTextAttr->m_qsEvent = QString(tr(
-        "Dialogue:  0,     0:00:00.00, 0:00:01.94, %1,         , 0,       0,       0,           , {\\q2}%2")).
-            arg((int)this).arg(toPlainText());
+        "Dialogue:  0,     %1,         %2,         %3,         , 0,       0,       0,           , {\\q2}%4\n")).
+            arg(start).arg(end).arg((int)this).arg(toPlainText());
     }
 }
 #endif

@@ -46,7 +46,8 @@ SOURCES += main.cpp \
     lineedit.cpp \
     videorectitem.cpp \
     musiclabel.cpp \
-    combobox.cpp
+    combobox.cpp \
+    comm.cpp
 
 HEADERS  += mainwindow.h \
     ffmpeg.h \

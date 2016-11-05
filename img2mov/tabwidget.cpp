@@ -52,7 +52,7 @@ TabWidget::TabWidget(QWidget *parent, GlobalContext* globalContext)
     setCurrentWidget(m_tabHome);
     setMaximumHeight(m_iconSize.height() + 120);
 
-    connect(this, SIGNAL(currentChanged(int)), this, SLOT(currentChanged(int)));
+    connect(this, SIGNAL(currentChanged(int)), this, SLOT(assignTabValue()));
     connect(this, SIGNAL(elementAttrChanged(bool)), (const QObject*)m_globalContext->m_elementsEdit, SLOT(elementAttrChanged(bool)));
 }
 void TabWidget::assignVideoInfo()
@@ -68,13 +68,21 @@ void TabWidget::assignVideoInfo()
         }
     }
 }
-void TabWidget::currentChanged(int /*index*/)
+void TabWidget::assignTabValue()
 {
     QWidget * widget= currentWidget();
     if(widget == m_tabVideo)
     {
         //QMessageBox::information(NULL, "info", QString(tr("video")));
         assignVideoInfo();
+    }
+    else if(widget == m_tabText)
+    {
+        assignTextInfo();
+    }
+    else if(widget == m_tabAnimations)
+    {
+        assignAnimationInfo();
     }
 }
 void TabWidget::handleVideoAttrChange()
@@ -1051,23 +1059,7 @@ void TabWidget::activeTabVideo(void* element, GlobalVideoAttr* globalVideoAttr)
 void TabWidget::activeTabText(void* velement)
 {
     setCurrentWidget(m_tabText);
-    Element* element = m_globalContext->m_elementsEdit->currentElement();
-    if(m_globalContext && ((void*)element==velement))
-    {
-        GlobalTextAttr* globalTextAttr = element->globalTextAttr();
-        if(globalTextAttr)
-        {
-            assignTabWidget(globalTextAttr);
-        }
-        else
-        {
-            //uncomplete
-        }
-    }
-    else
-    {
-        //uncomplete
-    }
+    assignTextInfo();
 }
 #if 0
 void TabWidget::activeTabText(void* element)
@@ -1097,27 +1089,64 @@ void TabWidget::activeTabMusic(GlobalMusicAttr* musicAttr)
     m_cbEndPointMusic->setCurrentText(QString(tr("%1s")).
             arg(QString::number((float)musicAttr->m_iEntPoint/1000, 'f', 2)));
 }
-void TabWidget::assignTabWidget(const GlobalTextAttr *globalTextAttr)
+void TabWidget::assignAnimationInfo()
 {
-    if(!globalTextAttr)
+    Element* element;
+    if(m_globalContext && (element=m_globalContext->m_elementsEdit->currentElement()))
+    {
+        GlobalAnimationAttr* globalAnimationAttr = element->globalAnimationAttr();
+        if(globalAnimationAttr)
+        {
+            //uncomplete
+        }
+        else
+        {
+            //uncomplete
+        }
+    }
+    else
     {
         //uncomplete
-        return;
     }
-    m_fontCombo->setFont(globalTextAttr->m_qfont);
-    m_fontSizeCombo->setCurrentText(globalTextAttr->m_fontSize);
-    m_boldButton->setChecked(globalTextAttr->m_isBoldChecked);
-    m_italicButton->setChecked(globalTextAttr->m_isItalicChecked);
-    m_underlineButton->setChecked(globalTextAttr->m_isUnderlineChecked);
-    //m_colorEdit->setColor(globalTextAttr->m_fontColor.rgb());
-
-    m_leftTextButton->setChecked(globalTextAttr->m_textAlign == Qt::AlignLeft);
-    m_centerTextButton->setChecked(globalTextAttr->m_textAlign == Qt::AlignHCenter);
-    m_rightTextButton->setChecked(globalTextAttr->m_textAlign == Qt::AlignRight);
-
-    m_startTimeTextCombo->setCurrentText(globalTextAttr->m_qsStartTimeText);
-    m_durationTextCombo->setCurrentText(globalTextAttr->m_qsDurationText);
 }
+void TabWidget::assignTextInfo()
+{
+    Element* element;
+    if(m_globalContext && (element=m_globalContext->m_elementsEdit->currentElement()))
+    {
+        GlobalTextAttr* globalTextAttr = element->globalTextAttr();
+        if(globalTextAttr)
+        {
+            m_fontCombo->setFont(globalTextAttr->m_qfont);
+            m_fontSizeCombo->setCurrentText(globalTextAttr->m_fontSize);
+            m_boldButton->setChecked(globalTextAttr->m_isBoldChecked);
+            m_italicButton->setChecked(globalTextAttr->m_isItalicChecked);
+            m_underlineButton->setChecked(globalTextAttr->m_isUnderlineChecked);
+            //m_colorEdit->setColor(globalTextAttr->m_fontColor.rgb());
+
+            m_leftTextButton->setChecked(globalTextAttr->m_textAlign == Qt::AlignLeft);
+            m_centerTextButton->setChecked(globalTextAttr->m_textAlign == Qt::AlignHCenter);
+            m_rightTextButton->setChecked(globalTextAttr->m_textAlign == Qt::AlignRight);
+
+            m_startTimeTextCombo->setCurrentText(QString(tr("%1s")).
+                    arg(QString::number((float)globalTextAttr->m_iStartTimeText/1000, 'f', 2)));
+            m_durationTextCombo->setCurrentText(QString(tr("%1s")).
+                    arg(QString::number((float)globalTextAttr->m_iDurationText/1000, 'f', 2)));
+
+            //m_startTimeTextCombo->setCurrentText(globalTextAttr->m_qsStartTimeText);
+            //m_durationTextCombo->setCurrentText(globalTextAttr->m_qsDurationText);
+        }
+        else
+        {
+            //uncomplete
+        }
+    }
+    else
+    {
+        //uncomplete
+    }
+}
+#if 0
 void TabWidget::assignTabWidget(const stTextAttr *textItem)
 {
     if(!textItem)
@@ -1138,6 +1167,7 @@ void TabWidget::assignTabWidget(const stTextAttr *textItem)
     m_startTimeTextCombo->setCurrentText(textItem->m_qsStartTimeText);
     m_durationTextCombo->setCurrentText(textItem->m_qsDurationText);
 }
+#endif
 #if 0
 void TabWidget::currentFontChanged()
 {
@@ -1162,8 +1192,8 @@ void TabWidget::handleFontChange()
         if(globalTextAttr)
         {
             QFont font = m_fontCombo->currentFont();
-            //font.setPointSize(m_fontSizeCombo->currentText().toInt());
-            font.setPixelSize(m_fontSizeCombo->currentText().toInt());
+            font.setPointSize(m_fontSizeCombo->currentText().toInt());
+            //font.setPixelSize(m_fontSizeCombo->currentText().toInt());
             font.setWeight(m_boldButton->isChecked() ? QFont::Bold : QFont::Normal);
             font.setItalic(m_italicButton->isChecked());
             font.setUnderline(m_underlineButton->isChecked());
@@ -1171,7 +1201,7 @@ void TabWidget::handleFontChange()
             globalTextAttr->m_qfont = font;
             globalTextAttr->m_fontColor = qvariant_cast<QColor>(textAction->data());
 
-            m_globalContext->m_scene->setVideoTextAttr(m_element, globalTextAttr);
+            m_globalContext->m_scene->setVideoTextAttr(element, globalTextAttr);
 
         }
         else

@@ -8,6 +8,7 @@
 #include <QVector>
 #include <QTime>
 #include <QDebug>
+#include "videoscene.h"
 
 #include "elementsedit.h"
 #include "element.h"
@@ -148,7 +149,6 @@ void ElementsEdit::scaleImage(Element *element)
 void ElementsEdit::addImages()
 {
     QWidget *currWidget = qobject_cast<QWidget *>(sender());
-    //只有image过来的insert事件，它的父类(element)才会是m_flowLayout的元素
     QStringList files = QFileDialog::getOpenFileNames(this, tr("Select Images"),
             /*QDir::currentPath()*/QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
             tr("Photos (*.jpg *.png *.bmp *.dib *.rle *.gif *.ico *.icon *.jpeg *.jpe *.jfif *.exif *.tiff *.tif *wdp *.jxr)"));
@@ -166,6 +166,7 @@ void ElementsEdit::addImages()
         delete m_firstLabel;
     }
     int idx = -1;
+    //只有image过来的insert事件，它的父类(element)才会是m_flowLayout的元素
     if((idx=m_flowLayout->indexOf(currWidget))>=0)
         idx++;
     int oldIdx = idx;
@@ -196,30 +197,78 @@ void ElementsEdit::addImages()
         //3, 图片视频
         createSimpleVideo(element);
     }
-    //4, 生成总视频
+    //4, 变更text的开始时间, 重新生成ass (前面增加一个图片、或者修改前面某个视频时长时)
+    updateTextAttrAndAss(oldIdx+1);
+
+    //5, 生成总视频
     //./ffmpeg_gr -y -f avi -i jpg/mi2.avi -f avi -i jpg/mm.avi -f avi jpg/all.avi
     //uncomplete
     createFinalVideo(false);
-    //5, 设置播放进度条
+    //6, 设置播放进度条
     //计算长度 for 进度条 ，需要在当前线程渲染之后，否则不对。放在duration信号槽内处理
     // 
     
-    //6, 选中合适的image
+    //7, 选中合适的image
     //oldIdx = oldIdx > 0? oldIdx: 0;
     //emit focusImageSignal();
 
-    //7, 第一次选择
+    //8, 第一次选择
     if(!m_lastSelectedElement)
     {
         m_idxCurrentElement = 0;
         m_lastSelectedElement = qobject_cast<QWidget *>(m_flowLayout->itemAt(m_idxCurrentElement)->widget());
-        (qobject_cast<Element *>(m_lastSelectedElement))->doSelectImage();
-        emit displayVideoTextSignal((void*)m_lastSelectedElement, true);
+        (qobject_cast<Element *>(m_lastSelectedElement))->doFocusImage();
+        emit displayVideoTextSignal(qobject_cast<Element *>(m_lastSelectedElement), true);
     }
 
 
     m_vecticalLine->raise(); // top level, Raises this widget to the top of the parent widget's stack.
     setCursor(QCursor(Qt::ArrowCursor));
+}
+void ElementsEdit::removeImage()
+{
+    QWidget *currWidget = qobject_cast<QWidget *>(sender());
+    Element *currElement = qobject_cast<Element *>(sender());
+    if(!currWidget || !currElement)
+    {
+        //error uncomple
+        return ;
+    }
+    int idx = -1;
+    if((idx=m_flowLayout->indexOf(currWidget))<0)
+    {
+        //error uncomplete
+        return;
+    }
+    currElement->setValid(false);
+    //1, rm from flowlayout
+    m_flowLayout->takeAt(idx);
+    if(m_flowLayout->count()<=0)
+    {
+        //uncomplete
+        return;
+    }
+    int newCurrIdx=-1;
+    if(idx==0)
+    {
+        newCurrIdx=0;
+    }
+    else if(idx==m_flowLayout->count())
+    {
+        newCurrIdx=m_flowLayout->count()-1;
+    }
+    m_flowLayout->update();
+    qDebug()<<"removeImages. idx: "<<idx<<" newCurrIdx: "<<newCurrIdx;
+    //2, update textattr && ass
+    updateTextAttrAndAss(newCurrIdx);
+    //3, create new video
+    createFinalVideo(false);
+    //4, select new current image
+    QWidget* theWidget = m_flowLayout->itemAt(newCurrIdx)->widget();
+    selectedImage(theWidget);
+    (qobject_cast<Element *>(theWidget))->doFocusImage();
+    //5, delete object && delete object's member
+    currWidget->deleteLater();
 }
 void ElementsEdit::addMusic()
 {
@@ -312,14 +361,39 @@ void ElementsEdit::selectedText(const QString& oritxt)
 {
     //只能先选定image，才能对text操作
     QWidget* send = qobject_cast<QWidget *>(sender());
+    Element* currElement = qobject_cast<Element *>(sender());
     //QMessageBox::information(this, "info", QString(tr("selected send: %1 m_lastSelectedElement: %2")).arg((size_t)send).arg((size_t)m_lastSelectedElement));
     if(send == m_lastSelectedElement && send)
     {
         //QMessageBox::information(this, "info", QString(tr("send")));
         //QWidget *lastWidget = qobject_cast<QWidget *>(m_lastSelectedElement);
         //int idx = m_flowLayout->indexOf(lastWidget);
+        if(!oritxt.isEmpty()) //uncomplete judge globaltext->text && globaltext->start && globaltext->duration
+        {
+            int iStartTime=0;
+            for (int i = 0; i < m_flowLayout->count(); ++i)
+            {
+                Element* element = qobject_cast<Element *>(m_flowLayout->itemAt(i)->widget());
+                if(element == currElement)
+                {
+                    currElement->globalTextAttr()->m_iStartTimeText=iStartTime;
+                    currElement->globalTextAttr()->m_iDurationText=element->globalVideoAttr()->m_iDuration;
+                    break;
+                }
+                if(element && element->globalVideoAttr())
+                {
+                    iStartTime += element->globalVideoAttr()->m_iDuration;
+                }
+                else
+                {
+                    //uncomplete
+                }
+            }
+            //first time
+
+        }
         //1, 激活对应VideoText
-        emit activeVideoTextSignal((void*)send, oritxt);
+        emit activeVideoTextSignal(currElement, oritxt);
         //2, 激活对应tabTextTool
         emit activeTabTextSignal((void*)send);
     }
@@ -328,9 +402,12 @@ void ElementsEdit::selectedMusic()
 {
     emit activeTabMusicSignal(NULL);
 }
-void ElementsEdit::selectedImage()
+void ElementsEdit::selectedImage(QWidget* theWidget)
 {
     QWidget* send = qobject_cast<QWidget *>(sender());
+    Element* sendElement = qobject_cast<Element *>(sender());
+    Element* theElement = qobject_cast<Element *>(theWidget);
+    qDebug()<< "selectedImage. theElement: "<< (size_t)theElement<<" send: "<< (size_t)send;
     //QMessageBox::information(this, "info", QString(tr("selectedImage send: %1 m_lastSelectedElement: %2")).arg((size_t)send).arg((size_t)m_lastSelectedElement));
     //1, 计算播放位移
     int imgWidth=0;
@@ -342,7 +419,7 @@ void ElementsEdit::selectedImage()
             // err uncomplete
             continue;
         }
-        if(send == element)
+        if(send == element || theWidget == element)
         {
             break;
         }
@@ -353,11 +430,13 @@ void ElementsEdit::selectedImage()
         m_imgPlayPosition = imgWidth*m_duration/m_imgWidth;
     emit changePlayPosition(m_imgPlayPosition); 
 
-    // 2, 移除上次高亮
-    if(send == m_lastSelectedElement)
+    if(!theWidget && send == m_lastSelectedElement)
         return;
+    // 2, 移除上次高亮
     int iCurrentIdx=-1;
-    if(send && (iCurrentIdx=m_flowLayout->indexOf(send))>=0)
+    if(( theWidget && (iCurrentIdx=m_flowLayout->indexOf(theWidget))>=0)
+            || (send && (iCurrentIdx=m_flowLayout->indexOf(send))>=0)
+      )
     {
         m_idxCurrentElement = iCurrentIdx;
     }
@@ -367,20 +446,28 @@ void ElementsEdit::selectedImage()
         int idx = m_flowLayout->indexOf(lastWidget);
         if(idx<0)
         {
-            QMessageBox::information(this, "error", QString(tr("can't find last widget")));
+            //QMessageBox::information(this, "error", QString(tr("can't find last widget")));
         }
         else
         {
             (qobject_cast<Element *>(m_lastSelectedElement))->unselectedImage();
             //移除上一次的VideoText的显示
-            emit displayVideoTextSignal((void*)m_lastSelectedElement, false);
+            emit displayVideoTextSignal((qobject_cast<Element *>(m_lastSelectedElement)), false);
         }
     }
     // 3, 显示本次VideoText
-    m_lastSelectedElement=send;
-    emit displayVideoTextSignal((void*)send, true);
-    // 4, 激活对应tabTextTool
-    //emit activeTabTextSignal((void*)send);
+    if(theWidget)
+    {
+        m_lastSelectedElement=theWidget;
+        emit displayVideoTextSignal(theElement, true);
+    }
+    else
+    {
+        m_lastSelectedElement=send;
+        emit displayVideoTextSignal(sendElement, true);
+    }
+    // 4, 赋值当前tab的值
+    emit assignTabValueSignal();
 }
 //void ElementsEdit::updatedText(stTextAttr* stTextAttr, const QString& qsText)
 void ElementsEdit::updatedText(const QString& qsAss)
@@ -935,27 +1022,6 @@ void ElementsEdit::assignProgress()
         m_vecticalLine->setGeometry(QRect(x, y, m_lineWidth, m_imgHeight)); //uncomplete
     }
 }
-QByteArray ElementsEdit::createAss(stTextAttr* stTextAttr, const QString& qsText)
-{
-    //http://bbs.tgbus.com/thread-927116-1-1.html
-    QByteArray qs("[Script Info]\n"
-"; Script generated by FFmpeg/Lavc57.24.102\n"
-"ScriptType: v4.00+\n"
-"PlayResX: 512\n"
-"PlayResY: 384\n"
-"\n"
-"[V4+ Styles]\n"
-"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding\n"
-"Style: Default,楷体,   16,       &Hffffff,      &Hffffff,        &H0,           &H0,        0,         0,      0,         0,         100,    100,    0,       0,     1,           1,       0,      2,          10,      10,      10,      0,          0\n"
-"\n"
-"[Events]\n"
-"Format:   Layer, Start,      End,        Style,  Name, MarginL, MarginR, MarginV, Effect, Text\n"
-";Dialogue: 0,     0:00:00.001, 0:00:01.99, Default,    , 0,       0,       0,             , Go kill something.\n"
-"Dialogue: 0,     0:00:00.01, 0:00:00.94, Default,    , 0,       0,       0,             , {\\move(0,0,60,120 [,100,500])}{\\fad(400,80)}{\\fs18\\t(130,500,\\fry360)}- Oh, stupid.\\N贱人\n"
-";Dialogue: 0,     0:00:01.01, 0:00:01.99, Default,    , 0,       0,       0,             , Go kill something.\n"
-);
-    return qs;
-}
 void ElementsEdit::createSingleVideo(int idxElement)
 {
     if(idxElement<0)
@@ -1196,4 +1262,55 @@ bool ElementsEdit::createAnimationPanzoom(Element *firstElement, Element *second
     createAnimation(firstElement, secondElement, true);
 
     return true;
+}
+void ElementsEdit::videoStateChanged(QMediaPlayer::State state)
+{
+    switch(state) {
+    case QMediaPlayer::PlayingState:
+        //hide videotext
+        for (int i = 0; i < m_flowLayout->count(); ++i)
+        {
+            Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(i)->widget());
+            if (!element)
+            {
+                // err uncomplete
+                continue;
+            }
+            emit displayVideoTextSignal(element, false);
+        }
+        break;
+    case QMediaPlayer::StoppedState:
+    default:
+        break;
+    }
+
+}
+void ElementsEdit::updateTextAttrAndAss(int iStartIdx)
+{
+    int iStartTime=0;
+    bool isChanged=false;
+    for (int i = 0; i < m_flowLayout->count(); ++i)
+    {
+        Element* element = qobject_cast<Element *>(m_flowLayout->itemAt(i)->widget());
+
+        if(i>=iStartIdx && element->globalTextAttr() && !element->globalTextAttr()->m_qsStyle.isEmpty()) //uncomplete: m_qsStyle->m_qsText
+        {
+            isChanged=true;
+            element->globalTextAttr()->m_iStartTimeText = iStartTime;
+        }
+
+        if(element && element->globalVideoAttr())
+        {
+            iStartTime += element->globalVideoAttr()->m_iDuration;
+        }
+        else
+        {
+            //uncomplete
+        }
+
+    }
+    if(isChanged && m_globalContext && m_globalContext->m_scene)
+    {
+        m_qsInText = m_globalContext->m_scene->createTotalAssInfo().toUtf8();
+    }
 }

@@ -61,12 +61,14 @@ signals:
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    QFont font;
-    font.setPointSize(8); 
-    QFontMetrics fm(font); 
-    int fw = fm.width("test");
-    int fh;// = fm.height();
-    qDebug() << "fw: " << fw <<" fh: " << fh ;
+
+#if 1
+    QString start = QDateTime(QDate::currentDate()).addMSecs(10).toString("yyyy/MM/dd hh:mm:ss.zzz");
+    start.chop(1);
+    qDebug() << "date: " << start;//.chop(1);
+    qDebug() << "date: " << QDateTime(QDate::currentDate()).addMSecs(2000).toString("hh:mm:ss.zz");
+#endif
+
 #if 0
 	// Task parented to the application so that it
     // will be deleted by the application.

@@ -12,11 +12,11 @@ class Image : public QLabel
 public:
     Image(const QString& path, QSize size, QWidget *parent=0);
     void unselectedImage();
-    void doSelectImage();
+    void doFocusImage();
 signals:
     void selectedImageSignal();
-public slots:
-    void focusImage();
+//public slots:
+//    void focusImage();
 protected:
     void contextMenuEvent(QContextMenuEvent * event) Q_DECL_OVERRIDE;
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
@@ -28,7 +28,7 @@ private slots:
     void open();
 #endif
 private:
-    QPixmap *m_pixMap;
+    QPixmap m_pixMap;
     bool m_focus;
 };
 //! [0]

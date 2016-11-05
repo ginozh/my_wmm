@@ -8,6 +8,7 @@ Element::Element(QWidget *parent, const QString& qsImageName,GraphicsScene* scen
     , m_elementLayout(new QVBoxLayout(this))
     , m_pimage(0)
     , m_qsImageName(qsImageName)
+    , m_bValid(true)
     , m_globalVideoAttr(new GlobalVideoAttr)
     , m_globalAnimationAttr(new GlobalAnimationAttr)
     , m_globalTextAttr(new GlobalTextAttr)
@@ -36,11 +37,12 @@ Element::Element(QWidget *parent, const QString& qsImageName,GraphicsScene* scen
         m_elementLayout->addWidget(m_pimage);
 
         connect(this, SIGNAL(insertImage()), parentWidget(), SLOT(addImages()) );
+        connect(this, SIGNAL(removeImage()), parentWidget(), SLOT(removeImage()) );
 
         //connect(parentWidget(), SIGNAL(focusImageSignal()), m_pimage(), SLOT(focusImage()) );
         //必须要二层，因为elementsedit是根据send(即element)来确定哪个element的
         connect(m_pimage, SIGNAL(selectedImageSignal()), this, SLOT(selectedImage()) );
-        connect(this, SIGNAL(selectedImageSignal()), parentWidget(), SLOT(selectedImage()) );
+        connect(this, SIGNAL(selectedImageSignal(QWidget*)), parentWidget(), SLOT(selectedImage(QWidget*)) );
 
         //load orignal file
         QFile file(qsImageName);
@@ -56,25 +58,25 @@ Element::Element(QWidget *parent, const QString& qsImageName,GraphicsScene* scen
         m_fbOriFile.out_len = NULL;
 
         m_iOutVideo = 10*1024*1024;
-        m_pBufferVideo=(uint8_t *)malloc(m_iOutVideo);
+        m_pBufferVideo=(uint8_t *)new char[m_iOutVideo];
         m_fbScaleAniVideo.ptr = m_pBufferVideo;
         m_fbScaleAniVideo.in_len = m_iOutVideo;
         m_fbScaleAniVideo.out_len = &m_iOutVideo;
 
         m_iOutPanzoomVideo = 10*1024*1024;
-        m_pBufferPanzoomVideo=(uint8_t *)malloc(m_iOutPanzoomVideo);
+        m_pBufferPanzoomVideo=(uint8_t *)new char[m_iOutPanzoomVideo];
         m_fbPanzoomVideo.ptr = m_pBufferPanzoomVideo;
         m_fbPanzoomVideo.in_len = m_iOutPanzoomVideo;
         m_fbPanzoomVideo.out_len = &m_iOutPanzoomVideo;
 
         m_iOutTransitionVideo = 10*1024*1024;
-        m_pBufferTransitionVideo=(uint8_t *)malloc(m_iOutTransitionVideo);
+        m_pBufferTransitionVideo=(uint8_t *)new char[m_iOutTransitionVideo];
         m_fbTransitionVideo.ptr = m_pBufferTransitionVideo;
         m_fbTransitionVideo.in_len = m_iOutTransitionVideo;
         m_fbTransitionVideo.out_len = &m_iOutTransitionVideo;
 
         m_iOutScaleFile = 1024*1024;
-        m_pBufferScaleFile=(uint8_t *)malloc(m_iOutScaleFile);
+        m_pBufferScaleFile=(uint8_t *)new char[m_iOutScaleFile];
         m_fbScaleFile.ptr = m_pBufferScaleFile;
         m_fbScaleFile.in_len = m_iOutScaleFile;
         m_fbScaleFile.out_len = &m_iOutScaleFile;
@@ -113,25 +115,38 @@ Element::Element(QWidget *parent, const QString& qsImageName,GraphicsScene* scen
 }
 Element::~Element()
 {
+    delete m_globalVideoAttr;
+    delete m_globalAnimationAttr;
+    delete m_globalTextAttr;
+    m_globalVideoAttr=0;m_globalAnimationAttr=0;m_globalTextAttr=0;
+
+
+    m_elementLayout->removeWidget(m_pimage);
+    m_elementLayout->removeWidget(m_musicLabel);
+    m_elementLayout->removeWidget(m_lineEdit);
     delete m_pimage;
-#if 0
-    // uncomplete
-    for(m_elementLayout widget)
-    {
-        delete widget;
-    }
-#endif
-    //delete m_fbScaleAniVideo.ptr; //uncomplete;
+    delete m_musicLabel;
+    delete m_lineEdit;
+    
     delete m_elementLayout;
-    m_baOriFile.clear();
+
+    delete[] m_pBufferVideo;
+    delete[] m_pBufferPanzoomVideo;
+    delete[] m_pBufferTransitionVideo;
+    delete[] m_pBufferScaleFile;
+    //m_baOriFile.clear();
 }
 void Element::insert()
 {
     emit insertImage();
 }
+void Element::remove()
+{
+    emit removeImage();
+}
 void Element::selectedImage()
 {
-    emit selectedImageSignal();
+    emit selectedImageSignal(NULL);
 }
 void Element::selectedText(const QString& ori)
 {

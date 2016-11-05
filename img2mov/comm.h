@@ -9,7 +9,7 @@ class ElementsEdit;
 class GraphicsScene;
 class VideoPlayer;
 class TabWidget;
-
+#if 0
 typedef struct stTextAttr{
 public:
     stTextAttr(const QString& qsStartTimeText="2.00s", const QString& qsDurationText="2.00")
@@ -52,24 +52,12 @@ public:
     QString m_qsEvent;
 
 }stTextAttr;
+#endif
 
 class GlobalTextAttr
 {
 public:
-    GlobalTextAttr()
-    {
-        //m_qfont = ;
-        m_fontSize = "8";
-        m_isBoldChecked = false;
-        m_isItalicChecked = false;
-        m_isUnderlineChecked = false;
-        m_fontColor = Qt::white;
-
-        m_textAlign = Qt::AlignLeft; //Qt::AlignHCenter; //AlignRight;
-        m_idxEffects = 0;
-        m_qsStartTimeText = "0.00s";
-        m_qsDurationText = "2.00s";
-    }
+    GlobalTextAttr();
 public:
     //QString m_qsText;
     //font
@@ -83,8 +71,10 @@ public:
     //Qt::Alignment m_textAlign; 
     int m_textAlign; 
     //Adjust
-    QString m_qsStartTimeText;
-    QString m_qsDurationText;
+    //QString m_qsStartTimeText;
+    //QString m_qsDurationText;
+    int m_iStartTimeText ;
+    int m_iDurationText ;
     //Effects
     int m_idxEffects;
     //ass
@@ -95,9 +85,7 @@ public:
 class GlobalAnimationAttr 
 {
 public:
-    GlobalAnimationAttr(){
-        m_iTransitionDuration = 1500;
-    }
+    GlobalAnimationAttr();
 public:
     QString m_qsTransitionName;
     QString m_qsPanZoom;
@@ -106,9 +94,7 @@ public:
 class GlobalVideoAttr 
 {
 public:
-    GlobalVideoAttr(){
-        m_iFramerate = 24;
-    }
+    GlobalVideoAttr();
 public:
     int m_iFramerate;
     int m_iDuration;
@@ -117,11 +103,7 @@ public:
 class GlobalMusicAttr
 {
 public:
-    GlobalMusicAttr(){
-        m_iStartTime = 0;
-        m_iStartPoint = 0;
-        //m_iEntPoint = 2000;
-    }
+    GlobalMusicAttr();
 public:
     QString m_qsAudioFilename;
     int m_iStartTime;
@@ -132,12 +114,7 @@ public:
 class GlobalContext
 {
 public:
-    GlobalContext(){
-        m_elementsEdit=NULL;
-        m_scene=NULL;
-        m_player=NULL;
-        m_tabWidget=NULL;
-    }
+    GlobalContext();
 public:
     ElementsEdit* m_elementsEdit;
     GraphicsScene* m_scene;

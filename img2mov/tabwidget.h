@@ -66,10 +66,11 @@ public slots:
     void textColorChanged();
     void handleFontChange();
     void handleVideoAttrChange();
+    void assignTabValue();
 signals:
     void elementAttrChanged(bool);
-private slots:
-    void currentChanged(int index);
+//public slots:
+    //void currentChanged(int index);
 private:
     void createTabHome();
     void createTabAnimations();
@@ -82,9 +83,10 @@ private:
     QMenu *createColorMenu(const char *slot, QColor defaultColor);
     QIcon createColorToolButtonIcon(const QString &imageFile, QColor color);
     QIcon createColorIcon(QColor color);
-    void assignTabWidget(const stTextAttr *textItem);
-    void assignTabWidget(const GlobalTextAttr *globalTextAttr);
+    //void assignTabWidget(const stTextAttr *textItem);
+    void assignTextInfo();
     void assignVideoInfo();
+    void assignAnimationInfo();
 private:
     QListWidget *contentsWidget;
     QSize m_iconSize;
@@ -92,12 +94,12 @@ private:
     //GraphicsScene* m_scene;
     GlobalContext* m_globalContext;
     void* m_element;
-    QMap<void*, stTextAttr*> m_mapText;
+    //QMap<void*, stTextAttr*> m_mapText;
 
     QWidget *m_tabHome;
     QWidget *m_tabAnimations;
     //video
-    QMap<void*, GlobalVideoAttr*> m_mapVieo;
+    //QMap<void*, GlobalVideoAttr*> m_mapVieo;
     QWidget *m_tabVideo;
     QComboBox* m_cbSpeedVideo;
     ComboBox* m_cbDurationVieo;

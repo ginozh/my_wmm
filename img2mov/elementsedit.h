@@ -38,26 +38,27 @@ private:
     bool createAnimationPanzoom(Element *firstElement, Element *secondElement);
     void initialProgress();
     void assignProgress();
-    //QString createAss(stTextAttr* stTextAttr, const QString&);
-    QByteArray createAss(stTextAttr* stTextAttr, const QString& qsText);
+    void updateTextAttrAndAss(int iStartIdx);
 signals:
     void readyVideo(const QString& fileName, const QByteArray& buffer, int position);
     void changePlayPosition(int);
     void playVideo();
     //void createVideoTextSignal(void*);
     void createVideoTextSignal(Element*);
-    void displayVideoTextSignal(void*, bool);
-    void activeVideoTextSignal(void*, const QString&);
+    void displayVideoTextSignal(Element*, bool);
+    void activeVideoTextSignal(Element*, const QString&);
     void activeTabTextSignal(void*);
     void activeTabMusicSignal(GlobalMusicAttr*);
+    void assignTabValueSignal();
 protected:
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void resizeEvent(QResizeEvent * event) Q_DECL_OVERRIDE;
 public slots:
     void addImages();
+    void removeImage();
     void addMusic();
     void addText();
-    void selectedImage();
+    void selectedImage(QWidget*);
     void selectedText(const QString&);
     void selectedMusic();
     void selectedTransition(const QString& animation);
@@ -68,6 +69,7 @@ public slots:
     //void selectedText(void*);
     //void handleContextMenuRequested(const QPoint &pos);
     void updatedText(const QString&);
+    void videoStateChanged(QMediaPlayer::State);
 private:
     FlowLayout *m_flowLayout;
     QVBoxLayout *m_firstLayout;

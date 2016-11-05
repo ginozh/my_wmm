@@ -27,23 +27,28 @@ public:
     ~Element();
     const QString& getImageName(){return m_qsImageName;}
     void unselectedImage(){if(m_pimage){m_pimage->unselectedImage();}}
-    void doSelectImage(){if(m_pimage){m_pimage->doSelectImage();}}
+    void doFocusImage(){if(m_pimage){m_pimage->doFocusImage();}}
     GlobalVideoAttr* globalVideoAttr(){return m_globalVideoAttr;}
     GlobalAnimationAttr* globalAnimationAttr(){return m_globalAnimationAttr;}
     GlobalTextAttr* globalTextAttr(){return m_globalTextAttr;}
     LineEdit* lineEdit(){return m_lineEdit;}
+    void setValid(bool bValid){m_bValid = bValid;}
+    bool valid(){return m_bValid;}
 signals:
     void insertImage();
-    void selectedImageSignal();
+    void removeImage();
+    void selectedImageSignal(QWidget*);
     void selectedTextSignal(const QString&);
 public slots:
     void insert();
+    void remove();
     void selectedImage();
     void selectedText(const QString&);
 private:
     QVBoxLayout *m_elementLayout;
     Image *m_pimage;
     QString m_qsImageName; //图片路径
+    bool m_bValid;
 public: // uncomplete
     FfmpegBuffer m_fbOriFile;        // 原始文件(图片、视频)
     QByteArray   m_baOriFile;
