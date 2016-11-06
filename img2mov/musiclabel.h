@@ -8,7 +8,7 @@ class MusicLabel : public QLabel
 
 public:
     MusicLabel(QSize size, QWidget *parent=0);
-    void updateMusicInfo(int pos, const QString& qsText);
+    void updateMusicInfo(int pos, const QString& qsText="");
 signals:
     void selectedMusicSignal();
 protected:

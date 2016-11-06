@@ -32,6 +32,7 @@ public:
     GlobalAnimationAttr* globalAnimationAttr(){return m_globalAnimationAttr;}
     GlobalTextAttr* globalTextAttr(){return m_globalTextAttr;}
     LineEdit* lineEdit(){return m_lineEdit;}
+    MusicLabel* musicLabel(){return m_musicLabel;}
     void setValid(bool bValid){m_bValid = bValid;}
     bool valid(){return m_bValid;}
 signals:
@@ -48,7 +49,7 @@ private:
     QVBoxLayout *m_elementLayout;
     Image *m_pimage;
     QString m_qsImageName; //图片路径
-    bool m_bValid;
+    bool m_bValid; //被flowlayout移除时设置false, 生成ass时才不会被引用
 public: // uncomplete
     FfmpegBuffer m_fbOriFile;        // 原始文件(图片、视频)
     QByteArray   m_baOriFile;

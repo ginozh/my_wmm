@@ -68,7 +68,6 @@ tab: font and text animation
     connect(openButton, SIGNAL(clicked()), this, SLOT(openFile()));
 #endif
     playButton = new QPushButton;
-    playButton->setEnabled(false); //uncomplete
     playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 
     connect(playButton, SIGNAL(clicked()), this, SLOT(play()));
@@ -100,6 +99,8 @@ tab: font and text animation
             this, SLOT(mediaStateChanged(QMediaPlayer::State)));
     connect(&mediaPlayer, SIGNAL(positionChanged(qint64)), this, SLOT(positionChanged(qint64)));
     connect(&mediaPlayer, SIGNAL(durationChanged(qint64)), this, SLOT(durationChanged(qint64)));
+
+    initial();
 }
 
 VideoPlayer::~VideoPlayer()
@@ -212,6 +213,15 @@ void VideoPlayer::rotateVideo(int angle)
     qreal x = videoItem->boundingRect().width() / 2.0;
     qreal y = videoItem->boundingRect().height() / 2.0;
     videoItem->setTransform(QTransform().translate(x, y).rotate(angle).translate(-x, -y));
+}
+void VideoPlayer::initial()
+{
+    //1, 
+    playButton->setEnabled(false);
+
+    //2, black screen //uncomlete
+    mediaPlayer.stop();
+    //mediaPlayer.setMedia(NULL);
 }
 /*
    QPalette pl = iEdit->palette();

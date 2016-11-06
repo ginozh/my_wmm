@@ -105,11 +105,12 @@ class GlobalMusicAttr
 public:
     GlobalMusicAttr();
 public:
-    QString m_qsAudioFilename;
+    QString m_qsMusicFullFilename;
+    QString m_qsMusicFilename;
     int m_iStartTime;
     int m_iStartPoint;
     int m_iEntPoint;
-    int m_iAudioDuration;
+    int m_iMusicDuration;
 };
 class GlobalContext
 {

@@ -9,9 +9,11 @@
 #include <QTime>
 #include <QDebug>
 #include "videoscene.h"
+#include "videoplayer.h"
 
 #include "elementsedit.h"
 #include "element.h"
+#include "musiclabel.h"
 extern "C"{
 #include "ffmpeg.h"
 }
@@ -21,6 +23,8 @@ ElementsEdit::ElementsEdit(QWidget *parent, GlobalContext* globalContext)
     : QWidget(parent)
       //, m_flowLayout(new FlowLayout(this))
       , m_flowLayout(NULL)
+      , m_firstLayout(NULL)
+      , m_firstLabel(NULL)
       , m_vecticalLine(new QFrame(this))
       , m_lastSelectedElement(0)
       , m_idxCurrentElement(-1)
@@ -31,7 +35,6 @@ ElementsEdit::ElementsEdit(QWidget *parent, GlobalContext* globalContext)
     //m_tmpdir=QDir::currentPath().append(tr("/tmp"));
 
     setBackgroundRole(QPalette::Light);
-    setCursor(QCursor(Qt::PointingHandCursor));
 
     m_duration=0;
     m_imgWidth=0;
@@ -51,7 +54,6 @@ ElementsEdit::ElementsEdit(QWidget *parent, GlobalContext* globalContext)
 
     m_vecticalLine->setObjectName(QStringLiteral("line"));
     m_vecticalLine->setEnabled(true);
-    m_vecticalLine->hide();
     //m_vecticalLine->setGeometry(QRect(300, 250, 10, 200));
     m_vecticalLine->setLineWidth(0);
     m_vecticalLine->setMidLineWidth(10);
@@ -65,18 +67,7 @@ ElementsEdit::ElementsEdit(QWidget *parent, GlobalContext* globalContext)
     m_vecticalLine->setFrameShape(QFrame::VLine);
     m_vecticalLine->setFrameShadow(QFrame::Sunken);
 
-    m_firstLabel=new QLabel(this);
-    m_firstLabel->setText(tr("Click here to browse for photos"));
-    //label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    QFont font = m_firstLabel->font();
-    font.setPointSize(25);
-    font.setBold(true);
-    m_firstLabel->setFont(font);
-    //m_firstLabel->setAlignment(Qt::AlignCenter);
-    m_firstLayout = new QVBoxLayout(this);
-    //layout->addWidget(m_addPhotos, 0, Qt::AlignCenter);
-    m_firstLayout->addWidget(m_firstLabel, 0, Qt::AlignCenter);
-    setLayout(m_firstLayout);
+    initialFirstLayout();
 #endif
 
     setWindowTitle(tr("Flow Layout"));
@@ -161,9 +152,12 @@ void ElementsEdit::addImages()
 
         //qDeleteAll(children());
         delete m_firstLayout;
+        m_firstLayout = NULL;
+        delete m_firstLabel;
+        m_firstLabel = NULL;
+
         m_flowLayout = new FlowLayout(this);
         setLayout(m_flowLayout);
-        delete m_firstLabel;
     }
     int idx = -1;
     //只有image过来的insert事件，它的父类(element)才会是m_flowLayout的元素
@@ -240,12 +234,15 @@ void ElementsEdit::removeImage()
         //error uncomplete
         return;
     }
-    currElement->setValid(false);
+    currElement->setValid(false); 
     //1, rm from flowlayout
     m_flowLayout->takeAt(idx);
+    m_flowLayout->update();
     if(m_flowLayout->count()<=0)
     {
-        //uncomplete
+        currWidget->deleteLater();
+
+        initialFirstLayout();
         return;
     }
     int newCurrIdx=-1;
@@ -257,7 +254,6 @@ void ElementsEdit::removeImage()
     {
         newCurrIdx=m_flowLayout->count()-1;
     }
-    m_flowLayout->update();
     qDebug()<<"removeImages. idx: "<<idx<<" newCurrIdx: "<<newCurrIdx;
     //2, update textattr && ass
     updateTextAttrAndAss(newCurrIdx);
@@ -277,20 +273,21 @@ void ElementsEdit::addMusic()
             tr("Audio and Music (*.wma *.mp3 *.wav *.aif *.aiff *.m4a *.ogg)"));
     if (file.isEmpty() )
         return;
-    //QFileInfo fi(file);
+    QFileInfo fi(file);
     //QString ext = fi.suffix();  // ext = "gz"
-    m_audioMediaPlayer.setMedia(QUrl::fromLocalFile(file));
-    connect(&m_audioMediaPlayer, SIGNAL(durationChanged(qint64)), this,
-            SLOT(audioDurationChanged(qint64)));
+    m_musicMediaPlayer.setMedia(QUrl::fromLocalFile(file));
+    connect(&m_musicMediaPlayer, SIGNAL(durationChanged(qint64)), this,
+            SLOT(musicDurationChanged(qint64)));
 
     m_isFirstMusic = true;
-    m_globalMusicAttr->m_qsAudioFilename = file;
+    m_globalMusicAttr->m_qsMusicFullFilename = file;
+    m_globalMusicAttr->m_qsMusicFilename = fi.baseName();
 
     setCursor(QCursor(Qt::WaitCursor));
 #if 0
-    m_qsAudioFilename = file;
-    m_iAudioStart = 0;
-    m_iAudioDuration = 2;
+    m_qsMusicFullFilename = file;
+    m_iMusicStart = 0;
+    m_iMusicDuration = 2;
 
     QVector<QString> vqsArgv;
     vqsArgv.push_back("ffmpeg");
@@ -302,11 +299,11 @@ void ElementsEdit::addMusic()
     //vqsArgv.push_back(QString(tr("-f")));
     //vqsArgv.push_back(QString(tr("%1")).arg(ext));
     vqsArgv.push_back(QString(tr("-ss")));
-    vqsArgv.push_back(QString(tr("%1")).arg(m_iAudioStart));
+    vqsArgv.push_back(QString(tr("%1")).arg(m_iMusicStart));
     vqsArgv.push_back(QString(tr("-t")));
-    vqsArgv.push_back(QString(tr("%1")).arg(m_iAudioDuration));
+    vqsArgv.push_back(QString(tr("%1")).arg(m_iMusicDuration));
     vqsArgv.push_back(QString(tr("-i")));
-    vqsArgv.push_back(m_qsAudioFilename);
+    vqsArgv.push_back(m_qsMusicFullFilename);
 
     vqsArgv.push_back("-i");
     struct to_buffer sinbuffer;
@@ -482,16 +479,16 @@ void ElementsEdit::updatedText(const QString& qsAss)
     vqsArgv.push_back("-v");
     vqsArgv.push_back("debug");
 #endif
-    if(!m_qsAudioFilename.isEmpty())
+    if(!m_qsMusicFullFilename.isEmpty())
     {
         //vqsArgv.push_back(QString(tr("-f")));
         //vqsArgv.push_back(QString(tr("%1")).arg(ext));
         vqsArgv.push_back(QString(tr("-ss")));
-        vqsArgv.push_back(QString(tr("%1")).arg(m_iAudioStart));
+        vqsArgv.push_back(QString(tr("%1")).arg(m_iMusicStart));
         vqsArgv.push_back(QString(tr("-t")));
-        vqsArgv.push_back(QString(tr("%1")).arg(m_iAudioDuration));
+        vqsArgv.push_back(QString(tr("%1")).arg(m_iMusicDuration));
         vqsArgv.push_back(QString(tr("-i")));
-        vqsArgv.push_back(m_qsAudioFilename);
+        vqsArgv.push_back(m_qsMusicFullFilename);
     }
 
     vqsArgv.push_back("-i");
@@ -604,7 +601,7 @@ void ElementsEdit::createFinalVideoMusicTxt(bool bPlay)
     sinbuffer.out_len = NULL;
     vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&sinbuffer));
 
-    if(!m_globalMusicAttr->m_qsAudioFilename.isEmpty())
+    if(!m_globalMusicAttr->m_qsMusicFullFilename.isEmpty())
     {
         //vqsArgv.push_back(QString(tr("-f")));
         //vqsArgv.push_back(QString(tr("%1")).arg(ext));
@@ -615,7 +612,7 @@ void ElementsEdit::createFinalVideoMusicTxt(bool bPlay)
             vqsArgv.push_back(QString(tr("-i")));
             vqsArgv.push_back(QString(tr("anullsrc=channel_layout=5.1:sample_rate=48000")));
             vqsArgv.push_back(QString(tr("-i")));
-            vqsArgv.push_back(m_globalMusicAttr->m_qsAudioFilename);
+            vqsArgv.push_back(m_globalMusicAttr->m_qsMusicFullFilename);
             vqsArgv.push_back(QString(tr("-filter_complex")));
             int iRealLength = m_globalMusicAttr->m_iEntPoint - m_globalMusicAttr->m_iStartPoint+m_globalMusicAttr->m_iStartTime;
             /*QMessageBox::information(NULL, "info", QString(tr("vduration: %1 starttime: %2 startpoint: %3 endpoint: %4")).
@@ -640,7 +637,7 @@ void ElementsEdit::createFinalVideoMusicTxt(bool bPlay)
             int iRealDuration = m_globalMusicAttr->m_iEntPoint - m_globalMusicAttr->m_iStartPoint;
             vqsArgv.push_back(QString(tr("%1")).arg(iRealDuration<m_duration?((float)iRealDuration/1000):(float)(m_duration/1000)));
             vqsArgv.push_back(QString(tr("-i")));
-            vqsArgv.push_back(m_globalMusicAttr->m_qsAudioFilename);
+            vqsArgv.push_back(m_globalMusicAttr->m_qsMusicFullFilename);
         }
     }
 
@@ -728,14 +725,14 @@ void ElementsEdit::createFinalVideo(bool bPlay)
     vqsArgv.push_back("concat"); //uncomplete
     vqsArgv.push_back(QString(tr("-i")));
     vqsArgv.push_back(QString(tr("buffer:video/avi;nobase64,%1")).arg((size_t)&sinbuffer));
-    if(m_globalMusicAttr->m_qsAudioFilename.isEmpty() && m_qsInText.isEmpty())
+    if(m_globalMusicAttr->m_qsMusicFullFilename.isEmpty() && m_qsInText.isEmpty())
     {
         vqsArgv.push_back(QString(tr("-c")));
         vqsArgv.push_back(QString(tr("copy")));
     }
     else
     {
-        if(!m_globalMusicAttr->m_qsAudioFilename.isEmpty())
+        if(!m_globalMusicAttr->m_qsMusicFullFilename.isEmpty())
         {
             //vqsArgv.push_back(QString(tr("-f")));
             //vqsArgv.push_back(QString(tr("%1")).arg(ext));
@@ -746,7 +743,7 @@ void ElementsEdit::createFinalVideo(bool bPlay)
                 vqsArgv.push_back(QString(tr("-i")));
                 vqsArgv.push_back(QString(tr("anullsrc=channel_layout=5.1:sample_rate=48000")));
                 vqsArgv.push_back(QString(tr("-i")));
-                vqsArgv.push_back(m_globalMusicAttr->m_qsAudioFilename);
+                vqsArgv.push_back(m_globalMusicAttr->m_qsMusicFullFilename);
                 vqsArgv.push_back(QString(tr("-filter_complex")));
                 int iRealLength = m_globalMusicAttr->m_iEntPoint - m_globalMusicAttr->m_iStartPoint+m_globalMusicAttr->m_iStartTime;
                 /*QMessageBox::information(NULL, "info", QString(tr("vduration: %1 starttime: %2 startpoint: %3 endpoint: %4")).
@@ -771,7 +768,7 @@ void ElementsEdit::createFinalVideo(bool bPlay)
                 int iRealDuration = m_globalMusicAttr->m_iEntPoint - m_globalMusicAttr->m_iStartPoint;
                 vqsArgv.push_back(QString(tr("%1")).arg(iRealDuration<m_duration?((float)iRealDuration/1000):(float)(m_duration/1000)));
                 vqsArgv.push_back(QString(tr("-i")));
-                vqsArgv.push_back(m_globalMusicAttr->m_qsAudioFilename);
+                vqsArgv.push_back(m_globalMusicAttr->m_qsMusicFullFilename);
             }
         }
 
@@ -873,7 +870,7 @@ void ElementsEdit::createFinalVideo(bool bPlay)
     {
         QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
     }
-    if(m_globalMusicAttr->m_qsAudioFilename.isEmpty() && m_qsInText.isEmpty())
+    if(m_globalMusicAttr->m_qsMusicFullFilename.isEmpty() && m_qsInText.isEmpty())
     {
         //5, 播放视频
         QByteArray tmp=QByteArray((const char*)soutbuffer.ptr, (int)m_outlen);
@@ -941,17 +938,18 @@ void ElementsEdit::durationChanged(qint64 duration)
     initialProgress(); //需要在addImages 图片渲染之后被调用，否则element的长宽不对
 }
 //用于加载音乐获取duration
-void ElementsEdit::audioDurationChanged(qint64 duration)
+void ElementsEdit::musicDurationChanged(qint64 duration)
 {
     if(m_isFirstMusic)
     {
-        //1, create video
         m_isFirstMusic = false;
-        m_globalMusicAttr->m_iAudioDuration = duration;
+        //1, create video
+        m_globalMusicAttr->m_iMusicDuration = duration;
         m_globalMusicAttr->m_iEntPoint = duration;
         createFinalVideoMusicTxt(false);
 
         //2, 显示music文件名和颜色
+        int iStartDuration=0;
         for (int i = 0; m_flowLayout && i < m_flowLayout->count(); ++i)
         {
             Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(i)->widget());
@@ -960,6 +958,26 @@ void ElementsEdit::audioDurationChanged(qint64 duration)
                 // err uncomplete
                 continue;
             }
+            if(iStartDuration >= duration)
+            {
+                break;
+            }
+            QString qsMusicName = (i==0?m_globalMusicAttr->m_qsMusicFilename:"");
+            int iRight=-1;
+            if(iStartDuration + element->globalVideoAttr()->m_iDuration <= duration)
+            {
+                element->musicLabel()->updateMusicInfo(iRight, qsMusicName);
+            }
+            else
+            {
+                iRight=element->musicLabel()->rect().width()*(duration-iStartDuration)/element->globalVideoAttr()->m_iDuration;
+                element->musicLabel()->updateMusicInfo(iRight, qsMusicName);
+            }
+            qDebug()<<"iStartDuration: "<<iStartDuration<<" videoduration: "<<
+                element->globalVideoAttr()->m_iDuration<<" music_duration: "<<duration<<
+                " iRight: "<<iRight<<" rect: "<<element->musicLabel()->rect().width();
+
+            iStartDuration+=element->globalVideoAttr()->m_iDuration;
         }
 
         //3, update tabwidget
@@ -1312,5 +1330,50 @@ void ElementsEdit::updateTextAttrAndAss(int iStartIdx)
     if(isChanged && m_globalContext && m_globalContext->m_scene)
     {
         m_qsInText = m_globalContext->m_scene->createTotalAssInfo().toUtf8();
+    }
+}
+void ElementsEdit::initialFirstLayout()
+{
+    //1, elements layout
+    setCursor(QCursor(Qt::PointingHandCursor));
+    m_vecticalLine->hide();
+    m_isFirstClick = true;
+    if(m_flowLayout)
+    {
+        delete m_flowLayout;
+        m_flowLayout = NULL;
+    }
+    if(m_firstLayout)
+    {
+        delete m_firstLayout;
+    }
+    if(m_firstLabel)
+    {
+        delete m_firstLabel;
+    }
+    m_firstLabel=new QLabel(this);
+    m_firstLabel->setText(tr("Click here to browse for photos"));
+    //label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    QFont font = m_firstLabel->font();
+    font.setPointSize(25);
+    font.setBold(true);
+    m_firstLabel->setFont(font);
+    //m_firstLabel->setAlignment(Qt::AlignCenter);
+    m_firstLayout = new QVBoxLayout(this);
+    //layout->addWidget(m_addPhotos, 0, Qt::AlignCenter);
+    m_firstLayout->addWidget(m_firstLabel, 0, Qt::AlignCenter);
+
+    setLayout(m_firstLayout);
+
+    //2, video layout
+    if(m_globalContext && m_globalContext->m_player)
+    {
+        m_globalContext->m_player->initial();
+    }
+
+    //3, tab layout
+    if(m_globalContext && m_globalContext->m_tabWidget)
+    {
+        //uncomplete
     }
 }

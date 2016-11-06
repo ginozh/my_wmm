@@ -39,6 +39,7 @@ private:
     void initialProgress();
     void assignProgress();
     void updateTextAttrAndAss(int iStartIdx);
+    void initialFirstLayout();
 signals:
     void readyVideo(const QString& fileName, const QByteArray& buffer, int position);
     void changePlayPosition(int);
@@ -64,7 +65,7 @@ public slots:
     void selectedTransition(const QString& animation);
     void elementAttrChanged(bool bPlay);
     void durationChanged(qint64 duration);
-    void audioDurationChanged(qint64 duration);
+    void musicDurationChanged(qint64 duration);
     void positionChanged(qint64 position);
     //void selectedText(void*);
     //void handleContextMenuRequested(const QPoint &pos);
@@ -108,13 +109,13 @@ private:
     QByteArray m_qsInText;
 
 
-    //audio
-    QMediaPlayer m_audioMediaPlayer;
+    //music
+    QMediaPlayer m_musicMediaPlayer;
     GlobalMusicAttr* m_globalMusicAttr;
     bool m_isFirstMusic;
-    //QString m_qsAudioFilename;
-    //int m_iAudioStart;
-    //int m_iAudioDuration;
+    //QString m_qsMusicFilename;
+    //int m_iMusicStart;
+    //int m_iMusicDuration;
     
     //video
 };

@@ -25,6 +25,7 @@ public:
     QSize sizeHint() const { return QSize(800, 600); }
     QMediaPlayer* MediaPlayer(){return &mediaPlayer;}
     GraphicsScene *Scene(){return scene;}
+    void initial();
 
 public slots:
     void openFile();
