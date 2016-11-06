@@ -3,6 +3,7 @@
 #include <QtWidgets>
 #include <QVideoSurfaceFormat>
 #include <QGraphicsVideoItem>
+#include <QDebug>
 
 VideoPlayer::VideoPlayer(QWidget *parent)
     : QWidget(parent)
@@ -13,7 +14,8 @@ VideoPlayer::VideoPlayer(QWidget *parent)
 {
     setMinimumWidth(400);
     setMaximumWidth(600);
-
+#if 0
+    //===================
     //scene = new GraphicsScene(NULL, this);
     scene = new GraphicsScene(this);
     graphicsView = new QGraphicsView(scene);
@@ -87,10 +89,77 @@ tab: font and text animation
     controlLayout->addWidget(playButton);
     controlLayout->addWidget(positionSlider);
 
+
     QBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(graphicsView);
     //layout->addWidget(rotateSlider);
     layout->addLayout(controlLayout);
+    //=============
+#endif
+
+    QBoxLayout *layout = new QVBoxLayout;
+    {
+        scene = new GraphicsScene(this);
+        graphicsView = new QGraphicsView(scene);
+        layout->addWidget(graphicsView);
+
+        //graphicsView->setSceneRect(0,0,500,480);
+        scene->setSceneRect(0,0,512,384); //如果没有这个，可能宽度会变成764
+        graphicsView->setSceneRect(0,0,512,384);
+
+        videoItem = new QGraphicsVideoItem;
+        videoItem->setSize(QSizeF(512, 384));
+        scene->addItem(videoItem);
+    }
+    {
+        m_qlDisplayTime = new QLabel;
+        layout->addWidget(m_qlDisplayTime);
+
+        m_qlDisplayTime->setAlignment(Qt::AlignRight);
+        m_qlDisplayTime->setText("00:00.00/00:00.00");
+
+#if 0
+        QBoxLayout *timeLayout = new QHBoxLayout;
+        layout->addLayout(timeLayout);
+        timeLayout->setMargin(0);
+        {
+        }
+        {
+        }
+        {
+        }
+        timeLayout->addWidget(playButton);
+        timeLayout->addWidget(positionSlider);
+#endif
+    }
+    {
+        QBoxLayout *controlLayout = new QHBoxLayout;
+        layout->addLayout(controlLayout);
+        controlLayout->setMargin(0);
+        {
+#ifdef OPEN_FILE
+            QAbstractButton *openButton = new QPushButton(tr("Open..."));
+            controlLayout->addWidget(openButton);
+
+            connect(openButton, SIGNAL(clicked()), this, SLOT(openFile()));
+#endif
+        }
+        {
+            playButton = new QPushButton;
+            controlLayout->addWidget(playButton);
+
+            playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+            connect(playButton, SIGNAL(clicked()), this, SLOT(play()));
+        }
+        {
+            positionSlider = new Slider(Qt::Horizontal);
+            controlLayout->addWidget(positionSlider);
+
+            positionSlider->setRange(0, 0);
+            connect(positionSlider, SIGNAL(sliderMoved(int)),
+                    this, SLOT(setPosition(int)));
+        }
+    }
 
     setLayout(layout);
 
@@ -204,6 +273,15 @@ void VideoPlayer::durationChanged(qint64 duration)
 void VideoPlayer::setPosition(int position)
 {
     mediaPlayer.setPosition(position);
+}
+void VideoPlayer::updatedVideoTimeText(int position, int duration)
+{
+    QString qsPosition = QDateTime(QDate::currentDate()).addMSecs(position).toString("mm:ss.zzz"); 
+    qsPosition.chop(1);
+    QString qsDuration = QDateTime(QDate::currentDate()).addMSecs(duration).toString("mm:ss.zzz"); 
+    qsDuration.chop(1);
+    //qDebug()<<"position: "<<position<<" duration: "<<duration<<"qsPosition: "<<qsPosition<<" qsDuration: "<<qsDuration;
+    m_qlDisplayTime->setText(QString(tr("%1/%2")).arg(qsPosition).arg(qsDuration));
 }
 
 

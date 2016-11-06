@@ -407,7 +407,8 @@ void ElementsEdit::selectedImage(QWidget* theWidget)
     qDebug()<< "selectedImage. theElement: "<< (size_t)theElement<<" send: "<< (size_t)send;
     //QMessageBox::information(this, "info", QString(tr("selectedImage send: %1 m_lastSelectedElement: %2")).arg((size_t)send).arg((size_t)m_lastSelectedElement));
     //1, 计算播放位移
-    int imgWidth=0;
+    //int imgWidth=0;
+    int iStartDuration=0;
     for (int i = 0; i < m_flowLayout->count(); ++i)
     {
         Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(i)->widget());
@@ -421,11 +422,16 @@ void ElementsEdit::selectedImage(QWidget* theWidget)
             break;
         }
         //QMessageBox::information(this, "info", QString(tr("imgWidth: %1")).arg(element->geometry().width()));
-        imgWidth+=element->geometry().width();
+        //imgWidth+=element->geometry().width();
+        iStartDuration += element->globalVideoAttr()->m_iDuration;
     }
-    if(m_imgWidth)
-        m_imgPlayPosition = imgWidth*m_duration/m_imgWidth;
+    //if(m_imgWidth)
+    {
+        //m_imgPlayPosition = imgWidth*m_duration/m_imgWidth;
+        m_imgPlayPosition = iStartDuration;
+    }
     emit changePlayPosition(m_imgPlayPosition); 
+    emit updatedVideoTimeTextSignal(m_imgPlayPosition, m_duration);
 
     if(!theWidget && send == m_lastSelectedElement)
         return;
@@ -540,12 +546,7 @@ void ElementsEdit::updatedText(const QString& qsAss)
 void ElementsEdit::elementAttrChanged(bool bPlay)
 {
     //1, 生成单独的视频
-    if(m_idxCurrentElement >= 1)
-    {
-    }
-    else
-    {
-    }
+    createSingleVideo(m_idxCurrentElement);
 
     //2, 合成声音、文字
     createFinalVideo(bPlay);
@@ -988,6 +989,7 @@ void ElementsEdit::musicDurationChanged(qint64 duration)
 void ElementsEdit::positionChanged(qint64 position)
 {
     m_playPosition=position;
+    emit updatedVideoTimeTextSignal(position, m_duration);
     assignProgress();
 }
 void ElementsEdit::initialProgress()
@@ -1027,6 +1029,7 @@ void ElementsEdit::initialProgress()
 }
 void ElementsEdit::assignProgress()
 {
+#if 0
     if(m_duration && m_signalImgWidth)
     {
         int xMax=(geometry().width()/m_signalImgWidth)*m_signalImgWidth;
@@ -1038,6 +1041,37 @@ void ElementsEdit::assignProgress()
         //    QMessageBox::information(this, "info", QString(tr("xMax: %1 xOri: %2 x: %3 y: %4 posi: %5 duration: %6 m_imgWidth: %7")).arg(xMax).arg(xOri).arg(x).arg(y).arg(m_playPosition).arg(m_duration).arg(m_imgWidth));
             //QMessageBox::information(this, "info", QString(tr("assign m_vecticalLine")));
         m_vecticalLine->setGeometry(QRect(x, y, m_lineWidth, m_imgHeight)); //uncomplete
+    }
+#endif
+    if(m_duration && m_signalImgWidth)
+    {
+        int xMaxImgCount = geometry().width()/m_signalImgWidth; 
+        int iStartDuration=0;
+        int xImgIdx=0, yImgIdx=0;
+        for (int i = 0; m_flowLayout && i < m_flowLayout->count(); ++i)
+        {
+            Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(i)->widget());
+            if (!element)
+            {
+                // err uncomplete
+                continue;
+            }
+            int iCurrDuration = element->globalVideoAttr()->m_iDuration;
+            if(iStartDuration + iCurrDuration >= m_playPosition)
+            {
+                int x=m_signalImgWidth*xImgIdx + m_signalImgWidth*(m_playPosition - iStartDuration)/iCurrDuration;
+                int y=yImgIdx*m_imgHeight;
+                m_vecticalLine->setGeometry(QRect(x, y, m_lineWidth, m_imgHeight)); //uncomplete
+                break;
+            }
+            //m_playPosition
+            iStartDuration += iCurrDuration;
+            if((++xImgIdx)>=xMaxImgCount)
+            {
+                xImgIdx = 0;
+                yImgIdx++;
+            }
+        }
     }
 }
 void ElementsEdit::createSingleVideo(int idxElement)

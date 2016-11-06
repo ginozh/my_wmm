@@ -12,6 +12,7 @@ QT_BEGIN_NAMESPACE
 class QAbstractButton;
 class QSlider;
 class QGraphicsVideoItem;
+class QLabel;
 QT_END_NAMESPACE
 
 class VideoPlayer : public QWidget
@@ -37,6 +38,7 @@ private slots:
     void positionChanged(qint64 position);
     void durationChanged(qint64 duration);
     void setPosition(int position);
+    void updatedVideoTimeText(int position, int duration);
     void rotateVideo(int angle);
 
 private:
@@ -50,6 +52,7 @@ private:
     GraphicsScene *scene;
     QGraphicsView *graphicsView;
 
+    QLabel* m_qlDisplayTime;
 };
 
 #endif

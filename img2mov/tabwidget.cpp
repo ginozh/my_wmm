@@ -110,12 +110,12 @@ void TabWidget::handleVideoAttrChange()
         }
         else
         {
-            QMessageBox::information(this, "error", QString(tr("handleVideoAttrChange no globalVideoAttr")));
+            //QMessageBox::information(this, "error", QString(tr("handleVideoAttrChange no globalVideoAttr")));
         }
     }
     else
     {
-        QMessageBox::information(this, "error", QString(tr("handleVideoAttrChange no currentElement")));
+        //QMessageBox::information(this, "error", QString(tr("handleVideoAttrChange no currentElement")));
     }
     if(isChange)
     {

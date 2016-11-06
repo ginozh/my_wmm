@@ -43,6 +43,7 @@ private:
 signals:
     void readyVideo(const QString& fileName, const QByteArray& buffer, int position);
     void changePlayPosition(int);
+    void updatedVideoTimeTextSignal(int, int);
     void playVideo();
     //void createVideoTextSignal(void*);
     void createVideoTextSignal(Element*);

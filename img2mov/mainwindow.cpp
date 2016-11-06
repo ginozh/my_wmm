@@ -96,6 +96,7 @@ MainWindow::MainWindow(QWidget *parent)
     //编辑文字时显示无文字视频；播放时显示有文字视频？
     //connect(m_globalContext->m_scene, SIGNAL(updatedTextSignal(stTextAttr*, const QString&)), m_globalContext->m_elementsEdit, SLOT(updatedText(stTextAttr*, const QString&)));
     connect(m_globalContext->m_scene, SIGNAL(updatedTextSignal(const QString&)), m_globalContext->m_elementsEdit, SLOT(updatedText(const QString&)));
+    connect(m_globalContext->m_elementsEdit, SIGNAL(updatedVideoTimeTextSignal(int, int)), m_globalContext->m_player, SLOT(updatedVideoTimeText(int, int)));
 
     // tab
     connect(m_globalContext->m_elementsEdit, SIGNAL(activeTabTextSignal(void*)), m_globalContext->m_tabWidget, SLOT(activeTabText(void*)));
