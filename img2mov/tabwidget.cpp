@@ -53,7 +53,7 @@ TabWidget::TabWidget(QWidget *parent, GlobalContext* globalContext)
     setMaximumHeight(m_iconSize.height() + 120);
 
     connect(this, SIGNAL(currentChanged(int)), this, SLOT(assignTabValue()));
-    connect(this, SIGNAL(elementAttrChanged(bool)), (const QObject*)m_globalContext->m_elementsEdit, SLOT(elementAttrChanged(bool)));
+    connect(this, SIGNAL(elementAttrChanged(int, bool)), (const QObject*)m_globalContext->m_elementsEdit, SLOT(elementAttrChanged(int, bool)));
 }
 void TabWidget::assignVideoInfo()
 {
@@ -63,7 +63,7 @@ void TabWidget::assignVideoInfo()
         GlobalVideoAttr* globalVideoAttr = element->globalVideoAttr();
         if(globalVideoAttr)
         { 
-            m_cbDurationVieo->setCurrentText(QString(tr("%1s")).
+            m_cbDurationVideo->setCurrentText(QString(tr("%1s")).
                     arg(QString::number((float)globalVideoAttr->m_iDuration/1000, 'f', 2)));
         }
     }
@@ -87,40 +87,108 @@ void TabWidget::assignTabValue()
 }
 void TabWidget::handleVideoAttrChange()
 {
-    qDebug() << "handleVideoAttrChange";
+    QWidget* send = qobject_cast<QWidget *>(sender());
     bool isChange = false;
-    if(m_globalContext && m_globalContext->m_elementsEdit->currentElement())
+    //bool bCreateSingleVideo = false;
+    int attrType = ATTR_NOTHING;
+    if(m_globalContext && m_globalContext->m_elementsEdit && m_globalContext->m_elementsEdit->currentElement())
     {
-        GlobalVideoAttr* globalVideoAttr = m_globalContext->m_elementsEdit->currentElement()->globalVideoAttr();
-        if(globalVideoAttr)
+        Element* element = m_globalContext->m_elementsEdit->currentElement();
+        GlobalVideoAttr* globalVideoAttr = element->globalVideoAttr();
+        GlobalMusicAttr* globalMusicAttr = m_globalContext->m_elementsEdit->globalMusicAttr();
+        if(!globalVideoAttr || !globalMusicAttr)
+        {
+            qDebug()<< "error uncomplete. TabWidget::handleVideoAttrChange: !globalVideoAttr || !globalMusicAtt";
+        }
+
+#define COMPARE_ASSIGN(macrop_var, macrop_commbox, macrop_globalattr) do {\
+        if(send == macrop_commbox && macrop_globalattr) \
+        { \
+            QString qs##macrop_var = macrop_commbox->currentText(); \
+            QStringList sl##macrop_var = qs##macrop_var.split("s"); \
+            float i##macrop_var = sl##macrop_var.at(0).toFloat();  \
+            float m_i##macrop_var = QString::number((float)macrop_globalattr->m_i##macrop_var/1000, 'f', 2).toFloat(); \
+            qDebug() << "handleVideoAttrChange. qs" #macrop_var ": " << qs##macrop_var << " i" #macrop_var ": " << i##macrop_var << " m_i" #macrop_var ": "<< m_i##macrop_var; \
+            if(i##macrop_var != m_i##macrop_var) \
+            { \
+                macrop_globalattr->m_i##macrop_var = i##macrop_var*1000; \
+                if((void*)globalVideoAttr == (void*)macrop_globalattr) \
+                { \
+                    attrType |= ATTR_VIDEO; \
+                } \
+                if((void*)globalMusicAttr == (void*)macrop_globalattr) \
+                { \
+                    attrType |= ATTR_MUSIC; \
+                } \
+                isChange = true; \
+            } \
+        } \
+        }while(0)
+
+        COMPARE_ASSIGN(Duration, m_cbDurationVideo, globalVideoAttr);
+        COMPARE_ASSIGN(StartTime, m_cbStartTimeMusic, globalMusicAttr);
+        COMPARE_ASSIGN(StartPoint, m_cbStartPointMusic, globalMusicAttr);
+        COMPARE_ASSIGN(EndPoint, m_cbEndPointMusic, globalMusicAttr);
+
+#if 0
+        if(send == m_cbDurationVideo && globalVideoAttr)
         { 
-            QString qsText = m_cbDurationVieo->currentText();
-            QStringList sl = qsText.split("s");
-            int duration = 1000*sl.at(0).toFloat(); 
-            qDebug() << "handleVideoAttrChange. qsText: " << qsText << " duration: " << duration;
-            if(duration != globalVideoAttr->m_iDuration)
+            QString qsDurationVideo = m_cbDurationVideo->currentText();
+            QStringList slDurationVideo = qsDurationVideo.split("s");
+            float iDurationVideo = slDurationVideo.at(0).toFloat(); 
+            float m_iDuration = QString::number((float)globalVideoAttr->m_iDuration/1000, 'f', 2).toFloat();
+            qDebug() << "handleVideoAttrChange. qsDurationVideo: " << qsDurationVideo << " iDurationVideo: " << iDurationVideo << " m_iDuration: " << m_iDuration;
+            if(iDurationVideo != m_iDuration)
             {
-                globalVideoAttr->m_iDuration = duration;
+                globalVideoAttr->m_iDuration = iDurationVideo*1000;
+                bCreateSingleVideo = true;
                 isChange = true;
             }
-            //QMessageBox::information(this, "info", QString(tr("handleVideoAttrChange value: %1 duration: %2")).arg(qsText).arg(duration));
-
-            //m_cbDurationVieo->setCurrentText(QString(tr("%1s")).
-            //        arg(QString::number((float)globalVideoAttr->m_iDuration/1000, 'f', 2)));
         }
-        else
+        if(send == m_cbStartTimeMusic && globalMusicAttr)
         {
-            //QMessageBox::information(this, "error", QString(tr("handleVideoAttrChange no globalVideoAttr")));
+            QString qsStartTimeMusic = m_cbStartTimeMusic->currentText();
+            QStringList slStartTimeMusic = qsStartTimeMusic.split("s");
+            float iStartTimeMusic = slStartTimeMusic.at(0).toFloat(); 
+            float m_iStartTime = QString::number((float)globalMusicAttr->m_iStartTime/1000, 'f', 2).toFloat();
+            qDebug() << "handleVideoAttrChange. qsStartTimeMusic: " << qsStartTimeMusic << " iStartTimeMusic: " << iStartTimeMusic << " m_iStartTime: "<< m_iStartTime;
+            if(iStartTimeMusic != m_iStartTime)
+            {
+                globalMusicAttr->m_iStartTime = iStartTimeMusic*1000;
+                isChange = true;
+            }
+
+            QString qsStartPointMusic = m_cbStartPointMusic->currentText();
+            QStringList slStartPointMusic = qsStartPointMusic.split("s");
+            float iStartPointMusic = slStartPointMusic.at(0).toFloat(); 
+            float m_iStartPoint = QString::number((float)globalMusicAttr->m_iStartPoint/1000, 'f', 2).toFloat();
+            qDebug() << "handleVideoAttrChange. qsStartPointMusic: " << qsStartPointMusic << " iStartPointMusic: " << iStartPointMusic << " m_iStartPoint: "<<m_iStartPoint;
+            if(iStartPointMusic != m_iStartPoint)
+            {
+                globalMusicAttr->m_iStartPoint = iStartPointMusic;
+                isChange = true;
+            }
+
+            QString qsEndPointMusic = m_cbEndPointMusic->currentText();
+            QStringList slEndPointMusic = qsEndPointMusic.split("s");
+            int iEndPointMusic = 1000*slEndPointMusic.at(0).toFloat(); 
+            qDebug() << "handleVideoAttrChange. qsEndPointMusic: " << qsEndPointMusic << " iEndPointMusic: " << iEndPointMusic << " m_iEndPoint: "<<globalMusicAttr->m_iEndPoint;
+            if(iEndPointMusic != globalMusicAttr->m_iEndPoint)
+            {
+                globalMusicAttr->m_iEndPoint = iEndPointMusic;
+                isChange = true;
+            }
         }
+#endif
     }
     else
     {
-        //QMessageBox::information(this, "error", QString(tr("handleVideoAttrChange no currentElement")));
+        qDebug()<< "error uncomplete. TabWidget::handleVideoAttrChange: m_globalContext && m_globalContext->m_elementsEdit";
     }
     if(isChange)
     {
         // 通知
-        emit elementAttrChanged(false);
+        emit elementAttrChanged(attrType, false);
     }
 }
 
@@ -556,13 +624,13 @@ void TabWidget::createTabVideo()
                         hboxDuration->addWidget(lbl);
                     }
                     {
-                        m_cbDurationVieo = new ComboBox();
-                        m_cbDurationVieo->setEditable(true);
-                        m_cbDurationVieo->addItem(QString(tr("0.00s")));
-                        connect(m_cbDurationVieo, SIGNAL(textChangedSignal(QString)),
+                        m_cbDurationVideo = new ComboBox();
+                        m_cbDurationVideo->setEditable(true);
+                        m_cbDurationVideo->addItem(QString(tr("0.00s")));
+                        connect(m_cbDurationVideo, SIGNAL(textChangedSignal(QString)),
                                 this, SLOT(handleVideoAttrChange()));
 
-                        hboxDuration->addWidget(m_cbDurationVieo);
+                        hboxDuration->addWidget(m_cbDurationVideo);
                     }
 
                 }
@@ -620,9 +688,11 @@ void TabWidget::createTabMusic()
                         hboxStartTime->addWidget(lbl);
                     }
                     {
-                        m_cbStartTimeMusic = new QComboBox();
+                        m_cbStartTimeMusic = new ComboBox();
                         m_cbStartTimeMusic->setEditable(true);
                         m_cbStartTimeMusic->addItem(QString(tr("0.00s")));
+                        connect(m_cbStartTimeMusic, SIGNAL(textChangedSignal(QString)),
+                                this, SLOT(handleVideoAttrChange()));
 
                         hboxStartTime->addWidget(m_cbStartTimeMusic);
                     }
@@ -637,9 +707,11 @@ void TabWidget::createTabMusic()
                         hboxStartPoint->addWidget(lbl);
                     }
                     {
-                        m_cbStartPointMusic = new QComboBox();
+                        m_cbStartPointMusic = new ComboBox();
                         m_cbStartPointMusic->setEditable(true);
                         m_cbStartPointMusic->addItem(QString(tr("0.00s")));
+                        connect(m_cbStartPointMusic, SIGNAL(textChangedSignal(QString)),
+                                this, SLOT(handleVideoAttrChange()));
 
                         hboxStartPoint->addWidget(m_cbStartPointMusic);
                     }
@@ -654,9 +726,11 @@ void TabWidget::createTabMusic()
                         hboxEndPoint->addWidget(lbl);
                     }
                     {
-                        m_cbEndPointMusic = new QComboBox();
+                        m_cbEndPointMusic = new ComboBox();
                         m_cbEndPointMusic->setEditable(true);
                         m_cbEndPointMusic->addItem(QString(tr("2.00s")));
+                        connect(m_cbEndPointMusic, SIGNAL(textChangedSignal(QString)),
+                                this, SLOT(handleVideoAttrChange()));
 
                         hboxEndPoint->addWidget(m_cbEndPointMusic);
                     }
@@ -1087,7 +1161,7 @@ void TabWidget::activeTabMusic(GlobalMusicAttr* musicAttr)
     if(!musicAttr)
         return;
     m_cbEndPointMusic->setCurrentText(QString(tr("%1s")).
-            arg(QString::number((float)musicAttr->m_iEntPoint/1000, 'f', 2)));
+            arg(QString::number((float)musicAttr->m_iEndPoint/1000, 'f', 2)));
 }
 void TabWidget::assignAnimationInfo()
 {
@@ -1138,12 +1212,12 @@ void TabWidget::assignTextInfo()
         }
         else
         {
-            //uncomplete
+            qDebug()<< "error uncomplete. TabWidget::assignTextInfo: globalTextAttr";
         }
     }
     else
     {
-        //uncomplete
+        qDebug()<< "error uncomplete. TabWidget::assignTextInfo: m_globalContext";
     }
 }
 #if 0
@@ -1206,12 +1280,12 @@ void TabWidget::handleFontChange()
         }
         else
         {
-            //uncomplete
+            qDebug()<< "error uncomplete. TabWidget::handleFontChange: globalTextAttr";
         }
     }
     else
     {
-        //uncomplete
+        qDebug()<< "error uncomplete. TabWidget::handleFontChange: m_globalContext";
 
     }
 }

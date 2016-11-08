@@ -523,7 +523,7 @@ void GraphicsTextItem::createAssInfo()
         QString start = QDateTime(QDate::currentDate()).addMSecs(m_globalTextAttr->m_iStartTimeText + 10).toString("hh:mm:ss.zzz"); //+10: 为了防止编辑文字时同时出现字幕
         //QString start = QDateTime(QDate::currentDate()).addMSecs(m_globalTextAttr->m_iStartTimeText ).toString("hh:mm:ss.zzz");
         start.chop(1);
-        QString end = QDateTime(QDate::currentDate()).addMSecs(m_globalTextAttr->m_iStartTimeText+m_globalTextAttr->m_iDurationText).toString("hh:mm:ss.zzz");
+        QString end = QDateTime(QDate::currentDate()).addMSecs(m_globalTextAttr->m_iStartTimeText+m_globalTextAttr->m_iDurationText-10).toString("hh:mm:ss.zzz"); //-10:如上 uncomplete:临界
         end.chop(1);
         qDebug() << "m_iStartTimeText: "<<m_globalTextAttr->m_iStartTimeText<<" start: "<< start;
         qDebug() << "m_iDurationText: "<<m_globalTextAttr->m_iDurationText<<" end: "<< end; 

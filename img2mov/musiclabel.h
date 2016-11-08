@@ -8,7 +8,8 @@ class MusicLabel : public QLabel
 
 public:
     MusicLabel(QSize size, QWidget *parent=0);
-    void updateMusicInfo(int pos, const QString& qsText="");
+    //void updateMusicInfo(int pos, const QString& qsText="");
+    void updateMusicInfo(int iLeft, int iRight, const QString& qsText="");
 signals:
     void selectedMusicSignal();
 protected:
@@ -17,7 +18,8 @@ protected:
     //void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 private:
     QString m_qsText;
-    int m_iFillWidth;
+    //int m_iFillWidth;
+    int m_iLeft, m_iRight;
 };
 //! [0]
 #endif // MUSICLABEL_H

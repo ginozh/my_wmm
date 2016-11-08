@@ -268,6 +268,7 @@ void VideoPlayer::positionChanged(qint64 position)
 void VideoPlayer::durationChanged(qint64 duration)
 {
     positionSlider->setRange(0, duration);
+    qDebug()<<"VideoPlayer::durationChanged duration: "<<duration;
 }
 
 void VideoPlayer::setPosition(int position)

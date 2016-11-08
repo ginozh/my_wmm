@@ -24,6 +24,7 @@ public:
     ElementsEdit(QWidget *parent, GlobalContext* globalContext);
     ~ElementsEdit();
     Element* currentElement();
+    GlobalMusicAttr* globalMusicAttr(){return m_globalMusicAttr;};
 private:
     int callFfmpeg(const QVector<QString>& vqsArgv);
     void createFinalVideo(bool bPlay);
@@ -40,6 +41,7 @@ private:
     void assignProgress();
     void updateTextAttrAndAss(int iStartIdx);
     void initialFirstLayout();
+    void musicAttrChanged();
 signals:
     void readyVideo(const QString& fileName, const QByteArray& buffer, int position);
     void changePlayPosition(int);
@@ -64,7 +66,7 @@ public slots:
     void selectedText(const QString&);
     void selectedMusic();
     void selectedTransition(const QString& animation);
-    void elementAttrChanged(bool bPlay);
+    void elementAttrChanged(int attrType, bool bPlay);
     void durationChanged(qint64 duration);
     void musicDurationChanged(qint64 duration);
     void positionChanged(qint64 position);

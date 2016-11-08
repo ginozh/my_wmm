@@ -53,7 +53,13 @@ public:
 
 }stTextAttr;
 #endif
-
+enum ATTR_TYPE
+{
+    ATTR_NOTHING =0
+    ,ATTR_VIDEO = 0x1
+    ,ATTR_MUSIC = 0x2
+    ,ATTR_TEXT =0x4
+};
 class GlobalTextAttr
 {
 public:
@@ -109,7 +115,7 @@ public:
     QString m_qsMusicFilename;
     int m_iStartTime;
     int m_iStartPoint;
-    int m_iEntPoint;
+    int m_iEndPoint;
     int m_iMusicDuration;
 };
 class GlobalContext

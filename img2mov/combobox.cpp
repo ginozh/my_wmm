@@ -5,6 +5,11 @@
 ComboBox::ComboBox(QWidget *parent)
     : QComboBox(parent)
 {
+#if 0
+    QRegExp rx("\\d{1,2}\\.\\d{2}s");
+    QValidator *validator = new QRegExpValidator(rx, this);
+    setValidator(validator);
+#endif
 }
 void ComboBox::leaveEvent(QEvent *event)
 {
@@ -18,14 +23,11 @@ void ComboBox::leaveEvent(QEvent *event)
     //QMessageBox::information(this, "Info", QString(tr("last text: %1 current text: %2")).arg(m_qsLastText).arg(qsText));
     //emit textChangedSignal(qsText);
 #if 1
-    qDebug() << "qsText: " << qsText << " m_qsLastText: " << m_qsLastText;
-    if(m_qsLastText.compare(qsText)!=0)
+    //qDebug() << "ComboBox::leaveEvent qsText: " << qsText << " m_qsLastText: " << m_qsLastText;
+    //if(m_qsLastText.compare(qsText)!=0)
     {
         m_qsLastText = qsText;
         emit textChangedSignal(qsText);
-    }
-    else
-    {
     }
 #endif
 }

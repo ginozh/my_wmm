@@ -68,7 +68,7 @@ public slots:
     void handleVideoAttrChange();
     void assignTabValue();
 signals:
-    void elementAttrChanged(bool);
+    void elementAttrChanged(int, bool);
 //public slots:
     //void currentChanged(int index);
 private:
@@ -102,12 +102,12 @@ private:
     //QMap<void*, GlobalVideoAttr*> m_mapVieo;
     QWidget *m_tabVideo;
     QComboBox* m_cbSpeedVideo;
-    ComboBox* m_cbDurationVieo;
+    ComboBox* m_cbDurationVideo;
     //music
     QWidget *m_tabMusic;
-    QComboBox* m_cbStartTimeMusic;
-    QComboBox* m_cbStartPointMusic;
-    QComboBox* m_cbEndPointMusic;
+    ComboBox* m_cbStartTimeMusic;
+    ComboBox* m_cbStartPointMusic;
+    ComboBox* m_cbEndPointMusic;
 
     //text
     QWidget *m_tabText;
