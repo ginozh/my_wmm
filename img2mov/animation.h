@@ -24,6 +24,7 @@ protected:
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void enterEvent(QEvent *event) Q_DECL_OVERRIDE;
+    void moveEvent(QMoveEvent *event) Q_DECL_OVERRIDE;
     void leaveEvent(QEvent *event) Q_DECL_OVERRIDE;
 #if 0
 private slots:
@@ -31,13 +32,18 @@ private slots:
 private slots:
     void open();
 #endif
+private slots:
+    void createAnimation();
 private:
     QString m_animation;
     QString m_tipsname;
     QPixmap *m_pixMap;
     bool m_focus;
-    QTimer m_timer;
+    QTimer m_timerStartAnimation;
+    QTimer m_timerPauseAnimation;
     GlobalContext* m_globalContext;
+
+    qint64 m_iEnterTime;
 };
 //! [0]
 #endif // ANIMATION_H

@@ -19,6 +19,7 @@ GlobalTextAttr::GlobalTextAttr()
 
 GlobalAnimationAttr::GlobalAnimationAttr()
 {
+    //m_qsPanZoom="zoompan=z='zoom+0.001':s=512x384";
     m_iTransitionDuration = 1500;
 }
 GlobalVideoAttr::GlobalVideoAttr()
