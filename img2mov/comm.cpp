@@ -31,6 +31,8 @@ GlobalMusicAttr::GlobalMusicAttr()
 {
     m_iStartTime = 0;
     m_iStartPoint = 0;
+    m_iEndPoint = 0;
+    m_iMusicDuration = 0;
     //m_iEntPoint = 2000;
 }
 

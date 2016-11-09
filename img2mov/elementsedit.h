@@ -28,7 +28,7 @@ public:
 private:
     int callFfmpeg(const QVector<QString>& vqsArgv);
     void createFinalVideo(bool bPlay);
-    void createFinalVideoMusicTxt(bool bPlay);
+    //void createFinalVideoMusicTxt(bool bPlay);
     void scaleImage(Element *element);
     void createSingleVideo(int idxElement);
     void createSimpleVideo(Element *element);
@@ -81,7 +81,7 @@ private:
 
     //进度条竖线
     QFrame *m_vecticalLine; 
-    qint64 m_duration;
+    qint64 m_iTotalVideoDuration;
     qint64 m_imgWidth;
     qint64 m_signalImgWidth;
     qint64 m_imgHeight;

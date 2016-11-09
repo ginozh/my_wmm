@@ -33,8 +33,8 @@ void MusicLabel::paintEvent(QPaintEvent *ev)
 #endif
     else
     {
-        qDebug()<<"paintEvent. m_iLeft: "<< m_iLeft<<" m_iRight: "<<m_iRight<<
-            " iFillWidth: "<<iFillWidth<<" rect: "<<rect().width()<<" m_qsText: "<<m_qsText;
+        //qDebug()<<"paintEvent. m_iLeft: "<< m_iLeft<<" m_iRight: "<<m_iRight<<
+        //    " iFillWidth: "<<iFillWidth<<" rect: "<<rect().width()<<" m_qsText: "<<m_qsText;
         if(m_iLeft)
         {
             QRect leftRect = rect();
