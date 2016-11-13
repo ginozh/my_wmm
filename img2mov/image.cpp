@@ -9,12 +9,11 @@ Image::Image(const QString& path, QSize size, QWidget *parent)
     //, m_pixMap(new QPixmap())
 {
     m_focus=false;
-    setMinimumSize(size);
-    setMaximumSize(size);
+    setFixedSize(size);
     //setMinimumHeight(size.height());
     //setMaximumHeight(size.height());
     //setContentsMargins(5, 5, 5, 5);
-#if 0
+#if 1
     setPixmap(QPixmap(path));
     setScaledContents(true);
     //setMaximumSize(200,200);

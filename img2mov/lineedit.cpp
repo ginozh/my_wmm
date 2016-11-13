@@ -65,3 +65,7 @@ void LineEdit::addTextByTabCaption()
     setFocus();
     activeText();
 }
+void LineEdit::updateTextByVideo(const QString& qsText)
+{
+    setPlaceholderText(m_qsPreText+qsText);
+}

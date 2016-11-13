@@ -53,7 +53,7 @@ class TabWidget : public QTabWidget
     Q_OBJECT
 
 public:
-    TabWidget(QWidget *parent, GlobalContext* globalContext);
+    TabWidget(QWidget *parent);
 public slots:
     void activeTabText(void* element);
     void activeTabVideo(void* element, GlobalVideoAttr* globalVideoAttr);
@@ -90,6 +90,7 @@ private:
 private:
     QListWidget *contentsWidget;
     QSize m_iconSize;
+    int m_iCellHeight; // 4 cells
     //QWidget *m_elementsEdit;
     //GraphicsScene* m_scene;
     GlobalContext* m_globalContext;

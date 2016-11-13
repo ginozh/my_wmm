@@ -17,13 +17,15 @@
 
 #include <QFileInfo>
 #include <QStandardPaths>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , m_globalContext(new GlobalContext)
+    //, m_globalContext(new GlobalContext)
     //, m_treeView(new QTreeView)
     //, m_detailsText(new QTextEdit)
 {
+    m_globalContext = GlobalContext::instance();
     setWindowTitle(tr("img to movie"));
     //installEventFilter( m_player->Scene() );
 
@@ -32,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_globalContext->m_player = new VideoPlayer(this);
     m_globalContext->m_scene = m_globalContext->m_player->Scene();
 
-    m_globalContext->m_elementsEdit = new ElementsEdit(this, m_globalContext);
+    m_globalContext->m_elementsEdit = new ElementsEdit(this);
 
 #if 0
     //widgets/widgets/tablet
@@ -45,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
     //QMenu *findMenu = menuBar()->addMenu(tr("&Edit"));
     menuBar()->addMenu(tr("&About"))->addAction(tr("&About Qt"), qApp, &QApplication::aboutQt);
 #endif
-    m_globalContext->m_tabWidget = new TabWidget(m_centralWidget, m_globalContext);
+    m_globalContext->m_tabWidget = new TabWidget(m_centralWidget);
 
     QSplitter *centralSplitter = new QSplitter(m_centralWidget);
     //setCentralWidget(centralSplitter);
@@ -71,6 +73,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     m_menu = new Menu(m_centralWidget, m_globalContext->m_elementsEdit, m_globalContext->m_tabWidget->geometry().x(), m_globalContext->m_tabWidget->geometry().y());
+    QRect rect = m_globalContext->m_tabWidget->tabBar()->tabRect(0);
+    qDebug()<<"tab_x: "<<rect.x()<<" tab_y:"<<rect.y()<<" tab_w: "<<rect.width()<<" tab_h: "<<rect.height()<<" tabw_x: "<<m_globalContext->m_tabWidget->geometry().x()<<" tabw_y: "<<m_globalContext->m_tabWidget->geometry().y();
     //QMessageBox::information(this, "Error Opening Picture", QString(tr("x: %1 y: %2")).arg(m_tabWidget->frameGeometry().x()).arg(m_tabWidget->frameGeometry().y()));
     mainLayout->addWidget(m_globalContext->m_tabWidget);
     mainLayout->addWidget(centralSplitter);
@@ -95,7 +99,7 @@ MainWindow::MainWindow(QWidget *parent)
     //更新videotext，生成2个视频：一个包含文字视频、一个未包含文字视频。
     //编辑文字时显示无文字视频；播放时显示有文字视频？
     //connect(m_globalContext->m_scene, SIGNAL(updatedTextSignal(stTextAttr*, const QString&)), m_globalContext->m_elementsEdit, SLOT(updatedText(stTextAttr*, const QString&)));
-    connect(m_globalContext->m_scene, SIGNAL(updatedTextSignal(const QString&)), m_globalContext->m_elementsEdit, SLOT(updatedText(const QString&)));
+    connect(m_globalContext->m_scene, SIGNAL(updatedElementsTextSignal(const QString&, const QString&)), m_globalContext->m_elementsEdit, SLOT(updatedText(const QString&, const QString&)));
     connect(m_globalContext->m_elementsEdit, SIGNAL(updatedVideoTimeTextSignal(int, int)), m_globalContext->m_player, SLOT(updatedVideoTimeText(int, int)));
 
     // tab

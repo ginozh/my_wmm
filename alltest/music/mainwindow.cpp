@@ -4,6 +4,8 @@
 #include "mainwindow.h"
 #include <QFontMetrics>
 #include <QFont>
+#include <QToolButton>
+#include <QMenu>
 MainWindow::MainWindow()
 {
     setWindowTitle(tr("Character Map"));
@@ -22,6 +24,15 @@ MainWindow::MainWindow()
     {
         lblDurationTrans = new QLabel(QString(tr("Duration: %1")).arg(duration));
         hboxAnimations->addWidget(lblDurationTrans);
+    }
+    //test popup
+    {
+        QToolButton* fontColorToolButton = new QToolButton;
+        hboxAnimations->addWidget(fontColorToolButton);
+
+        fontColorToolButton->setPopupMode(QToolButton::DelayedPopup);
+        QMenu *colorMenu = new QMenu(this);
+        fontColorToolButton->setMenu(colorMenu);
     }
     tabAnimations->setLayout(hboxAnimations);
     setCentralWidget(tabAnimations);

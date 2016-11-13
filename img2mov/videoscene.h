@@ -41,7 +41,7 @@ public slots:
 
 signals:
     //void updatedTextSignal(stTextAttr*, const QString&);
-    void updatedTextSignal(const QString&);
+    void updatedElementsTextSignal(const QString&, const QString&);
 
 protected:
     void keyPressEvent(QKeyEvent *keyEvent) Q_DECL_OVERRIDE;

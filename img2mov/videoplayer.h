@@ -20,7 +20,7 @@ class VideoPlayer : public QWidget
     Q_OBJECT
 
 public:
-    VideoPlayer(QWidget *parent = 0);
+    VideoPlayer(QWidget *parent);
     ~VideoPlayer();
 
     QSize sizeHint() const { return QSize(800, 600); }

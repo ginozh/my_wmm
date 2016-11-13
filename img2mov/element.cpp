@@ -13,6 +13,10 @@ Element::Element(QWidget *parent, const QString& qsImageName,GraphicsScene* scen
     , m_globalAnimationAttr(new GlobalAnimationAttr)
     , m_globalTextAttr(new GlobalTextAttr)
 {
+    GlobalContext* globalContext = GlobalContext::instance();
+    double dFactorX = globalContext->m_dFactorX;
+    double dFactorY = globalContext->m_dFactorY;
+
     //setWindowFlags(Qt::WindowStaysOnBottomHint);
     memset(&m_fbOriFile, 0, sizeof(m_fbOriFile));
     memset(&m_fbScaleFile, 0, sizeof(m_fbScaleFile));
@@ -25,8 +29,8 @@ Element::Element(QWidget *parent, const QString& qsImageName,GraphicsScene* scen
     memset(&m_fbInputTransitionVideo, 0, sizeof(m_fbInputTransitionVideo));
     m_elementLayout->setSpacing(0);
     m_elementLayout->setMargin(0);
-    int iMaxWidth=300;
-    int iMaxHeight=iMaxWidth*3/4;
+    int iMaxWidth=240*dFactorX;
+    int iMaxHeight=iMaxWidth*dFactorY*3/4;
     //setMinimumWidth(iMaxWidth);
     //setMaximumWidth(iMaxWidth);
     //m_elementLayout->addWidget(new Image(tr("C:\\QtProjects\\qtmovie\\jpg\\img001.jpg")));

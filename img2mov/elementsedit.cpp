@@ -19,7 +19,7 @@ extern "C"{
 }
 //#define DEBUG_FFMPEG
 //! [1]
-ElementsEdit::ElementsEdit(QWidget *parent, GlobalContext* globalContext)
+ElementsEdit::ElementsEdit(QWidget *parent)
     : QWidget(parent)
       //, m_flowLayout(new FlowLayout(this))
       , m_flowLayout(NULL)
@@ -31,7 +31,7 @@ ElementsEdit::ElementsEdit(QWidget *parent, GlobalContext* globalContext)
       , m_isFirstClick(true)
       , m_globalMusicAttr(new GlobalMusicAttr)
 {   
-    m_globalContext = globalContext;
+    m_globalContext = GlobalContext::instance();
     //m_tmpdir=QDir::currentPath().append(tr("/tmp"));
 
     setBackgroundRole(QPalette::Light);
@@ -48,8 +48,8 @@ ElementsEdit::ElementsEdit(QWidget *parent, GlobalContext* globalContext)
     m_outlen = m_outMaxLen = 10*1024*1024;
 	m_pOutBuffer=(uint8_t *)malloc(m_outMaxLen);
 
-    m_textVideoOutLen = m_textVideoMaxOutLen = 10*1024*1024;
-	m_pTextVideoOutBuffer=(uint8_t *)malloc(m_textVideoMaxOutLen);
+    //m_textVideoOutLen = m_textVideoMaxOutLen = 10*1024*1024;
+	//m_pTextVideoOutBuffer=(uint8_t *)malloc(m_textVideoMaxOutLen);
 #if 1
 
     m_vecticalLine->setObjectName(QStringLiteral("line"));
@@ -315,9 +315,18 @@ void ElementsEdit::selectedImage(QWidget* theWidget)
     emit changePlayPosition(m_imgPlayPosition); 
     emit updatedVideoTimeTextSignal(m_imgPlayPosition, m_iTotalVideoDuration);
 
+    // 2, 显示本次VideoText
+    if(theWidget)
+    {
+        emit displayVideoTextSignal(theElement, true);
+    }
+    else
+    {
+        emit displayVideoTextSignal(sendElement, true);
+    }
     if(!theWidget && send == m_lastSelectedElement)
         return;
-    // 2, 移除上次高亮
+    // 3, 移除上次高亮
     int iCurrentIdx=-1;
     if(( theWidget && (iCurrentIdx=m_flowLayout->indexOf(theWidget))>=0)
             || (send && (iCurrentIdx=m_flowLayout->indexOf(send))>=0)
@@ -340,18 +349,10 @@ void ElementsEdit::selectedImage(QWidget* theWidget)
             emit displayVideoTextSignal((qobject_cast<Element *>(m_lastSelectedElement)), false);
         }
     }
-    // 3, 显示本次VideoText
-    if(theWidget)
-    {
-        m_lastSelectedElement=theWidget;
-        emit displayVideoTextSignal(theElement, true);
-    }
-    else
-    {
-        m_lastSelectedElement=send;
-        emit displayVideoTextSignal(sendElement, true);
-    }
-    // 4, 赋值当前tab的值
+    // 4, 赋值
+    m_lastSelectedElement = theWidget?theWidget:send;
+
+    // 5, 赋值当前tab的值
     emit assignTabValueSignal();
 }
 /*
@@ -618,8 +619,19 @@ void ElementsEdit::selectedText(const QString& oritxt)
     }
 }
 //void ElementsEdit::updatedText(stTextAttr* stTextAttr, const QString& qsText)
-void ElementsEdit::updatedText(const QString& qsAss)
+void ElementsEdit::updatedText(const QString& qsAss, const QString& qsText)
 {
+    Element* element = currentElement();
+    if(element)
+    {
+        element->lineEdit()->updateTextByVideo(qsText);
+    }
+    else
+    {
+        //uncomplete
+        qDebug()<< "error uncomplete. ElementsEdit::addText";
+    }
+
     m_qsInText = qsAss.toUtf8();
     //createFinalVideoMusicTxt(false);
     createFinalVideo(false);

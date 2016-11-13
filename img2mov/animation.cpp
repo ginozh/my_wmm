@@ -7,13 +7,13 @@
 #include <QDebug>
 #include <QDateTime>
 Animation::Animation(const QString& path, const QString& animation
-        , const QString& tipsname, QSize size, GlobalContext* globalContext, QWidget *parent)
+        , const QString& tipsname, QSize size, QWidget *parent)
     : QLabel(parent)
     , m_animation(animation)
     , m_tipsname(tipsname)
     , m_pixMap(new QPixmap())
-    , m_globalContext(globalContext)
 {
+    m_globalContext = GlobalContext::instance();
     //QMessageBox::information(this,tr("info"),QString(tr("path: %1 animation: %2")).arg(path).arg(animation));
     m_focus=false;
     setMinimumSize(size);

@@ -107,7 +107,7 @@ void GraphicsScene::editorLostFocus(GraphicsTextItem *item)
         //emit updatedTextSignal(item->textAttr(), item->toPlainText());
 #if 1
         QString qsAss = createTotalAssInfo();
-        emit updatedTextSignal(qsAss);
+        emit updatedElementsTextSignal(qsAss, item->toPlainText());
 #endif
     }
 #if 0

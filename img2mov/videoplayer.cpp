@@ -12,110 +12,41 @@ VideoPlayer::VideoPlayer(QWidget *parent)
     , playButton(0)
     , positionSlider(0)
 {
-    setMinimumWidth(400);
-    setMaximumWidth(600);
-#if 0
-    //===================
-    //scene = new GraphicsScene(NULL, this);
-    scene = new GraphicsScene(this);
-    graphicsView = new QGraphicsView(scene);
-    //graphicsView->setSceneRect(0,0,500,480);
-    scene->setSceneRect(0,0,512,384); //如果没有这个，可能宽度会变成764
-    graphicsView->setSceneRect(0,0,512,384);
-
-    videoItem = new QGraphicsVideoItem;
-    videoItem->setSize(QSizeF(512, 384));
-    scene->addItem(videoItem);
-#if 0
-    videoItem = new QGraphicsVideoItem;
-    videoItem->setSize(QSizeF(500, 480));
-
-    QGraphicsScene *scene = new QGraphicsScene(this);
-    QGraphicsView *graphicsView = new QGraphicsView(scene);
-
-    scene->addItem(videoItem);
-
-    //widgets/graphicsview/diagramscene
-    QFont font;
-    font.setPointSize(font.pointSize() * 2);
-    font.setBold(true);
-    QString sceneText = "Qt Everywhere!";
-    QGraphicsTextItem *text = scene->addText(sceneText, font);
-    text->setDefaultTextColor(Qt::black);
-    text->setPos(50, 300);
-#endif
-    /*
-    一、准备工作
-tab: font and text animation
-    二、步骤
-    1、使编辑框处于编辑状态：1.1 点击图片，显示文本编辑框；再点击文本编辑框
-        or  1.2 双击图片下面的文字label
-    2、拖动。鼠标停留在文本框四周时，鼠标显示可拖动标识
-
-    三、开发计划
-    1, 
-     */
-#if 0
-    QSlider *rotateSlider = new QSlider(Qt::Horizontal);
-    rotateSlider->setRange(-180,  180);
-    rotateSlider->setValue(0);
-
-    connect(rotateSlider, SIGNAL(valueChanged(int)),
-            this, SLOT(rotateVideo(int)));
-#endif
-
-//#define OPEN_FILE
-#ifdef OPEN_FILE
-    QAbstractButton *openButton = new QPushButton(tr("Open..."));
-    connect(openButton, SIGNAL(clicked()), this, SLOT(openFile()));
-#endif
-    playButton = new QPushButton;
-    playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
-
-    connect(playButton, SIGNAL(clicked()), this, SLOT(play()));
-
-    //positionSlider = new QSlider(Qt::Horizontal);
-    positionSlider = new Slider(Qt::Horizontal);
-    positionSlider->setRange(0, 0);
-
-    connect(positionSlider, SIGNAL(sliderMoved(int)),
-            this, SLOT(setPosition(int)));
-
-    QBoxLayout *controlLayout = new QHBoxLayout;
-    controlLayout->setMargin(0);
-#ifdef OPEN_FILE
-    controlLayout->addWidget(openButton);
-#endif
-    controlLayout->addWidget(playButton);
-    controlLayout->addWidget(positionSlider);
-
+    GlobalContext* globalContext = GlobalContext::instance();
+    double dFactorX = globalContext->m_dFactorX;
+    double dFactorY = globalContext->m_dFactorY;
+    int iFrameWidth = 750*dFactorX;
+    //setMinimumWidth(400);
+    //setMaximumWidth(600);
+    setFixedWidth(iFrameWidth);
+    //setFixedSize(600, 500);
 
     QBoxLayout *layout = new QVBoxLayout;
-    layout->addWidget(graphicsView);
-    //layout->addWidget(rotateSlider);
-    layout->addLayout(controlLayout);
-    //=============
-#endif
-
-    QBoxLayout *layout = new QVBoxLayout;
+    layout->setMargin(0);
     {
         scene = new GraphicsScene(this);
         graphicsView = new QGraphicsView(scene);
         layout->addWidget(graphicsView);
 
         //graphicsView->setSceneRect(0,0,500,480);
-        scene->setSceneRect(0,0,512,384); //如果没有这个，可能宽度会变成764
-        graphicsView->setSceneRect(0,0,512,384);
+        int iSceneWidth = 512*dFactorX;
+        int iSceneHeight = 384*dFactorY;
+        int iHeightIdx = 0;
+        scene->setSceneRect(0,0,iSceneWidth,iSceneHeight); //如果没有这个，可能宽度会变成764
+        graphicsView->setSceneRect(0,0,iSceneWidth,iSceneHeight);
+        //graphicsView->setGeometry(QRect(0, 0, iFrameWidth, 500*dFactorY));
+        graphicsView->setFixedSize(iFrameWidth, 500*dFactorY);
 
         videoItem = new QGraphicsVideoItem;
-        videoItem->setSize(QSizeF(512, 384));
+        videoItem->setSize(QSizeF(iSceneWidth, iSceneHeight));
         scene->addItem(videoItem);
     }
     {
         m_qlDisplayTime = new QLabel;
         layout->addWidget(m_qlDisplayTime);
+        m_qlDisplayTime->setFixedHeight(40*dFactorY);
 
-        m_qlDisplayTime->setAlignment(Qt::AlignRight);
+        m_qlDisplayTime->setAlignment(Qt::AlignRight|Qt::AlignTop);
         m_qlDisplayTime->setText("00:00.00/00:00.00");
 
 #if 0
@@ -135,6 +66,9 @@ tab: font and text animation
     {
         QBoxLayout *controlLayout = new QHBoxLayout;
         layout->addLayout(controlLayout);
+        controlLayout->setAlignment(Qt::AlignTop);
+        //controlLayout->setFixedSize(600, 50);
+        controlLayout->setGeometry(QRect(0, 550*dFactorY, iFrameWidth, 20*dFactorY));
         controlLayout->setMargin(0);
         {
 #ifdef OPEN_FILE
@@ -160,6 +94,15 @@ tab: font and text animation
                     this, SLOT(setPosition(int)));
         }
     }
+#if 0
+    {
+        QVBoxLayout *nullLayout = new QVBoxLayout;
+        layout->addLayout(nullLayout);
+
+        QWidget* nullWidget = new QWidget;
+        nullLayout->addWidget(nullWidget);
+    }
+#endif
 
     setLayout(layout);
 

@@ -21,7 +21,7 @@ class ElementsEdit : public QWidget
     Q_OBJECT
 
 public:
-    ElementsEdit(QWidget *parent, GlobalContext* globalContext);
+    ElementsEdit(QWidget *parent);
     ~ElementsEdit();
     Element* currentElement();
     GlobalMusicAttr* globalMusicAttr(){return m_globalMusicAttr;};
@@ -54,6 +54,7 @@ signals:
     void activeTabTextSignal(void*);
     void activeTabMusicSignal(GlobalMusicAttr*);
     void assignTabValueSignal();
+    //void updatedElementTextSignal(const QString&);
 protected:
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void resizeEvent(QResizeEvent * event) Q_DECL_OVERRIDE;
@@ -72,7 +73,7 @@ public slots:
     void positionChanged(qint64 position);
     //void selectedText(void*);
     //void handleContextMenuRequested(const QPoint &pos);
-    void updatedText(const QString&);
+    void updatedText(const QString& qsAss, const QString& qsText);
     void videoStateChanged(QMediaPlayer::State);
 private:
     FlowLayout *m_flowLayout;
@@ -103,9 +104,9 @@ private:
     uint8_t* m_pOutBuffer;
     size_t m_outlen;
     size_t m_outMaxLen;
-    uint8_t* m_pTextVideoOutBuffer; // 包含文字的视频
-    size_t m_textVideoOutLen;
-    size_t m_textVideoMaxOutLen;
+    //uint8_t* m_pTextVideoOutBuffer; // 包含文字的视频
+    //size_t m_textVideoOutLen;
+    //size_t m_textVideoMaxOutLen;
 
     GlobalContext* m_globalContext;
 

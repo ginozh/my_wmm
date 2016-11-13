@@ -11,6 +11,7 @@ public:
     //LineEdit(int idx, QWidget *parent = 0);
     LineEdit(QSize size, GraphicsScene* scene, QWidget *parent = 0);
     void addTextByTabCaption();
+    void updateTextByVideo(const QString&);
 private:
     void activeText();
 signals:

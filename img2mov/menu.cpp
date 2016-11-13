@@ -7,7 +7,7 @@ Menu::Menu(QWidget *parent, QWidget *elementsEdit, int x, int y)
 {
     //widgets/graphicsview/diagramscene
     setObjectName(QStringLiteral("label"));
-    //setGeometry(QRect(x, y, 54, 22));
+    //setGeometry(QRect(x, y, 83, 32));
     //setGeometry(rect);
     setText(QApplication::translate("MainWindow", "Menu", 0));
     raise();
@@ -15,7 +15,7 @@ Menu::Menu(QWidget *parent, QWidget *elementsEdit, int x, int y)
     //m_menu->setScaledContents(true);
     m_menu->addAction(tr("Add Image"), m_elementsEdit, SLOT(addImages())  );
     m_menu->addSeparator();
-    m_menu->addAction(tr("E&xit"), parent, SLOT());
+    //m_menu->addAction(tr("E&xit"), parent, SLOT());
     //QWidget* widget = new QWidget( m_menu );
     //widget->setGeometry( 25, 80, 54, 22 );
     //m_menu->setGeometry(QRect(25, 80, 54, 22));

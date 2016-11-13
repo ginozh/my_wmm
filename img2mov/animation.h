@@ -14,7 +14,7 @@ class Animation : public QLabel
 
 public:
     Animation(const QString& path, const QString& animation, 
-            const QString& tipsname, QSize size, GlobalContext* globalContext,
+            const QString& tipsname, QSize size,
             QWidget *parent=0);
     void unselectedAnimation();
 signals:
