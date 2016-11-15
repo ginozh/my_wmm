@@ -485,6 +485,7 @@ void ffmpeg_init_globalvar() //storm
 static void ffmpeg_cleanup(int ret)
 {
     int i, j;
+    av_log(NULL, AV_LOG_DEBUG, "ffmpeg_cleanup. ret: %i\n", ret);
 
     if (do_benchmark) {
         int maxrss = getmaxrss() / 1024;

@@ -99,6 +99,9 @@ private:
 
     QWidget *m_tabHome;
     QWidget *m_tabAnimations;
+    //home
+    QToolButton *m_tbRotateLeft;
+    QToolButton *m_tbRotateRight;
     //video
     //QMap<void*, GlobalVideoAttr*> m_mapVieo;
     QWidget *m_tabVideo;

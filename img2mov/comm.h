@@ -17,6 +17,7 @@ enum ATTR_TYPE
     ,ATTR_VIDEO = 0x1
     ,ATTR_MUSIC = 0x2
     ,ATTR_TEXT =0x4
+    ,ATTR_ROTATE =0x8
 };
 
 // element

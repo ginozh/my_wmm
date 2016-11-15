@@ -13,6 +13,8 @@ public:
     Image(const QString& path, QSize size, QWidget *parent=0);
     void unselectedImage();
     void doFocusImage();
+	void rotate(bool bRight);
+    QString rotateVFilter();
 signals:
     void selectedImageSignal();
 //public slots:
@@ -30,6 +32,8 @@ private slots:
 private:
     QPixmap m_pixMap;
     bool m_focus;
+	int m_iRotateLeft;
+    int m_iRotateRight;
 };
 //! [0]
 #endif // IMAGE_H

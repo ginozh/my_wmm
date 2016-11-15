@@ -7,6 +7,8 @@ class ElementsEdit;
 Image::Image(const QString& path, QSize size, QWidget *parent)
     : QLabel(parent)
     //, m_pixMap(new QPixmap())
+    , m_iRotateLeft(0)
+    , m_iRotateRight(0)
 {
     m_focus=false;
     setFixedSize(size);
@@ -94,4 +96,55 @@ void Image::doFocusImage()
 {
     m_focus=true;
     update();
+}
+void Image::rotate(bool bRight)
+{
+	QPixmap pixmap(m_pixMap);
+	QMatrix rm;
+    if(bRight)
+    {
+        rm.rotate(90);
+        m_iRotateRight ++;
+    }
+    else
+    {
+        rm.rotate(270);
+        m_iRotateLeft ++;
+    }
+	pixmap = pixmap.transformed(rm);
+	setPixmap(pixmap);
+}
+/*
+#0 = 90CounterCLockwise and Vertical Flip (default)
+#1 = 90Clockwise 顺时针
+#2 = 90CounterClockwise 逆时针
+#3 = 90Clockwise and Vertical Flip
+#-vf "transpose=2,transpose=2" for 180 degrees
+ */
+QString Image::rotateVFilter()
+{
+    int iRotateRight;
+    QString qsVFilter;
+    if(m_iRotateRight>=m_iRotateLeft)
+    {
+        iRotateRight = (m_iRotateRight-m_iRotateLeft)%4;
+    }
+    else 
+    {
+        iRotateRight = 4-(m_iRotateLeft-m_iRotateRight)%4;
+    }
+    switch(iRotateRight){
+        case 1:
+            qsVFilter = "transpose=1";
+            break;
+        case 2:
+            qsVFilter = "transpose=1,transpose=1";
+            break;
+        case 3:
+            qsVFilter = "transpose=2";
+            break;
+        default:
+            break;
+    }
+    return qsVFilter;
 }

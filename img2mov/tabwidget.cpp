@@ -73,7 +73,7 @@ void TabWidget::assignVideoInfo()
         GlobalVideoAttr* globalVideoAttr = element->globalVideoAttr();
         if(globalVideoAttr)
         { 
-            m_cbDurationVideo->setCurrentText(QString(tr("%1s")).
+            m_cbDurationVideo->setCurrentText(QString(tr("%1")).
                     arg(QString::number((float)globalVideoAttr->m_iDuration/1000, 'f', 2)));
         }
     }
@@ -109,16 +109,21 @@ void TabWidget::handleVideoAttrChange()
         if(!globalVideoAttr || !globalMusicAttr)
         {
             qDebug()<< "error uncomplete. TabWidget::handleVideoAttrChange: !globalVideoAttr || !globalMusicAtt";
+            return;
+        }
+        if(send == m_tbRotateLeft || send == m_tbRotateRight)
+        {
+            element->image()->rotate(send == m_tbRotateRight?true:false);
+            attrType |= ATTR_ROTATE;
+            isChange = true;
         }
 
 #define COMPARE_ASSIGN(macrop_var, macrop_commbox, macrop_globalattr) do {\
         if(send == macrop_commbox && macrop_globalattr) \
         { \
-            QString qs##macrop_var = macrop_commbox->currentText(); \
-            QStringList sl##macrop_var = qs##macrop_var.split("s"); \
-            float i##macrop_var = sl##macrop_var.at(0).toFloat();  \
+            float i##macrop_var = macrop_commbox->currentText().toFloat(); \
             float m_i##macrop_var = QString::number((float)macrop_globalattr->m_i##macrop_var/1000, 'f', 2).toFloat(); \
-            qDebug() << "handleVideoAttrChange. qs" #macrop_var ": " << qs##macrop_var << " i" #macrop_var ": " << i##macrop_var << " m_i" #macrop_var ": "<< m_i##macrop_var; \
+            qDebug() << "handleVideoAttrChange. i" #macrop_var ": " << i##macrop_var << " m_i" #macrop_var ": "<< m_i##macrop_var; \
             if(i##macrop_var != m_i##macrop_var) \
             { \
                 macrop_globalattr->m_i##macrop_var = i##macrop_var*1000; \
@@ -296,27 +301,27 @@ void TabWidget::createTabHome()
             QHBoxLayout* hboxTop = new QHBoxLayout;
             vboxEditing->addLayout(hboxTop);
             {
-                QToolButton *addPhotos = new QToolButton();
-                hboxTop->addWidget(addPhotos, Qt::AlignLeft);
+                m_tbRotateLeft = new QToolButton();
+                hboxTop->addWidget(m_tbRotateLeft, Qt::AlignLeft);
 
-                addPhotos->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-                addPhotos->setIcon(QIcon("images/addphotos.png"));
-                addPhotos->setIconSize(m_iconSize);
-                addPhotos->setText("Rotate Left");
-                //addPhotos->setMaximumHeight(m_iconSize.height() + 250);
-                addPhotos->setMinimumWidth(m_iconSize.width() + 100);
-                //addPhotos->setMinimumWidth(addPhotos->text().length());
-                //connect(addPhotos, SIGNAL(clicked()), (const QObject*)m_globalContext->m_elementsEdit, SLOT(addImages()));
+                m_tbRotateLeft->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+                m_tbRotateLeft->setIcon(QIcon("images/addphotos.png"));
+                m_tbRotateLeft->setIconSize(m_iconSize);
+                m_tbRotateLeft->setText("Rotate Left");
+                //m_tbRotateLeft->setMaximumHeight(m_iconSize.height() + 250);
+                m_tbRotateLeft->setMinimumWidth(m_iconSize.width() + 100);
+                //m_tbRotateLeft->setMinimumWidth(m_tbRotateLeft->text().length());
+                connect(m_tbRotateLeft, SIGNAL(clicked()), this, SLOT(handleVideoAttrChange()));
             }
             {
-                QToolButton *addMusic = new QToolButton();
-                hboxTop->addWidget(addMusic, Qt::AlignLeft);
-                addMusic->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-                addMusic->setIcon(QIcon("images/addmusic.png"));
-                addMusic->setIconSize(m_iconSize);
-                addMusic->setText("Rotate Right");
-                addMusic->setMinimumWidth(m_iconSize.width() + 100);
-                //connect(addMusic, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(addImages()));
+                m_tbRotateRight = new QToolButton();
+                hboxTop->addWidget(m_tbRotateRight, Qt::AlignLeft);
+                m_tbRotateRight->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+                m_tbRotateRight->setIcon(QIcon("images/addmusic.png"));
+                m_tbRotateRight->setIconSize(m_iconSize);
+                m_tbRotateRight->setText("Rotate Right");
+                m_tbRotateRight->setMinimumWidth(m_iconSize.width() + 100);
+                connect(m_tbRotateRight, SIGNAL(clicked()), this, SLOT(handleVideoAttrChange()));
             }
             {
                 QVBoxLayout *vboxTopRightEditing = new QVBoxLayout;
@@ -614,7 +619,7 @@ void TabWidget::createTabVideo()
                     QHBoxLayout* hboxSpeed = new QHBoxLayout;
                     vboxTopright->addLayout(hboxSpeed);
                     {
-                        QLabel *lbl = new QLabel(tr("Speed:"));
+                        QLabel *lbl = new QLabel(tr("Speed(s):"));
                         lbl->setEnabled(false);
 
                         hboxSpeed->addWidget(lbl);
@@ -631,14 +636,16 @@ void TabWidget::createTabVideo()
                     QHBoxLayout* hboxDuration = new QHBoxLayout;
                     vboxTopright->addLayout(hboxDuration);
                     {
-                        QLabel *lbl = new QLabel(tr("Duration:"));
+                        QLabel *lbl = new QLabel(tr("Duration(s):"));
 
                         hboxDuration->addWidget(lbl);
                     }
                     {
                         m_cbDurationVideo = new ComboBox();
                         m_cbDurationVideo->setEditable(true);
-                        m_cbDurationVideo->addItem(QString(tr("0.00s")));
+                        m_cbDurationVideo->setCurrentText(QString(tr("2.00")));
+                        m_cbDurationVideo->addItem(QString(tr("2.00")));
+                        m_cbDurationVideo->setValidator(new QDoubleValidator(0.5, 30.0, 2, m_cbDurationVideo)); //uncomplete delete old
                         connect(m_cbDurationVideo, SIGNAL(textChangedSignal(QString)),
                                 this, SLOT(handleVideoAttrChange()));
 
@@ -695,14 +702,15 @@ void TabWidget::createTabMusic()
                     QHBoxLayout* hboxStartTime = new QHBoxLayout;
                     vboxTimes->addLayout(hboxStartTime);
                     {
-                        QLabel *lbl = new QLabel(tr("Start time:"));
+                        QLabel *lbl = new QLabel(tr("Start time(s):"));
 
                         hboxStartTime->addWidget(lbl);
                     }
                     {
                         m_cbStartTimeMusic = new ComboBox();
                         m_cbStartTimeMusic->setEditable(true);
-                        m_cbStartTimeMusic->addItem(QString(tr("0.00s")));
+                        m_cbStartTimeMusic->addItem(QString(tr("0.00")));
+                        m_cbStartTimeMusic->setCurrentText(QString(tr("0.00")));
                         connect(m_cbStartTimeMusic, SIGNAL(textChangedSignal(QString)),
                                 this, SLOT(handleVideoAttrChange()));
 
@@ -714,14 +722,15 @@ void TabWidget::createTabMusic()
                     QHBoxLayout* hboxStartPoint = new QHBoxLayout;
                     vboxTimes->addLayout(hboxStartPoint);
                     {
-                        QLabel *lbl = new QLabel(tr("Start point:"));
+                        QLabel *lbl = new QLabel(tr("Start point(s):"));
 
                         hboxStartPoint->addWidget(lbl);
                     }
                     {
                         m_cbStartPointMusic = new ComboBox();
                         m_cbStartPointMusic->setEditable(true);
-                        m_cbStartPointMusic->addItem(QString(tr("0.00s")));
+                        m_cbStartPointMusic->addItem(QString(tr("0.00")));
+                        m_cbStartPointMusic->setCurrentText(QString(tr("0.00")));
                         connect(m_cbStartPointMusic, SIGNAL(textChangedSignal(QString)),
                                 this, SLOT(handleVideoAttrChange()));
 
@@ -733,14 +742,15 @@ void TabWidget::createTabMusic()
                     QHBoxLayout* hboxEndPoint = new QHBoxLayout;
                     vboxTimes->addLayout(hboxEndPoint);
                     {
-                        QLabel *lbl = new QLabel(tr("End point:"));
+                        QLabel *lbl = new QLabel(tr("End point(s):"));
 
                         hboxEndPoint->addWidget(lbl);
                     }
                     {
                         m_cbEndPointMusic = new ComboBox();
                         m_cbEndPointMusic->setEditable(true);
-                        m_cbEndPointMusic->addItem(QString(tr("2.00s")));
+                        m_cbEndPointMusic->addItem(QString(tr("2.00")));
+                        m_cbEndPointMusic->setCurrentText(QString(tr("2.00")));
                         connect(m_cbEndPointMusic, SIGNAL(textChangedSignal(QString)),
                                 this, SLOT(handleVideoAttrChange()));
 
@@ -977,14 +987,15 @@ void TabWidget::createTabText()
                 {
                     QHBoxLayout* hboxTopAdjust = new QHBoxLayout;
                     {
-                        QLabel *lbl = new QLabel(tr("Start time:"));
+                        QLabel *lbl = new QLabel(tr("Start time(s):"));
 
                         hboxTopAdjust->addWidget(lbl);
                     }
                     {
                         m_startTimeTextCombo = new QComboBox();
                         m_startTimeTextCombo->setEditable(true);
-                        m_startTimeTextCombo->addItem(QString(tr("2.00s")));
+                        m_startTimeTextCombo->addItem(QString(tr("2.00")));
+                        m_startTimeTextCombo->setCurrentText(QString(tr("2.00")));
 
                         hboxTopAdjust->addWidget(m_startTimeTextCombo);
                     }
@@ -994,7 +1005,7 @@ void TabWidget::createTabText()
                 {
                     QHBoxLayout* hboxMidAdjust = new QHBoxLayout;
                     {
-                        QLabel *lbl = new QLabel(tr("Text duration:"));
+                        QLabel *lbl = new QLabel(tr("Text duration(s):"));
 
                         hboxMidAdjust->addWidget(lbl);
                     }
@@ -1172,8 +1183,16 @@ void TabWidget::activeTabMusic(GlobalMusicAttr* musicAttr)
     setCurrentWidget(m_tabMusic);
     if(!musicAttr)
         return;
-    m_cbEndPointMusic->setCurrentText(QString(tr("%1s")).
-            arg(QString::number((float)musicAttr->m_iEndPoint/1000, 'f', 2)));
+    float fEndPoint = (float)musicAttr->m_iEndPoint/1000;
+    float fStartTime =(float)m_globalContext->m_elementsEdit->totalVideoDuration()/1000;
+    m_cbEndPointMusic->setCurrentText(QString(tr("%1")).
+            arg(QString::number(fEndPoint, 'f', 2)));
+    qDebug()<< "TabWidget::activeTabMusic. fEndPoint: "<<fEndPoint<<" totalVideoDuration: "<<m_globalContext->m_elementsEdit->totalVideoDuration();
+    //widgets/widgets/validators
+    //focusOutEvent
+    m_cbStartTimeMusic->setValidator(new QDoubleValidator(0.0, fStartTime, 2, m_cbStartTimeMusic)); //uncomplete delete old
+    m_cbStartPointMusic->setValidator(new QDoubleValidator(0.0, fEndPoint, 2, m_cbStartPointMusic)); //uncomplete delete old
+    m_cbEndPointMusic->setValidator(new QDoubleValidator(0.0, fEndPoint, 2, m_cbEndPointMusic)); //uncomplete delete old
 }
 void TabWidget::assignAnimationInfo()
 {
@@ -1214,9 +1233,9 @@ void TabWidget::assignTextInfo()
             m_centerTextButton->setChecked(globalTextAttr->m_textAlign == Qt::AlignHCenter);
             m_rightTextButton->setChecked(globalTextAttr->m_textAlign == Qt::AlignRight);
 
-            m_startTimeTextCombo->setCurrentText(QString(tr("%1s")).
+            m_startTimeTextCombo->setCurrentText(QString(tr("%1")).
                     arg(QString::number((float)globalTextAttr->m_iStartTimeText/1000, 'f', 2)));
-            m_durationTextCombo->setCurrentText(QString(tr("%1s")).
+            m_durationTextCombo->setCurrentText(QString(tr("%1")).
                     arg(QString::number((float)globalTextAttr->m_iDurationText/1000, 'f', 2)));
 
             //m_startTimeTextCombo->setCurrentText(globalTextAttr->m_qsStartTimeText);

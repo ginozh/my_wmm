@@ -31,6 +31,7 @@ public:
     GlobalVideoAttr* globalVideoAttr(){return m_globalVideoAttr;}
     GlobalAnimationAttr* globalAnimationAttr(){return m_globalAnimationAttr;}
     GlobalTextAttr* globalTextAttr(){return m_globalTextAttr;}
+    Image* image(){return m_pimage;}
     LineEdit* lineEdit(){return m_lineEdit;}
     MusicLabel* musicLabel(){return m_musicLabel;}
     void setValid(bool bValid){m_bValid = bValid;}

@@ -43,8 +43,17 @@ COMMENT
     -map 0:v -map "[aout]" -vf ass=jpg/subtitle.ass jpg/mp3.512.5.avi
 COMMENT
 
-#add animation
+#right: add animation
 #time ./ffmpeg_r.exe -y  -framerate 24 -i jpg/512img002.jpg -vf "zoompan=z='zoom+0.001':d=125:s=512x384"  -t 2 jpg/zoom.512.2.avi;
 time ./ffmpeg_r.exe -y  -framerate 24 -i jpg/512img002.jpg -vf "zoompan=z='zoom+0.001':s=512x384" -t 2 jpg/zoom.512.2.avi;
 time ./ffmpeg_r.exe -y  -framerate 24 -i jpg/512img003.jpg -vf "zoompan=z='zoom+0.001':s=512x384" -t 2 jpg/zoom.512.3.avi;
 time ./ffmpeg_r.exe -y -i jpg/zoom.512.3.avi -i jpg/zoom.512.2.avi -filter_complex "blend=all_expr='if(crossfade,1.5,2)'"  jpg/annimation_zoom.avi
+
+#right: rotate and scale
+#0 = 90CounterCLockwise and Vertical Flip (default)
+#1 = 90Clockwise 顺时针
+#2 = 90CounterClockwise 逆时针
+#3 = 90Clockwise and Vertical Flip
+#-vf "transpose=2,transpose=2" for 180 degrees. http://stackoverflow.com/questions/3937387/rotating-videos-with-ffmpeg
+#setsar=1:1,setdar=4:3 像素点长宽比不一样时生成动画时会出错 http://video.stackexchange.com/questions/9947/how-do-i-change-frame-size-preserving-width-using-ffmpeg
+time ./ffmpeg_r.exe -y -i jpg/img007.jpg -vf "transpose=1,scale=512:384,setsar=1:1,setdar=4:3" jpg/512img007_1.jpg

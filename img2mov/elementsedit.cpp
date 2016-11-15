@@ -127,7 +127,9 @@ void ElementsEdit::scaleImage(Element *element)
     vqsArgv.push_back("-i");
     vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbOriFile));//uncomplete
     vqsArgv.push_back("-vf");
-    vqsArgv.push_back(QString(tr("scale=%1")).arg("512:384")); //512:384 256:192
+    QString qsRotateVFilter = element->image()->rotateVFilter();
+    qDebug()<< "ElementsEdit::scaleImage. qsRotateVFilter: "<<qsRotateVFilter;
+    vqsArgv.push_back(QString(tr("%1scale=%2,setsar=1:1,setdar=4:3")).arg(qsRotateVFilter.isEmpty()?qsRotateVFilter:(qsRotateVFilter+",")).arg("512:384")); //512:384 256:192
     vqsArgv.push_back(QString(tr("-f")));
     vqsArgv.push_back(QString(tr("mjpeg")));
     vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbScaleFile));
@@ -1149,10 +1151,14 @@ void ElementsEdit::createFinalVideo(bool bPlay)
 //每次重新生成视频时都会调用此函数. (生成动画时不能初始化m_vecticalLine的位置)
 void ElementsEdit::durationChanged(qint64 duration)
 {
-    m_iTotalVideoDuration=duration;
+    if(duration)
+    {
+        m_iTotalVideoDuration=duration;
+    }
+    qDebug()<<"ElementsEdit::durationChanged m_iTotalVideoDuration: "<<m_iTotalVideoDuration;
     initialProgress(); //需要在addImages 图片渲染之后被调用，否则element的长宽不对
 }
-void ElementsEdit::createSingleVideo(int idxElement)
+void ElementsEdit::createSingleVideo(int idxElement, bool bCreateSimpleVideo/*=true*/)
 {
     if(idxElement<0)
     {
@@ -1271,6 +1277,13 @@ void ElementsEdit::videoStateChanged(QMediaPlayer::State state)
 //文字
 void ElementsEdit::elementAttrChanged(int attrType, bool bPlay)
 {
+    //0
+    if(attrType & ATTR_ROTATE)
+    {
+        scaleImage(currentElement());
+        createSimpleVideo(currentElement());
+        createSingleVideo(m_idxCurrentElement, false);
+    }
     //1, 生成单独的视频
     if(attrType & ATTR_VIDEO)
     {

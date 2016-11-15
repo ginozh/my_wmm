@@ -24,13 +24,15 @@ public:
     ElementsEdit(QWidget *parent);
     ~ElementsEdit();
     Element* currentElement();
-    GlobalMusicAttr* globalMusicAttr(){return m_globalMusicAttr;};
+    GlobalMusicAttr* globalMusicAttr(){return m_globalMusicAttr;}
+    qint64 totalVideoDuration(){return m_iTotalVideoDuration;}
 private:
     int callFfmpeg(const QVector<QString>& vqsArgv);
     void createFinalVideo(bool bPlay);
     //void createFinalVideoMusicTxt(bool bPlay);
     void scaleImage(Element *element);
-    void createSingleVideo(int idxElement);
+    //void createSingleVideo(int idxElement);
+    void createSingleVideo(int idxElement, bool bCreateSimpleVideo=true);
     void createSimpleVideo(Element *element);
     void createPanzoomVideo(Element *element, int framerate, const QString& duration, const QString& panzoom);
     /*bool createAnimation(Element *firstElement, Element *secondElement
