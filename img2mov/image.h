@@ -34,6 +34,7 @@ private:
     bool m_focus;
 	int m_iRotateLeft;
     int m_iRotateRight;
+    QSize m_iSize;
 };
 //! [0]
 #endif // IMAGE_H

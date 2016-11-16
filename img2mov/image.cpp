@@ -11,12 +11,15 @@ Image::Image(const QString& path, QSize size, QWidget *parent)
     , m_iRotateRight(0)
 {
     m_focus=false;
+    m_iSize = size;
     setFixedSize(size);
     //setMinimumHeight(size.height());
     //setMaximumHeight(size.height());
     //setContentsMargins(5, 5, 5, 5);
 #if 1
-    setPixmap(QPixmap(path));
+    m_pixMap.load(path);
+    m_pixMap.scaled(m_iSize);
+    setPixmap(m_pixMap);
     setScaledContents(true);
     //setMaximumSize(200,200);
     //setMinimumSize(200,200);
@@ -111,8 +114,8 @@ void Image::rotate(bool bRight)
         rm.rotate(270);
         m_iRotateLeft ++;
     }
-	pixmap = pixmap.transformed(rm);
-	setPixmap(pixmap);
+	m_pixMap = pixmap.transformed(rm);
+	setPixmap(m_pixMap);
 }
 /*
 #0 = 90CounterCLockwise and Vertical Flip (default)
