@@ -5,7 +5,7 @@ Menu::Menu(QWidget *parent, QWidget *elementsEdit, int x, int y)
     , m_menu(new QMenu(this))
     , m_elementsEdit(elementsEdit)
 {
-    //widgets/graphicsview/diagramscene
+    //下拉: widgets/graphicsview/diagramscene
     setObjectName(QStringLiteral("label"));
     //setGeometry(QRect(x, y, 83, 32));
     //setGeometry(rect);
@@ -13,7 +13,27 @@ Menu::Menu(QWidget *parent, QWidget *elementsEdit, int x, int y)
     raise();
 
     //m_menu->setScaledContents(true);
-    m_menu->addAction(tr("Add Image"), m_elementsEdit, SLOT(addImages())  );
+    m_menu->addAction(tr("New Project"), m_elementsEdit, SLOT(addImages())  );
+    //xml parser: QXmlStreamReader xml/htmlinfo
+    m_menu->addAction(tr("Open Project"), m_elementsEdit, SLOT(addImages())  );
+    //xml write: QXmlStreamWriter xml/xmlstreamlint
+    /*
+       QXmlStreamWriter stream(&output);
+       stream.setAutoFormatting(true);
+       stream.writeStartDocument();
+       ...
+       stream.writeStartElement("bookmark");
+       stream.writeAttribute("href", "http://qt-project.org/");
+       stream.writeTextElement("title", "Qt Project");
+       stream.writeEndElement(); // bookmark
+       ...
+       stream.writeEndDocument();
+     */
+    m_menu->addAction(tr("Save Project"), m_elementsEdit, SLOT(addImages())  );
+    m_menu->addSeparator();
+    m_menu->addAction(tr("Publish Move"), m_elementsEdit, SLOT(addImages())  );
+    m_menu->addAction(tr("Save Move"), m_elementsEdit, SLOT(saveVideo())  );
+    //m_menu->addAction(tr("Add Image"), m_elementsEdit, SLOT(addImages())  );
     m_menu->addSeparator();
     //m_menu->addAction(tr("E&xit"), parent, SLOT());
     //QWidget* widget = new QWidget( m_menu );

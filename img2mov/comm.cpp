@@ -1,7 +1,15 @@
 #include "comm.h"
 #include <QDesktopWidget>
 #include <QApplication>
+#include <QDebug>
 
+GlobalImageAttr::GlobalImageAttr()
+{
+    m_iScaledSize = GlobalContext::instance()->m_iScaledSize;
+
+    m_iRotateLeft = 0;
+    m_iRotateRight = 0;
+}
 GlobalTextAttr::GlobalTextAttr()
 {
     //m_qfont = ;
@@ -51,6 +59,10 @@ GlobalContext::GlobalContext()
     m_rectDesktop = desktopWidget->availableGeometry();
     m_dFactorX = (double)m_rectDesktop.width()/2452;
     m_dFactorY = (double)m_rectDesktop.height()/1444;
+    int iTmpW=((int)(m_dFactorX*512/4))*4;
+    int iTmpH=(iTmpW/4)*3;
+    qDebug()<<"m_iScaledSize. m_dFactorX: "<<m_dFactorX<<" m_dFactorY: "<<m_dFactorY<<" w: "<<iTmpW<<" h:"<<iTmpH;
+    m_iScaledSize = QSize(iTmpW, iTmpH);//QSize(m_dFactorX*512, m_dFactorX*384); //4:3
 }
 GlobalContext* GlobalContext::instance()  
 {  

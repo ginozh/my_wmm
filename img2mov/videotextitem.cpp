@@ -474,7 +474,7 @@ void GraphicsTextItem::createGraphicsRectItem()
 	m_listGraphicsRectItem.append(west_middle);
 }
 #if 1
-void GraphicsTextItem::createAssInfo()
+void GraphicsTextItem::createAssInfo(float factor)
 {
     if(m_globalTextAttr && m_globalTextAttr->m_iDurationText)
     {
@@ -488,9 +488,12 @@ void GraphicsTextItem::createAssInfo()
         {
             case Qt::AlignLeft:
                 iAlignment=7;
-                iMarginL=pos().x()+fmDeviation.height();
-                iMarginV=pos().y()+fmDeviation.height();
-                break;
+                iMarginL=factor*(pos().x()+fmDeviation.height());
+                iMarginV=factor*(pos().y()+fmDeviation.height());
+                qDebug() << "x: "<<pos().x()<<" y: "<< pos().y()<<" s_x: "<<scenePos().x()<<
+                    " s_y: "<<scenePos().y()<<" s_w: "<<scene()->width()<<" s_h: "<<scene()->height()<<
+                    " iMarginL: "<<iMarginL<<" iMarginV: "<<iMarginV;
+                break; 
             case Qt::AlignHCenter:
                 iAlignment=7;
                 iMarginL=pos().x();
@@ -514,14 +517,14 @@ void GraphicsTextItem::createAssInfo()
         " 0,      %7,          %8,     %9,     %10,      0,          0\n")).
             //arg((int)this).arg(m_globalTextAttr->m_qfont.family()).arg(m_globalTextAttr->m_qfont.pointSize()).
             //arg((int)this).arg(m_globalTextAttr->m_qfont.family()).arg(m_globalTextAttr->m_qfont.pixelSize()).
-            arg((int)this).arg(m_globalTextAttr->m_qfont.family()).arg(fm.height()).
+            arg((int)this).arg(m_globalTextAttr->m_qfont.family()).arg(factor*fm.height()).
             arg(m_globalTextAttr->m_qfont.weight()==QFont::Bold?1:0).arg(m_globalTextAttr->m_qfont.italic()?1:0).
             arg(m_globalTextAttr->m_qfont.underline()?1:0 ).arg(iAlignment).arg(iMarginL).arg(iMarginR).
             arg(iMarginV);
 
         //document()->lineCount();
-        QString start = QDateTime(QDate::currentDate()).addMSecs(m_globalTextAttr->m_iStartTimeText + 10).toString("hh:mm:ss.zzz"); //+10: 为了防止编辑文字时同时出现字幕
-        //QString start = QDateTime(QDate::currentDate()).addMSecs(m_globalTextAttr->m_iStartTimeText ).toString("hh:mm:ss.zzz");
+        //QString start = QDateTime(QDate::currentDate()).addMSecs(m_globalTextAttr->m_iStartTimeText + 10).toString("hh:mm:ss.zzz"); //+10: 为了防止编辑文字时同时出现字幕
+        QString start = QDateTime(QDate::currentDate()).addMSecs(m_globalTextAttr->m_iStartTimeText ).toString("hh:mm:ss.zzz");
         start.chop(1);
         QString end = QDateTime(QDate::currentDate()).addMSecs(m_globalTextAttr->m_iStartTimeText+m_globalTextAttr->m_iDurationText-10).toString("hh:mm:ss.zzz"); //-10:如上 uncomplete:临界
         end.chop(1);

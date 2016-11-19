@@ -29,8 +29,9 @@ VideoPlayer::VideoPlayer(QWidget *parent)
         layout->addWidget(graphicsView);
 
         //graphicsView->setSceneRect(0,0,500,480);
-        int iSceneWidth = 512*dFactorX;
-        int iSceneHeight = 384*dFactorY;
+        QSize qSize=GlobalContext::instance()->m_iScaledSize;
+        int iSceneWidth = qSize.width();
+        int iSceneHeight = qSize.height();
         int iHeightIdx = 0;
         scene->setSceneRect(0,0,iSceneWidth,iSceneHeight); //如果没有这个，可能宽度会变成764
         graphicsView->setSceneRect(0,0,iSceneWidth,iSceneHeight);

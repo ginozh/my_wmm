@@ -26,6 +26,7 @@ ElementsEdit::ElementsEdit(QWidget *parent)
       , m_firstLayout(NULL)
       , m_firstLabel(NULL)
       , m_vecticalLine(new QFrame(this))
+      , m_qFinalVideoSize(0,0)
       , m_lastSelectedElement(0)
       , m_idxCurrentElement(-1)
       , m_isFirstClick(true)
@@ -114,8 +115,12 @@ int ElementsEdit::callFfmpeg(const QVector<QString>& vqsArgv)
 /*
  * Start Image
  * */
-void ElementsEdit::scaleImage(Element *element)
+void ElementsEdit::scaleImage(Element *element, QSize qScaleSize/*=QSize(0, 0)*/)
 {
+    if(qScaleSize.width()<=0)
+    {
+        qScaleSize=element->image()->globalImageAttr()->m_iScaledSize;
+    }
     //./ffmpeg -y -i 'jpg/img001.jpg' -vf scale=512:384 jpg/512img001.jpg
     QVector<QString> vqsArgv;
     vqsArgv.push_back("ffmpeg");
@@ -128,8 +133,8 @@ void ElementsEdit::scaleImage(Element *element)
     vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbOriFile));//uncomplete
     vqsArgv.push_back("-vf");
     QString qsRotateVFilter = element->image()->rotateVFilter();
-    qDebug()<< "ElementsEdit::scaleImage. qsRotateVFilter: "<<qsRotateVFilter;
-    vqsArgv.push_back(QString(tr("%1scale=%2,setsar=1:1,setdar=4:3")).arg(qsRotateVFilter.isEmpty()?qsRotateVFilter:(qsRotateVFilter+",")).arg("512:384")); //512:384 256:192
+    qDebug()<< "ElementsEdit::scaleImage. qsRotateVFilter: "<<qsRotateVFilter<<" width: "<<qScaleSize.width()<<" height: "<<qScaleSize.height();
+    vqsArgv.push_back(QString(tr("%1scale=%2:%3,setsar=1:1,setdar=4:3")).arg(qsRotateVFilter.isEmpty()?qsRotateVFilter:(qsRotateVFilter+",")).arg(qScaleSize.width()).arg(qScaleSize.height())); //512:384 256:192
     vqsArgv.push_back(QString(tr("-f")));
     vqsArgv.push_back(QString(tr("mjpeg")));
     vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbScaleFile));
@@ -174,6 +179,11 @@ void ElementsEdit::addImages()
     for (int i = 0; i < files.count(); ++i) {
         // 1, 读取文件，生成image
         Element *element=new Element(this, files[i], m_globalContext->m_scene);
+        GlobalImageAttr* globalImageAttr = element->image()->globalImageAttr();
+        if(m_qFinalVideoSize.width() < globalImageAttr->m_iSize.width())
+        {
+            m_qFinalVideoSize = globalImageAttr->m_iSize; //uncomplete. need same
+        }
         //emit createVideoTextSignal((void*)element); 
         emit createVideoTextSignal(element); 
         m_flowLayout->insertWidget(idx, element);
@@ -410,12 +420,12 @@ void ElementsEdit::addMusic()
     sinbuffer.out_len = NULL;
     vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&sinbuffer));
     //./ffmpeg_r.exe -y -i jpg/mp3.512.5.avi -vf ass=jpg/subtitle.ass jpg/subt.mp3.512.5.avi
-    if(!m_qsInText.isEmpty())
+    if(!m_qbAss.isEmpty())
     {
         vqsArgv.push_back(QString(tr("-vf")));
         struct to_buffer sintxtbuffer;
-        sintxtbuffer.ptr = (uint8_t*)m_qsInText.data();
-        sintxtbuffer.in_len = m_qsInText.length();
+        sintxtbuffer.ptr = (uint8_t*)m_qbAss.data();
+        sintxtbuffer.in_len = m_qbAss.length();
         sintxtbuffer.out_len = NULL;
         vqsArgv.push_back(QString(tr("ass=buffer|%1")).arg((size_t)&sintxtbuffer));
     }
@@ -634,7 +644,7 @@ void ElementsEdit::updatedText(const QString& qsAss, const QString& qsText)
         qDebug()<< "error uncomplete. ElementsEdit::addText";
     }
 
-    m_qsInText = qsAss.toUtf8();
+    m_qbAss = qsAss.toUtf8();
     //createFinalVideoMusicTxt(false);
     createFinalVideo(false);
 #if 0
@@ -666,11 +676,11 @@ void ElementsEdit::updatedText(const QString& qsAss, const QString& qsText)
     //./ffmpeg_r.exe -y -i jpg/mp3.512.5.avi -vf ass=jpg/subtitle.ass jpg/subt.mp3.512.5.avi
     vqsArgv.push_back(QString(tr("-vf")));
     //QByteArray qsInTxt = createAss(stTextAttr, qsText);
-    m_qsInText = qsAss.toUtf8();
+    m_qbAss = qsAss.toUtf8();
     //QMessageBox::information(this, "info", QString(tr("qsAss: %1")).arg(qsAss));
     struct to_buffer sintxtbuffer;
-    sintxtbuffer.ptr = (uint8_t*)m_qsInText.data();
-    sintxtbuffer.in_len = m_qsInText.length();
+    sintxtbuffer.ptr = (uint8_t*)m_qbAss.data();
+    sintxtbuffer.in_len = m_qbAss.length();
     sintxtbuffer.out_len = NULL;
     vqsArgv.push_back(QString(tr("ass=buffer|%1")).arg((size_t)&sintxtbuffer));
     vqsArgv.push_back(QString(tr("-f")));
@@ -725,7 +735,7 @@ void ElementsEdit::updateTextAttrAndAss(int iStartIdx)
     }
     if(isChanged && m_globalContext && m_globalContext->m_scene)
     {
-        m_qsInText = m_globalContext->m_scene->createTotalAssInfo().toUtf8();
+        m_qbAss = m_globalContext->m_scene->createTotalAssInfo().toUtf8();
     }
 }
 /*
@@ -930,8 +940,13 @@ bool ElementsEdit::createAnimationPanzoom(Element *firstElement, Element *second
 /*
  * Start Video
  * */
-void ElementsEdit::createFinalVideo(bool bPlay)
+void ElementsEdit::createFinalVideo(bool bPlay, QByteArray qbAss, const QString& qsFinalVideoFile/*=""*/)
+//void ElementsEdit::createFinalVideo(bool bPlay)
 {
+    if(qbAss.isEmpty() && !m_qbAss.isEmpty())
+    {
+        qbAss = m_qbAss;
+    }
     QVector<QString> vqsArgv;
     vqsArgv.push_back("ffmpeg");
     vqsArgv.push_back("-y");
@@ -979,7 +994,7 @@ void ElementsEdit::createFinalVideo(bool bPlay)
     vqsArgv.push_back("concat"); //uncomplete
     vqsArgv.push_back(QString(tr("-i")));
     vqsArgv.push_back(QString(tr("buffer:video/avi;nobase64,%1")).arg((size_t)&sinbuffer));
-    if(m_globalMusicAttr->m_qsMusicFullFilename.isEmpty() && m_qsInText.isEmpty())
+    if(m_globalMusicAttr->m_qsMusicFullFilename.isEmpty() && qbAss.isEmpty())
     {
         vqsArgv.push_back(QString(tr("-c")));
         vqsArgv.push_back(QString(tr("copy")));
@@ -1030,46 +1045,58 @@ void ElementsEdit::createFinalVideo(bool bPlay)
         }
 
         //./ffmpeg_r.exe -y -i jpg/mp3.512.5.avi -vf ass=jpg/subtitle.ass jpg/subt.mp3.512.5.avi
-        if(!m_qsInText.isEmpty())
+        if(!qbAss.isEmpty())
         {
             vqsArgv.push_back(QString(tr("-vf")));
             struct to_buffer sintxtbuffer;
-            sintxtbuffer.ptr = (uint8_t*)m_qsInText.data();
-            sintxtbuffer.in_len = m_qsInText.length();
+            sintxtbuffer.ptr = (uint8_t*)qbAss.data();
+            sintxtbuffer.in_len = qbAss.length();
             sintxtbuffer.out_len = NULL;
             vqsArgv.push_back(QString(tr("ass=buffer|%1")).arg((size_t)&sintxtbuffer));
         }
     }
     //printf("video input. stbuf: %p buf.ptr: %p in_len: %zu\n", &sinbuffer, sinbuffer.ptr, sinbuffer.in_len);
 
-    uint8_t* out_buffer = m_pOutBuffer;
-    m_outlen = m_outMaxLen;
-
-    struct to_buffer soutbuffer;
-    soutbuffer.ptr = out_buffer;
-    soutbuffer.in_len = m_outMaxLen;
-    soutbuffer.out_len = &m_outlen;
-    vqsArgv.push_back(QString(tr("-f")));
-    vqsArgv.push_back(QString(tr("avi")));
-    vqsArgv.push_back(QString(tr("buffer:video/avi;nobase64,%1")).arg((size_t)&soutbuffer));
-    //vqsArgv.push_back(QString(tr("mm.avi")));
-    //printf("video out. stbuf: %p buf.ptr: %p in_len: %zu out_len: %zu\n", &soutbuffer, soutbuffer.ptr, soutbuffer.in_len, *soutbuffer.out_len);
-    int ret;
-    if((ret=callFfmpeg(vqsArgv)))
+    if(qsFinalVideoFile.isEmpty())
     {
-        QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
+        uint8_t* out_buffer = m_pOutBuffer;
+        m_outlen = m_outMaxLen;
+
+        struct to_buffer soutbuffer;
+        soutbuffer.ptr = out_buffer;
+        soutbuffer.in_len = m_outMaxLen;
+        soutbuffer.out_len = &m_outlen;
+        vqsArgv.push_back(QString(tr("-f")));
+        vqsArgv.push_back(QString(tr("avi")));
+        vqsArgv.push_back(QString(tr("buffer:video/avi;nobase64,%1")).arg((size_t)&soutbuffer));
+        //vqsArgv.push_back(QString(tr("mm.avi")));
+        //printf("video out. stbuf: %p buf.ptr: %p in_len: %zu out_len: %zu\n", &soutbuffer, soutbuffer.ptr, soutbuffer.in_len, *soutbuffer.out_len);
+        int ret;
+        if((ret=callFfmpeg(vqsArgv)))
+        {
+            QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
+        }
+
+        qDebug()<<"ElementsEdit::createFinalVideo m_outlen: "<<m_outlen<<" m_imgPlayPosition: "<<m_imgPlayPosition<<" m_outMaxLen: "<<m_outMaxLen;
+
+        setCursor(QCursor(Qt::ArrowCursor));
+        //5, 播放视频
+        QByteArray tmp=QByteArray((const char*)soutbuffer.ptr, (int)m_outlen);
+        emit readyVideo("tmp.avi", tmp, m_imgPlayPosition);
+        //emit changePlayPosition(m_imgPlayPosition);
+        if(bPlay)
+        {
+            emit playVideo();
+        }
     }
-
-    qDebug()<<"ElementsEdit::createFinalVideo m_outlen: "<<m_outlen<<" m_imgPlayPosition: "<<m_imgPlayPosition<<" m_outMaxLen: "<<m_outMaxLen;
-
-    setCursor(QCursor(Qt::ArrowCursor));
-    //5, 播放视频
-    QByteArray tmp=QByteArray((const char*)soutbuffer.ptr, (int)m_outlen);
-    emit readyVideo("tmp.avi", tmp, m_imgPlayPosition);
-    //emit changePlayPosition(m_imgPlayPosition);
-    if(bPlay)
+    else
     {
-        emit playVideo();
+        vqsArgv.push_back(qsFinalVideoFile);
+        int ret;
+        if((ret=callFfmpeg(vqsArgv)))
+        {
+            QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
+        }
     }
 }
 #if 0
@@ -1130,7 +1157,7 @@ void ElementsEdit::createFinalVideo(bool bPlay)
     {
         QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
     }
-    if(m_globalMusicAttr->m_qsMusicFullFilename.isEmpty() && m_qsInText.isEmpty())
+    if(m_globalMusicAttr->m_qsMusicFullFilename.isEmpty() && m_qbAss.isEmpty())
     {
         //5, 播放视频
         QByteArray tmp=QByteArray((const char*)soutbuffer.ptr, (int)m_outlen);
@@ -1268,6 +1295,59 @@ void ElementsEdit::videoStateChanged(QMediaPlayer::State state)
     }
 
 }
+void ElementsEdit::saveVideo()
+{
+    //1, open write file
+    QFileDialog fileDialog(this, tr("Save as..."));
+    fileDialog.setAcceptMode(QFileDialog::AcceptSave);
+#if 0
+    QStringList mimeTypes;
+    mimeTypes << "application/vnd.oasis.opendocument.text" << "text/html" << "text/plain";
+    fileDialog.setMimeTypeFilters(mimeTypes);
+#endif
+    QStringList filters;
+    filters << "MPEG-4/H.264 Video file (*.mp4)"
+        << "Windows Media Video file (*.wmv)";
+    fileDialog.setNameFilters(filters);
+
+    fileDialog.setDefaultSuffix("mp4");
+    if (fileDialog.exec() != QDialog::Accepted)
+    {
+        //error uncomplete
+        return ;
+    }
+    const QString fn = fileDialog.selectedFiles().first();
+#if 0
+    QFile file(fn);
+    if (!file.open(QIODevice::WriteOnly)){
+        return;
+    }
+#endif
+    // 2, create video
+    for (int i = 0; i < m_flowLayout->count(); ++i)
+    {
+        Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(i)->widget());
+        if (!element)
+        {
+            // err uncomplete
+            qDebug()<< "error uncomplete. ElementsEdit::createFinalVideo elemnet";
+            continue;
+        }
+        //2.1 single video
+        scaleImage(element, m_qFinalVideoSize);
+        createSimpleVideo(element);
+        createSingleVideo(i, false);
+    }
+    //2.2 final video
+    QByteArray qbAss = m_globalContext->m_scene->createTotalAssInfo(m_qFinalVideoSize).toUtf8();
+    createFinalVideo(false, qbAss, fn);
+#if 0
+    // 3, write video file
+    QByteArray ba("test");
+    qint64 written = file.write((const char *)ba.data(), ba.length());
+    file.close();
+#endif
+}
 /*
  * End Video
  * */
@@ -1357,12 +1437,12 @@ void ElementsEdit::createFinalVideoMusicTxt(bool bPlay)
     }
 
     //./ffmpeg_r.exe -y -i jpg/mp3.512.5.avi -vf ass=jpg/subtitle.ass jpg/subt.mp3.512.5.avi
-    if(!m_qsInText.isEmpty())
+    if(!m_qbAss.isEmpty())
     {
         vqsArgv.push_back(QString(tr("-vf")));
         struct to_buffer sintxtbuffer;
-        sintxtbuffer.ptr = (uint8_t*)m_qsInText.data();
-        sintxtbuffer.in_len = m_qsInText.length();
+        sintxtbuffer.ptr = (uint8_t*)m_qbAss.data();
+        sintxtbuffer.in_len = m_qbAss.length();
         sintxtbuffer.out_len = NULL;
         vqsArgv.push_back(QString(tr("ass=buffer|%1")).arg((size_t)&sintxtbuffer));
     }

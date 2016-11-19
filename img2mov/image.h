@@ -4,6 +4,7 @@
 #include <QMouseEvent>
 #include <QPixmap>
 #include <QPoint>
+#include "comm.h"
 //! [0]
 class Image : public QLabel
 {
@@ -15,6 +16,7 @@ public:
     void doFocusImage();
 	void rotate(bool bRight);
     QString rotateVFilter();
+    GlobalImageAttr* globalImageAttr(){return m_globalImageAttr;}
 signals:
     void selectedImageSignal();
 //public slots:
@@ -30,11 +32,12 @@ private slots:
     void open();
 #endif
 private:
+    GlobalImageAttr* m_globalImageAttr;
     QPixmap m_pixMap;
     bool m_focus;
-	int m_iRotateLeft;
-    int m_iRotateRight;
-    QSize m_iSize;
+	//int m_iRotateLeft;
+    //int m_iRotateRight;
+    QSize m_iScaleSize; 
 };
 //! [0]
 #endif // IMAGE_H

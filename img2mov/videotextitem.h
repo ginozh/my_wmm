@@ -31,7 +31,7 @@ public:
     void setTextAttr(GlobalTextAttr* globalTextAttr);
     void setFirstTextPosWH(const QString& oritxt);
     bool getChanged(){return m_changed;}
-    void createAssInfo();
+    void createAssInfo(float factor=1);
 signals:
     void lostFocus(GraphicsTextItem *item);
     void selectedChange(QGraphicsItem *item);

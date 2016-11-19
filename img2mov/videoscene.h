@@ -29,7 +29,8 @@ public:
     void setVideoTextAttr(Element* element, GlobalTextAttr* globalTextAttr);
     //void setTextAttr(void* element, stTextAttr *textAttr);
     GraphicsTextItem* getGraphicsTextItem(){return curtextItem;}
-    QString createTotalAssInfo();
+    //QString createTotalAssInfo();
+    QString createTotalAssInfo(QSize qSize=QSize(0,0));
 
 public slots:
     //void setItemType(DiagramItem::DiagramType type);

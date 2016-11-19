@@ -28,11 +28,13 @@ public:
     qint64 totalVideoDuration(){return m_iTotalVideoDuration;}
 private:
     int callFfmpeg(const QVector<QString>& vqsArgv);
-    void createFinalVideo(bool bPlay);
+    void createFinalVideo(bool bPlay, QByteArray qbAss="", const QString& qsFinalVideoFile="");
     //void createFinalVideoMusicTxt(bool bPlay);
-    void scaleImage(Element *element);
+    //void scaleImage(Element *element);
+    void scaleImage(Element *element, QSize qScaleSize=QSize(0, 0));
     //void createSingleVideo(int idxElement);
     void createSingleVideo(int idxElement, bool bCreateSimpleVideo=true);
+    //void createSimpleVideo(Element *element, bool bUseScaledImage=true);
     void createSimpleVideo(Element *element);
     void createPanzoomVideo(Element *element, int framerate, const QString& duration, const QString& panzoom);
     /*bool createAnimation(Element *firstElement, Element *secondElement
@@ -77,6 +79,7 @@ public slots:
     //void handleContextMenuRequested(const QPoint &pos);
     void updatedText(const QString& qsAss, const QString& qsText);
     void videoStateChanged(QMediaPlayer::State);
+    void saveVideo();
 private:
     FlowLayout *m_flowLayout;
     QVBoxLayout *m_firstLayout;
@@ -84,13 +87,14 @@ private:
 
     //进度条竖线
     QFrame *m_vecticalLine; 
-    qint64 m_iTotalVideoDuration;
     qint64 m_imgWidth;
     qint64 m_signalImgWidth;
     qint64 m_imgHeight;
     qint64 m_lineWidth;
     qint64 m_playPosition;
     //end
+    qint64 m_iTotalVideoDuration;
+    QSize m_qFinalVideoSize; //最终视频统一尺寸
 
     qint64 m_imgPlayPosition; //选中图片计算出来的位移
 
@@ -112,7 +116,7 @@ private:
 
     GlobalContext* m_globalContext;
 
-    QByteArray m_qsInText;
+    QByteArray m_qbAss;
 
 
     //music

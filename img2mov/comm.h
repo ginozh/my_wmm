@@ -20,7 +20,18 @@ enum ATTR_TYPE
     ,ATTR_ROTATE =0x8
 };
 
-// element
+// image
+class GlobalImageAttr
+{
+public:
+    GlobalImageAttr();
+public:
+    QString m_qsImageName; //图片路径
+    QSize m_iSize; //原始尺寸
+    QSize m_iScaledSize; //缩放尺寸
+    int m_iRotateLeft;
+    int m_iRotateRight;
+};
 class GlobalTextAttr
 {
 public:
@@ -97,6 +108,7 @@ public:
     QRect m_rectDesktop;
     double m_dFactorX;
     double m_dFactorY;
+    QSize m_iScaledSize; //整体缩放尺寸,包括: 图片、scene、ass
 };
 
 #endif

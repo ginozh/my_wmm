@@ -3,22 +3,27 @@
 #include <QMenu>
 #include <QPainter>
 #include <QPen>
+#include <QDebug>
 class ElementsEdit;
 Image::Image(const QString& path, QSize size, QWidget *parent)
     : QLabel(parent)
+    , m_globalImageAttr(new GlobalImageAttr)
     //, m_pixMap(new QPixmap())
-    , m_iRotateLeft(0)
-    , m_iRotateRight(0)
+    //, m_iRotateLeft(0)
+    //, m_iRotateRight(0)
 {
     m_focus=false;
-    m_iSize = size;
+    m_iScaleSize = size;
     setFixedSize(size);
     //setMinimumHeight(size.height());
     //setMaximumHeight(size.height());
     //setContentsMargins(5, 5, 5, 5);
 #if 1
     m_pixMap.load(path);
-    m_pixMap.scaled(m_iSize);
+    const QImage& qImage = m_pixMap.toImage(); 
+    qDebug()<<"Image. height: "<<qImage.size().height()<<" width: "<<qImage.size().width();
+    m_globalImageAttr->m_iSize = qImage.size();
+    m_pixMap.scaled(m_iScaleSize);
     setPixmap(m_pixMap);
     setScaledContents(true);
     //setMaximumSize(200,200);
@@ -107,12 +112,12 @@ void Image::rotate(bool bRight)
     if(bRight)
     {
         rm.rotate(90);
-        m_iRotateRight ++;
+        m_globalImageAttr->m_iRotateRight ++;
     }
     else
     {
         rm.rotate(270);
-        m_iRotateLeft ++;
+        m_globalImageAttr->m_iRotateLeft ++;
     }
 	m_pixMap = pixmap.transformed(rm);
 	setPixmap(m_pixMap);
@@ -128,13 +133,13 @@ QString Image::rotateVFilter()
 {
     int iRotateRight;
     QString qsVFilter;
-    if(m_iRotateRight>=m_iRotateLeft)
+    if(m_globalImageAttr->m_iRotateRight>=m_globalImageAttr->m_iRotateLeft)
     {
-        iRotateRight = (m_iRotateRight-m_iRotateLeft)%4;
+        iRotateRight = (m_globalImageAttr->m_iRotateRight-m_globalImageAttr->m_iRotateLeft)%4;
     }
     else 
     {
-        iRotateRight = 4-(m_iRotateLeft-m_iRotateRight)%4;
+        iRotateRight = 4-(m_globalImageAttr->m_iRotateLeft-m_globalImageAttr->m_iRotateRight)%4;
     }
     switch(iRotateRight){
         case 1:
