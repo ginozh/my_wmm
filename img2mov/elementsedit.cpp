@@ -115,7 +115,7 @@ int ElementsEdit::callFfmpeg(const QVector<QString>& vqsArgv)
 /*
  * Start Image
  * */
-void ElementsEdit::scaleImage(Element *element, QSize qScaleSize/*=QSize(0, 0)*/)
+void ElementsEdit::scaleImage(Element *element, QSize qScaleSize/*=QSize(0, 0)*/, bool bCreateVideoFile/*=false*/)
 {
     if(qScaleSize.width()<=0)
     {
@@ -137,15 +137,24 @@ void ElementsEdit::scaleImage(Element *element, QSize qScaleSize/*=QSize(0, 0)*/
     vqsArgv.push_back(QString(tr("%1scale=%2:%3,setsar=1:1,setdar=4:3")).arg(qsRotateVFilter.isEmpty()?qsRotateVFilter:(qsRotateVFilter+",")).arg(qScaleSize.width()).arg(qScaleSize.height())); //512:384 256:192
     vqsArgv.push_back(QString(tr("-f")));
     vqsArgv.push_back(QString(tr("mjpeg")));
-    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbScaleFile));
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg(bCreateVideoFile?(size_t)&element->m_fbFileScaleFile:(size_t)&element->m_fbScaleFile));
     int ret;
     if((ret=callFfmpeg(vqsArgv)))
     {
         QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
     }
-    element->m_fbInputScaleFile.ptr=element->m_fbScaleFile.ptr;
-    element->m_fbInputScaleFile.in_len=*element->m_fbScaleFile.out_len;
-    element->m_fbInputScaleFile.out_len=NULL;
+    if(bCreateVideoFile)
+    {
+        element->m_fbFileInputScaleFile.ptr=element->m_fbFileScaleFile.ptr;
+        element->m_fbFileInputScaleFile.in_len=*element->m_fbFileScaleFile.out_len;
+        element->m_fbFileInputScaleFile.out_len=NULL;
+    }
+    else
+    {
+        element->m_fbInputScaleFile.ptr=element->m_fbScaleFile.ptr;
+        element->m_fbInputScaleFile.in_len=*element->m_fbScaleFile.out_len;
+        element->m_fbInputScaleFile.out_len=NULL;
+    }
 }
 //! [1]
 void ElementsEdit::addImages()
@@ -783,7 +792,7 @@ void ElementsEdit::selectedTransition(const QString& animation)
 bool ElementsEdit::createAnimation(Element *firstElement, Element *secondElement
         , const QString& animationName)
 #else
-bool ElementsEdit::createAnimation(Element *firstElement, Element *secondElement, bool isFromPanzoom)
+bool ElementsEdit::createAnimation(Element *firstElement, Element *secondElement, bool isFromPanzoom, bool bCreateVideoFile/*=false*/)
 #endif
 {
     qDebug()<< "createAnimation";
@@ -818,11 +827,11 @@ bool ElementsEdit::createAnimation(Element *firstElement, Element *secondElement
     vqsArgv.push_back("-i");
     if(isFromPanzoom)
     {
-        vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&firstElement->m_fbInputPanzoomVideo));
+        vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg(bCreateVideoFile?(size_t)&firstElement->m_fbFileInputPanzoomVideo:(size_t)&firstElement->m_fbInputPanzoomVideo));
     }
     else
     {
-        vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&firstElement->m_fbInputAniVideo));
+        vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg(bCreateVideoFile?(size_t)&firstElement->m_fbFileInputScaledVideo:(size_t)&firstElement->m_fbInputScaledVideo));
     }
 
 #if 0
@@ -836,11 +845,11 @@ bool ElementsEdit::createAnimation(Element *firstElement, Element *secondElement
     vqsArgv.push_back("-i");
     if(isFromPanzoom)
     {
-        vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&secondElement->m_fbInputPanzoomVideo));
+        vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg(bCreateVideoFile?(size_t)&secondElement->m_fbFileInputPanzoomVideo:(size_t)&secondElement->m_fbInputPanzoomVideo));
     }
     else
     {
-        vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&secondElement->m_fbInputAniVideo));
+        vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg(bCreateVideoFile?(size_t)&secondElement->m_fbFileInputScaledVideo:(size_t)&secondElement->m_fbInputScaledVideo));
     }
     //vqsArgv.push_back(secondImageName);
     //ffmpeg -y -framerate 25 -loop 1 -t 1 -i img001.jpg -loop 1 -t 1 -i img002.jpg -filter_complex "blend=all_expr='if(gte(N*SW*50+X,W),B,A)'" -pix_fmt yuv420p  out.mkv
@@ -856,11 +865,11 @@ bool ElementsEdit::createAnimation(Element *firstElement, Element *secondElement
     vqsArgv.push_back(QString(tr("-f")));
     vqsArgv.push_back(QString(tr("avi")));
 #if 0
-    secondElement->m_fbScaleAniVideo.in_len = 10*1024*1024;
-    *secondElement->m_fbScaleAniVideo.out_len = 10*1024*1024;
-    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&secondElement->m_fbScaleAniVideo));
+    secondElement->m_fbScaledVideo.in_len = 10*1024*1024;
+    *secondElement->m_fbScaledVideo.out_len = 10*1024*1024;
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&secondElement->m_fbScaledVideo));
 #endif
-    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&secondElement->m_fbTransitionVideo));
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg(bCreateVideoFile?(size_t)&secondElement->m_fbFileTransitionVideo:(size_t)&secondElement->m_fbTransitionVideo));
 #endif
     // -y -framerate 1 -i "C:\QtProjects\qtmovie\jpg\img%3d.jpg" myoutput.avi
     //QTime startTime = QTime::currentTime();
@@ -870,20 +879,29 @@ bool ElementsEdit::createAnimation(Element *firstElement, Element *secondElement
         QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
     }
 #if 0
-    secondElement->m_fbInputAniVideo.ptr=secondElement->m_fbScaleAniVideo.ptr;
-    secondElement->m_fbInputAniVideo.in_len=*secondElement->m_fbScaleAniVideo.out_len;
-    secondElement->m_fbInputAniVideo.out_len=NULL;
+    secondElement->m_fbInputScaledVideo.ptr=secondElement->m_fbScaledVideo.ptr;
+    secondElement->m_fbInputScaledVideo.in_len=*secondElement->m_fbScaledVideo.out_len;
+    secondElement->m_fbInputScaledVideo.out_len=NULL;
 #endif
-    secondElement->m_fbInputTransitionVideo.ptr=secondElement->m_fbTransitionVideo.ptr;
-    secondElement->m_fbInputTransitionVideo.in_len=*secondElement->m_fbTransitionVideo.out_len;
-    secondElement->m_fbInputTransitionVideo.out_len=NULL;
+    if(bCreateVideoFile)
+    {
+        secondElement->m_fbFileInputTransitionVideo.ptr=secondElement->m_fbFileTransitionVideo.ptr;
+        secondElement->m_fbFileInputTransitionVideo.in_len=*secondElement->m_fbFileTransitionVideo.out_len;
+        secondElement->m_fbFileInputTransitionVideo.out_len=NULL;
+    }
+    else
+    {
+        secondElement->m_fbInputTransitionVideo.ptr=secondElement->m_fbTransitionVideo.ptr;
+        secondElement->m_fbInputTransitionVideo.in_len=*secondElement->m_fbTransitionVideo.out_len;
+        secondElement->m_fbInputTransitionVideo.out_len=NULL;
+    }
     //int dt = startTime.msecsTo(QTime::currentTime());
     //qDebug()<< "ffmpeg waste: " << dt;
     //QMessageBox::information(this, "info", QString(tr("ffmpeg waste: %1")).arg(dt));
     //emit playVideo(vfileName);
     return true;
 }
-void ElementsEdit::createPanzoomVideo(Element *element, int framerate, const QString& duration, const QString& panzoom)
+void ElementsEdit::createPanzoomVideo(Element *element, int framerate, const QString& duration, const QString& panzoom, bool bCreateVideoFile/*=false*/)
 {
 
     qDebug()<< "createPanzoomVideo";
@@ -897,7 +915,7 @@ void ElementsEdit::createPanzoomVideo(Element *element, int framerate, const QSt
     vqsArgv.push_back("-framerate");
     vqsArgv.push_back(QString(tr("%1")).arg(framerate));
     vqsArgv.push_back("-i");
-    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbInputScaleFile));
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg(bCreateVideoFile?(size_t)&element->m_fbFileInputScaleFile:(size_t)&element->m_fbInputScaleFile));
     //-vf "zoompan=z='zoom+0.001':s=512x384" -t 2
     vqsArgv.push_back(QString(tr("-vf")));
     vqsArgv.push_back(QString(tr("%1")).arg(panzoom));
@@ -905,21 +923,30 @@ void ElementsEdit::createPanzoomVideo(Element *element, int framerate, const QSt
     vqsArgv.push_back(QString(tr("%1")).arg(duration));
     vqsArgv.push_back(QString(tr("-f")));
     vqsArgv.push_back(QString(tr("avi")));
-    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbPanzoomVideo));
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg(bCreateVideoFile?(size_t)&element->m_fbFilePanzoomVideo:(size_t)&element->m_fbPanzoomVideo));
     //vqsArgv.push_back(QString(tr("pic%1.avi")).arg(i));
     int ret;
     if((ret=callFfmpeg(vqsArgv)))
     {
         QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
     }
-    element->m_fbInputPanzoomVideo.ptr=element->m_fbPanzoomVideo.ptr;
-    element->m_fbInputPanzoomVideo.in_len=*element->m_fbPanzoomVideo.out_len;
-    element->m_fbInputPanzoomVideo.out_len=NULL;
+    if(bCreateVideoFile)
+    {
+        element->m_fbFileInputPanzoomVideo.ptr=element->m_fbFilePanzoomVideo.ptr;
+        element->m_fbFileInputPanzoomVideo.in_len=*element->m_fbFilePanzoomVideo.out_len;
+        element->m_fbFileInputPanzoomVideo.out_len=NULL;
+    }
+    else
+    {
+        element->m_fbInputPanzoomVideo.ptr=element->m_fbPanzoomVideo.ptr;
+        element->m_fbInputPanzoomVideo.in_len=*element->m_fbPanzoomVideo.out_len;
+        element->m_fbInputPanzoomVideo.out_len=NULL;
+    }
 }
 // pan & zoom
 //./ffmpeg_r.exe -y  -framerate 24 -i jpg/512img003.jpg -vf "zoompan=z='zoom+0.001':s=512x384"  -t 2 jpg/zoom.512.3.avi;
 //./ffmpeg_r.exe -y -i jpg/zoom.512.3.avi -i jpg/zoom.512.2.avi -filter_complex     "blend=all_expr='if(crossfade,1.5,2)'"  jpg/transition_zoom.avi
-bool ElementsEdit::createAnimationPanzoom(Element *firstElement, Element *secondElement)
+bool ElementsEdit::createAnimationPanzoom(Element *firstElement, Element *secondElement, bool bCreateVideoFile/*=false*/)
 {
     qDebug()<< "createAnimationPanzoom";
     GlobalVideoAttr* globalVideoAttr = secondElement->globalVideoAttr();
@@ -927,10 +954,10 @@ bool ElementsEdit::createAnimationPanzoom(Element *firstElement, Element *second
     QString duration = QString::number((float)globalVideoAttr->m_iDuration/1000, 'f', 2);
     //float animationDuration = QString::number((float)globalAnimationAttr->m_iTransitionDuration/1000, 'f', 2);
 
-    createPanzoomVideo(firstElement, globalVideoAttr->m_iFramerate, duration, globalAnimationAttr->m_qsPanZoom);
-    createPanzoomVideo(secondElement, globalVideoAttr->m_iFramerate, duration, globalAnimationAttr->m_qsPanZoom);
+    createPanzoomVideo(firstElement, globalVideoAttr->m_iFramerate, duration, globalAnimationAttr->m_qsPanZoom, bCreateVideoFile);
+    createPanzoomVideo(secondElement, globalVideoAttr->m_iFramerate, duration, globalAnimationAttr->m_qsPanZoom, bCreateVideoFile);
 
-    createAnimation(firstElement, secondElement, true);
+    createAnimation(firstElement, secondElement, true, bCreateVideoFile);
 
     return true;
 }
@@ -940,7 +967,7 @@ bool ElementsEdit::createAnimationPanzoom(Element *firstElement, Element *second
 /*
  * Start Video
  * */
-void ElementsEdit::createFinalVideo(bool bPlay, QByteArray qbAss, const QString& qsFinalVideoFile/*=""*/)
+void ElementsEdit::createFinalVideo(bool bPlay, QByteArray qbAss/*=""*/, const QString& qsFinalVideoFile/*=""*/, bool bCreateVideoFile/*=false*/)
 //void ElementsEdit::createFinalVideo(bool bPlay)
 {
     if(qbAss.isEmpty() && !m_qbAss.isEmpty())
@@ -967,24 +994,24 @@ void ElementsEdit::createFinalVideo(bool bPlay, QByteArray qbAss, const QString&
             qDebug()<< "error uncomplete. ElementsEdit::createFinalVideo elemnet";
             continue;
         }
-        if(!element->m_fbInputAniVideo.ptr)
+        if(!element->m_fbInputScaledVideo.ptr)
         {
             // err uncomplete
-            qDebug()<< "error uncomplete. ElementsEdit::createFinalVideo m_fbInputAniVideo";
+            qDebug()<< "error uncomplete. ElementsEdit::createFinalVideo m_fbInputScaledVideo";
             continue;
         }
         if(element->m_fbInputTransitionVideo.ptr)
         {
-            sinString.append(QString(tr("file buffer:video/avi;nobase64,%1\n")).arg((size_t)&element->m_fbInputTransitionVideo));
+            sinString.append(QString(tr("file buffer:video/avi;nobase64,%1\n")).arg(bCreateVideoFile?(size_t)&element->m_fbFileInputTransitionVideo:(size_t)&element->m_fbInputTransitionVideo));
         }
         else if(element->m_fbInputPanzoomVideo.ptr)
         {
-            sinString.append(QString(tr("file buffer:video/avi;nobase64,%1\n")).arg((size_t)&element->m_fbInputPanzoomVideo));
+            sinString.append(QString(tr("file buffer:video/avi;nobase64,%1\n")).arg(bCreateVideoFile?(size_t)&element->m_fbFileInputPanzoomVideo:(size_t)&element->m_fbInputPanzoomVideo));
         }
         else
         {
         //snprintf(in_buffer, len, "file buffer:video/avi;nobase64,%zu\n
-            sinString.append(QString(tr("file buffer:video/avi;nobase64,%1\n")).arg((size_t)&element->m_fbInputAniVideo));
+            sinString.append(QString(tr("file buffer:video/avi;nobase64,%1\n")).arg(bCreateVideoFile?(size_t)&element->m_fbFileInputScaledVideo:(size_t)&element->m_fbInputScaledVideo));
         }
     }
     sinbuffer.ptr = (uint8_t*)sinString.data();
@@ -1057,6 +1084,13 @@ void ElementsEdit::createFinalVideo(bool bPlay, QByteArray qbAss, const QString&
     }
     //printf("video input. stbuf: %p buf.ptr: %p in_len: %zu\n", &sinbuffer, sinbuffer.ptr, sinbuffer.in_len);
 
+    //解决音频可能导致时长加长几十毫秒的问题.
+    //http://stackoverflow.com/questions/21420296/how-to-extract-time-accurate-video-segments-with-ffmpeg
+    //./ffmpeg_r.exe -y -ss 00:00:10 -t 00:00:03 -i jpg/lovechina1.mp3 -i jpg/loop.512.5.avi jpg/mp3.512.5.avi
+    //./ffmpeg_r.exe -y -ss 00:00:10 -t 00:00:03 -i jpg/lovechina1.mp3 -i jpg/loop.512.5.avi -an -shortest jpg/mp3.512.5.avi
+    //vqsArgv.push_back(QString(tr("-an")));
+    //vqsArgv.push_back(QString(tr("-shortest")));
+
     if(qsFinalVideoFile.isEmpty())
     {
         uint8_t* out_buffer = m_pOutBuffer;
@@ -1121,13 +1155,13 @@ void ElementsEdit::createFinalVideo(bool bPlay)
             // err uncomplete
             continue;
         }
-        if(!element->m_fbInputAniVideo.ptr)
+        if(!element->m_fbInputScaledVideo.ptr)
         {
             // err uncomplete
             continue;
         }
         //snprintf(in_buffer, len, "file buffer:video/avi;nobase64,%zu\n
-        sinString.append(QString(tr("file buffer:video/avi;nobase64,%1\n")).arg((size_t)&element->m_fbInputAniVideo));
+        sinString.append(QString(tr("file buffer:video/avi;nobase64,%1\n")).arg((size_t)&element->m_fbInputScaledVideo));
     }
     sinbuffer.ptr = (uint8_t*)sinString.data();
     sinbuffer.in_len = sinString.length();
@@ -1185,7 +1219,7 @@ void ElementsEdit::durationChanged(qint64 duration)
     qDebug()<<"ElementsEdit::durationChanged m_iTotalVideoDuration: "<<m_iTotalVideoDuration;
     initialProgress(); //需要在addImages 图片渲染之后被调用，否则element的长宽不对
 }
-void ElementsEdit::createSingleVideo(int idxElement, bool bCreateSimpleVideo/*=true*/)
+void ElementsEdit::createSingleVideo(int idxElement, bool bCreateSimpleVideo/*=true*/, bool bCreateVideoFile/*=false*/)
 {
     if(idxElement<0)
     {
@@ -1212,14 +1246,14 @@ void ElementsEdit::createSingleVideo(int idxElement, bool bCreateSimpleVideo/*=t
             {
                 //./ffmpeg_r.exe -y -i jpg/512.3.avi -i jpg/512.2.avi -filter_complex     "blend=all_expr='if(crossfade,1.5,2)'"  jpg/transition.avi
                 //createPanzoomVideo(secondElement,globalVideoAttr->m_iFramerate, duration,globalAnimationAttr->m_qsPanZoom);
-                createAnimation(firstElement, secondElement, false);
+                createAnimation(firstElement, secondElement, false, bCreateVideoFile);
             }
             else
             {
             // pan & zoom
                 //./ffmpeg_r.exe -y  -framerate 24 -i jpg/512img003.jpg -vf "zoompan=z='zoom+0.001':s=512x384"  -t 2 jpg/zoom.512.3.avi;
                 //./ffmpeg_r.exe -y -i jpg/zoom.512.3.avi -i jpg/zoom.512.2.avi -filter_complex     "blend=all_expr='if(crossfade,1.5,2)'"  jpg/transition_zoom.avi
-                createAnimationPanzoom(firstElement, secondElement);
+                createAnimationPanzoom(firstElement, secondElement, bCreateVideoFile);
             }
         }
         else
@@ -1231,15 +1265,15 @@ void ElementsEdit::createSingleVideo(int idxElement, bool bCreateSimpleVideo/*=t
     else if(!globalAnimationAttr->m_qsPanZoom.isEmpty())
     {
         //./ffmpeg_r.exe -y  -framerate 24 -i jpg/512img003.jpg -vf "zoompan=z='zoom+0.001':s=512x384"  -t 2 jpg/zoom.512.3.avi;
-        createPanzoomVideo(secondElement, globalVideoAttr->m_iFramerate, duration, globalAnimationAttr->m_qsPanZoom);
+        createPanzoomVideo(secondElement, globalVideoAttr->m_iFramerate, duration, globalAnimationAttr->m_qsPanZoom, bCreateVideoFile);
     }
-    else
+    else if(bCreateSimpleVideo)
     {
         //./ffmpeg_r.exe -y  -framerate 24 -loop 1 -t 2 -i jpg/512img003.jpg -f avi jpg/loop.512.3.avi;
-        createSimpleVideo(secondElement);
+        createSimpleVideo(secondElement, bCreateVideoFile);
     }
 }
-void ElementsEdit::createSimpleVideo(Element *element)
+void ElementsEdit::createSimpleVideo(Element *element, bool bCreateVideoFile /*=false*/)
 {
     GlobalVideoAttr* globalVideoAttr = element->globalVideoAttr();
     QString duration = QString::number((float)globalVideoAttr->m_iDuration/1000, 'f', 2);
@@ -1259,19 +1293,28 @@ void ElementsEdit::createSimpleVideo(Element *element)
     vqsArgv.push_back("-t");
     vqsArgv.push_back(QString(tr("%1")).arg(duration));
     vqsArgv.push_back("-i");
-    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbInputScaleFile));//uncomplete
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg(bCreateVideoFile?(size_t)&element->m_fbFileInputScaleFile:(size_t)&element->m_fbInputScaleFile));//uncomplete
     vqsArgv.push_back(QString(tr("-f")));
     vqsArgv.push_back(QString(tr("avi")));
-    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbScaleAniVideo));
+    vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg(bCreateVideoFile?(size_t)&element->m_fbFileScaledVideo:(size_t)&element->m_fbScaledVideo));
     //vqsArgv.push_back(QString(tr("pic%1.avi")).arg(i));
     int ret;
     if((ret=callFfmpeg(vqsArgv)))
     {
         QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
     }
-    element->m_fbInputAniVideo.ptr=element->m_fbScaleAniVideo.ptr;
-    element->m_fbInputAniVideo.in_len=*element->m_fbScaleAniVideo.out_len;
-    element->m_fbInputAniVideo.out_len=NULL;
+    if(bCreateVideoFile)
+    {
+        element->m_fbFileInputScaledVideo.ptr=element->m_fbFileScaledVideo.ptr;
+        element->m_fbFileInputScaledVideo.in_len=*element->m_fbFileScaledVideo.out_len;
+        element->m_fbFileInputScaledVideo.out_len=NULL;
+    }
+    else
+    {
+        element->m_fbInputScaledVideo.ptr=element->m_fbScaledVideo.ptr;
+        element->m_fbInputScaledVideo.in_len=*element->m_fbScaledVideo.out_len;
+        element->m_fbInputScaledVideo.out_len=NULL;
+    }
 }
 void ElementsEdit::videoStateChanged(QMediaPlayer::State state)
 {
@@ -1324,6 +1367,7 @@ void ElementsEdit::saveVideo()
     }
 #endif
     // 2, create video
+#define B_CREATE_FINAL_VIDEO_FILE true 
     for (int i = 0; i < m_flowLayout->count(); ++i)
     {
         Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(i)->widget());
@@ -1334,13 +1378,30 @@ void ElementsEdit::saveVideo()
             continue;
         }
         //2.1 single video
-        scaleImage(element, m_qFinalVideoSize);
-        createSimpleVideo(element);
-        createSingleVideo(i, false);
+        element->initialMemoryForVideoFile();
+
+        scaleImage(element, m_qFinalVideoSize, B_CREATE_FINAL_VIDEO_FILE);
+
+        createSimpleVideo(element, B_CREATE_FINAL_VIDEO_FILE);
+#define NO_CREATE_SIMPLE_VIDEO false
+        createSingleVideo(i, NO_CREATE_SIMPLE_VIDEO, B_CREATE_FINAL_VIDEO_FILE);
     }
     //2.2 final video
     QByteArray qbAss = m_globalContext->m_scene->createTotalAssInfo(m_qFinalVideoSize).toUtf8();
-    createFinalVideo(false, qbAss, fn);
+    createFinalVideo(false, qbAss, fn, B_CREATE_FINAL_VIDEO_FILE);
+    //3, clean memory
+    for (int i = 0; i < m_flowLayout->count(); ++i)
+    {
+        Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(i)->widget());
+        if (!element)
+        {
+            // err uncomplete
+            qDebug()<< "error uncomplete. ElementsEdit::createFinalVideo elemnet";
+            continue;
+        }
+        //clean scaledfile, scaledvideo, panzoomvideo, transitionvideo
+        element->freeMemoryForVideoFile();
+    }
 #if 0
     // 3, write video file
     QByteArray ba("test");

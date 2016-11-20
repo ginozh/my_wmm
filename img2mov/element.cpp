@@ -21,8 +21,8 @@ Element::Element(QWidget *parent, const QString& qsImageName,GraphicsScene* scen
     memset(&m_fbOriFile, 0, sizeof(m_fbOriFile));
     memset(&m_fbScaleFile, 0, sizeof(m_fbScaleFile));
     memset(&m_fbInputScaleFile, 0, sizeof(m_fbInputScaleFile));
-    memset(&m_fbScaleAniVideo, 0, sizeof(m_fbScaleAniVideo));
-    memset(&m_fbInputAniVideo, 0, sizeof(m_fbInputAniVideo));
+    memset(&m_fbScaledVideo, 0, sizeof(m_fbScaledVideo));
+    memset(&m_fbInputScaledVideo, 0, sizeof(m_fbInputScaledVideo));
     memset(&m_fbPanzoomVideo, 0, sizeof(m_fbPanzoomVideo));
     memset(&m_fbInputPanzoomVideo, 0, sizeof(m_fbInputPanzoomVideo));
     memset(&m_fbTransitionVideo, 0, sizeof(m_fbTransitionVideo));
@@ -61,11 +61,17 @@ Element::Element(QWidget *parent, const QString& qsImageName,GraphicsScene* scen
         m_fbOriFile.in_len = m_baOriFile.size();
         m_fbOriFile.out_len = NULL;
 
-        m_iOutVideo = 10*1024*1024;
-        m_pBufferVideo=(uint8_t *)new char[m_iOutVideo];
-        m_fbScaleAniVideo.ptr = m_pBufferVideo;
-        m_fbScaleAniVideo.in_len = m_iOutVideo;
-        m_fbScaleAniVideo.out_len = &m_iOutVideo;
+        m_iOutScaleFile = 1024*1024;
+        m_pBufferScaleFile=(uint8_t *)new char[m_iOutScaleFile];
+        m_fbScaleFile.ptr = m_pBufferScaleFile;
+        m_fbScaleFile.in_len = m_iOutScaleFile;
+        m_fbScaleFile.out_len = &m_iOutScaleFile;
+
+        m_iOutScaledVideo = 10*1024*1024;
+        m_pBufferScaledVideo=(uint8_t *)new char[m_iOutScaledVideo];
+        m_fbScaledVideo.ptr = m_pBufferScaledVideo;
+        m_fbScaledVideo.in_len = m_iOutScaledVideo;
+        m_fbScaledVideo.out_len = &m_iOutScaledVideo;
 
         m_iOutPanzoomVideo = 10*1024*1024;
         m_pBufferPanzoomVideo=(uint8_t *)new char[m_iOutPanzoomVideo];
@@ -79,11 +85,6 @@ Element::Element(QWidget *parent, const QString& qsImageName,GraphicsScene* scen
         m_fbTransitionVideo.in_len = m_iOutTransitionVideo;
         m_fbTransitionVideo.out_len = &m_iOutTransitionVideo;
 
-        m_iOutScaleFile = 1024*1024;
-        m_pBufferScaleFile=(uint8_t *)new char[m_iOutScaleFile];
-        m_fbScaleFile.ptr = m_pBufferScaleFile;
-        m_fbScaleFile.in_len = m_iOutScaleFile;
-        m_fbScaleFile.out_len = &m_iOutScaleFile;
 #if 0
         m_pimage->setContextMenuPolicy(Qt::CustomContextMenu);
         connect(m_pimage, SIGNAL(customContextMenuRequested(QPoint)), parentWidget(), SLOT(handleContextMenuRequested(QPoint)) );
@@ -134,7 +135,7 @@ Element::~Element()
     
     delete m_elementLayout;
 
-    delete[] m_pBufferVideo;
+    delete[] m_pBufferScaledVideo;
     delete[] m_pBufferPanzoomVideo;
     delete[] m_pBufferTransitionVideo;
     delete[] m_pBufferScaleFile;
@@ -155,4 +156,46 @@ void Element::selectedImage()
 void Element::selectedText(const QString& ori)
 {
     emit selectedTextSignal(ori);
+}
+void Element::initialMemoryForVideoFile()
+{
+    memset(&m_fbFileScaleFile, 0, sizeof(m_fbFileScaleFile));
+    memset(&m_fbFileInputScaleFile, 0, sizeof(m_fbFileInputScaleFile));
+    memset(&m_fbFileScaledVideo, 0, sizeof(m_fbFileScaledVideo));
+    memset(&m_fbFileInputScaledVideo, 0, sizeof(m_fbFileInputScaledVideo));
+    memset(&m_fbFilePanzoomVideo, 0, sizeof(m_fbFilePanzoomVideo));
+    memset(&m_fbFileInputPanzoomVideo, 0, sizeof(m_fbFileInputPanzoomVideo));
+    memset(&m_fbFileTransitionVideo, 0, sizeof(m_fbFileTransitionVideo));
+    memset(&m_fbFileInputTransitionVideo, 0, sizeof(m_fbFileInputTransitionVideo));
+
+    m_iFileOutScaleFile = 10*1024*1024;
+    m_pFileBufferScaleFile=(uint8_t *)new char[m_iFileOutScaleFile];
+    m_fbFileScaleFile.ptr = m_pFileBufferScaleFile;
+    m_fbFileScaleFile.in_len = m_iFileOutScaleFile;
+    m_fbFileScaleFile.out_len = &m_iFileOutScaleFile;
+
+    m_iFileOutScaledVideo = 10*1024*1024;
+    m_pFileBufferScaledVideo=(uint8_t *)new char[m_iFileOutScaledVideo];
+    m_fbFileScaledVideo.ptr = m_pFileBufferScaledVideo;
+    m_fbFileScaledVideo.in_len = m_iFileOutScaledVideo;
+    m_fbFileScaledVideo.out_len = &m_iFileOutScaledVideo;
+
+    m_iFileOutPanzoomVideo = 10*1024*1024;
+    m_pFileBufferPanzoomVideo=(uint8_t *)new char[m_iFileOutPanzoomVideo];
+    m_fbFilePanzoomVideo.ptr = m_pFileBufferPanzoomVideo;
+    m_fbFilePanzoomVideo.in_len = m_iFileOutPanzoomVideo;
+    m_fbFilePanzoomVideo.out_len = &m_iFileOutPanzoomVideo;
+
+    m_iFileOutTransitionVideo = 10*1024*1024;
+    m_pFileBufferTransitionVideo=(uint8_t *)new char[m_iFileOutTransitionVideo];
+    m_fbFileTransitionVideo.ptr = m_pFileBufferTransitionVideo;
+    m_fbFileTransitionVideo.in_len = m_iFileOutTransitionVideo;
+    m_fbFileTransitionVideo.out_len = &m_iFileOutTransitionVideo;
+}
+void Element::freeMemoryForVideoFile()
+{
+    delete[] m_pFileBufferScaledVideo;
+    delete[] m_pFileBufferPanzoomVideo;
+    delete[] m_pFileBufferTransitionVideo;
+    delete[] m_pFileBufferScaleFile;
 }

@@ -28,19 +28,19 @@ public:
     qint64 totalVideoDuration(){return m_iTotalVideoDuration;}
 private:
     int callFfmpeg(const QVector<QString>& vqsArgv);
-    void createFinalVideo(bool bPlay, QByteArray qbAss="", const QString& qsFinalVideoFile="");
+    void createFinalVideo(bool bPlay, QByteArray qbAss="", const QString& qsFinalVideoFile="", bool bCreateVideoFile=false);
     //void createFinalVideoMusicTxt(bool bPlay);
     //void scaleImage(Element *element);
-    void scaleImage(Element *element, QSize qScaleSize=QSize(0, 0));
-    //void createSingleVideo(int idxElement);
-    void createSingleVideo(int idxElement, bool bCreateSimpleVideo=true);
+    void scaleImage(Element *element, QSize qScaleSize=QSize(0, 0), bool bCreateVideoFile=false);
     //void createSimpleVideo(Element *element, bool bUseScaledImage=true);
-    void createSimpleVideo(Element *element);
-    void createPanzoomVideo(Element *element, int framerate, const QString& duration, const QString& panzoom);
+    void createSimpleVideo(Element *element, bool bCreateVideoFile=false);
+    //void createSingleVideo(int idxElement);
+    void createSingleVideo(int idxElement, bool bCreateSimpleVideo=true, bool bCreateVideoFile=false);
+    void createPanzoomVideo(Element *element, int framerate, const QString& duration, const QString& panzoom, bool bCreateVideoFile=false);
     /*bool createAnimation(Element *firstElement, Element *secondElement
             , const QString& animationName);*/
-    bool createAnimation(Element *firstElement, Element *secondElement, bool isFromPanzoom);
-    bool createAnimationPanzoom(Element *firstElement, Element *secondElement);
+    bool createAnimation(Element *firstElement, Element *secondElement, bool isFromPanzoom, bool bCreateVideoFile=false);
+    bool createAnimationPanzoom(Element *firstElement, Element *secondElement, bool bCreateVideoFile=false);
     void initialProgress();
     void assignProgress();
     void updateTextAttrAndAss(int iStartIdx);
