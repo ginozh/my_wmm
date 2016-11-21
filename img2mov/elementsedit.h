@@ -59,6 +59,8 @@ signals:
     void activeTabMusicSignal(GlobalMusicAttr*);
     void assignTabValueSignal();
     //void updatedElementTextSignal(const QString&);
+    void saveMoiveProgress(qint64 completed, qint64 total);
+    void saveMoiveFinish();
 protected:
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void resizeEvent(QResizeEvent * event) Q_DECL_OVERRIDE;
@@ -128,7 +130,20 @@ private:
     //int m_iMusicDuration;
     
     //video
+
+
+    QString m_qsVideoFileFormat;
 };
 //! [0]
+#include <QProgressDialog>
+class ProgressDialog : public QProgressDialog {
+    Q_OBJECT
+
+public:
+    explicit ProgressDialog(const QString& qsFileName, QWidget *parent = Q_NULLPTR);
+
+public slots:
+    void saveMoiveProgress(qint64 completed, qint64 total);
+};
 
 #endif // ELEMENTSEDIT_H

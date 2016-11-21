@@ -31,8 +31,8 @@ Menu::Menu(QWidget *parent, QWidget *elementsEdit, int x, int y)
      */
     m_menu->addAction(tr("Save Project"), m_elementsEdit, SLOT(addImages())  );
     m_menu->addSeparator();
-    m_menu->addAction(tr("Publish Move"), m_elementsEdit, SLOT(addImages())  );
-    m_menu->addAction(tr("Save Move"), m_elementsEdit, SLOT(saveVideo())  );
+    m_menu->addAction(tr("Publish Moive"), m_elementsEdit, SLOT(addImages())  );
+    m_menu->addAction(tr("Save Moive"), m_elementsEdit, SLOT(saveVideo())  );
     //m_menu->addAction(tr("Add Image"), m_elementsEdit, SLOT(addImages())  );
     m_menu->addSeparator();
     //m_menu->addAction(tr("E&xit"), parent, SLOT());

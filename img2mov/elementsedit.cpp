@@ -19,6 +19,7 @@ extern "C"{
 }
 //#define DEBUG_FFMPEG
 //! [1]
+#define VIDEO_FILE_FORMAT "avi"
 ElementsEdit::ElementsEdit(QWidget *parent)
     : QWidget(parent)
       //, m_flowLayout(new FlowLayout(this))
@@ -31,6 +32,7 @@ ElementsEdit::ElementsEdit(QWidget *parent)
       , m_idxCurrentElement(-1)
       , m_isFirstClick(true)
       , m_globalMusicAttr(new GlobalMusicAttr)
+      , m_qsVideoFileFormat(VIDEO_FILE_FORMAT)
 {   
     m_globalContext = GlobalContext::instance();
     //m_tmpdir=QDir::currentPath().append(tr("/tmp"));
@@ -440,7 +442,7 @@ void ElementsEdit::addMusic()
     }
 #if 1
     vqsArgv.push_back(QString(tr("-f")));
-    vqsArgv.push_back(QString(tr("avi")));
+    vqsArgv.push_back(m_qsVideoFileFormat);
     struct to_buffer soutbuffer;
     soutbuffer.ptr = m_pTextVideoOutBuffer;
     soutbuffer.in_len = m_textVideoMaxOutLen;
@@ -693,7 +695,7 @@ void ElementsEdit::updatedText(const QString& qsAss, const QString& qsText)
     sintxtbuffer.out_len = NULL;
     vqsArgv.push_back(QString(tr("ass=buffer|%1")).arg((size_t)&sintxtbuffer));
     vqsArgv.push_back(QString(tr("-f")));
-    vqsArgv.push_back(QString(tr("avi")));
+    vqsArgv.push_back(m_qsVideoFileFormat);
 #if 1
     struct to_buffer soutbuffer;
     soutbuffer.ptr = m_pTextVideoOutBuffer;
@@ -863,7 +865,7 @@ bool ElementsEdit::createAnimation(Element *firstElement, Element *secondElement
     vqsArgv.push_back(vfileName);
 #else
     vqsArgv.push_back(QString(tr("-f")));
-    vqsArgv.push_back(QString(tr("avi")));
+    vqsArgv.push_back(m_qsVideoFileFormat);
 #if 0
     secondElement->m_fbScaledVideo.in_len = 10*1024*1024;
     *secondElement->m_fbScaledVideo.out_len = 10*1024*1024;
@@ -922,7 +924,7 @@ void ElementsEdit::createPanzoomVideo(Element *element, int framerate, const QSt
     vqsArgv.push_back(QString(tr("-t")));
     vqsArgv.push_back(QString(tr("%1")).arg(duration));
     vqsArgv.push_back(QString(tr("-f")));
-    vqsArgv.push_back(QString(tr("avi")));
+    vqsArgv.push_back(m_qsVideoFileFormat);
     vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg(bCreateVideoFile?(size_t)&element->m_fbFilePanzoomVideo:(size_t)&element->m_fbPanzoomVideo));
     //vqsArgv.push_back(QString(tr("pic%1.avi")).arg(i));
     int ret;
@@ -1101,7 +1103,7 @@ void ElementsEdit::createFinalVideo(bool bPlay, QByteArray qbAss/*=""*/, const Q
         soutbuffer.in_len = m_outMaxLen;
         soutbuffer.out_len = &m_outlen;
         vqsArgv.push_back(QString(tr("-f")));
-        vqsArgv.push_back(QString(tr("avi")));
+        vqsArgv.push_back(m_qsVideoFileFormat);
         vqsArgv.push_back(QString(tr("buffer:video/avi;nobase64,%1")).arg((size_t)&soutbuffer));
         //vqsArgv.push_back(QString(tr("mm.avi")));
         //printf("video out. stbuf: %p buf.ptr: %p in_len: %zu out_len: %zu\n", &soutbuffer, soutbuffer.ptr, soutbuffer.in_len, *soutbuffer.out_len);
@@ -1182,7 +1184,7 @@ void ElementsEdit::createFinalVideo(bool bPlay)
     soutbuffer.in_len = m_outMaxLen;
     soutbuffer.out_len = &m_outlen;
     vqsArgv.push_back(QString(tr("-f")));
-    vqsArgv.push_back(QString(tr("avi")));
+    vqsArgv.push_back(m_qsVideoFileFormat);
     vqsArgv.push_back(QString(tr("buffer:video/avi;nobase64,%1")).arg((size_t)&soutbuffer));
     //vqsArgv.push_back(QString(tr("mm.avi")));
     //printf("video out. stbuf: %p buf.ptr: %p in_len: %zu out_len: %zu\n", &soutbuffer, soutbuffer.ptr, soutbuffer.in_len, *soutbuffer.out_len);
@@ -1295,7 +1297,7 @@ void ElementsEdit::createSimpleVideo(Element *element, bool bCreateVideoFile /*=
     vqsArgv.push_back("-i");
     vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg(bCreateVideoFile?(size_t)&element->m_fbFileInputScaleFile:(size_t)&element->m_fbInputScaleFile));//uncomplete
     vqsArgv.push_back(QString(tr("-f")));
-    vqsArgv.push_back(QString(tr("avi")));
+    vqsArgv.push_back(m_qsVideoFileFormat);
     vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg(bCreateVideoFile?(size_t)&element->m_fbFileScaledVideo:(size_t)&element->m_fbScaledVideo));
     //vqsArgv.push_back(QString(tr("pic%1.avi")).arg(i));
     int ret;
@@ -1350,7 +1352,9 @@ void ElementsEdit::saveVideo()
 #endif
     QStringList filters;
     filters << "MPEG-4/H.264 Video file (*.mp4)"
-        << "Windows Media Video file (*.wmv)";
+        << "Windows Media Video file (*.wmv)"
+        << "Audio Video Interleaved Video file (*.avi)"
+        ;
     fileDialog.setNameFilters(filters);
 
     fileDialog.setDefaultSuffix("mp4");
@@ -1360,12 +1364,25 @@ void ElementsEdit::saveVideo()
         return ;
     }
     const QString fn = fileDialog.selectedFiles().first();
+    QFileInfo fi(fn);
 #if 0
-    QFile file(fn);
-    if (!file.open(QIODevice::WriteOnly)){
-        return;
+    //设置视频格式
+    m_qsVideoFileFormat = fi.suffix();  
+    if(m_qsVideoFileFormat=="wmv")
+    {
+        m_qsVideoFileFormat="wmv2";
     }
 #endif
+    // 2, 显示进度
+    ProgressDialog *progressDialog = new ProgressDialog(fi.fileName() , this);
+    progressDialog->setAttribute(Qt::WA_DeleteOnClose);
+    //connect(progressDialog, &QProgressDialog::canceled, this, &HttpWindow::cancelDownload);
+    connect(this, &ElementsEdit::saveMoiveProgress, progressDialog, &ProgressDialog::saveMoiveProgress);
+    connect(this, &ElementsEdit::saveMoiveFinish, progressDialog, &ProgressDialog::hide);
+    //progressDialog->setWindowModality(Qt::WindowModal);
+    progressDialog->show();
+    //progressDialog->exec();
+
     // 2, create video
 #define B_CREATE_FINAL_VIDEO_FILE true 
     for (int i = 0; i < m_flowLayout->count(); ++i)
@@ -1377,6 +1394,7 @@ void ElementsEdit::saveVideo()
             qDebug()<< "error uncomplete. ElementsEdit::createFinalVideo elemnet";
             continue;
         }
+        qApp->processEvents();
         //2.1 single video
         element->initialMemoryForVideoFile();
 
@@ -1385,10 +1403,12 @@ void ElementsEdit::saveVideo()
         createSimpleVideo(element, B_CREATE_FINAL_VIDEO_FILE);
 #define NO_CREATE_SIMPLE_VIDEO false
         createSingleVideo(i, NO_CREATE_SIMPLE_VIDEO, B_CREATE_FINAL_VIDEO_FILE);
+        emit saveMoiveProgress(i+1, m_flowLayout->count()+1);
     }
     //2.2 final video
     QByteArray qbAss = m_globalContext->m_scene->createTotalAssInfo(m_qFinalVideoSize).toUtf8();
     createFinalVideo(false, qbAss, fn, B_CREATE_FINAL_VIDEO_FILE);
+    emit saveMoiveProgress(m_flowLayout->count()+1, m_flowLayout->count()+1);
     //3, clean memory
     for (int i = 0; i < m_flowLayout->count(); ++i)
     {
@@ -1402,11 +1422,11 @@ void ElementsEdit::saveVideo()
         //clean scaledfile, scaledvideo, panzoomvideo, transitionvideo
         element->freeMemoryForVideoFile();
     }
+    emit saveMoiveFinish();
+    progressDialog->deleteLater();
 #if 0
-    // 3, write video file
-    QByteArray ba("test");
-    qint64 written = file.write((const char *)ba.data(), ba.length());
-    file.close();
+    //4, 还原视频格式
+    m_qsVideoFileFormat = VIDEO_FILE_FORMAT;
 #endif
 }
 /*
@@ -1509,7 +1529,7 @@ void ElementsEdit::createFinalVideoMusicTxt(bool bPlay)
     }
 #if 1
     vqsArgv.push_back(QString(tr("-f")));
-    vqsArgv.push_back(QString(tr("avi")));
+    vqsArgv.push_back(m_qsVideoFileFormat);
     struct to_buffer soutbuffer;
     soutbuffer.ptr = m_pTextVideoOutBuffer;
     soutbuffer.in_len = m_textVideoMaxOutLen;
@@ -1717,4 +1737,21 @@ void ElementsEdit::initialFirstLayout()
     {
         //uncomplete
     }
+}
+ProgressDialog::ProgressDialog(const QString &qsFileName, QWidget *parent)
+  : QProgressDialog(parent)
+{
+    setWindowTitle(tr("Movie Maker"));
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+    setLabelText(tr("Saving Movie %1.").arg(qsFileName));
+    setMinimum(0);
+    setValue(0);
+    setMinimumDuration(0);
+}
+
+void ProgressDialog::saveMoiveProgress(qint64 completed, qint64 total)
+{
+    qDebug()<< "saveMoiveProgress.  completed: " << completed<< " total: "<< total;
+    setMaximum(total);
+    setValue(completed);
 }
