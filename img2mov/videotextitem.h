@@ -13,7 +13,7 @@ class QGraphicsItem;
 class QGraphicsScene;
 class QGraphicsSceneMouseEvent;
 QT_END_NAMESPACE
-
+class Element;
 //! [0]
 class GraphicsTextItem : public QGraphicsTextItem
 {
@@ -29,7 +29,7 @@ public:
     }
     //void setTextAttr(stTextAttr* stTextAttr);
     void setTextAttr(GlobalTextAttr* globalTextAttr);
-    void setFirstTextPosWH(const QString& oritxt);
+    void setFirstTextPosWH(const QString& oritxt, const Element* element);
     bool getChanged(){return m_changed;}
     void createAssInfo(float factor=1);
 signals:

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project name="wmm_project" version="65540" >
+    <ImageItem id="1" filePath="C:\QtProjects\qtmovie\jpg\img001.jpg" rotateLeft="1" rotateRight="0" >
+        <TitleClip>
+            <BoundProperties>
+                <BoundPropertyString Name="family" Value="Segoe UI" />
+                <BoundPropertyString Name="size" Value="8" />
+                <BoundPropertyString Name="style" Value="Bold" />
+                <BoundPropertyString Name="style" Value="Italic" />
+                <BoundPropertyString Name="color" Value="&Hffffff" />
+                <BoundPropertyString Name="alignment" Value="left" />
+                <BoundPropertyInt Name="startTime" Value="0" />
+                <BoundPropertyInt Name="duration" Value="2" />
+                <BoundPropertyInt Name="effectIndex" Value="0" />
+                <BoundPropertyFloat Name="pos_x" Value="2.1985812187194824" />
+                <BoundPropertyFloat Name="pos_y" Value="2.1985812187194824" />
+                <!--BoundPropertyFloatSet Name="position">
+                    <BoundPropertyFloatElement Value="2.1985812187194824" />
+                    <BoundPropertyFloatElement Value="0.33333325386047363" />
+                    <BoundPropertyFloatElement Value="0.02500000037252903" />
+                </BoundPropertyFloatSet-->
+                <BoundPropertyStringSet Name="text">
+                    <BoundPropertyStringElement Value="jiao jj[please input " />
+                    <BoundPropertyStringElement Value="here]" />
+                </BoundPropertyStringSet>
+            </BoundProperties>
+            <Transitions>
+            </Transitions>
+        </TitleClip>
+        <Animation>
+            <Transitions effectTemplateID="crossfade" duration="1.5" />
+            <PanAndZoomShapeEffect effectTemplateID="panup" duration="1" />
+        </Animation>
+        <VideoClip duration="2">
+        </VideoClip>
+    </ImageItem> 
+    <AudioItem id="1" filePath="C:\QtProjects\qtmovie\lovechina1.mp3" startTime="1" startPoint="5" endPoint="10" duration="36.15">
+    </AudioItem>
+</Project>

@@ -82,6 +82,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_centralWidget->setLayout(mainLayout);
 
 
+    // elementsEdit
     connect(m_globalContext->m_elementsEdit, SIGNAL(readyVideo(const QString&,const QByteArray&,int)), m_globalContext->m_player, SLOT(readyVideo(const QString&, const QByteArray&, int)));
     connect(m_globalContext->m_player->MediaPlayer(), SIGNAL(durationChanged(qint64)), m_globalContext->m_elementsEdit, SLOT(durationChanged(qint64)));
     connect(m_globalContext->m_player->MediaPlayer(), SIGNAL(stateChanged(QMediaPlayer::State)), m_globalContext->m_elementsEdit, SLOT(videoStateChanged(QMediaPlayer::State)));
@@ -145,4 +146,13 @@ void MainWindow::keyPressEvent(QKeyEvent *keyEvent)
     //m_player->Scene()->setFocus();
     //QMessageBox::information(NULL, "info", QString(tr("MainWindow::keyPressEvent")));
     QMainWindow::keyPressEvent(keyEvent);
+}
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if(QMessageBox::Cancel == m_globalContext->m_elementsEdit->confirmSaveProject())
+    {
+        event->ignore();
+        return;
+    }
+    QMainWindow::closeEvent(event);
 }

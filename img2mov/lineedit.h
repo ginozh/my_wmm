@@ -12,6 +12,7 @@ public:
     LineEdit(QSize size, GraphicsScene* scene, QWidget *parent = 0);
     void addTextByTabCaption();
     void updateTextByVideo(const QString&);
+    QString& videoText(){return m_qsVideoText;} //uncomple 有次对象提供貌似不太合理
 private:
     void activeText();
 signals:
@@ -28,6 +29,7 @@ private:
 
     const QString m_qsPreText;
     const QString m_qsInitialText;
+    QString m_qsVideoText; //uncomplete 
 };
 
 #endif // LINEEDIT_H

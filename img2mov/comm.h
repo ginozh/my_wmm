@@ -25,6 +25,7 @@ class GlobalImageAttr
 {
 public:
     GlobalImageAttr();
+    GlobalImageAttr(const GlobalImageAttr& globalImageAttr);
 public:
     QString m_qsImageName; //图片路径
     QSize m_iSize; //原始尺寸
@@ -32,6 +33,7 @@ public:
     int m_iRotateLeft;
     int m_iRotateRight;
 };
+//element
 class GlobalTextAttr
 {
 public:
@@ -40,10 +42,10 @@ public:
     //QString m_qsText;
     //font
     QFont m_qfont;
-    QString m_fontSize;
-    bool m_isBoldChecked; //setChecked
-    bool m_isItalicChecked;
-    bool m_isUnderlineChecked;
+    //QString m_fontSize;
+    //bool m_isBoldChecked; //setChecked
+    //bool m_isItalicChecked;
+    //bool m_isUnderlineChecked;
     QColor m_fontColor;
     //Paragraph
     //Qt::Alignment m_textAlign; 
@@ -55,6 +57,8 @@ public:
     int m_iDurationText ;
     //Effects
     int m_idxEffects;
+    //
+    QPointF m_pfPos;
     //ass
     QString m_qsStyle;
     QString m_qsEvent;
@@ -109,6 +113,7 @@ public:
     double m_dFactorX;
     double m_dFactorY;
     QSize m_iScaledSize; //整体缩放尺寸,包括: 图片、scene、ass
+    int m_iFramerate;
 };
 
 #endif

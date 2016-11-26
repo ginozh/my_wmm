@@ -8,6 +8,7 @@
 #include <QTextDocument>
 #include <QDebug>
 #include <QDateTime>
+#include "element.h"
 
 //! [0]
 GraphicsTextItem::GraphicsTextItem(QGraphicsScene *scene)
@@ -93,21 +94,30 @@ void GraphicsTextItem::setTextAttr(GlobalTextAttr* globalTextAttr)
     }
 }
 //! [0]
-void GraphicsTextItem::setFirstTextPosWH(const QString& oritxt)
+void GraphicsTextItem::setFirstTextPosWH(const QString& oritxt
+        ,const Element* element)
 {
-    if(toPlainText().isEmpty())
+    if(toPlainText().isEmpty() && element)
     {
-        QFont font;
-        QFontMetrics fontMetrics(font);
+        const GlobalTextAttr * globalTextAttr = element->globalTextAttr();
+        //QFont font;
+        QFontMetrics fontMetrics(globalTextAttr->m_qfont);
         int fw = fontMetrics.width(oritxt);
         int fh = fontMetrics.height();
         m_width=fw+20;
         m_height=fh+10;
 
         setTextWidth(m_width);
-        int x=scene()->width()/2-textWidth()/2;
-        int y=scene()->height()*3/5;
-        setPos(x, y);
+        if(globalTextAttr->m_pfPos.x()!=-1)
+        {
+            setPos(globalTextAttr->m_pfPos);
+        }
+        else
+        {
+            int x=scene()->width()/2-textWidth()/2;
+            int y=scene()->height()*3/5;
+            setPos(x, y);
+        }
         //QMessageBox::information(NULL, "info", QString(tr("GraphicsTextItem::setFirstTextPosWH x: %1 y: %2")).arg(x).arg(y));
 
         setPlainText(oritxt);
@@ -484,6 +494,7 @@ void GraphicsTextItem::createAssInfo(float factor)
         QFont fontDeviation;
         fontDeviation.setPointSize(1);
         QFontMetrics fmDeviation(fontDeviation);
+        m_globalTextAttr->m_pfPos = pos();
         switch((Qt::AlignmentFlag)m_globalTextAttr->m_textAlign)
         {
             case Qt::AlignLeft:

@@ -1223,12 +1223,17 @@ void TabWidget::assignTextInfo()
         if(globalTextAttr)
         {
             m_fontCombo->setFont(globalTextAttr->m_qfont);
+            m_fontSizeCombo->setCurrentText(QString::number(globalTextAttr->m_qfont.pointSize()));
+            m_boldButton->setChecked(globalTextAttr->m_qfont.weight()==QFont::Bold?true:false);
+            m_italicButton->setChecked(globalTextAttr->m_qfont.italic()?true:false);
+            m_underlineButton->setChecked(globalTextAttr->m_qfont.underline()?true:false);
+#if 0
             m_fontSizeCombo->setCurrentText(globalTextAttr->m_fontSize);
             m_boldButton->setChecked(globalTextAttr->m_isBoldChecked);
             m_italicButton->setChecked(globalTextAttr->m_isItalicChecked);
             m_underlineButton->setChecked(globalTextAttr->m_isUnderlineChecked);
             //m_colorEdit->setColor(globalTextAttr->m_fontColor.rgb());
-
+#endif
             m_leftTextButton->setChecked(globalTextAttr->m_textAlign == Qt::AlignLeft);
             m_centerTextButton->setChecked(globalTextAttr->m_textAlign == Qt::AlignHCenter);
             m_rightTextButton->setChecked(globalTextAttr->m_textAlign == Qt::AlignRight);

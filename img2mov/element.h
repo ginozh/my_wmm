@@ -23,7 +23,8 @@ class Element : public QWidget
     Q_OBJECT
 
 public:
-    Element(QWidget *parent, const QString& image, GraphicsScene* scene);
+    //Element(QWidget *parent, const QString& image, GraphicsScene* scene);
+    Element(QWidget *parent, const GlobalImageAttr& newGlobalImageAttr, GraphicsScene* scene);
     ~Element();
     const QString& getImageName(){return m_qsImageName;}
     void unselectedImage(){if(m_pimage){m_pimage->unselectedImage();}}
@@ -31,6 +32,7 @@ public:
     GlobalVideoAttr* globalVideoAttr(){return m_globalVideoAttr;}
     GlobalAnimationAttr* globalAnimationAttr(){return m_globalAnimationAttr;}
     GlobalTextAttr* globalTextAttr(){return m_globalTextAttr;}
+    const GlobalTextAttr* globalTextAttr() const {return m_globalTextAttr;}
     Image* image(){return m_pimage;}
     LineEdit* lineEdit(){return m_lineEdit;}
     MusicLabel* musicLabel(){return m_musicLabel;}

@@ -52,6 +52,7 @@ void LineEdit::activeText()
     if(placeholderText().compare(m_qsPreText)==0 ||
             placeholderText().compare(m_qsPreText+m_qsInitialText)==0)
     {
+        m_qsVideoText = m_qsInitialText; 
         setPlaceholderText(m_qsPreText+m_qsInitialText);
         emit selectedTextSignal(m_qsInitialText);
     }
@@ -67,5 +68,6 @@ void LineEdit::addTextByTabCaption()
 }
 void LineEdit::updateTextByVideo(const QString& qsText)
 {
+    m_qsVideoText = qsText;
     setPlaceholderText(m_qsPreText+qsText);
 }

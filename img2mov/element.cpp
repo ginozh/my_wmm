@@ -3,11 +3,11 @@
 #include <QLabel>
 #include <QMessageBox>
 
-Element::Element(QWidget *parent, const QString& qsImageName,GraphicsScene* scene)
+Element::Element(QWidget *parent, const GlobalImageAttr& newGlobalImageAttr, GraphicsScene* scene)
+//Element::Element(QWidget *parent, const QString& qsImageName,GraphicsScene* scene)
     : QWidget(parent)
     , m_elementLayout(new QVBoxLayout(this))
     , m_pimage(0)
-    , m_qsImageName(qsImageName)
     , m_bValid(true)
     , m_globalVideoAttr(new GlobalVideoAttr)
     , m_globalAnimationAttr(new GlobalAnimationAttr)
@@ -34,9 +34,11 @@ Element::Element(QWidget *parent, const QString& qsImageName,GraphicsScene* scen
     //setMinimumWidth(iMaxWidth);
     //setMaximumWidth(iMaxWidth);
     //m_elementLayout->addWidget(new Image(tr("C:\\QtProjects\\qtmovie\\jpg\\img001.jpg")));
+    const QString& qsImageName = newGlobalImageAttr.m_qsImageName;
+    m_qsImageName=newGlobalImageAttr.m_qsImageName;
     if(!qsImageName.isEmpty())
     {
-        m_pimage = new Image(qsImageName, QSize(iMaxWidth, iMaxHeight), this);
+        m_pimage = new Image(newGlobalImageAttr, QSize(iMaxWidth, iMaxHeight), this);
         //webenginewidgets/simplebrowser/tabwidget.cpp
         m_elementLayout->addWidget(m_pimage);
 

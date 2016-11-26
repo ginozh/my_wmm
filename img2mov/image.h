@@ -11,10 +11,13 @@ class Image : public QLabel
     Q_OBJECT
 
 public:
-    Image(const QString& path, QSize size, QWidget *parent=0);
+    //Image(const QString& path, QSize size, QWidget *parent=0);
+    Image(const GlobalImageAttr& globalImageAttr, QSize size, QWidget *parent);
+    ~Image(){delete m_globalImageAttr;}
     void unselectedImage();
     void doFocusImage();
 	void rotate(bool bRight);
+    void rotate();
     QString rotateVFilter();
     GlobalImageAttr* globalImageAttr(){return m_globalImageAttr;}
 signals:

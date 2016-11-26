@@ -5,13 +5,17 @@
 #include <QPen>
 #include <QDebug>
 class ElementsEdit;
-Image::Image(const QString& path, QSize size, QWidget *parent)
+//Image::Image(const QString& path, QSize size, QWidget *parent)
+Image::Image(const GlobalImageAttr& globalImageAttr, QSize size, QWidget *parent)
     : QLabel(parent)
-    , m_globalImageAttr(new GlobalImageAttr)
+    , m_globalImageAttr(new GlobalImageAttr(globalImageAttr))
+    //, m_globalImageAttr(globalImageAttr)
     //, m_pixMap(new QPixmap())
     //, m_iRotateLeft(0)
     //, m_iRotateRight(0)
 {
+    //*m_globalImageAttr = globalImageAttr;
+
     m_focus=false;
     m_iScaleSize = size;
     setFixedSize(size);
@@ -19,10 +23,13 @@ Image::Image(const QString& path, QSize size, QWidget *parent)
     //setMaximumHeight(size.height());
     //setContentsMargins(5, 5, 5, 5);
 #if 1
-    m_pixMap.load(path);
+
     const QImage& qImage = m_pixMap.toImage(); 
     qDebug()<<"Image. height: "<<qImage.size().height()<<" width: "<<qImage.size().width();
+    QString& path = m_globalImageAttr->m_qsImageName;
     m_globalImageAttr->m_iSize = qImage.size();
+
+    m_pixMap.load(path);
     m_pixMap.scaled(m_iScaleSize);
     setPixmap(m_pixMap);
     setScaledContents(true);
@@ -45,6 +52,7 @@ Image::Image(const QString& path, QSize size, QWidget *parent)
     //setContextMenuPolicy(Qt::CustomContextMenu);
     //connect(this, &QLabel::customContextMenuRequested, parent()->parent(), &ElementsEdit::handleContextMenuRequested);
     //connect(this, SIGNAL(selectedImageSignal()), parentWidget(), SLOT(selectedImage()));
+    rotate();
 }
 void Image::contextMenuEvent(QContextMenuEvent * /*event*/)
 {
@@ -104,6 +112,28 @@ void Image::doFocusImage()
 {
     m_focus=true;
     update();
+}
+void Image::rotate()
+{
+    int iRotateRight;
+    if(m_globalImageAttr->m_iRotateRight>=m_globalImageAttr->m_iRotateLeft)
+    {
+        iRotateRight = (m_globalImageAttr->m_iRotateRight-m_globalImageAttr->m_iRotateLeft)%4;
+    }
+    else 
+    {
+        iRotateRight = 4-(m_globalImageAttr->m_iRotateLeft-m_globalImageAttr->m_iRotateRight)%4;
+    }
+    if(iRotateRight<=0)
+        return;
+	QPixmap pixmap(m_pixMap);
+	QMatrix rm;
+    for(int i=1; i<=iRotateRight; i++)
+    {
+        rm.rotate(90);
+    }
+	m_pixMap = pixmap.transformed(rm);
+	setPixmap(m_pixMap);
 }
 void Image::rotate(bool bRight)
 {

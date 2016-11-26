@@ -13,9 +13,9 @@ Menu::Menu(QWidget *parent, QWidget *elementsEdit, int x, int y)
     raise();
 
     //m_menu->setScaledContents(true);
-    m_menu->addAction(tr("New Project"), m_elementsEdit, SLOT(addImages())  );
+    m_menu->addAction(tr("New Project"), m_elementsEdit, SLOT(newProject())  );
     //xml parser: QXmlStreamReader xml/htmlinfo
-    m_menu->addAction(tr("Open Project"), m_elementsEdit, SLOT(addImages())  );
+    m_menu->addAction(tr("Open Project"), m_elementsEdit, SLOT(openProject())  );
     //xml write: QXmlStreamWriter xml/xmlstreamlint
     /*
        QXmlStreamWriter stream(&output);
@@ -29,9 +29,9 @@ Menu::Menu(QWidget *parent, QWidget *elementsEdit, int x, int y)
        ...
        stream.writeEndDocument();
      */
-    m_menu->addAction(tr("Save Project"), m_elementsEdit, SLOT(addImages())  );
+    m_menu->addAction(tr("Save Project"), m_elementsEdit, SLOT(saveProject())  );
     m_menu->addSeparator();
-    m_menu->addAction(tr("Publish Moive"), m_elementsEdit, SLOT(addImages())  );
+    m_menu->addAction(tr("Publish Moive"), m_elementsEdit, SLOT(publishVideo())  );
     m_menu->addAction(tr("Save Moive"), m_elementsEdit, SLOT(saveVideo())  );
     //m_menu->addAction(tr("Add Image"), m_elementsEdit, SLOT(addImages())  );
     m_menu->addSeparator();

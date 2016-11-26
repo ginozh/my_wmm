@@ -246,7 +246,7 @@ void GraphicsScene::activeVideoText(Element* element, const QString& oritxt)
         textItem->setActive(true);
 #endif
 
-        textItem->setFirstTextPosWH(oritxt);
+        textItem->setFirstTextPosWH(oritxt, element);
 #if 0
         if(textItem->toPlainText().isEmpty())
         {

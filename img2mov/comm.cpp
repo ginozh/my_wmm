@@ -10,13 +10,22 @@ GlobalImageAttr::GlobalImageAttr()
     m_iRotateLeft = 0;
     m_iRotateRight = 0;
 }
+GlobalImageAttr::GlobalImageAttr(const GlobalImageAttr& globalImageAttr)
+{
+    m_qsImageName = globalImageAttr.m_qsImageName;
+    m_iSize = globalImageAttr.m_iSize;
+    m_iScaledSize = globalImageAttr.m_iScaledSize;
+    m_iRotateLeft = globalImageAttr.m_iRotateLeft;
+    m_iRotateRight = globalImageAttr.m_iRotateRight;
+}
 GlobalTextAttr::GlobalTextAttr()
+    :m_pfPos(-1, -1)
 {
     //m_qfont = ;
-    m_fontSize = "8";
-    m_isBoldChecked = false;
-    m_isItalicChecked = false;
-    m_isUnderlineChecked = false;
+    //m_fontSize = "8";
+    //m_isBoldChecked = false;
+    //m_isItalicChecked = false;
+    //m_isUnderlineChecked = false;
     m_fontColor = Qt::white;
 
     m_textAlign = Qt::AlignLeft; //Qt::AlignHCenter; //AlignRight;
@@ -25,6 +34,7 @@ GlobalTextAttr::GlobalTextAttr()
     //m_qsDurationText = "2.00s";
     m_iStartTimeText = 0;
     m_iDurationText = 0;
+
 }
 
 GlobalAnimationAttr::GlobalAnimationAttr()
@@ -34,7 +44,7 @@ GlobalAnimationAttr::GlobalAnimationAttr()
 }
 GlobalVideoAttr::GlobalVideoAttr()
 {
-    m_iFramerate = 24;
+    m_iFramerate = GlobalContext::instance()->m_iFramerate;
     m_iDuration = 2000;
 }
 GlobalMusicAttr::GlobalMusicAttr()
@@ -63,6 +73,8 @@ GlobalContext::GlobalContext()
     int iTmpH=(iTmpW/4)*3;
     qDebug()<<"m_iScaledSize. m_dFactorX: "<<m_dFactorX<<" m_dFactorY: "<<m_dFactorY<<" w: "<<iTmpW<<" h:"<<iTmpH;
     m_iScaledSize = QSize(iTmpW, iTmpH);//QSize(m_dFactorX*512, m_dFactorX*384); //4:3
+
+    m_iFramerate = 24;
 }
 GlobalContext* GlobalContext::instance()  
 {  

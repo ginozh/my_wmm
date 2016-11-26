@@ -9,6 +9,7 @@
 #include <QToolButton>
 #include "comm.h"
 #include <QMediaPlayer>
+#include <QMessageBox>
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -26,6 +27,7 @@ public:
     Element* currentElement();
     GlobalMusicAttr* globalMusicAttr(){return m_globalMusicAttr;}
     qint64 totalVideoDuration(){return m_iTotalVideoDuration;}
+    QMessageBox::StandardButton confirmSaveProject();
 private:
     int callFfmpeg(const QVector<QString>& vqsArgv);
     void createFinalVideo(bool bPlay, QByteArray qbAss="", const QString& qsFinalVideoFile="", bool bCreateVideoFile=false);
@@ -46,6 +48,9 @@ private:
     void updateTextAttrAndAss(int iStartIdx);
     void initialFirstLayout();
     void musicAttrChanged();
+    //Element* initialImage(const QString& fileName, int& idx);
+    Element* initialImage(const GlobalImageAttr& newGlobalImageAttr, int& idx);
+    void createFlowLayout();
 signals:
     void readyVideo(const QString& fileName, const QByteArray& buffer, int position);
     void changePlayPosition(int);
@@ -82,6 +87,10 @@ public slots:
     void updatedText(const QString& qsAss, const QString& qsText);
     void videoStateChanged(QMediaPlayer::State);
     void saveVideo();
+    void publishVideo();
+    void newProject();
+    void openProject();
+    void saveProject();
 private:
     FlowLayout *m_flowLayout;
     QVBoxLayout *m_firstLayout;
@@ -133,6 +142,10 @@ private:
 
 
     QString m_qsVideoFileFormat;
+
+    QString m_qsProjectFile;
+    bool m_bCurrentProjectChanged;
+    QString m_qsFileType;
 };
 //! [0]
 #include <QProgressDialog>

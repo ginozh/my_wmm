@@ -3,7 +3,6 @@
 #include <QScrollBar>
 #include <QFileDialog>
 #include <QStandardPaths>
-#include <QMessageBox>
 #include <QDir>
 #include <QVector>
 #include <QTime>
@@ -17,9 +16,11 @@
 extern "C"{
 #include "ffmpeg.h"
 }
+#include <QXmlStreamWriter>
 //#define DEBUG_FFMPEG
 //! [1]
 #define VIDEO_FILE_FORMAT "avi"
+#define PROGRAM_TITLE "Film Maker"
 ElementsEdit::ElementsEdit(QWidget *parent)
     : QWidget(parent)
       //, m_flowLayout(new FlowLayout(this))
@@ -168,19 +169,7 @@ void ElementsEdit::addImages()
     if (files.count() == 0)
         return;
     setCursor(QCursor(Qt::WaitCursor));
-    if(m_isFirstClick)
-    {
-        m_isFirstClick=false;
-
-        //qDeleteAll(children());
-        delete m_firstLayout;
-        m_firstLayout = NULL;
-        delete m_firstLabel;
-        m_firstLabel = NULL;
-
-        m_flowLayout = new FlowLayout(this);
-        setLayout(m_flowLayout);
-    }
+    createFlowLayout();
     int idx = -1;
     //只有image过来的insert事件，它的父类(element)才会是m_flowLayout的元素
     if((idx=m_flowLayout->indexOf(currWidget))>=0)
@@ -189,6 +178,7 @@ void ElementsEdit::addImages()
     QString qsFileType;
     for (int i = 0; i < files.count(); ++i) {
         // 1, 读取文件，生成image
+#if 0
         Element *element=new Element(this, files[i], m_globalContext->m_scene);
         GlobalImageAttr* globalImageAttr = element->image()->globalImageAttr();
         if(m_qFinalVideoSize.width() < globalImageAttr->m_iSize.width())
@@ -219,6 +209,13 @@ void ElementsEdit::addImages()
         createSimpleVideo(element);
         //4, 用于music的有效长度判断
         m_iTotalVideoDuration += element->globalVideoAttr()->m_iDuration;
+#endif
+        GlobalImageAttr  newGlobalImageAttr;
+        newGlobalImageAttr.m_qsImageName = files[i];
+        //initialImage(files[i], idx);
+        if(! initialImage(newGlobalImageAttr, idx))
+        {
+        }
     }
     //4, 变更text的开始时间, 重新生成ass (前面增加一个图片、或者修改前面某个视频时长时)
     updateTextAttrAndAss(oldIdx+1);
@@ -377,6 +374,44 @@ void ElementsEdit::selectedImage(QWidget* theWidget)
 
     // 5, 赋值当前tab的值
     emit assignTabValueSignal();
+}
+//Element* ElementsEdit::initialImage(const QString& fileName, int& idx)
+Element* ElementsEdit::initialImage(const GlobalImageAttr&  newGlobalImageAttr, int& idx)
+{
+    const QString& fileName = newGlobalImageAttr.m_qsImageName;
+    QFileInfo fi(fileName);
+    QString ext = fi.suffix();  // ext = "gz"
+    if(m_qsFileType.isEmpty())
+    {
+        m_qsFileType = ext;
+    }
+    else if(m_qsFileType.compare(ext)!=0)
+    {
+        QMessageBox::information(this, "error", QString(tr("need same file type(%1). current file: %2")).arg(m_qsFileType, fileName));
+        return NULL;
+        //break;
+    }
+    Element *element=new Element(this, newGlobalImageAttr, m_globalContext->m_scene);
+    GlobalImageAttr* globalImageAttr = element->image()->globalImageAttr();
+    if(m_qFinalVideoSize.width() < globalImageAttr->m_iSize.width())
+    {
+        m_qFinalVideoSize = globalImageAttr->m_iSize; //uncomplete. need same
+    }
+    //emit createVideoTextSignal((void*)element); 
+    emit createVideoTextSignal(element); 
+    m_flowLayout->insertWidget(idx, element);
+    if(idx>=0)
+        idx++;
+    //2, 转化为小图片
+    //QImage.scale: 1,是否支持内存读入文件内容。2，是否可以输出文件内容到buffer
+    //or ffmpeg
+    scaleImage(element);
+    //3, 图片视频
+    createSimpleVideo(element);
+    //4, 用于music的有效长度判断
+    m_iTotalVideoDuration += element->globalVideoAttr()->m_iDuration;
+
+    return element;
 }
 /*
  * End Image
@@ -1429,6 +1464,9 @@ void ElementsEdit::saveVideo()
     m_qsVideoFileFormat = VIDEO_FILE_FORMAT;
 #endif
 }
+void ElementsEdit::publishVideo()
+{
+}
 /*
  * End Video
  * */
@@ -1738,10 +1776,458 @@ void ElementsEdit::initialFirstLayout()
         //uncomplete
     }
 }
+#define COMFIRM_SAVE
+QMessageBox::StandardButton ElementsEdit::confirmSaveProject()
+{
+    QFileInfo fi(m_qsProjectFile);
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, tr(PROGRAM_TITLE),
+            QString(tr("Do you want to save changes to %1")).arg(fi.fileName()),
+            QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+    if (reply == QMessageBox::Yes)
+    {
+        saveProject();
+    }
+    else if (reply == QMessageBox::No)
+    {
+    }
+    else
+    {
+    }
+    return reply;
+}
+void ElementsEdit::newProject()
+{
+    //1, save current project
+    if(!m_qsProjectFile.isEmpty())
+    {
+        // whether save ?
+        if(QMessageBox::Cancel == confirmSaveProject())
+        {
+            return;
+        }
+    }
+    //2, new project
+    m_qsProjectFile="";
+}
+void ElementsEdit::openProject()
+{
+    //1, whether changed?
+    if(m_bCurrentProjectChanged && !m_qsProjectFile.isEmpty())
+    {
+        // whether save ?
+        if(QMessageBox::Cancel == confirmSaveProject())
+        {
+            return;
+        }
+    }
+
+    //2, open project
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Project"),
+            QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation),
+            tr("Film Maker Project (*.fmp)"));
+    if (fileName.isEmpty() || fileName.compare(m_qsProjectFile)==0)
+        return;
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QMessageBox::information(this, "error", tr("can't read file: %1").arg(fileName));
+        return;
+    }
+    //3, 
+    createFlowLayout();
+    //4, delete current element
+    for (int i = m_flowLayout->count()-1; i>=0; --i)
+    {
+        QWidget *element = qobject_cast<QWidget *>(m_flowLayout->itemAt(i)->widget());
+        if (!element)
+        {
+            // err uncomplete
+            qDebug()<< "error uncomplete. ElementsEdit::selectedImage";
+            continue;
+        }
+        //(qobject_cast<Element *>element)->setValid(false); 
+        m_flowLayout->takeAt(i);
+        element->deleteLater();
+    }
+    //initialFirstLayout();
+
+    //5, read xml && new Element: /c/QtProjects/QtExamples/widgets/animation/sub-attaq/graphicsscene.cpp
+    QTextStream errorStream(stderr);
+    QXmlStreamReader reader(&file);
+    Element *element = NULL;
+    m_iTotalVideoDuration = 0;
+    while (!reader.atEnd())
+    {
+        reader.readNext();
+        if (reader.tokenType() == QXmlStreamReader::StartElement 
+                && reader.name() == "ImageItem") 
+        {
+            qDebug()<< "ImageItem id: " << reader.attributes().value("id").toString().toInt();
+            qDebug()<< "ImageItem filePath: " << reader.attributes().value("filePath").toString();
+            if(!reader.attributes().hasAttribute("filePath"))
+            {
+                //error uncomplete
+                continue;
+            }
+            GlobalImageAttr  newGlobalImageAttr;
+            newGlobalImageAttr.m_qsImageName = reader.attributes().value("filePath").toString();
+            newGlobalImageAttr.m_iRotateLeft = reader.attributes().value("rotateLeft").toString().toInt();
+            newGlobalImageAttr.m_iRotateRight = reader.attributes().value("rotateRight").toString().toInt();
+            int idx=m_flowLayout->count();
+            if(!(element = initialImage(newGlobalImageAttr, idx)))
+            {
+                continue;
+            }
+            GlobalImageAttr * globalImageAttr = element->image()->globalImageAttr();
+            GlobalTextAttr * globalTextAttr = element->globalTextAttr();
+            GlobalAnimationAttr * globalAnimationAttr = element->globalAnimationAttr();
+            GlobalVideoAttr * globalVideoAttr = element->globalVideoAttr();
+
+            // uncomplete rotate
+            while (!reader.atEnd()) {
+                reader.readNext();
+                qDebug()<< "ImageItem element: " << reader.name();
+                if (reader.tokenType() == QXmlStreamReader::StartElement
+                        && reader.name() == "TitleClip") 
+                {
+                    while (!reader.atEnd()) {
+                        reader.readNext();
+                        qDebug()<< "TitleClip element: " << reader.name();
+                        if (reader.tokenType() == QXmlStreamReader::StartElement
+                                && reader.name() == "BoundProperties") 
+                        {
+                            while (!reader.atEnd()) {
+                                reader.readNext();
+                                qDebug()<< "BoundProperties element: " << reader.name();
+                                if (reader.tokenType() == QXmlStreamReader::StartElement
+                                        && ( reader.name() == "BoundPropertyString"
+                                            || reader.name() == "BoundPropertyInt"
+                                            || reader.name() == "BoundPropertyFloat"
+                                            ) )
+                                {
+                                    QString qsName=reader.attributes().value("Name").toString();
+                                    QString qsValue=reader.attributes().value("Value").toString();
+                                    qDebug()<< qsName<<" "<<qsValue;
+                                    if(qsName.compare("family")==0)
+                                    {
+                                        globalTextAttr->m_qfont.setFamily(qsValue);
+                                    }
+                                    else if(qsName.compare("size")==0)
+                                    {
+                                        globalTextAttr->m_qfont.setPointSize(qsValue.toInt());
+                                    }
+                                    else if(qsName.compare("style")==0)
+                                    {
+                                        if(qsValue.compare("Bold")==0)
+                                            globalTextAttr->m_qfont.setWeight(QFont::Bold);
+                                        else if(qsValue.compare("Italic")==0)
+                                            globalTextAttr->m_qfont.setItalic(true);
+                                        else if(qsValue.compare("Underline")==0)
+                                            globalTextAttr->m_qfont.setUnderline(true);
+                                    }
+                                    if(qsName.compare("color")==0)
+                                    {
+                                        globalTextAttr->m_fontColor=QColor(qsValue);
+                                    }
+                                    if(qsName.compare("alignment")==0)
+                                    {
+                                        globalTextAttr->m_textAlign = qsValue.compare("left")==0?Qt::AlignLeft:(qsValue.compare("center")==0?Qt::AlignHCenter:Qt::AlignRight);
+                                    }
+                                    if(qsName.compare("startTime")==0)
+                                    {
+                                        globalTextAttr->m_iStartTimeText = qsValue.toInt();
+                                    }
+                                    if(qsName.compare("duration")==0)
+                                    {
+                                        globalTextAttr->m_iDurationText = qsValue.toInt();
+                                    }
+                                    if(qsName.compare("effectIndex")==0)
+                                    {
+                                        globalTextAttr->m_idxEffects = qsValue.toInt();
+                                    }
+                                    if(qsName.compare("pos_x")==0)
+                                    {
+                                        globalTextAttr->m_pfPos.setX(qsValue.toFloat());
+                                    }
+                                    if(qsName.compare("pos_y")==0)
+                                    {
+                                        globalTextAttr->m_pfPos.setY(qsValue.toFloat());
+                                    }
+                                    if(qsName.compare("text")==0)
+                                    {
+                                        element->lineEdit()->updateTextByVideo(qsValue);
+                                        //globalTextAttr->m_pfPos.setY(qsValue.toFloat());
+                                    }
+                                }
+                                else if (reader.tokenType() == QXmlStreamReader::EndElement
+                                        && reader.name() == "BoundProperties") 
+                                {
+                                    QString qsVideoText = element->lineEdit()->videoText();
+                                    emit activeVideoTextSignal(element, qsVideoText);
+                                    break;
+                                }
+                            }
+                        }
+                        else if (reader.tokenType() == QXmlStreamReader::StartElement
+                                && reader.name() == "Transitions") 
+                        {
+                        }
+                        else if (reader.tokenType() == QXmlStreamReader::EndElement
+                                && reader.name() == "TitleClip") 
+                        {
+                            break;
+                        }
+                    }
+                }
+                else if (reader.tokenType() == QXmlStreamReader::StartElement
+                        && reader.name() == "Animation") 
+                {
+                    while (!reader.atEnd()) {
+                        reader.readNext();
+                        //qDebug()<< "TitleClip element: " << reader.name();
+                        if (reader.tokenType() == QXmlStreamReader::StartElement
+                                && reader.name() == "Transitions") 
+                        {
+                            globalAnimationAttr->m_qsTransitionName = 
+                                reader.attributes().value("effectTemplateID").toString();
+                            globalAnimationAttr->m_iTransitionDuration = 
+                                reader.attributes().value("duration").toString().toInt();
+                        }
+                        else if (reader.tokenType() == QXmlStreamReader::StartElement
+                                && reader.name() == "PanAndZoomShapeEffect") 
+                        {
+                            globalAnimationAttr->m_qsPanZoom = 
+                                reader.attributes().value("effectTemplateID").toString();
+                        }
+                        else if (reader.tokenType() == QXmlStreamReader::EndElement
+                                && reader.name() == "Animation") 
+                        {
+                            break;
+                        }
+                    }
+                }
+                else if (reader.tokenType() == QXmlStreamReader::StartElement
+                        && reader.name() == "VideoClip") 
+                {
+                    globalVideoAttr->m_iDuration = 
+                        reader.attributes().value("duration").toString().toInt();
+                }
+                else if (reader.tokenType() == QXmlStreamReader::EndElement
+                        && reader.name() == "ImageItem") 
+                {
+                    element = NULL;
+                    break;
+                }
+            }
+        }
+        else if (reader.tokenType() == QXmlStreamReader::StartElement 
+                && reader.name() == "AudioItem") 
+        {
+            m_globalMusicAttr->m_qsMusicFullFilename = reader.attributes().value("filePath").toString();
+            m_globalMusicAttr->m_iStartTime = reader.attributes().value("startTime").toString().toInt();
+            m_globalMusicAttr->m_iStartPoint = reader.attributes().value("startPoint").toString().toInt();
+            m_globalMusicAttr->m_iEndPoint = reader.attributes().value("endPoint").toString().toInt();
+            m_globalMusicAttr->m_iMusicDuration = reader.attributes().value("duration").toString().toInt();
+        }
+    }
+    file.close();
+    //4, 变更text的开始时间, 重新生成ass (前面增加一个图片、或者修改前面某个视频时长时)
+    updateTextAttrAndAss(0);
+    //5, 生成总视频
+    createFinalVideo(false);
+    //5, 显示music文件名和颜色
+    musicAttrChanged();
+    //8, 第一次选择
+    if(!m_lastSelectedElement)
+    {
+        m_idxCurrentElement = 0;
+        m_lastSelectedElement = qobject_cast<QWidget *>(m_flowLayout->itemAt(m_idxCurrentElement)->widget());
+        (qobject_cast<Element *>(m_lastSelectedElement))->doFocusImage();
+        emit displayVideoTextSignal(qobject_cast<Element *>(m_lastSelectedElement), true);
+    }
+
+
+    m_vecticalLine->raise(); // top level, Raises this widget to the top of the parent widget's stack.
+}
+void ElementsEdit::saveProject()
+{
+    //1, 
+    QString qsFile;
+    if(m_qsProjectFile.isEmpty())
+    {
+        //open save file
+        //m_qsProjectFile = ;
+        QFileDialog fileDialog(this, tr("Open Project"));
+        fileDialog.setAcceptMode(QFileDialog::AcceptSave);
+        QStringList filters;
+        filters << "Film Maker Project (*.fmp)"
+            << "All File (*.*)"
+            ;
+        fileDialog.setNameFilters(filters);
+        if (fileDialog.exec() != QDialog::Accepted)
+        {
+            //error uncomplete
+            return ;
+        }
+        m_qsProjectFile = fileDialog.selectedFiles().first();
+    }
+
+    //2, write xml
+    QFile file(m_qsProjectFile);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QMessageBox::information(this, "error", tr("can't write file: %1").arg(m_qsProjectFile));
+        return;
+    }
+    //QString qsProject;
+    QXmlStreamWriter stream(&file);
+    stream.setAutoFormatting(true);
+    stream.writeStartDocument();
+
+    stream.writeStartElement("Project");
+    stream.writeAttribute("name", "wmm_project");
+    stream.writeAttribute("version", "1");
+    for (int i = 0, id = 1; i < m_flowLayout->count(); ++i)
+    {
+        Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(i)->widget());
+        if (!element)
+        {
+            // err uncomplete
+            qDebug()<< "error uncomplete. ElementsEdit::selectedImage";
+            continue;
+        }
+
+#define WRITE_XML_ELEMENT(type, name, value) do{ \
+        stream.writeStartElement("BoundProperty"#type); \
+        stream.writeAttribute("Name", name); \
+        stream.writeAttribute("Value", value); \
+        stream.writeEndElement();  \
+    } \
+    while(0)
+        GlobalImageAttr * globalImageAttr = element->image()->globalImageAttr();
+        GlobalTextAttr * globalTextAttr = element->globalTextAttr();
+        GlobalAnimationAttr * globalAnimationAttr = element->globalAnimationAttr();
+        GlobalVideoAttr * globalVideoAttr = element->globalVideoAttr();
+        QString qsVideoText = element->lineEdit()->videoText();
+
+        stream.writeStartElement("ImageItem");
+        stream.writeAttribute("id", QString::number(id));
+        stream.writeAttribute("filePath", globalImageAttr->m_qsImageName);
+        stream.writeAttribute("rotateLeft", QString::number(globalImageAttr->m_iRotateLeft));
+        stream.writeAttribute("rotateRight", QString::number(globalImageAttr->m_iRotateRight));
+        {
+            stream.writeStartElement("TitleClip");
+            //if(!qsVideoText.isEmpty())
+            {
+                stream.writeStartElement("BoundProperties");
+                {
+                    WRITE_XML_ELEMENT(String, "family", globalTextAttr->m_qfont.family());
+#if 0
+                    stream.writeStartElement("BoundPropertyString");
+                    stream.writeAttribute("name", "family");
+                    stream.writeAttribute("Value", globalTextAttr->m_qfont.family());
+                    stream.writeEndElement(); 
+#endif
+                    WRITE_XML_ELEMENT(String, "size", QString::number(globalTextAttr->m_qfont.pointSize()));
+                    if(globalTextAttr->m_qfont.weight()==QFont::Bold)
+                    {
+                        WRITE_XML_ELEMENT(String, "style", "Bold");
+                    }
+                    if(globalTextAttr->m_qfont.italic())
+                    {
+                        WRITE_XML_ELEMENT(String, "style", "Italic");
+                    }
+                    if(globalTextAttr->m_qfont.underline())
+                    {
+                        WRITE_XML_ELEMENT(String, "style", "Underline");
+                    }
+                    //WRITE_XML_ELEMENT(String, "color", ); //uncomplete
+                    WRITE_XML_ELEMENT(String, "alignment", globalTextAttr->m_textAlign == Qt::AlignLeft?"left":(globalTextAttr->m_textAlign == Qt::AlignHCenter?"center":"right")); //uncomplete
+                    WRITE_XML_ELEMENT(Int, "startTime", QString::number(globalTextAttr->m_iStartTimeText));
+                    WRITE_XML_ELEMENT(Int, "duration", QString::number(globalTextAttr->m_iDurationText));
+                    WRITE_XML_ELEMENT(Int, "effectIndex", QString::number(globalTextAttr->m_idxEffects));
+                    WRITE_XML_ELEMENT(Float, "pos_x", QString::number(globalTextAttr->m_pfPos.x()));
+                    WRITE_XML_ELEMENT(Float, "pos_y", QString::number(globalTextAttr->m_pfPos.y()));
+                    WRITE_XML_ELEMENT(String, "text", qsVideoText); //uncomple
+#if 0
+                    stream.writeStartElement("BoundPropertyStringSet");
+                    stream.writeAttribute("Name", "text");
+                    WRITE_XML_ELEMENT(String, "Value", qsVideoText); //uncomple \n
+                    stream.writeEndElement(); 
+#endif
+                }
+                stream.writeEndElement(); // BoundProperties
+            }
+            {
+                stream.writeStartElement("Transitions");
+                stream.writeEndElement(); // Transitions 
+            }
+            stream.writeEndElement(); // TitleClip 
+        }
+        {
+            stream.writeStartElement("Animation");
+            if(!globalAnimationAttr->m_qsTransitionName.isEmpty())
+            {
+                stream.writeStartElement("Transitions");
+                stream.writeAttribute("effectTemplateID", globalAnimationAttr->m_qsTransitionName);
+                stream.writeAttribute("duration", QString::number(globalAnimationAttr->m_iTransitionDuration));
+                stream.writeEndElement(); // Transitions 
+            }
+            if(!globalAnimationAttr->m_qsPanZoom.isEmpty())
+            {
+                stream.writeStartElement("PanAndZoomShapeEffect");
+                stream.writeAttribute("effectTemplateID", globalAnimationAttr->m_qsPanZoom);
+                stream.writeEndElement(); // PanAndZoomShapeEffect
+            }
+            stream.writeEndElement(); // Animation
+        }
+        {
+            stream.writeStartElement("VideoClip");
+            stream.writeAttribute("duration", QString::number(globalVideoAttr->m_iDuration));
+            stream.writeEndElement(); // VideoClip
+        }
+        stream.writeEndElement(); // ImageItem 
+
+        id ++;
+    }
+    {
+        stream.writeStartElement("AudioItem");
+        stream.writeAttribute("id", "1");
+        stream.writeAttribute("filePath", m_globalMusicAttr->m_qsMusicFullFilename);
+        stream.writeAttribute("startTime", QString::number(m_globalMusicAttr->m_iStartTime));
+        stream.writeAttribute("startPoint", QString::number(m_globalMusicAttr->m_iStartPoint));
+        stream.writeAttribute("endPoint", QString::number(m_globalMusicAttr->m_iEndPoint));
+        stream.writeAttribute("duration", QString::number(m_globalMusicAttr->m_iMusicDuration));
+        stream.writeEndElement(); // AudioItem
+    }
+
+    stream.writeEndElement(); // Project 
+
+    stream.writeEndDocument();
+    file.close();
+    
+}
+void ElementsEdit::createFlowLayout()
+{
+    if(m_isFirstClick)
+    {
+        m_isFirstClick=false;
+
+        //qDeleteAll(children());
+        delete m_firstLayout;
+        m_firstLayout = NULL;
+        delete m_firstLabel;
+        m_firstLabel = NULL;
+
+        m_flowLayout = new FlowLayout(this);
+        setLayout(m_flowLayout);
+    }
+}
 ProgressDialog::ProgressDialog(const QString &qsFileName, QWidget *parent)
   : QProgressDialog(parent)
 {
-    setWindowTitle(tr("Movie Maker"));
+    setWindowTitle(tr(PROGRAM_TITLE));
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     setLabelText(tr("Saving Movie %1.").arg(qsFileName));
     setMinimum(0);
