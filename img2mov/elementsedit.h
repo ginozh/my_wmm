@@ -91,6 +91,7 @@ public slots:
     void newProject();
     void openProject();
     void saveProject();
+    void cleanProject();
 private:
     FlowLayout *m_flowLayout;
     QVBoxLayout *m_firstLayout;

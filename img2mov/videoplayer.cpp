@@ -244,7 +244,9 @@ void VideoPlayer::initial()
 
     //2, black screen //uncomlete
     mediaPlayer.stop();
-    //mediaPlayer.setMedia(NULL);
+    mediaPlayer.setMedia(NULL);
+
+    m_qlDisplayTime->setText("00:00.00/00:00.00");
 }
 /*
    QPalette pl = iEdit->palette();

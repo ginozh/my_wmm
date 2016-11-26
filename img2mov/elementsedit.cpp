@@ -34,6 +34,7 @@ ElementsEdit::ElementsEdit(QWidget *parent)
       , m_isFirstClick(true)
       , m_globalMusicAttr(new GlobalMusicAttr)
       , m_qsVideoFileFormat(VIDEO_FILE_FORMAT)
+      , m_bCurrentProjectChanged(false)
 {   
     m_globalContext = GlobalContext::instance();
     //m_tmpdir=QDir::currentPath().append(tr("/tmp"));
@@ -1007,6 +1008,7 @@ bool ElementsEdit::createAnimationPanzoom(Element *firstElement, Element *second
 void ElementsEdit::createFinalVideo(bool bPlay, QByteArray qbAss/*=""*/, const QString& qsFinalVideoFile/*=""*/, bool bCreateVideoFile/*=false*/)
 //void ElementsEdit::createFinalVideo(bool bPlay)
 {
+    m_bCurrentProjectChanged = true;
     if(qbAss.isEmpty() && !m_qbAss.isEmpty())
     {
         qbAss = m_qbAss;
@@ -1779,6 +1781,10 @@ void ElementsEdit::initialFirstLayout()
 #define COMFIRM_SAVE
 QMessageBox::StandardButton ElementsEdit::confirmSaveProject()
 {
+    if(!m_bCurrentProjectChanged)
+    {
+        return QMessageBox::No;
+    }
     QFileInfo fi(m_qsProjectFile);
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, tr(PROGRAM_TITLE),
@@ -1809,11 +1815,34 @@ void ElementsEdit::newProject()
     }
     //2, new project
     m_qsProjectFile="";
+
+    cleanProject();
+
+    initialFirstLayout();
+}
+void ElementsEdit::cleanProject()
+{
+    createFlowLayout();
+    //4, delete current element
+    for (int i = m_flowLayout->count()-1; i>=0; --i)
+    {
+        QWidget *element = qobject_cast<QWidget *>(m_flowLayout->itemAt(i)->widget());
+        if (!element)
+        {
+            // err uncomplete
+            qDebug()<< "error uncomplete. ElementsEdit::selectedImage";
+            continue;
+        }
+        //(qobject_cast<Element *>element)->setValid(false); 
+        m_flowLayout->takeAt(i);
+        element->deleteLater();
+    }
 }
 void ElementsEdit::openProject()
 {
     //1, whether changed?
-    if(m_bCurrentProjectChanged && !m_qsProjectFile.isEmpty())
+    //if(m_bCurrentProjectChanged && !m_qsProjectFile.isEmpty())
+    if(!m_qsProjectFile.isEmpty())
     {
         // whether save ?
         if(QMessageBox::Cancel == confirmSaveProject())
@@ -1834,6 +1863,8 @@ void ElementsEdit::openProject()
         QMessageBox::information(this, "error", tr("can't read file: %1").arg(fileName));
         return;
     }
+    cleanProject();
+#if 0
     //3, 
     createFlowLayout();
     //4, delete current element
@@ -1851,7 +1882,7 @@ void ElementsEdit::openProject()
         element->deleteLater();
     }
     //initialFirstLayout();
-
+#endif
     //5, read xml && new Element: /c/QtProjects/QtExamples/widgets/animation/sub-attaq/graphicsscene.cpp
     QTextStream errorStream(stderr);
     QXmlStreamReader reader(&file);
@@ -2049,6 +2080,8 @@ void ElementsEdit::openProject()
 
 
     m_vecticalLine->raise(); // top level, Raises this widget to the top of the parent widget's stack.
+
+    m_bCurrentProjectChanged = false;
 }
 void ElementsEdit::saveProject()
 {
