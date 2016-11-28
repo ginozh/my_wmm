@@ -1278,7 +1278,7 @@ void ElementsEdit::createSingleVideo(int idxElement, bool bCreateSimpleVideo/*=t
     QString duration = QString::number((float)globalVideoAttr->m_iDuration/1000, 'f', 2);
     if(idxElement >= 1 && globalAnimationAttr && !globalAnimationAttr->m_qsTransitionName.isEmpty())
     {
-        Element *firstElement = qobject_cast<Element *>(m_flowLayout->itemAt(m_idxCurrentElement-1)->widget());
+        Element *firstElement = qobject_cast<Element *>(m_flowLayout->itemAt(idxElement-1)->widget());
         if(firstElement)
         {
             if(globalAnimationAttr->m_qsPanZoom.isEmpty())
@@ -2034,6 +2034,7 @@ void ElementsEdit::openProject()
                         else if (reader.tokenType() == QXmlStreamReader::EndElement
                                 && reader.name() == "Animation") 
                         {
+                            createSingleVideo(m_flowLayout->count()-1, false);
                             break;
                         }
                     }
@@ -2239,7 +2240,8 @@ void ElementsEdit::saveProject()
 
     stream.writeEndDocument();
     file.close();
-    
+
+    m_bCurrentProjectChanged = false;
 }
 void ElementsEdit::createFlowLayout()
 {
