@@ -62,7 +62,7 @@ void MusicLabel::mousePressEvent(QMouseEvent* /*event*/)
 {
     emit selectedMusicSignal();
 }
-void MusicLabel::updateMusicInfo(int iLeft, int iRight, const QString& qsText)
+void MusicLabel::updateMusicInfo(int iLeft, int iRight, const QString& qsText/*=""*/)
 {
     //m_iFillWidth = pos;
     m_iLeft = iLeft;

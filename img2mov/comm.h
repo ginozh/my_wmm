@@ -87,6 +87,7 @@ class GlobalMusicAttr
 {
 public:
     GlobalMusicAttr();
+    initialMusicAttr();
 public:
     QString m_qsMusicFullFilename;
     QString m_qsMusicFilename;

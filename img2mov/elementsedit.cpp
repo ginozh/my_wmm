@@ -519,7 +519,8 @@ void ElementsEdit::musicAttrChanged()
         }
         if(iStartDuration >= m_globalMusicAttr->m_iStartTime + duration)
         {
-            break;
+            element->musicLabel()->updateMusicInfo(0, 0); //可能是中间插入一个图片
+            continue;
         }
         QString qsMusicName;
         if(m_globalMusicAttr->m_iStartTime >= iStartDuration+element->globalVideoAttr()->m_iDuration)
@@ -764,7 +765,8 @@ void ElementsEdit::updateTextAttrAndAss(int iStartIdx)
     {
         Element* element = qobject_cast<Element *>(m_flowLayout->itemAt(i)->widget());
 
-        if(i>=iStartIdx && element->globalTextAttr() && !element->globalTextAttr()->m_qsStyle.isEmpty()) //uncomplete: m_qsStyle->m_qsText
+        //if(i>=iStartIdx && element->globalTextAttr() && !element->globalTextAttr()->m_qsStyle.isEmpty()) //uncomplete: m_qsStyle->m_qsText
+        if(i>=iStartIdx && element->lineEdit() && !element->lineEdit()->videoText().isEmpty())
         {
             isChanged=true;
             element->globalTextAttr()->m_iStartTimeText = iStartTime;
@@ -1837,6 +1839,7 @@ void ElementsEdit::cleanProject()
         m_flowLayout->takeAt(i);
         element->deleteLater();
     }
+    m_globalMusicAttr->initialMusicAttr();
 }
 void ElementsEdit::openProject()
 {

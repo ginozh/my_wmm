@@ -47,12 +47,18 @@ GlobalVideoAttr::GlobalVideoAttr()
     m_iFramerate = GlobalContext::instance()->m_iFramerate;
     m_iDuration = 2000;
 }
-GlobalMusicAttr::GlobalMusicAttr()
+GlobalMusicAttr::initialMusicAttr()
 {
+    m_qsMusicFullFilename = "";
+    m_qsMusicFilename = "";
     m_iStartTime = 0;
     m_iStartPoint = 0;
     m_iEndPoint = 0;
     m_iMusicDuration = 0;
+}
+GlobalMusicAttr::GlobalMusicAttr()
+{
+    initialMusicAttr();
     //m_iEntPoint = 2000;
 }
 GlobalContext* GlobalContext::m_pInstance = NULL;
