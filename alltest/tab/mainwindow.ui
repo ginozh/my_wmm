@@ -23,8 +23,23 @@
       <height>341</height>
      </rect>
     </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>16777215</width>
+      <height>16777215</height>
+     </size>
+    </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
+    </property>
+    <property name="documentMode">
+     <bool>false</bool>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -307,7 +322,7 @@
                      <rect>
                       <x>0</x>
                       <y>10</y>
-                      <width>161</width>
+                      <width>164</width>
                       <height>71</height>
                      </rect>
                     </property>

@@ -80,6 +80,7 @@ private:
     void createTabText();
     void initialScrollArea(QScrollArea *scrollArea);
     void appendLine(QHBoxLayout *hbox);
+    void appendExpandingWidget(QHBoxLayout *hbox);
     QMenu *createColorMenu(const char *slot, QColor defaultColor);
     QIcon createColorToolButtonIcon(const QString &imageFile, QColor color);
     QIcon createColorIcon(QColor color);

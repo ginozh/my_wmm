@@ -15,7 +15,7 @@ VideoPlayer::VideoPlayer(QWidget *parent)
     GlobalContext* globalContext = GlobalContext::instance();
     double dFactorX = globalContext->m_dFactorX;
     double dFactorY = globalContext->m_dFactorY;
-    int iFrameWidth = 750*dFactorX;
+    int iFrameWidth = 650*dFactorX;
     //setMinimumWidth(400);
     //setMaximumWidth(600);
     setFixedWidth(iFrameWidth);
@@ -95,13 +95,15 @@ VideoPlayer::VideoPlayer(QWidget *parent)
                     this, SLOT(setPosition(int)));
         }
     }
-#if 0
+#if 1
     {
+#if 0
         QVBoxLayout *nullLayout = new QVBoxLayout;
         layout->addLayout(nullLayout);
-
+#endif
         QWidget* nullWidget = new QWidget;
-        nullLayout->addWidget(nullWidget);
+        nullWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        layout->addWidget(nullWidget);
     }
 #endif
 

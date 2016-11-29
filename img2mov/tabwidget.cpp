@@ -209,11 +209,12 @@ void TabWidget::handleVideoAttrChange()
 
 void TabWidget::createTabHome()
 {
-    m_tabHome = new QWidget;
+    m_tabHome = new QWidget(this);
     QHBoxLayout *hbox = new QHBoxLayout;
     m_tabHome->setLayout(hbox);
     {
         QVBoxLayout *vboxAdd = new QVBoxLayout;
+        //vboxAdd->setGeometry(QRect(0, 0, 3*m_iCellHeight, 4*m_iCellHeight));
         hbox->addLayout(vboxAdd);
         {
             QHBoxLayout* hboxTop = new QHBoxLayout;
@@ -240,7 +241,8 @@ void TabWidget::createTabHome()
                 addMusic->setIcon(QIcon("images/addmusic.png"));
                 addMusic->setIconSize(m_iconSize);
                 addMusic->setText("Add music");
-                addMusic->setMinimumWidth(m_iconSize.width() + 100);
+                //addMusic->setMinimumWidth(m_iconSize.width() + 100);
+                addMusic->setFixedWidth(3*m_iCellHeight);
                 connect(addMusic, SIGNAL(clicked()), (const QObject*)m_globalContext->m_elementsEdit, SLOT(addMusic()));
             }
             {
@@ -254,6 +256,7 @@ void TabWidget::createTabHome()
                     //addTitle->setIcon(QIcon("images/addTitle.png"));
                     //addTitle->setIconSize(m_iconSize);
                     addTitle->setText("Title");
+                    addTitle->setFixedWidth(3*m_iCellHeight);
                     //connect(addTitle, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(addImages()));
 
                 }
@@ -265,6 +268,7 @@ void TabWidget::createTabHome()
                     //addCaption->setIcon(QIcon("images/addCaption.png"));
                     //addCaption->setIconSize(m_iconSize);
                     addCaption->setText("Caption");
+                    addCaption->setFixedWidth(3*m_iCellHeight);
                     //addCaption->setMaximumHeight(m_iconSize.height() + 250);
                     //addCaption->setMinimumWidth(m_iconSize.width() + 100);
                     //addCaption->setMinimumWidth(addCaption->text().length());
@@ -279,6 +283,7 @@ void TabWidget::createTabHome()
                     //addCredits->setIcon(QIcon("images/addCredits.png"));
                     //addCredits->setIconSize(m_iconSize);
                     addCredits->setText("Credits");
+                    addCredits->setFixedWidth(3*m_iCellHeight);
                     //connect(addCredits, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(addImages()));
 
                 }
@@ -287,6 +292,7 @@ void TabWidget::createTabHome()
         {
             QLabel *lbl = new QLabel(tr("Add"));
             lbl->setAlignment(Qt::AlignCenter);
+            lbl->setFixedWidth(3*m_iCellHeight);
 
             vboxAdd->addWidget(lbl);
         }
@@ -309,7 +315,8 @@ void TabWidget::createTabHome()
                 m_tbRotateLeft->setIconSize(m_iconSize);
                 m_tbRotateLeft->setText("Rotate Left");
                 //m_tbRotateLeft->setMaximumHeight(m_iconSize.height() + 250);
-                m_tbRotateLeft->setMinimumWidth(m_iconSize.width() + 100);
+                //m_tbRotateLeft->setMinimumWidth(m_iconSize.width() + 100);
+                m_tbRotateLeft->setFixedWidth(3*m_iCellHeight);
                 //m_tbRotateLeft->setMinimumWidth(m_tbRotateLeft->text().length());
                 connect(m_tbRotateLeft, SIGNAL(clicked()), this, SLOT(handleVideoAttrChange()));
             }
@@ -321,6 +328,7 @@ void TabWidget::createTabHome()
                 m_tbRotateRight->setIconSize(m_iconSize);
                 m_tbRotateRight->setText("Rotate Right");
                 m_tbRotateRight->setMinimumWidth(m_iconSize.width() + 100);
+                m_tbRotateRight->setFixedWidth(3*m_iCellHeight);
                 connect(m_tbRotateRight, SIGNAL(clicked()), this, SLOT(handleVideoAttrChange()));
             }
             {
@@ -334,6 +342,7 @@ void TabWidget::createTabHome()
                     //remove->setIcon(QIcon("images/remove.png"));
                     //remove->setIconSize(m_iconSize);
                     remove->setText("Remove");
+                    remove->setFixedWidth(3*m_iCellHeight);
                     //connect(remove, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(addImages()));
 
                 }
@@ -345,6 +354,7 @@ void TabWidget::createTabHome()
                     //selectAll->setIcon(QIcon("images/selectAll.png"));
                     //selectAll->setIconSize(m_iconSize);
                     selectAll->setText("Select all");
+                    selectAll->setFixedWidth(3*m_iCellHeight);
                     //selectAll->setMaximumHeight(m_iconSize.height() + 250);
                     //selectAll->setMinimumWidth(m_iconSize.width() + 100);
                     //selectAll->setMinimumWidth(selectAll->text().length());
@@ -356,12 +366,16 @@ void TabWidget::createTabHome()
         {
             QLabel *lbl = new QLabel(tr("Editing"));
             lbl->setAlignment(Qt::AlignCenter);
+            lbl->setFixedWidth(3*m_iCellHeight);
 
             vboxEditing->addWidget(lbl);
         }
     }
     {
         appendLine(hbox);
+    }
+    {
+        appendExpandingWidget(hbox);
     }
 #if 0
     QToolButton *addPhotos = new QToolButton(this);
@@ -579,6 +593,9 @@ void TabWidget::createTabAnimations()
     {
         appendLine(hboxAnimations);
     }
+    {
+        appendExpandingWidget(hboxAnimations);
+    }
 
     m_tabAnimations->setLayout(hboxAnimations);
 
@@ -664,6 +681,9 @@ void TabWidget::createTabVideo()
     }
     {
         appendLine(hbox);
+    }
+    {
+        appendExpandingWidget(hbox);
     }
 
     addTab(m_tabVideo, tr("&VideoTools"));
@@ -769,6 +789,9 @@ void TabWidget::createTabMusic()
     }
     {
         appendLine(hbox);
+    }
+    {
+        appendExpandingWidget(hbox);
     }
 
     addTab(m_tabMusic, tr("&MusicTools"));
@@ -1079,6 +1102,9 @@ void TabWidget::createTabText()
     {
         appendLine(hbox);
     }
+    {
+        appendExpandingWidget(hbox);
+    }
 
     m_tabText->setLayout(hbox);
 
@@ -1092,6 +1118,13 @@ void TabWidget::appendLine(QHBoxLayout *hbox)
     line->setFrameShadow(QFrame::Sunken);
 
     hbox->addWidget(line);
+}
+//增加伸缩因子的空qwidget：http://www.cnblogs.com/alleyonline/p/4631605.html
+void TabWidget::appendExpandingWidget(QHBoxLayout *hbox)
+{
+    QWidget *nullWidget = new QWidget;
+    nullWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    hbox->addWidget(nullWidget);
 }
 void TabWidget::initialScrollArea(QScrollArea *scrollArea)
 {
