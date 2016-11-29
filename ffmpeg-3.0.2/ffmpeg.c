@@ -1653,7 +1653,7 @@ static void print_report(int is_last_report, int64_t timer_start, int64_t cur_ti
     snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf),
              "%02d:%02d:%02d.%02d ", hours, mins, secs,
              (100 * us) / AV_TIME_BASE);
-
+    av_log(NULL, AV_LOG_DEBUG, "time: %02d:%02d:%02d.%02d ", hours, mins, secs, (100 * us) / AV_TIME_BASE);//storm
     if (bitrate < 0) {
         snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf),"bitrate=N/A");
         av_bprintf(&buf_script, "bitrate=N/A\n");

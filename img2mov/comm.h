@@ -88,13 +88,15 @@ class GlobalMusicAttr
 public:
     GlobalMusicAttr();
     initialMusicAttr();
+    const QString& musicFileName();
 public:
     QString m_qsMusicFullFilename;
-    QString m_qsMusicFilename;
     int m_iStartTime;
     int m_iStartPoint;
     int m_iEndPoint;
     int m_iMusicDuration;
+private:
+    QString m_qsMusicFilename;
 };
 
 // mainwindow

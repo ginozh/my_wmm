@@ -2,6 +2,7 @@
 #include <QDesktopWidget>
 #include <QApplication>
 #include <QDebug>
+#include <QFileInfo> 
 
 GlobalImageAttr::GlobalImageAttr()
 {
@@ -55,6 +56,15 @@ GlobalMusicAttr::initialMusicAttr()
     m_iStartPoint = 0;
     m_iEndPoint = 0;
     m_iMusicDuration = 0;
+}
+const QString& GlobalMusicAttr::musicFileName()
+{
+    if(!m_qsMusicFullFilename.isEmpty() && m_qsMusicFilename.isEmpty())
+    {
+        QFileInfo fi(m_qsMusicFullFilename);
+        m_qsMusicFilename = fi.baseName();
+    }
+    return m_qsMusicFilename;
 }
 GlobalMusicAttr::GlobalMusicAttr()
 {

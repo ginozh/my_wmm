@@ -428,7 +428,7 @@ void ElementsEdit::addMusic()
             tr("Audio and Music (*.wma *.mp3 *.wav *.aif *.aiff *.m4a *.ogg)"));
     if (file.isEmpty() )
         return;
-    QFileInfo fi(file);
+    //QFileInfo fi(file);
     //QString ext = fi.suffix();  // ext = "gz"
     m_musicMediaPlayer.setMedia(QUrl::fromLocalFile(file));
     connect(&m_musicMediaPlayer, SIGNAL(durationChanged(qint64)), this,
@@ -436,7 +436,7 @@ void ElementsEdit::addMusic()
 
     m_isFirstMusic = true;
     m_globalMusicAttr->m_qsMusicFullFilename = file;
-    m_globalMusicAttr->m_qsMusicFilename = fi.baseName();
+    //m_globalMusicAttr->m_qsMusicFilename = fi.baseName();
 
     setCursor(QCursor(Qt::WaitCursor));
 #if 0
@@ -519,21 +519,21 @@ void ElementsEdit::musicAttrChanged()
         }
         if(iStartDuration >= m_globalMusicAttr->m_iStartTime + duration)
         {
-            element->musicLabel()->updateMusicInfo(0, 0); //可能是中间插入一个图片
+            element->musicLabel()->updateMusicInfo(0, 0); //可能是中间插入一个图片,导致后面的music需要变更
             continue;
         }
-        QString qsMusicName;
         if(m_globalMusicAttr->m_iStartTime >= iStartDuration+element->globalVideoAttr()->m_iDuration)
         {
             iStartDuration+=element->globalVideoAttr()->m_iDuration;
 
-            element->musicLabel()->updateMusicInfo(0, 0, qsMusicName);
+            element->musicLabel()->updateMusicInfo(0, 0);
             continue;
         }
+        QString qsMusicName;
         if(!bDrawMusicName)
         {
             // 只出现一次
-            qsMusicName = m_globalMusicAttr->m_qsMusicFilename;
+            qsMusicName = m_globalMusicAttr->musicFileName();//m_qsMusicFilename;
             bDrawMusicName = true;
         }
 
@@ -2086,6 +2086,8 @@ void ElementsEdit::openProject()
     m_vecticalLine->raise(); // top level, Raises this widget to the top of the parent widget's stack.
 
     m_bCurrentProjectChanged = false;
+
+    m_qsProjectFile = fileName;
 }
 void ElementsEdit::saveProject()
 {
