@@ -8,7 +8,7 @@ CONFIG += c++11
 #PRECOMPILED_HEADER = stable.h
 #QMAKE_CXXFLAGS += /MP
 
-INCLUDEPATH += C:\QtProjects\ffmpeg-3.0.2
+INCLUDEPATH += C:\qtproject\ffmpeg-3.0.2
 #QMAKE_CFLAGS += -D__STDC_CONSTANT_MACROS -static-libgcc -static-libstdc++ -ggdb
 QMAKE_CFLAGS += -D__STDC_CONSTANT_MACROS
 #QMAKE_CXXFLAGS += -D__STDC_CONSTANT_MACROS -static-libgcc -static-libstdc++ -ggdb

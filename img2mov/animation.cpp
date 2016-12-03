@@ -48,7 +48,7 @@ void Animation::paintEvent(QPaintEvent *ev)
     {
         QPainter draw(this);
         QPen pen(QColor(Qt::red));
-        pen.setWidth(20);
+        pen.setWidth(20*GlobalContext::instance()->m_dFactorY);
         draw.setPen(pen);
         //draw.setPen(QPen(QColor(Qt::red)));
         //draw.drawLine(rect().topLeft(), rect().bottomRight());

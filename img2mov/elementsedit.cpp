@@ -17,7 +17,7 @@ extern "C"{
 #include "ffmpeg.h"
 }
 #include <QXmlStreamWriter>
-//#define DEBUG_FFMPEG
+#define DEBUG_FFMPEG
 //! [1]
 #define VIDEO_FILE_FORMAT "avi"
 #define PROGRAM_TITLE "Film Maker"
@@ -61,7 +61,7 @@ ElementsEdit::ElementsEdit(QWidget *parent)
     m_vecticalLine->setEnabled(true);
     //m_vecticalLine->setGeometry(QRect(300, 250, 10, 200));
     m_vecticalLine->setLineWidth(0);
-    m_vecticalLine->setMidLineWidth(10);
+    m_vecticalLine->setMidLineWidth(10*m_globalContext->m_dFactorY);
     QPalette palette1;
     QBrush brush2(QColor(0, 0, 0, 255));
     brush2.setStyle(Qt::SolidPattern);
@@ -397,6 +397,7 @@ Element* ElementsEdit::initialImage(const GlobalImageAttr&  newGlobalImageAttr, 
     if(m_qFinalVideoSize.width() < globalImageAttr->m_iSize.width())
     {
         m_qFinalVideoSize = globalImageAttr->m_iSize; //uncomplete. need same
+        qDebug()<< "ElementsEdit::initialImage. m_qFinalVideoSize w: "<<m_qFinalVideoSize.width()<<" h: "<< m_qFinalVideoSize.height();
     }
     //emit createVideoTextSignal((void*)element); 
     emit createVideoTextSignal(element); 

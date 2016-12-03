@@ -23,13 +23,13 @@ Image::Image(const GlobalImageAttr& globalImageAttr, QSize size, QWidget *parent
     //setMaximumHeight(size.height());
     //setContentsMargins(5, 5, 5, 5);
 #if 1
+    QString& path = m_globalImageAttr->m_qsImageName;
+    m_pixMap.load(path);
 
     const QImage& qImage = m_pixMap.toImage(); 
     qDebug()<<"Image. height: "<<qImage.size().height()<<" width: "<<qImage.size().width();
-    QString& path = m_globalImageAttr->m_qsImageName;
     m_globalImageAttr->m_iSize = qImage.size();
 
-    m_pixMap.load(path);
     m_pixMap.scaled(m_iScaleSize);
     setPixmap(m_pixMap);
     setScaledContents(true);
@@ -96,7 +96,7 @@ void Image::paintEvent(QPaintEvent *ev)
     {
         QPainter draw(this);
         QPen pen(QColor(Qt::red));
-        pen.setWidth(20);
+        pen.setWidth(20*GlobalContext::instance()->m_dFactorY);
         draw.setPen(pen);
         //draw.setPen(QPen(QColor(Qt::red)));
         //draw.drawLine(rect().topLeft(), rect().bottomRight());

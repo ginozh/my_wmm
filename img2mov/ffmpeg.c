@@ -4293,6 +4293,7 @@ int qt_ffmpeg(int argc, char **argv)
 {
     int ret;
     int64_t ti;
+    int idx;
     ffmpeg_init_globalvar(); //storm
     //av_log(NULL, AV_LOG_INFO, "1 nb_input_files %d.\n", nb_input_files);
     register_exit(ffmpeg_cleanup);
@@ -4309,7 +4310,7 @@ int qt_ffmpeg(int argc, char **argv)
         argc--;
         argv++;
     }
-    for(int idx=0; idx<argc; idx++) {
+    for(idx=0; idx<argc; idx++) {
         av_log(NULL, AV_LOG_WARNING, " ==%s==\n", argv[idx]);
     }
     av_log(NULL, AV_LOG_WARNING, "\n");

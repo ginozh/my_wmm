@@ -1033,7 +1033,7 @@ static void blend_expr_16bit(const uint8_t *_top, ptrdiff_t top_linesize,
         bottom += bottom_linesize;                                             
     }                                                                          
 }
-static int cntExpr=0; // storm
+//static int cntExpr=0; // storm
 static void blend_expr_normal_8bit(const uint8_t *_top, ptrdiff_t top_linesize,          
                                const uint8_t *_bottom, ptrdiff_t bottom_linesize,    
                                uint8_t *_dst, ptrdiff_t dst_linesize,                
@@ -1085,8 +1085,8 @@ static void blend_expr_8bit(const uint8_t *_top, ptrdiff_t top_linesize,
     top_linesize /= 1;                                                       
     bottom_linesize /= 1;                                                    
     //printf ("cntExpr: %d\n", ++cntExpr) ; //why 75(50 frame) time? 2 frame == 3 
-    av_log(NULL, AV_LOG_VERBOSE, "cntExpr:  %d\n", ++cntExpr) ;
-    av_log(NULL, AV_LOG_VERBOSE, "values[VAR_N]: %f values[VAR_T]: %f values[VAR_W]: %f values[VAR_H]: %f values[VAR_SW]: %f values[VAR_SH]: %f e->type: %d\n"
+    //av_log(NULL, AV_LOG_VERBOSE, "cntExpr:  %d\n", ++cntExpr) ;
+    av_log(NULL, AV_LOG_DEBUG, "values[VAR_N]: %f values[VAR_T]: %f values[VAR_W]: %f values[VAR_H]: %f values[VAR_SW]: %f values[VAR_SH]: %f e->type: %d\n"
             , values[VAR_N], values[VAR_T], values[VAR_W], values[VAR_H], values[VAR_SW], values[VAR_SH], e->type) ;
     if(e->type == e_if)
     {
