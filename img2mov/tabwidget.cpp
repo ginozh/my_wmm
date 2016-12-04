@@ -68,9 +68,9 @@ TabWidget::TabWidget(QWidget *parent)
     m_iCellHeight = iHeight/4;
     setFixedHeight(iHeight);
 
-    m_iconSize.setWidth(150*dFactorX);
+    m_iconSize.setWidth(1.5*m_iCellHeight);
     //m_iconSize.setHeight(100*dFactorY);
-    m_iconSize.setHeight(110*dFactorY);
+    m_iconSize.setHeight(1.5*m_iCellHeight);
 
     QWidget *tabNull = new QWidget;
     addTab(tabNull, tr("   "));
@@ -255,7 +255,7 @@ void TabWidget::createTabHome()
                 addPhotos->setText("Add photos");
                 //addPhotos->setMaximumHeight(m_iconSize.height() + 250);
                 //addPhotos->setMinimumWidth(m_iconSize.width() + 100);
-                addPhotos->setFixedWidth(3*m_iCellHeight);
+                //addPhotos->setFixedWidth(3*m_iCellHeight);
                 //addPhotos->setMinimumWidth(addPhotos->text().length());
                 connect(addPhotos, SIGNAL(clicked()), (const QObject*)m_globalContext->m_elementsEdit, SLOT(addImages()));
             }
@@ -267,7 +267,7 @@ void TabWidget::createTabHome()
                 addMusic->setIconSize(m_iconSize);
                 addMusic->setText("Add music");
                 //addMusic->setMinimumWidth(m_iconSize.width() + 100);
-                addMusic->setFixedWidth(3*m_iCellHeight);
+                //addMusic->setFixedWidth(3*m_iCellHeight);
                 connect(addMusic, SIGNAL(clicked()), (const QObject*)m_globalContext->m_elementsEdit, SLOT(addMusic()));
             }
             {
@@ -482,10 +482,10 @@ void TabWidget::createTabAnimations()
                     {
                         FlowLayout* flowLayout = new FlowLayout();
                         //flowLayout->setContentsMargins(10, 10, 10, 10);
-                        flowLayout->setContentsMargins(5, 5, 5, 5);
+                        flowLayout->setContentsMargins(5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX);
                         {
 #define INITIAL_ANIMATION(animation_name, tips_name) do {\
-    Animation *animation_name=new Animation("images/"#animation_name".png", ""#animation_name"", tips_name, m_iconSize) ; \
+    Animation *animation_name=new Animation("images/"#animation_name".png", ""#animation_name"", tips_name, QSize(1.8*m_iCellHeight, 1.8*m_iCellHeight)) ; \
     connect(animation_name, SIGNAL(selectedAnimationSignal(const QString&)), (const QObject*)m_globalContext->m_elementsEdit, SLOT(selectedTransition(const QString&))); \
     flowLayout->insertWidget(flowLayout->count(), animation_name); \
 } while(0)

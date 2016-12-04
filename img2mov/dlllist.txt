@@ -1,3 +1,4 @@
+#ldd img2mov.exe |egrep mingw32| awk -F'/' '{print $NF}' | awk '{print $1}' > ../dlllist.txt
 avcodec-57.dll
 libgcc_s_dw2-1.dll
 libwinpthread-1.dll
@@ -71,3 +72,8 @@ Qt5Network.dll
 Qt5MultimediaWidgets.dll
 Qt5OpenGL.dll
 Qt5Widgets.dll
+
+#
+libhogweed-4.dll
+libnettle-6.dll
+libjpeg-8.dll
