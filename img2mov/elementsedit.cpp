@@ -45,7 +45,7 @@ ElementsEdit::ElementsEdit(QWidget *parent)
     m_imgWidth=0;
     m_signalImgWidth=0;
     m_imgHeight=0;
-    m_lineWidth=10;
+    m_lineWidth=10*m_globalContext->m_dFactorY;
     m_playPosition=0;
 
     m_imgPlayPosition = 0;
@@ -61,7 +61,7 @@ ElementsEdit::ElementsEdit(QWidget *parent)
     m_vecticalLine->setEnabled(true);
     //m_vecticalLine->setGeometry(QRect(300, 250, 10, 200));
     m_vecticalLine->setLineWidth(0);
-    m_vecticalLine->setMidLineWidth(10*m_globalContext->m_dFactorY);
+    m_vecticalLine->setMidLineWidth(m_lineWidth);
     QPalette palette1;
     QBrush brush2(QColor(0, 0, 0, 255));
     brush2.setStyle(Qt::SolidPattern);

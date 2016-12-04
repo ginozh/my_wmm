@@ -103,13 +103,14 @@ void GraphicsTextItem::setFirstTextPosWH(const QString& oritxt
 {
     if(toPlainText().isEmpty() && element)
     {
+        GlobalContext* globalContext = GlobalContext::instance();
         const GlobalTextAttr * globalTextAttr = element->globalTextAttr();
         //QFont font;
         QFontMetrics fontMetrics(globalTextAttr->m_qfont);
         int fw = fontMetrics.width(oritxt);
         int fh = fontMetrics.height();
-        m_width=fw+20;
-        m_height=fh+10;
+        m_width=fw+20*globalContext->m_dFactorX;
+        m_height=fh+10*globalContext->m_dFactorY;
 
         setTextWidth(m_width);
         if(globalTextAttr->m_pfPos.x()!=-1)

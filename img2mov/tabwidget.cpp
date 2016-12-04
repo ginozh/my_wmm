@@ -47,8 +47,13 @@ QSize TabBar::tabSizeHint(int idx) const
     }
     else
     {
+        QFont font;
+        QFontMetrics fontMetrics(font);
+        int fw = fontMetrics.width(tabText(idx));
+        int fh = fontMetrics.height();
+        return QSize(fw+40*globalContext->m_dFactorX, fh);
         //qDebug()<< "TabBar::tabSizeHint. m_iOtherTabSize w: " << globalContext->m_iOtherTabSize.width() << " h: "<<globalContext->m_iOtherTabSize.height();
-        return globalContext->m_iOtherTabSize;
+        //return globalContext->m_iOtherTabSize;
     }
 }
 TabWidget::TabWidget(QWidget *parent)
@@ -1152,7 +1157,7 @@ void TabWidget::appendExpandingWidget(QHBoxLayout *hbox)
 void TabWidget::initialScrollArea(QScrollArea *scrollArea)
 {
     scrollArea->setBackgroundRole(QPalette::Light);
-    scrollArea->setMinimumWidth(500);
+    scrollArea->setMinimumWidth(500*GlobalContext::instance()->m_dFactorX);
     ////scrollArea->setMinimumHeight(120);
     ////scrollArea->setMaximumHeight(120);
     //scrollArea->setContentsMargins(10, 10, 10, 10);
