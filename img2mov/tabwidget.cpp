@@ -59,7 +59,7 @@ TabWidget::TabWidget(QWidget *parent)
     m_globalContext = GlobalContext::instance();
     double dFactorX = m_globalContext->m_dFactorX;
     double dFactorY = m_globalContext->m_dFactorY;
-    int iHeight = 230*dFactorY;
+    int iHeight = 240*dFactorY;
     m_iCellHeight = iHeight/4;
     setFixedHeight(iHeight);
 

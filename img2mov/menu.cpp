@@ -11,6 +11,7 @@ Menu::Menu(QWidget *parent, QWidget *elementsEdit, int x, int y)
     //setGeometry(QRect(x, y, 83, 32));
     //setGeometry(rect);
     setText(QApplication::translate("MainWindow", "Menu", 0));
+    setPopupMode(QToolButton::MenuButtonPopup);
     setMenu(m_menu);
     setAutoFillBackground(true);
     raise();
@@ -43,11 +44,13 @@ Menu::Menu(QWidget *parent, QWidget *elementsEdit, int x, int y)
     //widget->setGeometry( 25, 80, 54, 22 );
     //m_menu->setGeometry(QRect(25, 80, 54, 22));
 }
+#if 0
 void Menu::mousePressEvent(QMouseEvent *event)
 {
     if (event->buttons() & Qt::LeftButton)
     {
-        //m_menu->exec(QCursor::pos());
-        m_menu->exec(parentWidget()->mapToGlobal(QPoint(25,60)));
+        m_menu->exec(QCursor::pos());
+        //m_menu->exec(parentWidget()->mapToGlobal(QPoint(25,60)));
     }
 }
+#endif

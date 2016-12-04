@@ -14,7 +14,7 @@ public:
     //Menu(QWidget *parent, QWidget *elementsEdit, const QRect &rect);
     Menu(QWidget *parent, QWidget *elementsEdit, int x, int y);
 protected:
-    void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    //void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 private:
     QMenu* m_menu;
     QWidget *m_elementsEdit;
