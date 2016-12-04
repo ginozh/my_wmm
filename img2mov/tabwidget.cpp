@@ -275,6 +275,7 @@ void TabWidget::createTabHome()
                 hboxTop->addLayout(vboxTopRightAdd);
                 {
                     QToolButton *addTitle = new QToolButton();
+                    addTitle->setEnabled(false);
                     vboxTopRightAdd->addWidget(addTitle, Qt::AlignLeft);
 
                     addTitle->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -302,6 +303,7 @@ void TabWidget::createTabHome()
                 }
                 {
                     QToolButton *addCredits = new QToolButton();
+                    addCredits->setEnabled(false);
                     vboxTopRightAdd->addWidget(addCredits, Qt::AlignLeft);
 
                     addCredits->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -361,6 +363,7 @@ void TabWidget::createTabHome()
                 hboxTop->addLayout(vboxTopRightEditing);
                 {
                     QToolButton *remove = new QToolButton();
+                    remove->setEnabled(false);
                     vboxTopRightEditing->addWidget(remove, Qt::AlignLeft);
 
                     remove->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -373,6 +376,7 @@ void TabWidget::createTabHome()
                 }
                 {
                     QToolButton *selectAll = new QToolButton();
+                    selectAll->setEnabled(false);
                     vboxTopRightEditing->addWidget(selectAll, Qt::AlignLeft);
 
                     selectAll->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -558,6 +562,7 @@ void TabWidget::createTabAnimations()
                 }
                 {
                     QAbstractButton *btnApplyTrans = new QPushButton(tr("Apply to all"));
+                    btnApplyTrans->setEnabled(false);
                     //connect(btnApplyTrans, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(openFile()));
                     //btnApplyTrans->setAlignment(Qt::AlignCenter);
 
@@ -599,6 +604,7 @@ void TabWidget::createTabAnimations()
             }
             {
                 QAbstractButton *btnApplyPanzoom = new QPushButton(tr("Apply to all"));
+                btnApplyPanzoom->setEnabled(false);
                 //connect(btnApplyPanzoom, SIGNAL(clicked()), m_globalContext->m_elementsEdit, SLOT(openFile()));
                 //btnApplyPanzoom->setAlignment(Qt::AlignCenter);
 
@@ -1025,6 +1031,7 @@ void TabWidget::createTabText()
             vboxAdjust->addLayout(hboxAdjust);
             {
                 QToolButton *editextBtn = new QToolButton(this);
+                editextBtn->setEnabled(false);
                 editextBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
                 editextBtn->setIcon(QIcon("images/edittext.png"));
                 //editextBtn->setIcon(QIcon("images/textpointer.png"));
@@ -1044,6 +1051,7 @@ void TabWidget::createTabText()
                     }
                     {
                         m_startTimeTextCombo = new QComboBox();
+                        m_startTimeTextCombo->setEnabled(false);
                         m_startTimeTextCombo->setEditable(true);
                         m_startTimeTextCombo->addItem(QString(tr("2.00")));
                         m_startTimeTextCombo->setCurrentText(QString(tr("2.00")));
@@ -1062,6 +1070,7 @@ void TabWidget::createTabText()
                     }
                     {
                         m_durationTextCombo = new QComboBox();
+                        m_durationTextCombo->setEnabled(false);
                         m_durationTextCombo->setEditable(true);
                         for (int i = 2; i < 30; i = i + 2)
                             m_durationTextCombo->addItem(QString().setNum(i));
@@ -1097,6 +1106,7 @@ void TabWidget::createTabText()
                     {
 #define INITIAL_TEXT(animation_name, tips_name) do {\
     Animation *animation_name=new Animation("images/"#animation_name".png", ""#animation_name"", tips_name, m_iconSize) ; \
+    animation_name->setEnabled(false); \
     /*connect(animation_name, SIGNAL(selectedAnimationSignal(const QString&)), (const QObject*)m_globalContext->m_elementsEdit, SLOT(selectedTransition(const QString&)));*/ \
     flowLayout->insertWidget(flowLayout->count(), animation_name); \
 } while(0)
