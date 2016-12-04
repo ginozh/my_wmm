@@ -96,7 +96,7 @@ void Image::paintEvent(QPaintEvent *ev)
     {
         QPainter draw(this);
         QPen pen(QColor(Qt::red));
-        pen.setWidth(20*GlobalContext::instance()->m_dFactorY);
+        pen.setWidth(20*GlobalContext::instance()->m_dFactorX);
         draw.setPen(pen);
         //draw.setPen(QPen(QColor(Qt::red)));
         //draw.drawLine(rect().topLeft(), rect().bottomRight());

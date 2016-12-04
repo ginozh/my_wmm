@@ -14,16 +14,16 @@ public:
     GraphicsRectItem(qreal len, PosInHost pos, QGraphicsItem *parent);
     ~GraphicsRectItem();
     int type() const {return Type;};
-    void setInHost(PosInHost pos){posInHost = pos;};
-    PosInHost getInHost(){return posInHost;};
+    void setInHost(PosInHost pos){m_posInHost = pos;};
+    PosInHost getInHost(){return m_posInHost;};
     void locateInHost();
 protected:
     void hoverEnterEvent ( QGraphicsSceneHoverEvent * event ) Q_DECL_OVERRIDE;
     void hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ) Q_DECL_OVERRIDE;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) Q_DECL_OVERRIDE;
 private:
-    PosInHost posInHost;
-    qreal wsize;
+    PosInHost m_posInHost;
+    qreal m_wsize;
 };
 
 #endif // VIDEORECTITEM_H
