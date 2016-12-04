@@ -32,10 +32,30 @@ const QString rsrcPath = "images/mac";
 const QString rsrcPath = "images/win";
 #endif
 
+TabBar::TabBar(QWidget *parent)
+    : QTabBar(parent)
+{
+}
+
+QSize TabBar::tabSizeHint(int idx) const
+{
+    GlobalContext* globalContext = GlobalContext::instance();
+    if(idx==0)
+    {
+        //qDebug()<< "TabBar::tabSizeHint. m_iFirstTabSize w: " << globalContext->m_iFirstTabSize.width() << " h: "<<globalContext->m_iFirstTabSize.height();
+        return globalContext->m_iFirstTabSize;
+    }
+    else
+    {
+        //qDebug()<< "TabBar::tabSizeHint. m_iOtherTabSize w: " << globalContext->m_iOtherTabSize.width() << " h: "<<globalContext->m_iOtherTabSize.height();
+        return globalContext->m_iOtherTabSize;
+    }
+}
 TabWidget::TabWidget(QWidget *parent)
     : QTabWidget(parent)
     , m_element(0)
 {
+    setTabBar(new TabBar);
     m_globalContext = GlobalContext::instance();
     double dFactorX = m_globalContext->m_dFactorX;
     double dFactorY = m_globalContext->m_dFactorY;
@@ -662,7 +682,10 @@ void TabWidget::createTabVideo()
                         m_cbDurationVideo->setEditable(true);
                         m_cbDurationVideo->setCurrentText(QString(tr("2.00")));
                         m_cbDurationVideo->addItem(QString(tr("2.00")));
-                        m_cbDurationVideo->setValidator(new QDoubleValidator(0.5, 30.0, 2, m_cbDurationVideo)); //uncomplete delete old
+                        QDoubleValidator* validator = new QDoubleValidator();
+                        validator->setRange(0.5, 30.0, 2);
+                        validator->setNotation(QDoubleValidator::StandardNotation);
+                        m_cbDurationVideo->setValidator(validator); //uncomplete delete old
                         connect(m_cbDurationVideo, SIGNAL(textChangedSignal(QString)),
                                 this, SLOT(handleVideoAttrChange()));
 

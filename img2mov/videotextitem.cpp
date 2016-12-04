@@ -13,8 +13,12 @@
 //! [0]
 GraphicsTextItem::GraphicsTextItem(QGraphicsScene *scene)
     : QGraphicsTextItem()
-    ,m_width(100),m_height(100),m_margin(8)
 {
+    GlobalContext* globalContext = GlobalContext::instance();
+    m_width = 100*globalContext->m_dFactorX;
+    m_height = 100*globalContext->m_dFactorX;
+    m_margin = 8*globalContext->m_dFactorX;
+
     setFlag(QGraphicsItem::ItemIsMovable);
     setFlag(QGraphicsItem::ItemIsSelectable);
     setFlag(QGraphicsItem::ItemSendsGeometryChanges);

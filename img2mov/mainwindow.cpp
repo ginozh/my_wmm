@@ -62,7 +62,7 @@ MainWindow::MainWindow(QWidget *parent)
 #if 1
     m_scrollArea = new QScrollArea;
     m_scrollArea->setBackgroundRole(QPalette::Light);
-    m_scrollArea->setMinimumWidth(500);
+    m_scrollArea->setMinimumWidth(500*m_globalContext->m_dFactorX);
     m_scrollArea->setWidgetResizable (true);
     m_scrollArea->setWidget(m_globalContext->m_elementsEdit);
     centralSplitter->addWidget(m_scrollArea);
@@ -129,7 +129,8 @@ void MainWindow::addImages()
 #endif
 void MainWindow::resizeEvent(QResizeEvent *ev)
 {
-    m_menu->setGeometry(QRect(m_globalContext->m_tabWidget->geometry().x()+18, m_globalContext->m_tabWidget->geometry().y()+3, m_globalContext->m_tabWidget->iconSize().width()+30, m_globalContext->m_tabWidget->iconSize().height()));
+    //m_menu->setGeometry(QRect(m_globalContext->m_tabWidget->geometry().x()+18, m_globalContext->m_tabWidget->geometry().y()+3, m_globalContext->m_tabWidget->iconSize().width()+30, m_globalContext->m_tabWidget->iconSize().height()));
+    m_menu->setGeometry(QRect(m_globalContext->m_tabWidget->geometry().x(), m_globalContext->m_tabWidget->geometry().y(), m_globalContext->m_iFirstTabSize.width(), m_globalContext->m_iFirstTabSize.height()));
     //QMessageBox::information(this, "menu", QString(tr("x: %1 y: %2")).arg(m_tabWidget->frameGeometry().x()).arg(m_tabWidget->frameGeometry().y()));
     //QMessageBox::information(this, "menu", QString(tr("w: %1 h: %2")).arg(m_tabWidget->iconSize().width()).arg(m_tabWidget->iconSize().height()));
     //qDebug()<< "resizeEvent w: " << m_tabWidget->iconSize().width() << " h: "<< m_tabWidget->iconSize().height();

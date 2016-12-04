@@ -3,8 +3,9 @@
 #include <QLabel>
 #include <QMouseEvent>
 #include <QMenu>
+#include <QToolButton>
 //! [0]
-class Menu : public QLabel
+class Menu : public QToolButton
 {
     Q_OBJECT
 

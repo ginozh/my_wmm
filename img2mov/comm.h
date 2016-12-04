@@ -112,11 +112,13 @@ public:
     GraphicsScene* m_scene;
     VideoPlayer* m_player;
     TabWidget* m_tabWidget;
-    QRect m_rectDesktop;
-    double m_dFactorX;
+    //QRect m_rectDesktop;
+    double m_dFactorX; //宽度缩放比率
     double m_dFactorY;
     QSize m_iScaledSize; //整体缩放尺寸,包括: 图片、scene、ass
     int m_iFramerate;
+    QSize m_iFirstTabSize;
+    QSize m_iOtherTabSize;
 };
 
 #endif

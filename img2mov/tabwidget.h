@@ -48,6 +48,15 @@ private:
     int m_id;
 };
 //! [0]
+class TabBar : public QTabBar
+{
+    Q_OBJECT
+
+public:
+    TabBar(QWidget *parent=NULL);
+protected:
+    virtual QSize tabSizeHint(int) const Q_DECL_OVERRIDE;
+};
 class TabWidget : public QTabWidget
 {
     Q_OBJECT

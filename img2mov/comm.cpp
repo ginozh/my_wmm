@@ -82,15 +82,18 @@ GlobalContext::GlobalContext()
     m_tabWidget=NULL;
 
     QDesktopWidget* desktopWidget = QApplication::desktop();
-    m_rectDesktop = desktopWidget->availableGeometry();
-    m_dFactorX = (double)m_rectDesktop.width()/2452;
-    m_dFactorY = (double)m_rectDesktop.height()/1444;
+    QRect rectDesktop = desktopWidget->availableGeometry();
+    m_dFactorX = (double)rectDesktop.width()/2452;
+    m_dFactorY = m_dFactorX;//(double)rectDesktop.height()/1444;
     int iTmpW=((int)(m_dFactorX*512/8))*8; // 8而不是4，因为高度需要2的倍数
     int iTmpH=(iTmpW/4)*3;
     qDebug()<<"m_iScaledSize. m_dFactorX: "<<m_dFactorX<<" m_dFactorY: "<<m_dFactorY<<" w: "<<iTmpW<<" h:"<<iTmpH;
     m_iScaledSize = QSize(iTmpW, iTmpH);//QSize(m_dFactorX*512, m_dFactorX*384); //4:3
 
     m_iFramerate = 24;
+
+    m_iFirstTabSize = QSize((int)(100*m_dFactorX),(int)(40*m_dFactorY) );
+    m_iOtherTabSize = QSize((int)(180*m_dFactorX), m_iFirstTabSize.height() );
 }
 GlobalContext* GlobalContext::instance()  
 {  

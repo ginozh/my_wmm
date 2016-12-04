@@ -1,7 +1,8 @@
 #include "Menu.h"
 #include <QApplication>
 Menu::Menu(QWidget *parent, QWidget *elementsEdit, int x, int y)
-    : QLabel(parent)
+    //: QLabel(parent)
+    : QToolButton(parent)
     , m_menu(new QMenu(this))
     , m_elementsEdit(elementsEdit)
 {
@@ -10,6 +11,8 @@ Menu::Menu(QWidget *parent, QWidget *elementsEdit, int x, int y)
     //setGeometry(QRect(x, y, 83, 32));
     //setGeometry(rect);
     setText(QApplication::translate("MainWindow", "Menu", 0));
+    setMenu(m_menu);
+    setAutoFillBackground(true);
     raise();
 
     //m_menu->setScaledContents(true);
