@@ -8,6 +8,7 @@
 #include <QMap>
 #include <QFontComboBox>
 #include <QComboBox>
+#include <QDoubleSpinBox>
 #include "comm.h"
 #include "combobox.h"
 
@@ -57,6 +58,25 @@ public:
 protected:
     virtual QSize tabSizeHint(int) const Q_DECL_OVERRIDE;
 };
+class SpinBox : public QDoubleSpinBox 
+{
+	Q_OBJECT
+public:
+	explicit SpinBox( QWidget *parent = 0)
+		: QDoubleSpinBox (parent)
+	{
+	}
+signals:
+    void textChangedSignal(double);
+protected:
+    void leaveEvent(QEvent *event)
+    //void focusOutEvent(QFocusEvent* event)
+    {
+        emit textChangedSignal(value());
+        //QDoubleSpinBox::focusOutEvent(event);
+        QDoubleSpinBox::leaveEvent(event);
+    }
+};
 class TabWidget : public QTabWidget
 {
     Q_OBJECT
@@ -97,6 +117,7 @@ private:
     void assignTextInfo();
     void assignVideoInfo();
     void assignAnimationInfo();
+    void assignMusciInfo();
 private:
     QListWidget *contentsWidget;
     QSize m_iconSize;
@@ -117,11 +138,18 @@ private:
     QWidget *m_tabVideo;
     QComboBox* m_cbSpeedVideo;
     ComboBox* m_cbDurationVideo;
+    QDoubleValidator* m_dvDurationVideo;
     //music
     QWidget *m_tabMusic;
-    ComboBox* m_cbStartTimeMusic;
-    ComboBox* m_cbStartPointMusic;
-    ComboBox* m_cbEndPointMusic;
+    SpinBox* m_dsbStartTimeMusic;
+    SpinBox* m_dsbStartPointMusic;
+    SpinBox* m_dsbEndPointMusic;
+    //ComboBox* m_cbStartTimeMusic;
+    //QDoubleValidator* m_dvStartTimeMusic;
+    //ComboBox* m_cbStartPointMusic;
+    //QDoubleValidator* m_dvStartPointMusic;
+    //ComboBox* m_cbEndPointMusic;
+    //QDoubleValidator* m_dvEndPointMusic;
 
     //text
     QWidget *m_tabText;

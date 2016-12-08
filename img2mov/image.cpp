@@ -24,7 +24,7 @@ Image::Image(const GlobalImageAttr& globalImageAttr, QSize size, QWidget *parent
     //setContentsMargins(5, 5, 5, 5);
 #if 1
     QString& path = m_globalImageAttr->m_qsImageName;
-    m_pixMap.load(path);
+    m_pixMap.load(path); // 可能在新环境下加载失败，需要添加图片格式qt解析dll库
 
     const QImage& qImage = m_pixMap.toImage(); 
     qDebug()<<"Image. height: "<<qImage.size().height()<<" width: "<<qImage.size().width();

@@ -60,6 +60,10 @@ TabWidget::TabWidget(QWidget *parent)
     : QTabWidget(parent)
     , m_element(0)
 {
+    //m_dvStartTimeMusic = NULL;
+    //m_dvStartPointMusic = NULL;
+    //m_dvEndPointMusic = NULL;
+
     setTabBar(new TabBar);
     m_globalContext = GlobalContext::instance();
     double dFactorX = m_globalContext->m_dFactorX;
@@ -106,6 +110,9 @@ void TabWidget::assignVideoInfo()
 void TabWidget::assignTabValue()
 {
     QWidget * widget= currentWidget();
+    qDebug()<< "TabWidget::assignTabValue. widget: "<<(int)widget<<" m_tabVideo: "<<(int)m_tabVideo
+        <<" m_tabText: "<<(int)m_tabText<<" m_tabAnimations: "<<(int)m_tabAnimations
+        <<" m_tabMusic: "<<(int)m_tabMusic;
     if(widget == m_tabVideo)
     {
         //QMessageBox::information(NULL, "info", QString(tr("video")));
@@ -118,6 +125,10 @@ void TabWidget::assignTabValue()
     else if(widget == m_tabAnimations)
     {
         assignAnimationInfo();
+    }
+    else if(widget == m_tabMusic)
+    {
+        assignMusciInfo();
     }
 }
 void TabWidget::handleVideoAttrChange()
@@ -163,63 +174,41 @@ void TabWidget::handleVideoAttrChange()
                 isChange = true; \
             } \
         } \
+        else \
+        { \
+            qDebug() << "handleVideoAttrChange. error i" #macrop_var ": " << macrop_commbox->currentText() << " m_i" #macrop_var ": "<< macrop_globalattr->m_i##macrop_var << " macrop_globalattr: "<<(int)macrop_globalattr; \
+        } \
         }while(0)
 
         COMPARE_ASSIGN(Duration, m_cbDurationVideo, globalVideoAttr);
-        COMPARE_ASSIGN(StartTime, m_cbStartTimeMusic, globalMusicAttr);
-        COMPARE_ASSIGN(StartPoint, m_cbStartPointMusic, globalMusicAttr);
-        COMPARE_ASSIGN(EndPoint, m_cbEndPointMusic, globalMusicAttr);
+        //COMPARE_ASSIGN(StartTime, m_cbStartTimeMusic, globalMusicAttr);
+        //COMPARE_ASSIGN(StartPoint, m_cbStartPointMusic, globalMusicAttr);
+        //COMPARE_ASSIGN(EndPoint, m_cbEndPointMusic, globalMusicAttr);
+#define SPINBOX_COMPARE_ASSIGN(macrop_var, macrop_commbox, macrop_globalattr) do {\
+        if(send == macrop_commbox && macrop_globalattr) \
+        { \
+            double i##macrop_var = macrop_commbox->value(); \
+            double m_i##macrop_var = QString::number((double)macrop_globalattr->m_i##macrop_var/1000, 'f', 2).toDouble(); \
+            qDebug() << "handleVideoAttrChange. i" #macrop_var ": " << i##macrop_var << " m_i" #macrop_var ": "<< m_i##macrop_var; \
+            if(i##macrop_var != m_i##macrop_var) \
+            { \
+                macrop_globalattr->m_i##macrop_var = i##macrop_var*1000; \
+                if((void*)globalVideoAttr == (void*)macrop_globalattr) \
+                { \
+                    attrType |= ATTR_VIDEO; \
+                } \
+                if((void*)globalMusicAttr == (void*)macrop_globalattr) \
+                { \
+                    attrType |= ATTR_MUSIC; \
+                } \
+                isChange = true; \
+            } \
+        } \
+        }while(0)
+        SPINBOX_COMPARE_ASSIGN(StartTime, m_dsbStartTimeMusic, globalMusicAttr);
+        SPINBOX_COMPARE_ASSIGN(StartPoint, m_dsbStartPointMusic, globalMusicAttr);
+        SPINBOX_COMPARE_ASSIGN(EndPoint, m_dsbEndPointMusic, globalMusicAttr);
 
-#if 0
-        if(send == m_cbDurationVideo && globalVideoAttr)
-        { 
-            QString qsDurationVideo = m_cbDurationVideo->currentText();
-            QStringList slDurationVideo = qsDurationVideo.split("s");
-            float iDurationVideo = slDurationVideo.at(0).toFloat(); 
-            float m_iDuration = QString::number((float)globalVideoAttr->m_iDuration/1000, 'f', 2).toFloat();
-            qDebug() << "handleVideoAttrChange. qsDurationVideo: " << qsDurationVideo << " iDurationVideo: " << iDurationVideo << " m_iDuration: " << m_iDuration;
-            if(iDurationVideo != m_iDuration)
-            {
-                globalVideoAttr->m_iDuration = iDurationVideo*1000;
-                bCreateSingleVideo = true;
-                isChange = true;
-            }
-        }
-        if(send == m_cbStartTimeMusic && globalMusicAttr)
-        {
-            QString qsStartTimeMusic = m_cbStartTimeMusic->currentText();
-            QStringList slStartTimeMusic = qsStartTimeMusic.split("s");
-            float iStartTimeMusic = slStartTimeMusic.at(0).toFloat(); 
-            float m_iStartTime = QString::number((float)globalMusicAttr->m_iStartTime/1000, 'f', 2).toFloat();
-            qDebug() << "handleVideoAttrChange. qsStartTimeMusic: " << qsStartTimeMusic << " iStartTimeMusic: " << iStartTimeMusic << " m_iStartTime: "<< m_iStartTime;
-            if(iStartTimeMusic != m_iStartTime)
-            {
-                globalMusicAttr->m_iStartTime = iStartTimeMusic*1000;
-                isChange = true;
-            }
-
-            QString qsStartPointMusic = m_cbStartPointMusic->currentText();
-            QStringList slStartPointMusic = qsStartPointMusic.split("s");
-            float iStartPointMusic = slStartPointMusic.at(0).toFloat(); 
-            float m_iStartPoint = QString::number((float)globalMusicAttr->m_iStartPoint/1000, 'f', 2).toFloat();
-            qDebug() << "handleVideoAttrChange. qsStartPointMusic: " << qsStartPointMusic << " iStartPointMusic: " << iStartPointMusic << " m_iStartPoint: "<<m_iStartPoint;
-            if(iStartPointMusic != m_iStartPoint)
-            {
-                globalMusicAttr->m_iStartPoint = iStartPointMusic;
-                isChange = true;
-            }
-
-            QString qsEndPointMusic = m_cbEndPointMusic->currentText();
-            QStringList slEndPointMusic = qsEndPointMusic.split("s");
-            int iEndPointMusic = 1000*slEndPointMusic.at(0).toFloat(); 
-            qDebug() << "handleVideoAttrChange. qsEndPointMusic: " << qsEndPointMusic << " iEndPointMusic: " << iEndPointMusic << " m_iEndPoint: "<<globalMusicAttr->m_iEndPoint;
-            if(iEndPointMusic != globalMusicAttr->m_iEndPoint)
-            {
-                globalMusicAttr->m_iEndPoint = iEndPointMusic;
-                isChange = true;
-            }
-        }
-#endif
     }
     else
     {
@@ -690,13 +679,14 @@ void TabWidget::createTabVideo()
                     }
                     {
                         m_cbDurationVideo = new ComboBox();
+                        m_cbDurationVideo->setEnabled(false);
                         m_cbDurationVideo->setEditable(true);
                         m_cbDurationVideo->setCurrentText(QString(tr("2.00")));
                         m_cbDurationVideo->addItem(QString(tr("2.00")));
-                        QDoubleValidator* validator = new QDoubleValidator();
-                        validator->setRange(0.5, 30.0, 2);
-                        validator->setNotation(QDoubleValidator::StandardNotation);
-                        m_cbDurationVideo->setValidator(validator); //uncomplete delete old
+                        m_dvDurationVideo = new QDoubleValidator();
+                        m_dvDurationVideo->setRange(0.5, 30.0, 2);
+                        m_dvDurationVideo->setNotation(QDoubleValidator::StandardNotation);
+                        m_cbDurationVideo->setValidator(m_dvDurationVideo); //uncomplete delete old
                         connect(m_cbDurationVideo, SIGNAL(textChangedSignal(QString)),
                                 this, SLOT(handleVideoAttrChange()));
 
@@ -761,6 +751,7 @@ void TabWidget::createTabMusic()
                         hboxStartTime->addWidget(lbl);
                     }
                     {
+#if 0
                         m_cbStartTimeMusic = new ComboBox();
                         m_cbStartTimeMusic->setEditable(true);
                         m_cbStartTimeMusic->addItem(QString(tr("0.00")));
@@ -769,6 +760,16 @@ void TabWidget::createTabMusic()
                                 this, SLOT(handleVideoAttrChange()));
 
                         hboxStartTime->addWidget(m_cbStartTimeMusic);
+#endif
+                        m_dsbStartTimeMusic = new SpinBox;
+                        //m_dsbStartTimeMusic->setSingleStep(1.0);
+                        //m_dsbStartTimeMusic->setValue(0.00);
+                        m_dsbStartTimeMusic->setSuffix("s");
+                        m_dsbStartTimeMusic->setDecimals(2);
+                        m_dsbStartTimeMusic->setRange(0.0, 0.0);
+                        connect(m_dsbStartTimeMusic, SIGNAL(textChangedSignal(double)),
+                                this, SLOT(handleVideoAttrChange()));
+                        hboxStartTime->addWidget(m_dsbStartTimeMusic);
                     }
 
                 }
@@ -781,14 +782,21 @@ void TabWidget::createTabMusic()
                         hboxStartPoint->addWidget(lbl);
                     }
                     {
-                        m_cbStartPointMusic = new ComboBox();
+                        m_dsbStartPointMusic = new SpinBox();
+                        m_dsbStartPointMusic->setSuffix("s");
+                        m_dsbStartPointMusic->setDecimals(2);
+                        m_dsbStartPointMusic->setRange(0.0, 0.0);
+                        connect(m_dsbStartPointMusic, SIGNAL(textChangedSignal(double)),
+                                this, SLOT(handleVideoAttrChange()));
+                        hboxStartPoint->addWidget(m_dsbStartPointMusic);
+#if 0
                         m_cbStartPointMusic->setEditable(true);
                         m_cbStartPointMusic->addItem(QString(tr("0.00")));
                         m_cbStartPointMusic->setCurrentText(QString(tr("0.00")));
                         connect(m_cbStartPointMusic, SIGNAL(textChangedSignal(QString)),
                                 this, SLOT(handleVideoAttrChange()));
-
                         hboxStartPoint->addWidget(m_cbStartPointMusic);
+#endif
                     }
 
                 }
@@ -801,14 +809,22 @@ void TabWidget::createTabMusic()
                         hboxEndPoint->addWidget(lbl);
                     }
                     {
+                        m_dsbEndPointMusic = new SpinBox();
+                        m_dsbEndPointMusic->setSuffix("s");
+                        m_dsbEndPointMusic->setDecimals(2);
+                        m_dsbEndPointMusic->setRange(0.0, 0.0);
+                        connect(m_dsbEndPointMusic, SIGNAL(textChangedSignal(double)),
+                                this, SLOT(handleVideoAttrChange()));
+                        hboxEndPoint->addWidget(m_dsbEndPointMusic);
+#if 0
                         m_cbEndPointMusic = new ComboBox();
                         m_cbEndPointMusic->setEditable(true);
                         m_cbEndPointMusic->addItem(QString(tr("2.00")));
                         m_cbEndPointMusic->setCurrentText(QString(tr("2.00")));
                         connect(m_cbEndPointMusic, SIGNAL(textChangedSignal(QString)),
                                 this, SLOT(handleVideoAttrChange()));
-
                         hboxEndPoint->addWidget(m_cbEndPointMusic);
+#endif
                     }
 
                 }
@@ -1253,17 +1269,11 @@ void TabWidget::activeTabMusic(GlobalMusicAttr* musicAttr)
 {
     setCurrentWidget(m_tabMusic);
     if(!musicAttr)
+    {
+        qDebug()<< "TabWidget::activeTabMusic. musicAttr is null";
         return;
-    float fEndPoint = (float)musicAttr->m_iEndPoint/1000;
-    float fStartTime =(float)m_globalContext->m_elementsEdit->totalVideoDuration()/1000;
-    m_cbEndPointMusic->setCurrentText(QString(tr("%1")).
-            arg(QString::number(fEndPoint, 'f', 2)));
-    qDebug()<< "TabWidget::activeTabMusic. fEndPoint: "<<fEndPoint<<" totalVideoDuration: "<<m_globalContext->m_elementsEdit->totalVideoDuration();
-    //widgets/widgets/validators
-    //focusOutEvent
-    m_cbStartTimeMusic->setValidator(new QDoubleValidator(0.0, fStartTime, 2, m_cbStartTimeMusic)); //uncomplete delete old
-    m_cbStartPointMusic->setValidator(new QDoubleValidator(0.0, fEndPoint, 2, m_cbStartPointMusic)); //uncomplete delete old
-    m_cbEndPointMusic->setValidator(new QDoubleValidator(0.0, fEndPoint, 2, m_cbEndPointMusic)); //uncomplete delete old
+    }
+    assignMusciInfo();
 }
 void TabWidget::assignAnimationInfo()
 {
@@ -1284,6 +1294,71 @@ void TabWidget::assignAnimationInfo()
     {
         //uncomplete
     }
+}
+void TabWidget::assignMusciInfo()
+{
+    GlobalMusicAttr* globalMusicAttr = m_globalContext->m_elementsEdit->globalMusicAttr();
+    if(!globalMusicAttr)
+    {
+        qDebug()<< "error uncomplete. TabWidget::handleVideoAttrChange: !globalVideoAttr || !globalMusicAtt";
+        return;
+    }
+    double fStartTime =(double)globalMusicAttr->m_iStartTime/1000;
+    double fStartPoint = (double)globalMusicAttr->m_iStartPoint/1000;
+    double fEndPoint = (double)globalMusicAttr->m_iEndPoint/1000;
+    double fMusicDuration = (double)globalMusicAttr->m_iMusicDuration/1000;
+    double fVideoDuration =(double)m_globalContext->m_elementsEdit->totalVideoDuration()/1000;
+    //widgets/widgets/validators
+    //focusOutEvent
+#if 0
+    if(m_dvStartTimeMusic)
+    {
+        delete m_dvStartTimeMusic;
+    }
+    m_dvStartTimeMusic = new QDoubleValidator();
+    m_dvStartTimeMusic->setRange(0.0, fStartTime, 2);
+    m_dvStartTimeMusic->setNotation(QDoubleValidator::StandardNotation);
+    m_cbStartTimeMusic->setValidator(m_dvStartTimeMusic); //uncomplete delete old
+#endif
+    //1, validate
+    m_dsbStartTimeMusic->setRange(0.0, fVideoDuration);
+    m_dsbStartPointMusic->setRange(0.0, fMusicDuration);
+    m_dsbEndPointMusic->setRange(0.0, fMusicDuration);
+    //m_dsbStartTimeMusic->setRange(0.0, 8.00);
+#if 0
+    if(m_dvStartPointMusic)
+    {
+        delete m_dvStartPointMusic;
+    }
+    m_dvStartPointMusic = new QDoubleValidator();
+    m_dvStartPointMusic->setRange(0.0, fEndPoint, 2);
+    m_dvStartPointMusic->setNotation(QDoubleValidator::StandardNotation);
+    m_cbStartPointMusic->setValidator(m_dvStartPointMusic); //uncomplete delete old
+
+    if(m_dvEndPointMusic)
+    {
+        delete m_dvEndPointMusic;
+    }
+    m_dvEndPointMusic = new QDoubleValidator();
+    m_dvEndPointMusic->setRange(0.0, fEndPoint, 2);
+    m_dvEndPointMusic->setNotation(QDoubleValidator::StandardNotation);
+    m_cbEndPointMusic->setValidator(m_dvEndPointMusic); //uncomplete delete old
+#endif
+    //m_cbStartTimeMusic->setValidator(new QDoubleValidator(0.0, fStartTime, 2, m_cbStartTimeMusic)); //uncomplete delete old
+    //m_cbStartPointMusic->setValidator(new QDoubleValidator(0.0, fEndPoint, 2, m_cbStartPointMusic)); //uncomplete delete old
+    //m_cbEndPointMusic->setValidator(new QDoubleValidator(0.0, fEndPoint, 2, m_cbEndPointMusic)); //uncomplete delete old
+
+    //2, assgin
+    m_dsbStartTimeMusic->setValue(fStartTime);
+    m_dsbStartPointMusic->setValue(fStartPoint);
+    if(fEndPoint == 0)
+    {
+        fEndPoint = fMusicDuration;
+    }
+    m_dsbEndPointMusic->setValue(fEndPoint);
+
+    qDebug()<< "TabWidget::assignMusciInfo. fStartTime: "<<fStartTime<<" fStartPoint: "<<fStartPoint
+        <<" fEndPoint: "<<fEndPoint<<" fMusicDuration: "<<fMusicDuration<<" fVideoDuration:"<<fVideoDuration;
 }
 void TabWidget::assignTextInfo()
 {
