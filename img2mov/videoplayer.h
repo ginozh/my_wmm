@@ -32,7 +32,8 @@ public slots:
     void openFile();
     void play();
     void readyVideo(const QString& fileName, const QByteArray& buffer, int position);
-
+signals:
+    //void selectedImageSignal(QWidget*);
 private slots:
     void mediaStateChanged(QMediaPlayer::State state);
     void positionChanged(qint64 position);

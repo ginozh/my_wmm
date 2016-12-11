@@ -212,7 +212,7 @@ void VideoPlayer::controlMusicState(int position/*=-1*/)
             m_globalContext->m_elementsEdit->m_musicMediaPlayer.play();
             break;
         case QMediaPlayer::StoppedState:
-            //m_globalContext->m_elementsEdit->m_musicMediaPlayer.stop();
+            //m_globalContext->m_elementsEdit->m_musicMediaPlayer.stop(); //不能用stop否则setPositon可能无效?
             //break;
         case QMediaPlayer::PausedState:
             m_globalContext->m_elementsEdit->m_musicMediaPlayer.pause();
@@ -243,6 +243,10 @@ void VideoPlayer::mediaStateChanged(QMediaPlayer::State state)
     case QMediaPlayer::PausedState:
     default:
         playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+        if(m_globalContext->m_elementsEdit && m_globalContext->m_elementsEdit->currentElement())
+        {
+            //emit selectedImageSignal(m_globalContext->m_elementsEdit->currentElement());
+        }
         break;
     }
     controlMusicState();

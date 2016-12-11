@@ -304,7 +304,7 @@ void ElementsEdit::removeImage()
     //4, select new current image
     QWidget* theWidget = m_flowLayout->itemAt(newCurrIdx)->widget();
     selectedImage(theWidget);
-    (qobject_cast<Element *>(theWidget))->doFocusImage();
+    //(qobject_cast<Element *>(theWidget))->doFocusImage();
     //5, delete object && delete object's member
     currWidget->deleteLater();
 }
@@ -329,6 +329,21 @@ void ElementsEdit::selectedImage(QWidget* theWidget)
         }
         if(send == element || theWidget == element)
         {
+            //不是从element过来的
+            if(send != element)
+            {
+                qDebug()<< "ElementsEdit::selectedImage. focusimage";
+                element->doFocusImage();
+            }
+            else if(send == element)
+            {
+                //2 停止播放
+                if(m_globalContext->m_player 
+                        && (m_globalContext->m_player->MediaPlayer()->state() == QMediaPlayer::PlayingState))
+                {
+                    m_globalContext->m_player->MediaPlayer()->pause();
+                }
+            }
             break;
         }
         //QMessageBox::information(this, "info", QString(tr("imgWidth: %1")).arg(element->geometry().width()));
@@ -339,12 +354,6 @@ void ElementsEdit::selectedImage(QWidget* theWidget)
     {
         //m_imgPlayPosition = imgWidth*m_iTotalVideoDuration/m_imgWidth;
         m_imgPlayPosition = iStartDuration;
-    }
-    //2 停止播放
-    if(m_globalContext->m_player 
-            && (m_globalContext->m_player->MediaPlayer()->state() == QMediaPlayer::PlayingState))
-    {
-        m_globalContext->m_player->MediaPlayer()->pause();
     }
     //3 更改播放位置信息
     emit changePlayPosition(m_imgPlayPosition); 
@@ -363,9 +372,10 @@ void ElementsEdit::selectedImage(QWidget* theWidget)
             emit displayVideoTextSignal(sendElement, true);
         }
     }
-    if(!theWidget && send == m_lastSelectedElement)
+    if((!theWidget && send == m_lastSelectedElement) || (theWidget == m_lastSelectedElement))
         return;
     // 5, 移除上次高亮
+    qDebug()<< "ElementsEdit::selectedImage. rm last highlight";
     int iCurrentIdx=-1;
     if(( theWidget && (iCurrentIdx=m_flowLayout->indexOf(theWidget))>=0)
             || (send && (iCurrentIdx=m_flowLayout->indexOf(send))>=0)
@@ -1915,11 +1925,16 @@ ElementsEdit::~ElementsEdit()
     }
 }
 //视频播放时被调用，m_vecticalLine也需要跟着变化
+//如果是视频刚生成时不应该赋值
 void ElementsEdit::positionChanged(qint64 position)
 {
-    m_playPosition=position;
-    emit updatedVideoTimeTextSignal(position, m_iTotalVideoDuration);
-    assignProgress();
+    //qDebug()<< "ElementsEdit::positionChanged. position: "<<position;
+    if(m_globalContext->m_player->MediaPlayer()->isVideoAvailable())
+    {
+        m_playPosition=position;
+        emit updatedVideoTimeTextSignal(position, m_iTotalVideoDuration);
+        assignProgress();
+    }
 }
 void ElementsEdit::initialProgress()
 {
@@ -1948,7 +1963,7 @@ void ElementsEdit::initialProgress()
         //Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(0)->widget());
         //const QRect &rect=element->geometry();
         //QMessageBox::information(this, "info", QString(tr("initail m_vecticalLine")));
-        m_vecticalLine->setGeometry(QRect(0, 0, m_lineWidth, m_imgHeight)); //uncomplete
+        ////m_vecticalLine->setGeometry(QRect(0, 0, m_lineWidth, m_imgHeight)); //uncomplete
         m_vecticalLine->raise(); // top level, Raises this widget to the top of the parent widget's stack.
         //m_vecticalLine->setGeometry(QRect(rect.x(), rect.y(), 160, rect.height()));
         //m_vecticalLine->setWindowFlags(Qt::WindowStaysOnTopHint);

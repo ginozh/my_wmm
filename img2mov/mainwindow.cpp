@@ -89,6 +89,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_globalContext->m_player->MediaPlayer(), SIGNAL(positionChanged(qint64)), m_globalContext->m_elementsEdit, SLOT(positionChanged(qint64))); //播放条变更后，移动图片区的垂直条
     connect(m_globalContext->m_elementsEdit, SIGNAL(changePlayPosition(int)), m_globalContext->m_player, SLOT(setPosition(int)));
     connect(m_globalContext->m_elementsEdit, SIGNAL(playVideo()), m_globalContext->m_player, SLOT(play()));
+    //connect(m_globalContext->m_player, SIGNAL(selectedImageSignal(QWidget*)), (const QObject*)m_globalContext->m_elementsEdit, SLOT(selectedImage(QWidget*)));
 
     //创建videotext
     //connect(m_globalContext->m_elementsEdit, SIGNAL(createVideoTextSignal(void*)), m_globalContext->m_scene, SLOT(createVideoText(void*)));

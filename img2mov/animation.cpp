@@ -6,6 +6,7 @@
 #include <QToolTip>
 #include <QDebug>
 #include <QDateTime>
+#include "elementsedit.h"
 Animation::Animation(const QString& path, const QString& animation
         , const QString& tipsname, QSize size, QWidget *parent)
     : QLabel(parent)
@@ -96,7 +97,7 @@ void Animation::enterEvent(QEvent *event)
     //m_iEnterTime = QDateTime::currentMSecsSinceEpoch();
     //qDebug()<<"Animation::enterEvent m_iEnterTime: "<<m_iEnterTime;
     m_timerStartAnimation.setSingleShot(true);
-    m_timerStartAnimation.setInterval(400); 
+    m_timerStartAnimation.setInterval(100);  //N毫秒之后才使用此动画
     connect(&m_timerStartAnimation, SIGNAL(timeout()), this, SLOT(createAnimation()));
     m_timerStartAnimation.start();
 }
@@ -119,6 +120,9 @@ void Animation::leaveEvent(QEvent *event)
     m_timerPauseAnimation.stop();
     m_focus=false;
     update();
+    m_globalContext->m_player->MediaPlayer()->pause();
+    emit selectedImageSignal(m_globalContext->m_elementsEdit->currentElement());
+    //m_globalContext->m_elementsEdit->currentElement()->doFocusImage();
 }
 #if 0
 void Animation::leaveEvent(QEvent *event)

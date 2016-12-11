@@ -480,6 +480,7 @@ void TabWidget::createTabAnimations()
 #define INITIAL_ANIMATION(animation_name, tips_name) do {\
     Animation *animation_name=new Animation("images/"#animation_name".png", ""#animation_name"", tips_name, QSize(1.8*m_iCellHeight, 1.8*m_iCellHeight)) ; \
     connect(animation_name, SIGNAL(selectedAnimationSignal(const QString&)), (const QObject*)m_globalContext->m_elementsEdit, SLOT(selectedTransition(const QString&))); \
+    connect(animation_name, SIGNAL(selectedImageSignal(QWidget*)), (const QObject*)m_globalContext->m_elementsEdit, SLOT(selectedImage(QWidget*)));\
     flowLayout->insertWidget(flowLayout->count(), animation_name); \
 } while(0)
 #if 0
