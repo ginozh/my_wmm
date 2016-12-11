@@ -40,6 +40,8 @@ private slots:
     void setPosition(int position);
     void updatedVideoTimeText(int position, int duration);
     void rotateVideo(int angle);
+private:
+    void controlMusicState(int position=-1);
 
 private:
     QMediaPlayer mediaPlayer;

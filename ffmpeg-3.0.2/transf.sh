@@ -15,8 +15,10 @@ COMMENT
 #./ffmpeg_r.exe -y -ss 00:00:10 -t 00:00:02 -i jpg/lovechina1.mp3 -i jpg/loop.512.5.avi jpg/mp3.512.5.avi
 #精确时长-无用: http://stackoverflow.com/questions/21420296/how-to-extract-time-accurate-video-segments-with-ffmpeg
 #无用：./ffmpeg_r.exe -y -ss 00:00:10 -t 00:00:03 -i jpg/lovechina1.mp3 -i jpg/loop.512.5.avi -an -shortest jpg/mp3.512.5.avi
+#wrong: http://stackoverflow.com/questions/26899871/cannot-join-mp3-file-and-avi-file-with-ffmpeg
+#./ffmpeg_r.exe -y -i /c/Users/user/Videos/11.avi -ss 0 -t 5 -i /c/Users/user/Music/shortlovechina2.wav   -map 0 -map 1:a -c copy  /c/Users/user/Videos/11music.avi
 
-#add music, subtitle
+#wrong add music, subtitle
 #./ffmpeg_r.exe -y -ss 00:00:10 -t 00:00:02 -i jpg/lovechina1.mp3 -i jpg/loop.512.5.avi -vf ass=jpg/subtitle.ass jpg/mp3.512.5.avi
 
 <<COMMENT
@@ -35,6 +37,11 @@ COMMENT
     [aud1][aud2]concat=n=2:v=0:a=1[aout]" \
     -map 0:v -map "[aout]" -vf ass=jpg/subtitle.ass jpg/mp3.512.5.avi
 COMMENT
+./ffmpeg_r.exe -y -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=48000 -i jpg/lovechina1.wav -filter_complex \
+    "[0:a]atrim=0:1,asetpts=PTS-STARTPTS[aud1]; \
+    [1:a]atrim=0:2,asetpts=PTS-STARTPTS[aud2]; \
+    [aud1][aud2]concat=n=2:v=0:a=1[aout]" \
+    -map "[aout]"  jpg/nulllovechina2.mp3
 
 <<COMMENT
 #right: videos mp3 text
@@ -45,12 +52,15 @@ COMMENT
     -map 0:v -map "[aout]" -vf ass=jpg/subtitle.ass jpg/mp3.512.5.avi
 COMMENT
 
+<<COMMENT
 #right: add animation
 #time ./ffmpeg_r.exe -y  -framerate 24 -i jpg/512img002.jpg -vf "zoompan=z='zoom+0.001':d=125:s=512x384"  -t 2 jpg/zoom.512.2.avi;
 time ./ffmpeg_r.exe -y  -framerate 24 -i jpg/512img002.jpg -vf "zoompan=z='zoom+0.001':s=512x384" -t 2 jpg/zoom.512.2.avi;
 time ./ffmpeg_r.exe -y  -framerate 24 -i jpg/512img003.jpg -vf "zoompan=z='zoom+0.001':s=512x384" -t 2 jpg/zoom.512.3.avi;
 time ./ffmpeg_r.exe -y -i jpg/zoom.512.3.avi -i jpg/zoom.512.2.avi -filter_complex "blend=all_expr='if(crossfade,1.5,2)'"  jpg/annimation_zoom.avi
+COMMENT
 
+<<COMMENT
 #right: rotate and scale
 #0 = 90CounterCLockwise and Vertical Flip (default)
 #1 = 90Clockwise 顺时针
@@ -59,3 +69,4 @@ time ./ffmpeg_r.exe -y -i jpg/zoom.512.3.avi -i jpg/zoom.512.2.avi -filter_compl
 #-vf "transpose=2,transpose=2" for 180 degrees. http://stackoverflow.com/questions/3937387/rotating-videos-with-ffmpeg
 #setsar=1:1,setdar=4:3 像素点长宽比不一样时生成动画时会出错 http://video.stackexchange.com/questions/9947/how-do-i-change-frame-size-preserving-width-using-ffmpeg
 time ./ffmpeg_r.exe -y -i jpg/img007.jpg -vf "transpose=1,scale=512:384,setsar=1:1,setdar=4:3" jpg/512img007_1.jpg
+COMMENT

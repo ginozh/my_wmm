@@ -67,12 +67,12 @@ public:
 	{
 	}
 signals:
-    void textChangedSignal(double);
+    void valueChangedSignal(double);
 protected:
     void leaveEvent(QEvent *event)
     //void focusOutEvent(QFocusEvent* event)
     {
-        emit textChangedSignal(value());
+        emit valueChangedSignal(value());
         //QDoubleSpinBox::focusOutEvent(event);
         QDoubleSpinBox::leaveEvent(event);
     }

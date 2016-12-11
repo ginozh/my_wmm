@@ -90,7 +90,7 @@ GlobalContext::GlobalContext()
     qDebug()<<"m_iScaledSize. m_dFactorX: "<<m_dFactorX<<" m_dFactorY: "<<m_dFactorY<<" w: "<<iTmpW<<" h:"<<iTmpH;
     m_iScaledSize = QSize(iTmpW, iTmpH);//QSize(m_dFactorX*512, m_dFactorX*384); //4:3
 
-    m_iFramerate = 24;
+    m_iFramerate = 25;
 
     m_iFirstTabSize = QSize((int)(100*m_dFactorX),(int)(40*m_dFactorY) );
     m_iOtherTabSize = QSize((int)(180*m_dFactorX), m_iFirstTabSize.height() );

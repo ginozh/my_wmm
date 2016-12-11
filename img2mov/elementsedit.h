@@ -48,6 +48,8 @@ private:
     void updateTextAttrAndAss(int iStartIdx);
     void initialFirstLayout();
     void musicAttrChanged();
+    void createMusicArgs(QVector<QString>& vqsArgv, bool bCreateFinalVedeo);
+    void createMusic();
     //Element* initialImage(const QString& fileName, int& idx);
     Element* initialImage(const GlobalImageAttr& newGlobalImageAttr, int& idx);
     void createFlowLayout();
@@ -125,14 +127,21 @@ private:
     //uint8_t* m_pTextVideoOutBuffer; // 包含文字的视频
     //size_t m_textVideoOutLen;
     //size_t m_textVideoMaxOutLen;
+    uint8_t* m_pOutBufferMusic;
+    size_t m_outlenMusic;
+    size_t m_outMaxLenMusic;
+    QByteArray m_playDataMusic;
+    QBuffer m_playBufferMusic;
 
     GlobalContext* m_globalContext;
 
     QByteArray m_qbAss;
 
-
+public:
     //music
     QMediaPlayer m_musicMediaPlayer;
+private:
+
     GlobalMusicAttr* m_globalMusicAttr;
     bool m_isFirstMusic;
     //QString m_qsMusicFilename;
@@ -143,6 +152,9 @@ private:
 
 
     QString m_qsVideoFileFormat;
+    QString m_qsFinalVideoFileFormat;
+
+    QString m_qsMusicFileFormat;
 
     QString m_qsProjectFile;
     bool m_bCurrentProjectChanged;

@@ -1,4 +1,5 @@
 #include "videoplayer.h"
+#include "elementsedit.h"
 
 #include <QtWidgets>
 #include <QVideoSurfaceFormat>
@@ -72,6 +73,7 @@ VideoPlayer::VideoPlayer(QWidget *parent)
         controlLayout->setGeometry(QRect(0, 550*dFactorY, iFrameWidth, 20*dFactorY));
         controlLayout->setMargin(0);
         {
+//#define OPEN_FILE
 #ifdef OPEN_FILE
             QAbstractButton *openButton = new QPushButton(tr("Open..."));
             controlLayout->addWidget(openButton);
@@ -125,7 +127,8 @@ VideoPlayer::~VideoPlayer()
 #if 1
 void VideoPlayer::openFile()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Movie"),QDir::homePath());
+    //QString fileName = QFileDialog::getOpenFileName(this, tr("Open Movie"),QDir::homePath());
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Movie"),QStandardPaths::writableLocation(QStandardPaths::MoviesLocation));
     //QMessageBox::information(this, "info", QString(tr("open fileName: %1")).arg(fileName));
 
     if (!fileName.isEmpty()) {
@@ -133,6 +136,15 @@ void VideoPlayer::openFile()
         //QMessageBox::information(this, "info", QString(tr("open fileName: %1")).arg(vfileName));
         //mediaPlayer.setMedia(QUrl::fromLocalFile(vfileName));
         mediaPlayer.setMedia(QUrl::fromLocalFile(fileName));
+
+#if 0
+        QMediaContent mc = mediaPlayer.media();
+        //QMediaResourceList mrl = mc.resources();
+        QMediaResource mr = mc.canonicalResource();
+        qDebug() << "VideoPlayer::openFile. codec: " << mr.videoCodec()<<" mimeType: "<<mr.mimeType()
+            <<" dataSize: "<< mr.dataSize()<<" sampleRate: "<<mr.sampleRate()<<" channelCount: "
+            <<mr.channelCount();
+#endif
 
         playButton->setEnabled(true);
     }
@@ -142,6 +154,7 @@ void VideoPlayer::openFile()
 void VideoPlayer::readyVideo(const QString& fileName, const QByteArray& buffer, int position)
 {
     //QMessageBox::information(this, "info", QString(tr("position: %1")).arg(position));
+    qDebug()<<"VideoPlayer::readyVideo fileName: "<<fileName;
     if (!fileName.isEmpty()) {
 #if 0
         QFile file(fileName);
@@ -185,18 +198,54 @@ void VideoPlayer::play()
     }
 }
 
+void VideoPlayer::controlMusicState(int position/*=-1*/)
+{
+    qDebug()<<"VideoPlayer::controlMusicState";
+    GlobalContext* m_globalContext = GlobalContext::instance();
+    if(!m_globalContext || !m_globalContext->m_elementsEdit || !m_globalContext->m_elementsEdit->m_musicMediaPlayer.isAudioAvailable() ) 
+    {
+        return;
+    }
+    QMediaPlayer::State state = mediaPlayer.state();
+    switch(state) {
+        case QMediaPlayer::PlayingState:
+            m_globalContext->m_elementsEdit->m_musicMediaPlayer.play();
+            break;
+        case QMediaPlayer::StoppedState:
+            //m_globalContext->m_elementsEdit->m_musicMediaPlayer.stop();
+            //break;
+        case QMediaPlayer::PausedState:
+            m_globalContext->m_elementsEdit->m_musicMediaPlayer.pause();
+            break;
+    }
+#if 1
+    if(position!=-1 && m_globalContext->m_elementsEdit->m_musicMediaPlayer.isAudioAvailable()) 
+    {
+        qDebug()<<"VideoPlayer::controlMusicState. music. position: "<<position<<" state: "<<state;
+        m_globalContext->m_elementsEdit->m_musicMediaPlayer.setPosition(position); 
+    }
+    else
+    {
+        qDebug()<<"VideoPlayer::controlMusicState. no music. position: "<<position<<" state: "<<state;
+    }
+#endif
+}
 void VideoPlayer::mediaStateChanged(QMediaPlayer::State state)
 {
+    qDebug()<<"VideoPlayer::mediaStateChanged state: "<<state;
+    GlobalContext* m_globalContext = GlobalContext::instance();
     switch(state) {
     case QMediaPlayer::PlayingState:
         playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
         break;
     case QMediaPlayer::StoppedState:
         //mediaPlayer.pause(); // for display image  //uncomplete
+    case QMediaPlayer::PausedState:
     default:
         playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
         break;
     }
+    controlMusicState();
 }
 
 void VideoPlayer::positionChanged(qint64 position)
@@ -214,12 +263,22 @@ void VideoPlayer::positionChanged(qint64 position)
 void VideoPlayer::durationChanged(qint64 duration)
 {
     positionSlider->setRange(0, duration);
-    qDebug()<<"VideoPlayer::durationChanged duration: "<<duration;
+    qDebug()<<"VideoPlayer::durationChanged duration: "<<duration<<" isVideoAvailable: "<<mediaPlayer.isVideoAvailable();
+#if 0
+    QMediaContent mc = mediaPlayer.media();
+    QMediaResourceList mrl = mc.resources();
+    QMediaResource mr = mrl[0];//mc.canonicalResource();
+    qDebug() << "VideoPlayer::openFile. codec: " << mr.videoCodec()<<" mimeType: "<<mr.mimeType()
+        <<" dataSize: "<< mr.dataSize()<<" sampleRate: "<<mr.sampleRate()<<" channelCount: "
+        <<mr.channelCount();
+#endif
 }
 
 void VideoPlayer::setPosition(int position)
 {
-    mediaPlayer.setPosition(position);
+    qDebug()<<"VideoPlayer::setPosition. position: "<<position;
+    mediaPlayer.setPosition(position); //notice 不会立即生效
+    controlMusicState(position);
 }
 void VideoPlayer::updatedVideoTimeText(int position, int duration)
 {

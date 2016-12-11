@@ -17,9 +17,12 @@ extern "C"{
 #include "ffmpeg.h"
 }
 #include <QXmlStreamWriter>
-#define DEBUG_FFMPEG
+//#define DEBUG_FFMPEG
 //! [1]
+//libavformat/allformats.c
 #define VIDEO_FILE_FORMAT "avi"
+#define FINAL_VIDEO_FILE_FORMAT "avi"
+#define MUSIC_FILE_FORMAT "mp3"
 #define PROGRAM_TITLE "Film Maker"
 ElementsEdit::ElementsEdit(QWidget *parent)
     : QWidget(parent)
@@ -34,6 +37,8 @@ ElementsEdit::ElementsEdit(QWidget *parent)
       , m_isFirstClick(true)
       , m_globalMusicAttr(new GlobalMusicAttr)
       , m_qsVideoFileFormat(VIDEO_FILE_FORMAT)
+      , m_qsFinalVideoFileFormat(FINAL_VIDEO_FILE_FORMAT)
+      , m_qsMusicFileFormat(MUSIC_FILE_FORMAT)
       , m_bCurrentProjectChanged(false)
 {   
     m_globalContext = GlobalContext::instance();
@@ -53,6 +58,8 @@ ElementsEdit::ElementsEdit(QWidget *parent)
     m_outlen = m_outMaxLen = 10*1024*1024;
 	m_pOutBuffer=(uint8_t *)malloc(m_outMaxLen);
 
+    m_outlenMusic = m_outMaxLenMusic = 10*1024*1024;
+	m_pOutBufferMusic=(uint8_t *)malloc(m_outMaxLenMusic);
     //m_textVideoOutLen = m_textVideoMaxOutLen = 10*1024*1024;
 	//m_pTextVideoOutBuffer=(uint8_t *)malloc(m_textVideoMaxOutLen);
 #if 1
@@ -333,21 +340,32 @@ void ElementsEdit::selectedImage(QWidget* theWidget)
         //m_imgPlayPosition = imgWidth*m_iTotalVideoDuration/m_imgWidth;
         m_imgPlayPosition = iStartDuration;
     }
+    //2 停止播放
+    if(m_globalContext->m_player 
+            && (m_globalContext->m_player->MediaPlayer()->state() == QMediaPlayer::PlayingState))
+    {
+        m_globalContext->m_player->MediaPlayer()->pause();
+    }
+    //3 更改播放位置信息
     emit changePlayPosition(m_imgPlayPosition); 
     emit updatedVideoTimeTextSignal(m_imgPlayPosition, m_iTotalVideoDuration);
 
-    // 2, 显示本次VideoText
-    if(theWidget)
+    // 4, 显示本次VideoText(需要判断是否在播放)
+    if(m_globalContext->m_player 
+            && (m_globalContext->m_player->MediaPlayer()->state() != QMediaPlayer::PlayingState))
     {
-        emit displayVideoTextSignal(theElement, true);
-    }
-    else
-    {
-        emit displayVideoTextSignal(sendElement, true);
+        if(theWidget)
+        {
+            emit displayVideoTextSignal(theElement, true);
+        }
+        else
+        {
+            emit displayVideoTextSignal(sendElement, true);
+        }
     }
     if(!theWidget && send == m_lastSelectedElement)
         return;
-    // 3, 移除上次高亮
+    // 5, 移除上次高亮
     int iCurrentIdx=-1;
     if(( theWidget && (iCurrentIdx=m_flowLayout->indexOf(theWidget))>=0)
             || (send && (iCurrentIdx=m_flowLayout->indexOf(send))>=0)
@@ -370,10 +388,10 @@ void ElementsEdit::selectedImage(QWidget* theWidget)
             emit displayVideoTextSignal((qobject_cast<Element *>(m_lastSelectedElement)), false);
         }
     }
-    // 4, 赋值
+    // 6, 赋值
     m_lastSelectedElement = theWidget?theWidget:send;
 
-    // 5, 赋值当前tab的值
+    // 7, 赋值当前tab的值
     emit assignTabValueSignal();
 }
 //Element* ElementsEdit::initialImage(const QString& fileName, int& idx)
@@ -509,6 +527,7 @@ void ElementsEdit::musicAttrChanged()
     qint64 duration = m_globalMusicAttr->m_iEndPoint - m_globalMusicAttr->m_iStartPoint;
     int iStartDuration=0;
     bool bDrawMusicName=false;
+    // 1, update music label
     for (int i = 0; m_flowLayout && i < m_flowLayout->count(); ++i)
     {
         Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(i)->widget());
@@ -619,6 +638,101 @@ void ElementsEdit::musicDurationChanged(qint64 duration)
         //3, update tabwidget
         emit activeTabMusicSignal(m_globalMusicAttr);
     }
+}
+void ElementsEdit::createMusicArgs(QVector<QString>& vqsArgv, bool bCreateFinalVedeo)
+{
+    if(m_globalMusicAttr->m_qsMusicFullFilename.isEmpty())
+        return;
+    if(m_globalMusicAttr->m_iStartTime)
+    {
+        int iAdd=0;
+        if(bCreateFinalVedeo)
+        {
+            iAdd++;
+        }
+        vqsArgv.push_back(QString(tr("-f")));
+        vqsArgv.push_back(QString(tr("lavfi")));
+        vqsArgv.push_back(QString(tr("-i")));
+        vqsArgv.push_back(QString(tr("anullsrc=channel_layout=5.1:sample_rate=48000")));
+        vqsArgv.push_back(QString(tr("-i")));
+        vqsArgv.push_back(m_globalMusicAttr->m_qsMusicFullFilename);
+        vqsArgv.push_back(QString(tr("-filter_complex")));
+        int iRealLength = m_globalMusicAttr->m_iEndPoint - m_globalMusicAttr->m_iStartPoint+m_globalMusicAttr->m_iStartTime;
+        /*QMessageBox::information(NULL, "info", QString(tr("vduration: %1 starttime: %2 startpoint: %3 endpoint: %4")).
+          arg(m_iTotalVideoDuration).arg(m_globalMusicAttr->m_iStartTime).
+          arg(m_globalMusicAttr->m_iStartPoint).arg(m_globalMusicAttr->m_iEndPoint));*/
+        vqsArgv.push_back(QString(tr("[%1:a]atrim=0:%2,asetpts=PTS-STARTPTS[aud1];"
+                        "[%3:a]atrim=%4:%5,asetpts=PTS-STARTPTS[aud2];"
+                        "[aud1][aud2]concat=n=2:v=0:a=1[aout]")).
+                arg(0+iAdd).
+                arg((float)m_globalMusicAttr->m_iStartTime/1000).
+                arg(1+iAdd).
+                arg((float)m_globalMusicAttr->m_iStartPoint/1000).
+                arg(iRealLength<=m_iTotalVideoDuration?((float)m_globalMusicAttr->m_iEndPoint/1000):((float)(m_iTotalVideoDuration-m_globalMusicAttr->m_iStartTime+m_globalMusicAttr->m_iStartPoint)/1000)));
+        if(bCreateFinalVedeo)
+        {
+            vqsArgv.push_back(QString(tr("-map")));
+            vqsArgv.push_back(QString(tr("0:v")));
+        }
+        vqsArgv.push_back(QString(tr("-map")));
+        vqsArgv.push_back(QString(tr("[aout]")));
+    }
+    else
+    {
+        qDebug()<< "ElementsEdit::createFinalVideo. m_iStartPoint: " << 
+            m_globalMusicAttr->m_iStartPoint<<" m_iEndPoint: "<<m_globalMusicAttr->m_iEndPoint<<
+            " m_iTotalVideoDuration: "<< m_iTotalVideoDuration;
+        vqsArgv.push_back(QString(tr("-ss")));
+        vqsArgv.push_back(QString(tr("%1")).arg((float)m_globalMusicAttr->m_iStartPoint/1000));
+        vqsArgv.push_back(QString(tr("-t")));
+        int iRealDuration = m_globalMusicAttr->m_iEndPoint - m_globalMusicAttr->m_iStartPoint;
+        vqsArgv.push_back(QString(tr("%1")).arg(iRealDuration<m_iTotalVideoDuration?((float)iRealDuration/1000):(float)(m_iTotalVideoDuration/1000)));
+        vqsArgv.push_back(QString(tr("-i")));
+        vqsArgv.push_back(m_globalMusicAttr->m_qsMusicFullFilename);
+#if 0
+        vqsArgv.push_back(QString(tr("-map")));//-map 0 -map 1:a -c copy
+        vqsArgv.push_back(QString(tr("0:v")));
+        vqsArgv.push_back(QString(tr("-map")));
+        vqsArgv.push_back(QString(tr("1:a")));
+        vqsArgv.push_back(QString(tr("-c")));
+        vqsArgv.push_back(QString(tr("copy")));
+#endif
+    }
+}
+void ElementsEdit::createMusic()
+{
+    QVector<QString> vqsArgv;
+    vqsArgv.push_back("ffmpeg");
+    vqsArgv.push_back("-y");
+#ifdef DEBUG_FFMPEG
+    vqsArgv.push_back("-v");
+    vqsArgv.push_back("debug");
+#endif
+    createMusicArgs(vqsArgv, false);
+
+    uint8_t* out_buffer = m_pOutBufferMusic;
+    m_outlenMusic = m_outMaxLenMusic;
+
+    struct to_buffer soutbuffer;
+    soutbuffer.ptr = out_buffer;
+    soutbuffer.in_len = m_outMaxLenMusic;
+    soutbuffer.out_len = &m_outlenMusic;
+    vqsArgv.push_back(QString(tr("-f")));
+    //vqsArgv.push_back(m_qsVideoFileFormat);
+    vqsArgv.push_back(m_qsMusicFileFormat);
+    vqsArgv.push_back(QString(tr("buffer:video/avi;nobase64,%1")).arg((size_t)&soutbuffer));
+    //vqsArgv.push_back(QString(tr("mm.avi")));
+    //printf("video out. stbuf: %p buf.ptr: %p in_len: %zu out_len: %zu\n", &soutbuffer, soutbuffer.ptr, soutbuffer.in_len, *soutbuffer.out_len);
+    int ret;
+    if((ret=callFfmpeg(vqsArgv)))
+    {
+        QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
+    }
+    m_playDataMusic=QByteArray((const char*)soutbuffer.ptr, (int)m_outlenMusic);
+    m_playBufferMusic.setBuffer(&m_playDataMusic);
+    m_playBufferMusic.open(QIODevice::ReadOnly);
+    m_musicMediaPlayer.setMedia(QUrl::fromLocalFile(QString(tr("tmp.%1")).arg(m_qsMusicFileFormat)), &m_playBufferMusic);
+    //emit readyVideo(QString(tr("tmp.%1")).arg(m_qsFinalVideoFileFormat), tmp, m_imgPlayPosition);
 }
 /*
  * End Music
@@ -1063,15 +1177,19 @@ void ElementsEdit::createFinalVideo(bool bPlay, QByteArray qbAss/*=""*/, const Q
     vqsArgv.push_back("concat"); //uncomplete
     vqsArgv.push_back(QString(tr("-i")));
     vqsArgv.push_back(QString(tr("buffer:video/avi;nobase64,%1")).arg((size_t)&sinbuffer));
-    if(m_globalMusicAttr->m_qsMusicFullFilename.isEmpty() && qbAss.isEmpty())
+    //生成最终文件且music为空|| 不生成最终文件
+    if((qsFinalVideoFile.isEmpty() || (!qsFinalVideoFile.isEmpty() && m_globalMusicAttr->m_qsMusicFullFilename.isEmpty() ))
+            && qbAss.isEmpty())
     {
         vqsArgv.push_back(QString(tr("-c")));
         vqsArgv.push_back(QString(tr("copy")));
     }
     else
     {
-        if(!m_globalMusicAttr->m_qsMusicFullFilename.isEmpty())
+        if(!qsFinalVideoFile.isEmpty() && !m_globalMusicAttr->m_qsMusicFullFilename.isEmpty())
         {
+            createMusicArgs(vqsArgv, true);
+#if 0
             //vqsArgv.push_back(QString(tr("-f")));
             //vqsArgv.push_back(QString(tr("%1")).arg(ext));
             if(m_globalMusicAttr->m_iStartTime)
@@ -1110,9 +1228,17 @@ void ElementsEdit::createFinalVideo(bool bPlay, QByteArray qbAss/*=""*/, const Q
                 vqsArgv.push_back(QString(tr("%1")).arg(iRealDuration<m_iTotalVideoDuration?((float)iRealDuration/1000):(float)(m_iTotalVideoDuration/1000)));
                 vqsArgv.push_back(QString(tr("-i")));
                 vqsArgv.push_back(m_globalMusicAttr->m_qsMusicFullFilename);
+#if 0
+                vqsArgv.push_back(QString(tr("-map")));//-map 0 -map 1:a -c copy
+                vqsArgv.push_back(QString(tr("0:v")));
+                vqsArgv.push_back(QString(tr("-map")));
+                vqsArgv.push_back(QString(tr("1:a")));
+                vqsArgv.push_back(QString(tr("-c")));
+                vqsArgv.push_back(QString(tr("copy")));
+#endif
             }
+#endif
         }
-
         //./ffmpeg_r.exe -y -i jpg/mp3.512.5.avi -vf ass=jpg/subtitle.ass jpg/subt.mp3.512.5.avi
         if(!qbAss.isEmpty())
         {
@@ -1143,7 +1269,8 @@ void ElementsEdit::createFinalVideo(bool bPlay, QByteArray qbAss/*=""*/, const Q
         soutbuffer.in_len = m_outMaxLen;
         soutbuffer.out_len = &m_outlen;
         vqsArgv.push_back(QString(tr("-f")));
-        vqsArgv.push_back(m_qsVideoFileFormat);
+        //vqsArgv.push_back(m_qsVideoFileFormat);
+        vqsArgv.push_back(m_qsFinalVideoFileFormat);
         vqsArgv.push_back(QString(tr("buffer:video/avi;nobase64,%1")).arg((size_t)&soutbuffer));
         //vqsArgv.push_back(QString(tr("mm.avi")));
         //printf("video out. stbuf: %p buf.ptr: %p in_len: %zu out_len: %zu\n", &soutbuffer, soutbuffer.ptr, soutbuffer.in_len, *soutbuffer.out_len);
@@ -1158,7 +1285,21 @@ void ElementsEdit::createFinalVideo(bool bPlay, QByteArray qbAss/*=""*/, const Q
         setCursor(QCursor(Qt::ArrowCursor));
         //5, 播放视频
         QByteArray tmp=QByteArray((const char*)soutbuffer.ptr, (int)m_outlen);
-        emit readyVideo("tmp.avi", tmp, m_imgPlayPosition);
+        emit readyVideo(QString(tr("tmp.%1")).arg(m_qsFinalVideoFileFormat), tmp, m_imgPlayPosition);
+        //emit readyVideo("C:/Users/user/Videos/11.mp4", tmp, m_imgPlayPosition);
+#if 0
+        {
+            QString fileName=QString(tr("final.%1")).arg(m_qsFinalVideoFileFormat);
+            QFile file(fileName);
+            if (!file.open(QIODevice::WriteOnly ))
+            {
+                QMessageBox::information(this, "error", tr("can't write file: %1").arg(fileName));
+                return;
+            }
+            qDebug()<<"write file: "<<fileName<<" n: "<< file.write((const char*)soutbuffer.ptr, (int)m_outlen);
+            file.close();
+        }
+#endif
         //emit changePlayPosition(m_imgPlayPosition);
         if(bPlay)
         {
@@ -1257,6 +1398,19 @@ void ElementsEdit::durationChanged(qint64 duration)
     if(duration)
     {
         m_iTotalVideoDuration=duration;
+#if 0
+        m_iTotalVideoDuration = 0;
+        for (int i = 0; i < m_flowLayout->count(); ++i)
+        {
+            Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(i)->widget());
+            if (!element)
+            {
+                // err uncomplete
+                continue;
+            }
+            m_iTotalVideoDuration += element->globalVideoAttr()->m_iDuration;
+        }
+#endif
     }
     qDebug()<<"ElementsEdit::durationChanged m_iTotalVideoDuration: "<<m_iTotalVideoDuration;
     initialProgress(); //需要在addImages 图片渲染之后被调用，否则element的长宽不对
@@ -1380,6 +1534,123 @@ void ElementsEdit::videoStateChanged(QMediaPlayer::State state)
     }
 
 }
+#if 0
+void ElementsEdit::saveVideo()
+{
+    //1, open write file
+    QFileDialog fileDialog(this, tr("Save as..."));
+    fileDialog.setAcceptMode(QFileDialog::AcceptSave);
+#if 0
+    QStringList mimeTypes;
+    mimeTypes << "application/vnd.oasis.opendocument.text" << "text/html" << "text/plain";
+    fileDialog.setMimeTypeFilters(mimeTypes);
+#endif
+    QStringList filters;
+    filters << "MPEG-4/H.264 Video file (*.mp4)"
+        << "Windows Media Video file (*.wmv)"
+        << "Audio Video Interleaved Video file (*.avi)"
+        ;
+    fileDialog.setNameFilters(filters);
+
+    fileDialog.setDefaultSuffix("mp4");
+    if (fileDialog.exec() != QDialog::Accepted)
+    {
+        //error uncomplete
+        return ;
+    }
+    const QString fn = fileDialog.selectedFiles().first();
+    QFileInfo fi(fn);
+#if 0
+    //设置视频格式
+    m_qsVideoFileFormat = fi.suffix();  
+    if(m_qsVideoFileFormat=="wmv")
+    {
+        m_qsVideoFileFormat="wmv2";
+    }
+#endif
+#define B_CREATE_FINAL_VIDEO_FILE true 
+    for (int i = 0; i < m_flowLayout->count(); ++i)
+    {
+        Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(i)->widget());
+        if (!element)
+        {
+            // err uncomplete
+            qDebug()<< "error uncomplete. ElementsEdit::createFinalVideo elemnet";
+            continue;
+        }
+        //2.1 single video
+        element->initialMemoryForVideoFile();
+        //create simple video
+        bool bCreateVideoFile=true;
+        GlobalVideoAttr* globalVideoAttr = element->globalVideoAttr();
+        QString duration = QString::number((float)globalVideoAttr->m_iDuration/1000, 'f', 2);
+        qDebug()<<"ElementsEdit::createSimpleVideo globalVideoAttr->m_iDuration: "<<globalVideoAttr->m_iDuration;
+
+        QVector<QString> vqsArgv;
+        vqsArgv.push_back("ffmpeg");
+        vqsArgv.push_back("-y");
+#ifdef DEBUG_FFMPEG
+        vqsArgv.push_back("-v");
+        vqsArgv.push_back("debug");
+#endif
+        vqsArgv.push_back("-framerate");
+        vqsArgv.push_back(QString(tr("%1")).arg(globalVideoAttr->m_iFramerate));
+        vqsArgv.push_back("-loop");
+        vqsArgv.push_back("1");
+        vqsArgv.push_back("-t");
+        vqsArgv.push_back(QString(tr("%1")).arg(duration));
+        vqsArgv.push_back("-i");
+        vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg((size_t)&element->m_fbOriFile));
+        vqsArgv.push_back(QString(tr("-f")));
+        vqsArgv.push_back(m_qsVideoFileFormat);
+        vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg(bCreateVideoFile?(size_t)&element->m_fbFileScaledVideo:(size_t)&element->m_fbScaledVideo));
+        //vqsArgv.push_back(QString(tr("pic%1.avi")).arg(i));
+        int ret;
+        if((ret=callFfmpeg(vqsArgv)))
+        {
+            QMessageBox::information(this, "error", QString(tr("callffmpeg: %1")).arg(ret));
+        }
+        if(bCreateVideoFile)
+        {
+            element->m_fbFileInputScaledVideo.ptr=element->m_fbFileScaledVideo.ptr;
+            element->m_fbFileInputScaledVideo.in_len=*element->m_fbFileScaledVideo.out_len;
+            element->m_fbFileInputScaledVideo.out_len=NULL;
+            QString fileName=QString(tr("%1.%2")).arg(i).arg(m_qsVideoFileFormat);
+            QFile file(fileName);
+            if (!file.open(QIODevice::WriteOnly ))
+            {
+                QMessageBox::information(this, "error", tr("can't write file: %1").arg(fileName));
+                return;
+            }
+            file.write((const char*)element->m_fbFileInputScaledVideo.ptr, element->m_fbFileInputScaledVideo.in_len);
+            file.close();
+        }
+        else
+        {
+            element->m_fbInputScaledVideo.ptr=element->m_fbScaledVideo.ptr;
+            element->m_fbInputScaledVideo.in_len=*element->m_fbScaledVideo.out_len;
+            element->m_fbInputScaledVideo.out_len=NULL;
+        }
+    }
+    //2.2 final video
+    QByteArray qbAss = "";//m_globalContext->m_scene->createTotalAssInfo(m_qFinalVideoSize).toUtf8();
+    createFinalVideo(false, qbAss, fn, B_CREATE_FINAL_VIDEO_FILE);
+    //3, clean memory
+    for (int i = 0; i < m_flowLayout->count(); ++i)
+    {
+        Element *element = qobject_cast<Element *>(m_flowLayout->itemAt(i)->widget());
+        if (!element)
+        {
+            // err uncomplete
+            qDebug()<< "error uncomplete. ElementsEdit::createFinalVideo elemnet";
+            continue;
+        }
+        //clean scaledfile, scaledvideo, panzoomvideo, transitionvideo
+        element->freeMemoryForVideoFile();
+    }
+}
+#endif
+#if 1
 void ElementsEdit::saveVideo()
 {
     //1, open write file
@@ -1469,6 +1740,7 @@ void ElementsEdit::saveVideo()
     m_qsVideoFileFormat = VIDEO_FILE_FORMAT;
 #endif
 }
+#endif
 void ElementsEdit::publishVideo()
 {
 }
@@ -1481,6 +1753,13 @@ void ElementsEdit::publishVideo()
 //文字
 void ElementsEdit::elementAttrChanged(int attrType, bool bPlay)
 {
+    //-1, 
+    if(attrType & ATTR_MUSIC)
+    {
+        musicAttrChanged();
+        createMusic();
+        return;
+    }
     //0
     if(attrType & ATTR_ROTATE)
     {
@@ -1492,12 +1771,6 @@ void ElementsEdit::elementAttrChanged(int attrType, bool bPlay)
     if(attrType & ATTR_VIDEO)
     {
         createSingleVideo(m_idxCurrentElement);
-    }
-
-    //2, 
-    if(attrType & ATTR_MUSIC)
-    {
-        musicAttrChanged();
     }
 
     //3, 合成声音、文字

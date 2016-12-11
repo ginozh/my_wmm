@@ -176,7 +176,7 @@ void TabWidget::handleVideoAttrChange()
         } \
         else \
         { \
-            qDebug() << "handleVideoAttrChange. error i" #macrop_var ": " << macrop_commbox->currentText() << " m_i" #macrop_var ": "<< macrop_globalattr->m_i##macrop_var << " macrop_globalattr: "<<(int)macrop_globalattr; \
+            qDebug() << "TabWidget::handleVideoAttrChange.  i" #macrop_var ": " << macrop_commbox->currentText() << " m_i" #macrop_var ": "<< macrop_globalattr->m_i##macrop_var << " macrop_globalattr: "<<(int)macrop_globalattr; \
         } \
         }while(0)
 
@@ -189,13 +189,13 @@ void TabWidget::handleVideoAttrChange()
         { \
             double i##macrop_var = macrop_commbox->value(); \
             double m_i##macrop_var = QString::number((double)macrop_globalattr->m_i##macrop_var/1000, 'f', 2).toDouble(); \
-            qDebug() << "handleVideoAttrChange. i" #macrop_var ": " << i##macrop_var << " m_i" #macrop_var ": "<< m_i##macrop_var; \
+            qDebug() << "TabWidget::handleVideoAttrChange. i" #macrop_var ": " << i##macrop_var << " m_i" #macrop_var ": "<< m_i##macrop_var; \
             if(i##macrop_var != m_i##macrop_var) \
             { \
                 macrop_globalattr->m_i##macrop_var = i##macrop_var*1000; \
                 if((void*)globalVideoAttr == (void*)macrop_globalattr) \
                 { \
-                    attrType |= ATTR_VIDEO; \
+                    /*attrType |= ATTR_VIDEO;*/ \
                 } \
                 if((void*)globalMusicAttr == (void*)macrop_globalattr) \
                 { \
@@ -308,7 +308,7 @@ void TabWidget::createTabHome()
         {
             QLabel *lbl = new QLabel(tr("Add"));
             lbl->setAlignment(Qt::AlignCenter);
-            lbl->setFixedWidth(3*m_iCellHeight);
+            //lbl->setFixedWidth(3*m_iCellHeight);
 
             vboxAdd->addWidget(lbl);
         }
@@ -343,7 +343,7 @@ void TabWidget::createTabHome()
                 m_tbRotateRight->setIcon(QIcon("images/addmusic.png"));
                 m_tbRotateRight->setIconSize(m_iconSize);
                 m_tbRotateRight->setText("Rotate Right");
-                m_tbRotateRight->setMinimumWidth(m_iconSize.width() + 100);
+                //m_tbRotateRight->setMinimumWidth(m_iconSize.width() + 100);
                 m_tbRotateRight->setFixedWidth(3*m_iCellHeight);
                 connect(m_tbRotateRight, SIGNAL(clicked()), this, SLOT(handleVideoAttrChange()));
             }
@@ -384,7 +384,7 @@ void TabWidget::createTabHome()
         {
             QLabel *lbl = new QLabel(tr("Editing"));
             lbl->setAlignment(Qt::AlignCenter);
-            lbl->setFixedWidth(3*m_iCellHeight);
+            //lbl->setFixedWidth(3*m_iCellHeight);
 
             vboxEditing->addWidget(lbl);
         }
@@ -742,6 +742,16 @@ void TabWidget::createTabMusic()
             {
                 QVBoxLayout *vboxTimes = new QVBoxLayout;
                 hboxTop->addLayout(vboxTimes);
+
+#define INIT_SPINBOX(var_hlayout, var_spinbox) do{ \
+                        var_spinbox = new SpinBox; \
+                        var_spinbox->setSuffix("s"); \
+                        var_spinbox->setDecimals(2); \
+                        var_spinbox->setRange(0.0, 0.0); \
+                        connect(var_spinbox, SIGNAL(valueChangedSignal(double)), \
+                                this, SLOT(handleVideoAttrChange())); \
+                        var_hlayout->addWidget(var_spinbox); \
+    }while(0)
                 {
                     QHBoxLayout* hboxStartTime = new QHBoxLayout;
                     vboxTimes->addLayout(hboxStartTime);
@@ -751,25 +761,7 @@ void TabWidget::createTabMusic()
                         hboxStartTime->addWidget(lbl);
                     }
                     {
-#if 0
-                        m_cbStartTimeMusic = new ComboBox();
-                        m_cbStartTimeMusic->setEditable(true);
-                        m_cbStartTimeMusic->addItem(QString(tr("0.00")));
-                        m_cbStartTimeMusic->setCurrentText(QString(tr("0.00")));
-                        connect(m_cbStartTimeMusic, SIGNAL(textChangedSignal(QString)),
-                                this, SLOT(handleVideoAttrChange()));
-
-                        hboxStartTime->addWidget(m_cbStartTimeMusic);
-#endif
-                        m_dsbStartTimeMusic = new SpinBox;
-                        //m_dsbStartTimeMusic->setSingleStep(1.0);
-                        //m_dsbStartTimeMusic->setValue(0.00);
-                        m_dsbStartTimeMusic->setSuffix("s");
-                        m_dsbStartTimeMusic->setDecimals(2);
-                        m_dsbStartTimeMusic->setRange(0.0, 0.0);
-                        connect(m_dsbStartTimeMusic, SIGNAL(textChangedSignal(double)),
-                                this, SLOT(handleVideoAttrChange()));
-                        hboxStartTime->addWidget(m_dsbStartTimeMusic);
+                        INIT_SPINBOX(hboxStartTime, m_dsbStartTimeMusic);
                     }
 
                 }
@@ -782,13 +774,7 @@ void TabWidget::createTabMusic()
                         hboxStartPoint->addWidget(lbl);
                     }
                     {
-                        m_dsbStartPointMusic = new SpinBox();
-                        m_dsbStartPointMusic->setSuffix("s");
-                        m_dsbStartPointMusic->setDecimals(2);
-                        m_dsbStartPointMusic->setRange(0.0, 0.0);
-                        connect(m_dsbStartPointMusic, SIGNAL(textChangedSignal(double)),
-                                this, SLOT(handleVideoAttrChange()));
-                        hboxStartPoint->addWidget(m_dsbStartPointMusic);
+                        INIT_SPINBOX(hboxStartPoint, m_dsbStartPointMusic);
 #if 0
                         m_cbStartPointMusic->setEditable(true);
                         m_cbStartPointMusic->addItem(QString(tr("0.00")));
@@ -809,22 +795,7 @@ void TabWidget::createTabMusic()
                         hboxEndPoint->addWidget(lbl);
                     }
                     {
-                        m_dsbEndPointMusic = new SpinBox();
-                        m_dsbEndPointMusic->setSuffix("s");
-                        m_dsbEndPointMusic->setDecimals(2);
-                        m_dsbEndPointMusic->setRange(0.0, 0.0);
-                        connect(m_dsbEndPointMusic, SIGNAL(textChangedSignal(double)),
-                                this, SLOT(handleVideoAttrChange()));
-                        hboxEndPoint->addWidget(m_dsbEndPointMusic);
-#if 0
-                        m_cbEndPointMusic = new ComboBox();
-                        m_cbEndPointMusic->setEditable(true);
-                        m_cbEndPointMusic->addItem(QString(tr("2.00")));
-                        m_cbEndPointMusic->setCurrentText(QString(tr("2.00")));
-                        connect(m_cbEndPointMusic, SIGNAL(textChangedSignal(QString)),
-                                this, SLOT(handleVideoAttrChange()));
-                        hboxEndPoint->addWidget(m_cbEndPointMusic);
-#endif
+                        INIT_SPINBOX(hboxEndPoint, m_dsbEndPointMusic);
                     }
 
                 }
@@ -890,7 +861,7 @@ void TabWidget::createTabText()
         {
             QHBoxLayout* hboxMidFont = new QHBoxLayout;
             vboxFont->addLayout(hboxMidFont);
-            hboxMidFont->setMargin(5);
+            //hboxMidFont->setMargin(5);
             {
                 m_boldButton = new QToolButton(this);
                 m_boldButton->setCheckable(true);
