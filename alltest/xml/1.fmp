@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project name="wmm_project" version="1">
+    <ImageItem id="1" filePath="" rotateLeft="0" rotateRight="0">
+        <TitleClip>
+            <BoundProperties>
+                <BoundPropertyString Name="family" Value="SimSun"/>
+                <BoundPropertyString Name="size" Value="9"/>
+                <BoundPropertyString Name="alignment" Value="left"/>
+                <BoundPropertyInt Name="startTime" Value="0"/>
+                <BoundPropertyInt Name="duration" Value="2000"/>
+                <BoundPropertyInt Name="effectIndex" Value="0"/>
+                <BoundPropertyFloat Name="pos_x" Value="1"/>
+                <BoundPropertyFloat Name="pos_y" Value="347"/>
+                <BoundPropertyString Name="text" Value="[Enter text "/>
+                <BoundPropertyString Name="text" Value="here]"/>
+                <!--BoundPropertyStringSet Name="text">
+                    <BoundPropertyString Name="Value" Value="[Enter text here]"/>
+                </BoundPropertyStringSet-->
+            </BoundProperties>
+            <Transitions/>
+        </TitleClip>
+        <Animation/>
+        <VideoClip duration="2000"/>
+    </ImageItem>
+    <ImageItem id="2" filePath="" rotateLeft="0" rotateRight="0">
+        <TitleClip>
+            <BoundProperties>
+                <BoundPropertyString Name="family" Value="SimSun"/>
+                <BoundPropertyString Name="size" Value="9"/>
+                <BoundPropertyString Name="alignment" Value="left"/>
+                <BoundPropertyInt Name="startTime" Value="2000"/>
+                <BoundPropertyInt Name="duration" Value="2000"/>
+                <BoundPropertyInt Name="effectIndex" Value="0"/>
+                <BoundPropertyFloat Name="pos_x" Value="284"/>
+                <BoundPropertyFloat Name="pos_y" Value="3"/>
+                <BoundPropertyStringSet Name="text">
+                    <BoundPropertyString Name="Value" Value="[Enter text here]"/>
+                </BoundPropertyStringSet>
+            </BoundProperties>
+            <Transitions/>
+        </TitleClip>
+        <Animation>
+            <Transitions effectTemplateID="bowtieh" duration="1500"/>
+        </Animation>
+        <VideoClip duration="2000"/>
+    </ImageItem>
+    <ImageItem id="3" filePath="" rotateLeft="0" rotateRight="0">
+        <TitleClip>
+            <BoundProperties>
+                <BoundPropertyString Name="family" Value="SimSun"/>
+                <BoundPropertyString Name="size" Value="9"/>
+                <BoundPropertyString Name="alignment" Value="left"/>
+                <BoundPropertyInt Name="startTime" Value="4000"/>
+                <BoundPropertyInt Name="duration" Value="2000"/>
+                <BoundPropertyInt Name="effectIndex" Value="0"/>
+                <BoundPropertyFloat Name="pos_x" Value="282"/>
+                <BoundPropertyFloat Name="pos_y" Value="349"/>
+                <BoundPropertyStringSet Name="text">
+                    <BoundPropertyString Name="Value" Value="[Enter text here]"/>
+                </BoundPropertyStringSet>
+            </BoundProperties>
+            <Transitions/>
+        </TitleClip>
+        <Animation>
+            <Transitions effectTemplateID="diagcrossout" duration="1500"/>
+        </Animation>
+        <VideoClip duration="2000"/>
+    </ImageItem>
+    <ImageItem id="4" filePath="" rotateLeft="1" rotateRight="0">
+        <TitleClip>
+            <BoundProperties>
+                <BoundPropertyString Name="family" Value="SimSun"/>
+                <BoundPropertyString Name="size" Value="9"/>
+                <BoundPropertyString Name="alignment" Value="left"/>
+                <BoundPropertyInt Name="startTime" Value="0"/>
+                <BoundPropertyInt Name="duration" Value="0"/>
+                <BoundPropertyInt Name="effectIndex" Value="0"/>
+                <BoundPropertyFloat Name="pos_x" Value="0"/>
+                <BoundPropertyFloat Name="pos_y" Value="0"/>
+                <BoundPropertyStringSet Name="text">
+                    <BoundPropertyString Name="Value" Value=""/>
+                </BoundPropertyStringSet>
+            </BoundProperties>
+            <Transitions/>
+        </TitleClip>
+        <Animation/>
+        <VideoClip duration="2000"/>
+    </ImageItem>
+    <AudioItem id="1" filePath="C:/Users/user/Music/shortlovechina2.wav" startTime="0" startPoint="0" endPoint="5000" duration="5000"/>
+</Project>
