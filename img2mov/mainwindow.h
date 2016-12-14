@@ -31,6 +31,10 @@ protected:
     void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
     void keyPressEvent(QKeyEvent *keyEvent) Q_DECL_OVERRIDE;
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
+public slots:
+#ifdef TEST_ZOOMPAN
+    void assignZoomPan();
+#endif
 private:
     QWidget *m_centralWidget;
     //TabWidget *m_tabWidget;
@@ -43,6 +47,10 @@ private:
     QScrollArea *m_scrollArea;
 
     GlobalContext* m_globalContext;
+#ifdef TEST_ZOOMPAN
+    QLineEdit* m_leZoomPan;
+    QToolButton *m_tbZoomPan;
+#endif
 };
 
 #endif // MAINWINDOW_H

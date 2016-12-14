@@ -19,7 +19,7 @@ Animation::Animation(const QString& path, const QString& animation
     m_focus=false;
     setMinimumSize(size);
     setMaximumSize(size);
-    setContentsMargins(5, 5, 5, 5);
+    setContentsMargins(5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX);
     setPixmap(QPixmap(path));
     setScaledContents(true);
 }

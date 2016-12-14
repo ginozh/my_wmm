@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     //, m_detailsText(new QTextEdit)
 {
     m_globalContext = GlobalContext::instance();
-    setWindowTitle(tr("img to movie"));
+    setWindowTitle(tr("Film Maker"));
     //installEventFilter( m_player->Scene() );
 
     //setFocusPolicy ( Qt::StrongFocus );
@@ -79,6 +79,20 @@ MainWindow::MainWindow(QWidget *parent)
     mainLayout->addWidget(m_globalContext->m_tabWidget);
     mainLayout->addWidget(centralSplitter);
 
+#ifdef TEST_ZOOMPAN
+    QHBoxLayout* hbox = new QHBoxLayout;
+    mainLayout->addLayout(hbox);
+    {
+        m_leZoomPan = new QLineEdit;
+        hbox->addWidget(m_leZoomPan);
+    }
+    {
+        m_tbZoomPan = new QToolButton;
+        m_tbZoomPan->setText("submit zoompan");
+        connect(m_tbZoomPan, SIGNAL(clicked()), this, SLOT(assignZoomPan()));
+        hbox->addWidget(m_tbZoomPan);
+    }
+#endif
     m_centralWidget->setLayout(mainLayout);
 
 
@@ -158,3 +172,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
     QMainWindow::closeEvent(event);
 }
+#ifdef TEST_ZOOMPAN
+void MainWindow::assignZoomPan()
+{
+    m_globalContext->m_qsWholePanZoom = m_leZoomPan->text();
+    qDebug()<<"MainWindow::assignZoomPan. panzoom: "<<m_globalContext->m_qsWholePanZoom;
+}
+#endif

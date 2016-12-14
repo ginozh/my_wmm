@@ -5,12 +5,13 @@
 #include<QString>
 #include<QColor>
 #include<QRect>
+#include<QMap>
 
 class ElementsEdit;
 class GraphicsScene;
 class VideoPlayer;
 class TabWidget;
-
+#define TEST_ZOOMPAN
 enum ATTR_TYPE
 {
     ATTR_NOTHING =0
@@ -87,7 +88,7 @@ class GlobalMusicAttr
 {
 public:
     GlobalMusicAttr();
-    initialMusicAttr();
+    void initialMusicAttr();
     const QString& musicFileName();
 public:
     QString m_qsMusicFullFilename;
@@ -119,6 +120,10 @@ public:
     int m_iFramerate;
     QSize m_iFirstTabSize;
     QSize m_iOtherTabSize;
+#ifdef TEST_ZOOMPAN
+    QString m_qsWholePanZoom; //for test
+#endif
+    QMap<QString/*panzoom*/, QString /*filter*/> m_mapPanZoom;
 };
 
 #endif

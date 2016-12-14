@@ -41,6 +41,8 @@ GlobalTextAttr::GlobalTextAttr()
 GlobalAnimationAttr::GlobalAnimationAttr()
 {
     //m_qsPanZoom="zoompan=z='zoom+0.001':s=512x384";
+    //m_qsPanZoom="zoompan=z='zoom+0.001':x='if(gte(zoom,1.5),x,x+1)':y='y':s=512x384";
+    //m_qsPanZoom="scale=8000:-1,zoompan=z='zoom+0.001':x='if(gte(zoom,1.5),x,x+1)':y='y':s=512x384";
     m_iTransitionDuration = 1500;
 }
 GlobalVideoAttr::GlobalVideoAttr()
@@ -48,7 +50,7 @@ GlobalVideoAttr::GlobalVideoAttr()
     m_iFramerate = GlobalContext::instance()->m_iFramerate;
     m_iDuration = 2000;
 }
-GlobalMusicAttr::initialMusicAttr()
+void GlobalMusicAttr::initialMusicAttr()
 {
     m_qsMusicFullFilename = "";
     m_qsMusicFilename = "";
@@ -94,6 +96,19 @@ GlobalContext::GlobalContext()
 
     m_iFirstTabSize = QSize((int)(100*m_dFactorX),(int)(40*m_dFactorY) );
     m_iOtherTabSize = QSize((int)(180*m_dFactorX), m_iFirstTabSize.height() );
+
+    //m_qsPanZoom="zoompan=z='zoom+0.001':x='if(gte(zoom,1.5),x,x+1)':y='y':s=512x384";
+    m_mapPanZoom["none"]="";
+    m_mapPanZoom["pandownleft"]="zoompan=z='1.2':y='min(y+(zoom-1)*ih/2/25,(zoom-1)*ih/2)':s=512x384";
+    m_mapPanZoom["pandown"]="zoompan=z='1.2':x='(zoom-1)*iw/2':y='min(y+(zoom-1)*ih/2/25,(zoom-1)*ih/2)':s=512x384";
+    m_mapPanZoom["pandownright"]= "zoompan=z='1.2':x='(zoom-1)*iw':y='min(y+(zoom-1)*ih/2/25,(zoom-1)*ih/2)':s=512x384";
+    m_mapPanZoom["panrighttop"]="zoompan=z='1.2':x='min(x+(zoom-1)*iw/2/25,(zoom-1)*iw/2)':s=512x384";
+    m_mapPanZoom["panright"]="";
+    m_mapPanZoom["panrightbottom"]="";
+    m_mapPanZoom["panlefttop"]="";
+    m_mapPanZoom["panleft"]="";
+    m_mapPanZoom["panleftbottom"];
+    m_mapPanZoom["zoomintopleft"]="zoompan=z='min(zoom+0.001,1.2)':s=512x384";
 }
 GlobalContext* GlobalContext::instance()  
 {  

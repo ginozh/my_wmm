@@ -142,7 +142,8 @@ static int output_single_frame(AVFilterContext *ctx, AVFrame *in, double *var_va
     uint8_t *input[4];
     int px[4], py[4];
     AVFrame *out;
-
+    av_log(NULL, AV_LOG_DEBUG, "var_values[VAR_TIME]: %f var_values[VAR_FRAME]: %f var_values[VAR_ON]: %f values[VAR_H]: %f values[VAR_SW]: %f values[VAR_SH]: %f e->type: %d\n"
+            , var_values[VAR_TIME], var_values[VAR_FRAME], var_values[VAR_ON], values[VAR_H], values[VAR_SW], values[VAR_SH], e->type) ;
     var_values[VAR_TIME] = pts * av_q2d(outlink->time_base);
     var_values[VAR_FRAME] = i;
     var_values[VAR_ON] = outlink->frame_count + 1;

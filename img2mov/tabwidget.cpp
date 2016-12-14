@@ -489,6 +489,7 @@ void TabWidget::createTabAnimations()
 
                             flowLayout->insertWidget(0, animation);
 #endif
+                            INITIAL_ANIMATION( none, "No transition");
                             INITIAL_ANIMATION( bowtieh, "bow tie - horizontal");
                             INITIAL_ANIMATION( bowtiev, "bow tie - vertical");
                             INITIAL_ANIMATION( diagboxout, "diagonal - box out");
@@ -585,6 +586,29 @@ void TabWidget::createTabAnimations()
                 {
                     QWidget* panzooms = new QWidget();
                     {
+                        FlowLayout* flowLayout = new FlowLayout();
+                        //flowLayout->setContentsMargins(10, 10, 10, 10);
+                        flowLayout->setContentsMargins(5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX);
+                        {
+#define INITIAL_ANIMATION(animation_name, tips_name) do {\
+    Animation *animation_name=new Animation("images/"#animation_name".png", ""#animation_name"", tips_name, QSize(1.8*m_iCellHeight, 1.8*m_iCellHeight)) ; \
+    connect(animation_name, SIGNAL(selectedAnimationSignal(const QString&)), (const QObject*)m_globalContext->m_elementsEdit, SLOT(selectedPanZoom(const QString&))); \
+    connect(animation_name, SIGNAL(selectedImageSignal(QWidget*)), (const QObject*)m_globalContext->m_elementsEdit, SLOT(selectedImage(QWidget*)));\
+    flowLayout->insertWidget(flowLayout->count(), animation_name); \
+} while(0)
+                            INITIAL_ANIMATION( none, "No pan and zoom");
+                            INITIAL_ANIMATION( pandownleft, "Pan down along left");
+                            INITIAL_ANIMATION( pandown, "Pan down");
+                            INITIAL_ANIMATION( pandownright, "Pan down along right");
+                            INITIAL_ANIMATION( panrighttop, "Pan right along top");
+                            //INITIAL_ANIMATION( panright, "Pan right");
+                            //INITIAL_ANIMATION( panrightbottom, "Pan right along bottom");
+                            //INITIAL_ANIMATION( panlefttop, "Pan left along top");
+                            //INITIAL_ANIMATION( panleft, "Pan left");
+                            //INITIAL_ANIMATION( panleftbottom, "Pan left along bottom");
+                            INITIAL_ANIMATION( zoomintopleft, "Zoom in top-left");
+                        }
+                        panzooms->setLayout(flowLayout);
                     }
 
                     scrollArea->setWidget(panzooms);
@@ -615,7 +639,7 @@ void TabWidget::createTabAnimations()
         appendLine(hboxAnimations);
     }
     {
-        appendExpandingWidget(hboxAnimations);
+        //appendExpandingWidget(hboxAnimations);
     }
 
     m_tabAnimations->setLayout(hboxAnimations);
@@ -1090,7 +1114,7 @@ void TabWidget::createTabText()
                 QWidget* effects = new QWidget();
                 {
                     FlowLayout* flowLayout = new FlowLayout();
-                    flowLayout->setContentsMargins(5, 5, 5, 5);
+                    flowLayout->setContentsMargins(5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX);
                     {
 #define INITIAL_TEXT(animation_name, tips_name) do {\
     Animation *animation_name=new Animation("images/"#animation_name".png", ""#animation_name"", tips_name, m_iconSize) ; \

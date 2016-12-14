@@ -80,6 +80,7 @@ public slots:
     void selectedText(const QString&);
     void selectedMusic();
     void selectedTransition(const QString& animation);
+    void selectedPanZoom(const QString& panzoom);
     void elementAttrChanged(int attrType, bool bPlay);
     void durationChanged(qint64 duration);
     void musicDurationChanged(qint64 duration);

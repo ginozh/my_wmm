@@ -17,7 +17,7 @@ extern "C"{
 #include "ffmpeg.h"
 }
 #include <QXmlStreamWriter>
-//#define DEBUG_FFMPEG
+#define DEBUG_FFMPEG
 //! [1]
 //libavformat/allformats.c
 #define VIDEO_FILE_FORMAT "avi"
@@ -920,8 +920,17 @@ void ElementsEdit::updateTextAttrAndAss(int iStartIdx)
  * */
 void ElementsEdit::selectedTransition(const QString& animation)
 {
+    if(animation.compare(currentElement()->globalAnimationAttr()->m_qsTransitionName)==0)
+        return;
 #if 1
-    currentElement()->globalAnimationAttr()->m_qsTransitionName = animation;
+    if(animation.compare("none")==0)
+    {
+        currentElement()->globalAnimationAttr()->m_qsTransitionName = "";
+    }
+    else
+    {
+        currentElement()->globalAnimationAttr()->m_qsTransitionName = animation;
+    }
     createSingleVideo(m_idxCurrentElement);
 #else
     if(m_idxCurrentElement >= 1)
@@ -951,6 +960,22 @@ void ElementsEdit::selectedTransition(const QString& animation)
     }
 #endif
     //4, 生成总视频
+    createFinalVideo(true);
+}
+void ElementsEdit::selectedPanZoom(const QString& panzoom)
+{
+    QString qsRealPanZoom = m_globalContext->m_mapPanZoom[panzoom];
+    if(qsRealPanZoom.compare(currentElement()->globalAnimationAttr()->m_qsPanZoom)==0)
+        return;
+    if(panzoom.compare("none")==0)
+    {
+        currentElement()->globalAnimationAttr()->m_qsPanZoom = "";
+    }
+    else
+    {
+        currentElement()->globalAnimationAttr()->m_qsPanZoom = qsRealPanZoom;
+    }
+    createSingleVideo(m_idxCurrentElement);
     createFinalVideo(true);
 }
 #if 0
@@ -1119,6 +1144,14 @@ bool ElementsEdit::createAnimationPanzoom(Element *firstElement, Element *second
     QString duration = QString::number((float)globalVideoAttr->m_iDuration/1000, 'f', 2);
     //float animationDuration = QString::number((float)globalAnimationAttr->m_iTransitionDuration/1000, 'f', 2);
 
+#ifdef TEST_ZOOMPAN
+    //tmp test
+    if(!m_globalContext->m_qsWholePanZoom.isEmpty())
+    {
+        globalAnimationAttr->m_qsPanZoom = m_globalContext->m_qsWholePanZoom.trimmed();
+        qDebug()<<"ElementsEdit::createAnimationPanzoom. panzoom: "<<globalAnimationAttr->m_qsPanZoom;
+    }
+#endif
     createPanzoomVideo(firstElement, globalVideoAttr->m_iFramerate, duration, globalAnimationAttr->m_qsPanZoom, bCreateVideoFile);
     createPanzoomVideo(secondElement, globalVideoAttr->m_iFramerate, duration, globalAnimationAttr->m_qsPanZoom, bCreateVideoFile);
 
