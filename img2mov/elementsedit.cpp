@@ -1108,7 +1108,16 @@ void ElementsEdit::createPanzoomVideo(Element *element, int framerate, const QSt
     vqsArgv.push_back(QString(tr("buffer:image/jpg;nobase64,%1")).arg(bCreateVideoFile?(size_t)&element->m_fbFileInputScaleFile:(size_t)&element->m_fbInputScaleFile));
     //-vf "zoompan=z='zoom+0.001':s=512x384" -t 2
     vqsArgv.push_back(QString(tr("-vf")));
-    vqsArgv.push_back(QString(tr("%1")).arg(panzoom));
+    QSize qScaleSize;
+    if(bCreateVideoFile)
+    {
+        qScaleSize=m_qFinalVideoSize;
+    }
+    else
+    {
+        qScaleSize=element->image()->globalImageAttr()->m_iScaledSize;
+    }
+    vqsArgv.push_back(QString(tr("%1:s=%2x%3")).arg(panzoom).arg(qScaleSize.width()).arg(qScaleSize.height()));
     vqsArgv.push_back(QString(tr("-t")));
     vqsArgv.push_back(QString(tr("%1")).arg(duration));
     vqsArgv.push_back(QString(tr("-f")));
@@ -1199,11 +1208,13 @@ void ElementsEdit::createFinalVideo(bool bPlay, QByteArray qbAss/*=""*/, const Q
             qDebug()<< "error uncomplete. ElementsEdit::createFinalVideo m_fbInputScaledVideo";
             continue;
         }
-        if(element->m_fbInputTransitionVideo.ptr)
+        if(element->m_fbInputTransitionVideo.ptr && element->globalAnimationAttr()
+                && !element->globalAnimationAttr()->m_qsTransitionName.isEmpty()) //可能选择了一个之后被取消
         {
             sinString.append(QString(tr("file buffer:video/avi;nobase64,%1\n")).arg(bCreateVideoFile?(size_t)&element->m_fbFileInputTransitionVideo:(size_t)&element->m_fbInputTransitionVideo));
         }
-        else if(element->m_fbInputPanzoomVideo.ptr)
+        else if(element->m_fbInputPanzoomVideo.ptr && element->globalAnimationAttr()
+                && !element->globalAnimationAttr()->m_qsPanZoom.isEmpty()) //由于后一个如果有zoompan可能会导致当前这个也会先生成zoompan视频,或者选择了一个之后被取消
         {
             sinString.append(QString(tr("file buffer:video/avi;nobase64,%1\n")).arg(bCreateVideoFile?(size_t)&element->m_fbFileInputPanzoomVideo:(size_t)&element->m_fbInputPanzoomVideo));
         }

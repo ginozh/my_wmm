@@ -99,16 +99,16 @@ GlobalContext::GlobalContext()
 
     //m_qsPanZoom="zoompan=z='zoom+0.001':x='if(gte(zoom,1.5),x,x+1)':y='y':s=512x384";
     m_mapPanZoom["none"]="";
-    m_mapPanZoom["pandownleft"]="zoompan=z='1.2':y='min(y+(zoom-1)*ih/2/25,(zoom-1)*ih/2)':s=512x384";
-    m_mapPanZoom["pandown"]="zoompan=z='1.2':x='(zoom-1)*iw/2':y='min(y+(zoom-1)*ih/2/25,(zoom-1)*ih/2)':s=512x384";
-    m_mapPanZoom["pandownright"]= "zoompan=z='1.2':x='(zoom-1)*iw':y='min(y+(zoom-1)*ih/2/25,(zoom-1)*ih/2)':s=512x384";
-    m_mapPanZoom["panrighttop"]="zoompan=z='1.2':x='min(x+(zoom-1)*iw/2/25,(zoom-1)*iw/2)':s=512x384";
+    m_mapPanZoom["pandownleft"]="zoompan=z='1.2':y='min(y+(zoom-1)*ih/2/25,(zoom-1)*ih/2)'";
+    m_mapPanZoom["pandown"]="zoompan=z='1.2':x='(zoom-1)*iw/2':y='min(y+(zoom-1)*ih/2/25,(zoom-1)*ih/2)'";
+    m_mapPanZoom["pandownright"]= "zoompan=z='1.2':x='(zoom-1)*iw':y='min(y+(zoom-1)*ih/2/25,(zoom-1)*ih/2)'";
+    m_mapPanZoom["panrighttop"]="zoompan=z='1.2':x='min(x+(zoom-1)*iw/2/25,(zoom-1)*iw/2)'";
     m_mapPanZoom["panright"]="";
     m_mapPanZoom["panrightbottom"]="";
     m_mapPanZoom["panlefttop"]="";
     m_mapPanZoom["panleft"]="";
     m_mapPanZoom["panleftbottom"];
-    m_mapPanZoom["zoomintopleft"]="zoompan=z='min(zoom+0.001,1.2)':s=512x384";
+    m_mapPanZoom["zoomintopleft"]="zoompan=z='min(zoom+0.001,1.2)'";
 }
 GlobalContext* GlobalContext::instance()  
 {  
