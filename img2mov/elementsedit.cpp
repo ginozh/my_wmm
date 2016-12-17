@@ -17,7 +17,7 @@ extern "C"{
 #include "ffmpeg.h"
 }
 #include <QXmlStreamWriter>
-#define DEBUG_FFMPEG
+//#define DEBUG_FFMPEG
 //! [1]
 //libavformat/allformats.c
 #define VIDEO_FILE_FORMAT "avi"
@@ -86,7 +86,22 @@ ElementsEdit::ElementsEdit(QWidget *parent)
 }
 Element* ElementsEdit::currentElement()
 {
-    return qobject_cast<Element *>(m_lastSelectedElement);
+    if(!m_lastSelectedElement)
+        return NULL;
+    else
+        return qobject_cast<Element *>(m_lastSelectedElement);
+}
+int ElementsEdit::currentElementIdx()
+{
+    QWidget* element;
+    if(element = currentElement())
+    {
+        return m_flowLayout->indexOf(element);
+    }
+    else
+    {
+        return -1;
+    }
 }
 int ElementsEdit::callFfmpeg(const QVector<QString>& vqsArgv)
 {
@@ -255,6 +270,8 @@ void ElementsEdit::addImages()
 
     m_vecticalLine->raise(); // top level, Raises this widget to the top of the parent widget's stack.
     setCursor(QCursor(Qt::ArrowCursor));
+    // 9, 赋值当前tab的值
+    emit assignTabValueSignal();
 }
 void ElementsEdit::removeImage()
 {
@@ -920,7 +937,7 @@ void ElementsEdit::updateTextAttrAndAss(int iStartIdx)
  * */
 void ElementsEdit::selectedTransition(const QString& animation)
 {
-    if(animation.compare(currentElement()->globalAnimationAttr()->m_qsTransitionName)==0)
+    if(!currentElement() || animation.compare(currentElement()->globalAnimationAttr()->m_qsTransitionName)==0)
         return;
 #if 1
     if(animation.compare("none")==0)
@@ -965,7 +982,7 @@ void ElementsEdit::selectedTransition(const QString& animation)
 void ElementsEdit::selectedPanZoom(const QString& panzoom)
 {
     QString qsRealPanZoom = m_globalContext->m_mapPanZoom[panzoom];
-    if(qsRealPanZoom.compare(currentElement()->globalAnimationAttr()->m_qsPanZoom)==0)
+    if(!currentElement() || qsRealPanZoom.compare(currentElement()->globalAnimationAttr()->m_qsPanZoom)==0)
         return;
     if(panzoom.compare("none")==0)
     {

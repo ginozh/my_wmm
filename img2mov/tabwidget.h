@@ -11,6 +11,7 @@
 #include <QDoubleSpinBox>
 #include "comm.h"
 #include "combobox.h"
+#include "flowlayout.h"
 
 QT_BEGIN_NAMESPACE
 class QHBoxLayout;
@@ -170,6 +171,10 @@ private:
     //Adjust
     QComboBox* m_startTimeTextCombo;
     QComboBox* m_durationTextCombo;
+
+    //animation
+    FlowLayout* m_flowLayoutTransition;
+    FlowLayout* m_flowLayoutPanZoom;
 };
 //! [0]
 #endif // TABWIDGET_H

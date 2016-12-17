@@ -1,7 +1,6 @@
 #include "tabwidget.h"
 #include <QLayout>
 #include <QScrollArea>
-#include "flowlayout.h"
 #include "animation.h"
 #include <QFontComboBox>
 #include <QColorDialog>
@@ -473,15 +472,15 @@ void TabWidget::createTabAnimations()
                 {
                     QWidget* animations = new QWidget();
                     {
-                        FlowLayout* flowLayout = new FlowLayout();
+                        m_flowLayoutTransition = new FlowLayout();
                         //flowLayout->setContentsMargins(10, 10, 10, 10);
-                        flowLayout->setContentsMargins(5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX);
+                        m_flowLayoutTransition->setContentsMargins(5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX);
                         {
 #define INITIAL_ANIMATION(animation_name, tips_name) do {\
     Animation *animation_name=new Animation("images/"#animation_name".png", ""#animation_name"", tips_name, QSize(1.8*m_iCellHeight, 1.8*m_iCellHeight)) ; \
     connect(animation_name, SIGNAL(selectedAnimationSignal(const QString&)), (const QObject*)m_globalContext->m_elementsEdit, SLOT(selectedTransition(const QString&))); \
     connect(animation_name, SIGNAL(selectedImageSignal(QWidget*)), (const QObject*)m_globalContext->m_elementsEdit, SLOT(selectedImage(QWidget*)));\
-    flowLayout->insertWidget(flowLayout->count(), animation_name); \
+    m_flowLayoutTransition->insertWidget(m_flowLayoutTransition->count(), animation_name); \
 } while(0)
 #if 0
                             Animation *animation=new Animation("images/bowtieh.png", "bowtieh") ;
@@ -525,8 +524,8 @@ void TabWidget::createTabAnimations()
                             INITIAL_ANIMATION( splitv, "split vertical");
                             INITIAL_ANIMATION( fanin, "fan in");
                         }
-
-                        animations->setLayout(flowLayout);
+#undef INITIAL_ANIMATION
+                        animations->setLayout(m_flowLayoutTransition);
                     }
                     scrollArea->setWidget(animations);
                 }
@@ -586,15 +585,15 @@ void TabWidget::createTabAnimations()
                 {
                     QWidget* panzooms = new QWidget();
                     {
-                        FlowLayout* flowLayout = new FlowLayout();
-                        //flowLayout->setContentsMargins(10, 10, 10, 10);
-                        flowLayout->setContentsMargins(5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX);
+                        m_flowLayoutPanZoom = new FlowLayout();
+                        //m_flowLayoutPanZoom->setContentsMargins(10, 10, 10, 10);
+                        m_flowLayoutPanZoom->setContentsMargins(5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX, 5*m_globalContext->m_dFactorX);
                         {
 #define INITIAL_ANIMATION(animation_name, tips_name) do {\
     Animation *animation_name=new Animation("images/"#animation_name".png", ""#animation_name"", tips_name, QSize(1.8*m_iCellHeight, 1.8*m_iCellHeight)) ; \
     connect(animation_name, SIGNAL(selectedAnimationSignal(const QString&)), (const QObject*)m_globalContext->m_elementsEdit, SLOT(selectedPanZoom(const QString&))); \
     connect(animation_name, SIGNAL(selectedImageSignal(QWidget*)), (const QObject*)m_globalContext->m_elementsEdit, SLOT(selectedImage(QWidget*)));\
-    flowLayout->insertWidget(flowLayout->count(), animation_name); \
+    m_flowLayoutPanZoom->insertWidget(m_flowLayoutPanZoom->count(), animation_name); \
 } while(0)
                             INITIAL_ANIMATION( none, "No pan and zoom");
                             INITIAL_ANIMATION( pandownleft, "Pan down along left");
@@ -608,8 +607,9 @@ void TabWidget::createTabAnimations()
                             //INITIAL_ANIMATION( panleftbottom, "Pan left along bottom");
                             INITIAL_ANIMATION( zoomintopleft, "Zoom in top-left");
                         }
-                        panzooms->setLayout(flowLayout);
+                        panzooms->setLayout(m_flowLayoutPanZoom);
                     }
+#undef INITIAL_ANIMATION
 
                     scrollArea->setWidget(panzooms);
                 }
@@ -1273,6 +1273,54 @@ void TabWidget::activeTabMusic(GlobalMusicAttr* musicAttr)
 }
 void TabWidget::assignAnimationInfo()
 {
+    int idx;
+    if((idx=m_globalContext->m_elementsEdit->currentElementIdx()) <= 0)
+    {
+        for (int i = 0; i < m_flowLayoutTransition->count(); ++i)
+        {
+            QWidget *element = m_flowLayoutTransition->itemAt(i)->widget();
+            if (!element)
+            {
+                //uncomplete
+                continue;
+            }
+            element->setVisible(false);
+        }
+        for (int i = 0; i < m_flowLayoutPanZoom->count(); ++i)
+        {
+            QWidget *element = m_flowLayoutPanZoom->itemAt(i)->widget();
+            if (!element)
+            {
+                //uncomplete
+                continue;
+            }
+            element->setVisible(idx == 0? true:false);
+        }
+        return;
+    }
+    else
+    {
+        for (int i = 0; i < m_flowLayoutTransition->count(); ++i)
+        {
+            QWidget *element = m_flowLayoutTransition->itemAt(i)->widget();
+            if (!element)
+            {
+                //uncomplete
+                continue;
+            }
+            element->setVisible(true);
+        }
+        for (int i = 0; i < m_flowLayoutPanZoom->count(); ++i)
+        {
+            QWidget *element = m_flowLayoutPanZoom->itemAt(i)->widget();
+            if (!element)
+            {
+                //uncomplete
+                continue;
+            }
+            element->setVisible(true);
+        }
+    }
     Element* element;
     if(m_globalContext && (element=m_globalContext->m_elementsEdit->currentElement()))
     {
@@ -1288,7 +1336,6 @@ void TabWidget::assignAnimationInfo()
     }
     else
     {
-        //uncomplete
     }
 }
 void TabWidget::assignMusciInfo()

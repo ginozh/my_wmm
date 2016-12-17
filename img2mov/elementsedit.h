@@ -25,6 +25,7 @@ public:
     ElementsEdit(QWidget *parent);
     ~ElementsEdit();
     Element* currentElement();
+    int currentElementIdx();
     GlobalMusicAttr* globalMusicAttr(){return m_globalMusicAttr;}
     qint64 totalVideoDuration(){return m_iTotalVideoDuration;}
     QMessageBox::StandardButton confirmSaveProject();
