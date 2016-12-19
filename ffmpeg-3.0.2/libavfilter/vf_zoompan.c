@@ -33,6 +33,8 @@ static const char *const var_names[] = {
     "in_h",   "ih",
     "out_w",  "ow",
     "out_h",  "oh",
+    "middle_w",  "mw", //storm
+    "middle_h",  "mh", //storm
     "in",
     "on",
     "duration",
@@ -56,6 +58,8 @@ enum var_name {
     VAR_IN_H,   VAR_IH,
     VAR_OUT_W,  VAR_OW,
     VAR_OUT_H,  VAR_OH,
+    VAR_MIDDLE_W,  VAR_MW, //storm
+    VAR_MIDDLE_H,  VAR_MH, //storm
     VAR_IN,
     VAR_ON,
     VAR_DURATION,
@@ -82,6 +86,10 @@ typedef struct ZPcontext {
     char *duration_expr_str;
     int w, h;
     double x, y;
+    //double ox, oy;
+    int64_t mwx, mhy, mwhx, mhhy;
+    char *ox_expr_str; //storm
+    char *oy_expr_str;
     double prev_zoom;
     int prev_nb_frames;
     struct SwsContext *sws;
@@ -102,6 +110,14 @@ static const AVOption zoompan_options[] = {
     { "z", "set the zoom expression", OFFSET(zoom_expr_str), AV_OPT_TYPE_STRING, {.str = "1" }, .flags = FLAGS },
     { "x", "set the x expression", OFFSET(x_expr_str), AV_OPT_TYPE_STRING, {.str="0"}, .flags = FLAGS },
     { "y", "set the y expression", OFFSET(y_expr_str), AV_OPT_TYPE_STRING, {.str="0"}, .flags = FLAGS },
+    //{ "ox", "set the original x", OFFSET(ox), AV_OPT_TYPE_DOUBLE, {.dbl=0}, 0, 512, .flags = FLAGS },
+    //{ "oy", "set the original y", OFFSET(oy), AV_OPT_TYPE_DOUBLE, {.dbl=0}, 0, 318, .flags = FLAGS },
+    { "mwx", "x use middle w", OFFSET(mwx), AV_OPT_TYPE_INT, {.i64=0}, 0, 1, .flags = FLAGS }, //storm
+    { "mhy", "y use middle h", OFFSET(mhy), AV_OPT_TYPE_INT, {.i64=0}, 0, 1, .flags = FLAGS }, //storm
+    { "mwhx", "x use half middle w", OFFSET(mwhx), AV_OPT_TYPE_INT, {.i64=0}, 0, 1, .flags = FLAGS }, //storm
+    { "mhhy", "y use half middle h", OFFSET(mhhy), AV_OPT_TYPE_INT, {.i64=0}, 0, 1, .flags = FLAGS }, //storm
+    { "ox", "set the orignal x expression", OFFSET(ox_expr_str), AV_OPT_TYPE_STRING, {.str="0"}, .flags = FLAGS }, //storm
+    { "oy", "set the orignal y expression", OFFSET(oy_expr_str), AV_OPT_TYPE_STRING, {.str="0"}, .flags = FLAGS }, //storm
     { "d", "set the duration expression", OFFSET(duration_expr_str), AV_OPT_TYPE_STRING, {.str="90"}, .flags = FLAGS },
     { "s", "set the output image size", OFFSET(w), AV_OPT_TYPE_IMAGE_SIZE, {.str="hd720"}, .flags = FLAGS },
     { "fps", "set the output framerate", OFFSET(framerate), AV_OPT_TYPE_VIDEO_RATE, { .str = "25" }, .flags = FLAGS },
@@ -142,8 +158,7 @@ static int output_single_frame(AVFilterContext *ctx, AVFrame *in, double *var_va
     uint8_t *input[4];
     int px[4], py[4];
     AVFrame *out;
-    av_log(NULL, AV_LOG_DEBUG, "var_values[VAR_TIME]: %f var_values[VAR_FRAME]: %f var_values[VAR_ON]: %f values[VAR_H]: %f values[VAR_SW]: %f values[VAR_SH]: %f e->type: %d\n"
-            , var_values[VAR_TIME], var_values[VAR_FRAME], var_values[VAR_ON], values[VAR_H], values[VAR_SW], values[VAR_SH], e->type) ;
+
     var_values[VAR_TIME] = pts * av_q2d(outlink->time_base);
     var_values[VAR_FRAME] = i;
     var_values[VAR_ON] = outlink->frame_count + 1;
@@ -154,24 +169,42 @@ static int output_single_frame(AVFilterContext *ctx, AVFrame *in, double *var_va
 
     *zoom = av_clipd(*zoom, 1, 10);
     var_values[VAR_ZOOM] = *zoom;
-    w = in->width * (1.0 / *zoom);
-    h = in->height * (1.0 / *zoom);
+    if(s->mwhx)
+    {
+        w = in->width * (1.0 / *zoom); //storm
+        var_values[VAR_MIDDLE_W] =var_values[VAR_MW] = w = in->width - ((int)((in->width-w)/2))*2;
+    }
+    else
+    {
+        var_values[VAR_MIDDLE_W] =var_values[VAR_MW] = w = in->width * (1.0 / *zoom); //storm
+    }
+    if(s->mhhy)
+    {
+        h = in->height * (1.0 / *zoom); //storm
+        var_values[VAR_MIDDLE_H] =var_values[VAR_MH] = h = in->height - ((int)((in->height-h)/2))*2;
+    }
+    else
+    {
+        var_values[VAR_MIDDLE_H] =var_values[VAR_MH] = h = in->height * (1.0 / *zoom); //storm
+    }
 
     if ((ret = av_expr_parse_and_eval(dx, s->x_expr_str,
                                       var_names, var_values,
                                       NULL, NULL, NULL, NULL, NULL, 0, ctx)) < 0)
         return ret;
-    x = *dx = av_clipd(*dx, 0, FFMAX(in->width - w, 0));
+    x = *dx = av_clipd(*dx, 0, FFMAX(in->width - w, 0));//in->width-w; //storm
     var_values[VAR_X] = *dx;
-    x &= ~((1 << s->desc->log2_chroma_w) - 1);
+    if(!s->mwx && !s->mwhx)
+        x &= ~((1 << s->desc->log2_chroma_w) - 1); //storm
 
     if ((ret = av_expr_parse_and_eval(dy, s->y_expr_str,
                                       var_names, var_values,
                                       NULL, NULL, NULL, NULL, NULL, 0, ctx)) < 0)
         return ret;
-    y = *dy = av_clipd(*dy, 0, FFMAX(in->height - h, 0));
+    y = *dy = av_clipd(*dy, 0, FFMAX(in->height - h, 0));//in->height-h; //storm
     var_values[VAR_Y] = *dy;
-    y &= ~((1 << s->desc->log2_chroma_h) - 1);
+    if(!s->mhy && !s->mhhy)
+        y &= ~((1 << s->desc->log2_chroma_h) - 1); //storm
 
     out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
     if (!out) {
@@ -222,7 +255,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     AVFilterContext *ctx = inlink->dst;
     AVFilterLink *outlink = ctx->outputs[0];
     ZPContext *s = ctx->priv;
-    double nb_frames;
+    double nb_frames, ox=0, oy=0; //storm
     int ret;
 
     av_assert0(s->in == NULL);
@@ -236,8 +269,8 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     s->var_values[VAR_ON]    = outlink->frame_count + 1;
     s->var_values[VAR_PX]    = s->x;
     s->var_values[VAR_PY]    = s->y;
-    s->var_values[VAR_X]     = 0;
-    s->var_values[VAR_Y]     = 0;
+    //s->var_values[VAR_X]     = 0; //storm
+    //s->var_values[VAR_Y]     = 0; //storm
     s->var_values[VAR_PZOOM] = s->prev_zoom;
     s->var_values[VAR_ZOOM]  = 1;
     s->var_values[VAR_PDURATION] = s->prev_nb_frames;
@@ -247,6 +280,17 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     s->var_values[VAR_DAR]   = s->var_values[VAR_A] * s->var_values[VAR_SAR];
     s->var_values[VAR_HSUB]  = 1 << s->desc->log2_chroma_w;
     s->var_values[VAR_VSUB]  = 1 << s->desc->log2_chroma_h;
+	//storm
+    if ((ret = av_expr_parse_and_eval(&ox, s->ox_expr_str,
+                                      var_names, s->var_values,
+                                      NULL, NULL, NULL, NULL, NULL, 0, ctx)) < 0)
+        return ret;
+    if ((ret = av_expr_parse_and_eval(&oy, s->oy_expr_str,
+                                      var_names, s->var_values,
+                                      NULL, NULL, NULL, NULL, NULL, 0, ctx)) < 0)
+        return ret;
+    s->var_values[VAR_X]     = ox;
+    s->var_values[VAR_Y]     = oy;
 
     if ((ret = av_expr_parse_and_eval(&nb_frames, s->duration_expr_str,
                                       var_names, s->var_values,

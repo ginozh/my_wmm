@@ -1108,7 +1108,7 @@ bool ElementsEdit::createAnimation(Element *firstElement, Element *secondElement
     //emit playVideo(vfileName);
     return true;
 }
-void ElementsEdit::createPanzoomVideo(Element *element, int framerate, const QString& duration, const QString& panzoom, bool bCreateVideoFile/*=false*/)
+void ElementsEdit::createPanzoomVideo(Element *element, int framerate, const QString& duration, QString panzoom, bool bCreateVideoFile/*=false*/)
 {
 
     qDebug()<< "createPanzoomVideo";
@@ -1134,7 +1134,15 @@ void ElementsEdit::createPanzoomVideo(Element *element, int framerate, const QSt
     {
         qScaleSize=element->image()->globalImageAttr()->m_iScaledSize;
     }
-    vqsArgv.push_back(QString(tr("%1:s=%2x%3")).arg(panzoom).arg(qScaleSize.width()).arg(qScaleSize.height()));
+    if(panzoom.indexOf("M_SCALE")>=0)
+    {
+        panzoom.replace("M_SCALE", QString(tr("%1x%2")).arg(qScaleSize.width()).arg(qScaleSize.height()));
+        vqsArgv.push_back(panzoom);
+    }
+    else
+    {
+        vqsArgv.push_back(QString(tr("%1:s=%2x%3")).arg(panzoom).arg(qScaleSize.width()).arg(qScaleSize.height()));
+    }
     vqsArgv.push_back(QString(tr("-t")));
     vqsArgv.push_back(QString(tr("%1")).arg(duration));
     vqsArgv.push_back(QString(tr("-f")));
@@ -1170,14 +1178,6 @@ bool ElementsEdit::createAnimationPanzoom(Element *firstElement, Element *second
     QString duration = QString::number((float)globalVideoAttr->m_iDuration/1000, 'f', 2);
     //float animationDuration = QString::number((float)globalAnimationAttr->m_iTransitionDuration/1000, 'f', 2);
 
-#ifdef TEST_ZOOMPAN
-    //tmp test
-    if(!m_globalContext->m_qsWholePanZoom.isEmpty())
-    {
-        globalAnimationAttr->m_qsPanZoom = m_globalContext->m_qsWholePanZoom.trimmed();
-        qDebug()<<"ElementsEdit::createAnimationPanzoom. panzoom: "<<globalAnimationAttr->m_qsPanZoom;
-    }
-#endif
     createPanzoomVideo(firstElement, globalVideoAttr->m_iFramerate, duration, globalAnimationAttr->m_qsPanZoom, bCreateVideoFile);
     createPanzoomVideo(secondElement, globalVideoAttr->m_iFramerate, duration, globalAnimationAttr->m_qsPanZoom, bCreateVideoFile);
 
@@ -1504,6 +1504,14 @@ void ElementsEdit::createSingleVideo(int idxElement, bool bCreateSimpleVideo/*=t
     GlobalAnimationAttr * globalAnimationAttr = secondElement->globalAnimationAttr();
     GlobalVideoAttr* globalVideoAttr = secondElement->globalVideoAttr();
     QString duration = QString::number((float)globalVideoAttr->m_iDuration/1000, 'f', 2);
+#ifdef TEST_ZOOMPAN
+    //tmp test
+    if(globalAnimationAttr && !m_globalContext->m_qsWholePanZoom.isEmpty())
+    {
+        globalAnimationAttr->m_qsPanZoom = m_globalContext->m_qsWholePanZoom.trimmed();
+        qDebug()<<"ElementsEdit::createAnimationPanzoom. panzoom: "<<globalAnimationAttr->m_qsPanZoom;
+    }
+#endif
     if(idxElement >= 1 && globalAnimationAttr && !globalAnimationAttr->m_qsTransitionName.isEmpty())
     {
         Element *firstElement = qobject_cast<Element *>(m_flowLayout->itemAt(idxElement-1)->widget());

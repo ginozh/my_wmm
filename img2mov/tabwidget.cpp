@@ -596,6 +596,9 @@ void TabWidget::createTabAnimations()
     m_flowLayoutPanZoom->insertWidget(m_flowLayoutPanZoom->count(), animation_name); \
 } while(0)
                             INITIAL_ANIMATION( none, "No pan and zoom");
+                            INITIAL_ANIMATION( panupleft, "Pan up along left");
+                            INITIAL_ANIMATION( panup, "Pan up");
+                            INITIAL_ANIMATION( panupright, "Pan up along right");
                             INITIAL_ANIMATION( pandownleft, "Pan down along left");
                             INITIAL_ANIMATION( pandown, "Pan down");
                             INITIAL_ANIMATION( pandownright, "Pan down along right");
@@ -605,7 +608,26 @@ void TabWidget::createTabAnimations()
                             //INITIAL_ANIMATION( panlefttop, "Pan left along top");
                             //INITIAL_ANIMATION( panleft, "Pan left");
                             //INITIAL_ANIMATION( panleftbottom, "Pan left along bottom");
+                            INITIAL_ANIMATION( zoomincenter, "Zoom in center");
+                            INITIAL_ANIMATION( zoomincenterrotateright, "Zoom in center and rotate right");
+                            INITIAL_ANIMATION( zoomincenterrotateleft, "Zoom in center and rotate left");
                             INITIAL_ANIMATION( zoomintopleft, "Zoom in top-left");
+                            INITIAL_ANIMATION( zoomintop, "Zoom in top");
+                            INITIAL_ANIMATION( zoomintopright, "Zoom in top-right");
+                            INITIAL_ANIMATION( zoominright, "Zoom in right");
+                            INITIAL_ANIMATION( zoominbottomright, "Zoom in bottom-right");
+                            INITIAL_ANIMATION( zoominbottom, "Zoom in bottom");
+                            INITIAL_ANIMATION( zoominbottomleft, "Zoom in bottom-left");
+                            INITIAL_ANIMATION( zoominleft, "Zoom in left");
+                            INITIAL_ANIMATION( zoomoutcenter, "Zoom out center");
+                            INITIAL_ANIMATION( zoomouttopleft, "Zoom out top-left");
+                            INITIAL_ANIMATION( zoomouttop, "Zoom out top");
+                            INITIAL_ANIMATION( zoomouttopright, "Zoom out top-right");
+                            INITIAL_ANIMATION( zoomoutright, "Zoom out right");
+                            INITIAL_ANIMATION( zoomoutbottomright, "Zoom out bottom-right");
+                            INITIAL_ANIMATION( zoomoutbottom, "Zoom out bottom");
+                            INITIAL_ANIMATION( zoomoutbottomleft, "Zoom out bottom-left");
+                            INITIAL_ANIMATION( zoomoutleft, "Zoom out left");
                         }
                         panzooms->setLayout(m_flowLayoutPanZoom);
                     }

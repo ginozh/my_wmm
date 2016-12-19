@@ -39,7 +39,7 @@ private:
     void createSimpleVideo(Element *element, bool bCreateVideoFile=false);
     //void createSingleVideo(int idxElement);
     void createSingleVideo(int idxElement, bool bCreateSimpleVideo=true, bool bCreateVideoFile=false);
-    void createPanzoomVideo(Element *element, int framerate, const QString& duration, const QString& panzoom, bool bCreateVideoFile=false);
+    void createPanzoomVideo(Element *element, int framerate, const QString& duration, QString panzoom, bool bCreateVideoFile=false);
     /*bool createAnimation(Element *firstElement, Element *secondElement
             , const QString& animationName);*/
     bool createAnimation(Element *firstElement, Element *secondElement, bool isFromPanzoom, bool bCreateVideoFile=false);

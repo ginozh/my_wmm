@@ -98,7 +98,11 @@ GlobalContext::GlobalContext()
     m_iOtherTabSize = QSize((int)(180*m_dFactorX), m_iFirstTabSize.height() );
 
     //m_qsPanZoom="zoompan=z='zoom+0.001':x='if(gte(zoom,1.5),x,x+1)':y='y':s=512x384";
+    
     m_mapPanZoom["none"]="";
+    m_mapPanZoom["panupleft"]="zoompan=z='1.2':oy='0.2*ih':y='max(y-(zoom-1)*ih/2/25,0)'";
+    m_mapPanZoom["panup"]="zoompan=z='1.2':x='(zoom-1)*iw/2':oy='0.2*ih':y='max(y-(zoom-1)*ih/2/25,0)'";
+    m_mapPanZoom["panupright"]="zoompan=z='1.2':x='(zoom-1)*iw':oy='0.2*ih':y='max(y-(zoom-1)*ih/2/25,0)'";
     m_mapPanZoom["pandownleft"]="zoompan=z='1.2':y='min(y+(zoom-1)*ih/2/25,(zoom-1)*ih/2)'";
     m_mapPanZoom["pandown"]="zoompan=z='1.2':x='(zoom-1)*iw/2':y='min(y+(zoom-1)*ih/2/25,(zoom-1)*ih/2)'";
     m_mapPanZoom["pandownright"]= "zoompan=z='1.2':x='(zoom-1)*iw':y='min(y+(zoom-1)*ih/2/25,(zoom-1)*ih/2)'";
@@ -108,7 +112,29 @@ GlobalContext::GlobalContext()
     m_mapPanZoom["panlefttop"]="";
     m_mapPanZoom["panleft"]="";
     m_mapPanZoom["panleftbottom"];
+    m_mapPanZoom["zoomincenter"]="zoompan=z='zoom+0.01':mwhx='1':x='(iw-mw)/2':mhhy='1':y='(ih-mh)/2'";
+    //放大一分钟(zoom:1.25)，旋转一分钟(t:1)
+    //m_mapPanZoom["zoomincenterrotateright"]="zoompan=z='min(zoom+0.01,1.25)':mwhx='1':x='(iw-mw)/2':mhhy='1':y='(ih-mh)/2':s=512x384,rotate='if(gte(t,1), 0, 2*PI*t)'"; //uncomple: 512*384
+    m_mapPanZoom["zoomincenterrotateright"]="zoompan=z='min(zoom+0.01,1.25)':mwhx='1':x='(iw-mw)/2':mhhy='1':y='(ih-mh)/2':s=M_SCALE,rotate='if(gte(t,1), 0, 2*PI*t)'"; //uncomple: 512*384
+    //m_mapPanZoom["zoomincenterrotateleft"]="zoompan=z='min(zoom+0.01,1.25)':mwhx='1':x='(iw-mw)/2':mhhy='1':y='(ih-mh)/2':s=512x384,rotate='if(gte(t,1), 0, -2*PI*t)'"; //uncomple: 512*384
+    m_mapPanZoom["zoomincenterrotateleft"]="zoompan=z='min(zoom+0.01,1.25)':mwhx='1':x='(iw-mw)/2':mhhy='1':y='(ih-mh)/2':s=M_SCALE,rotate='if(gte(t,1), 0, -2*PI*t)'"; //uncomple: 512*384
     m_mapPanZoom["zoomintopleft"]="zoompan=z='min(zoom+0.001,1.2)'";
+    m_mapPanZoom["zoomintop"]="zoompan=z='zoom+0.01':mwhx='1':x='(iw-mw)/2'";
+    m_mapPanZoom["zoomintopright"]="zoompan=z='zoom+0.01':mwx='1':x='iw-mw'";
+    m_mapPanZoom["zoominright"]="zoompan=z='zoom+0.01':mwx='1':x='iw-mw':mhhy='1':y='(ih-mh)/2";
+    m_mapPanZoom["zoominbottomright"]="zoompan=z='zoom+0.01':mwx='1':x='iw-mw':mhy='1':y='ih-mh'";
+    m_mapPanZoom["zoominbottom"]="zoompan=z='zoom+0.01':mwhx='1':x='(iw-mw)/2':mhy='1':y='ih-mh'";
+    m_mapPanZoom["zoominbottomleft"]="zoompan=z='zoom+0.01':mhy='1':y='ih-mh'";
+    m_mapPanZoom["zoominleft"]="zoompan=z='zoom+0.01':mhhy='1':y='(ih-mh)/2'";
+    m_mapPanZoom["zoomoutcenter"]="zoompan=z='if(lte(zoom,1.0),1.2,max(1.001,zoom-0.01))':mwhx='1':x='(iw-mw)/2':mhhy='1':y='(ih-mh)/2'";  // 必须是:0.01或者0.005(有点抖动)
+    m_mapPanZoom["zoomouttopleft"]="zoompan=z='if(lte(zoom,1.0),1.2,max(1.001,zoom-0.01))'";
+    m_mapPanZoom["zoomouttop"]="zoompan=z='if(lte(zoom,1.0),1.2,max(1.001,zoom-0.01))':mwhx='1':x='(iw-mw)/2'";
+    m_mapPanZoom["zoomouttopright"]="zoompan=z='if(lte(zoom,1.0),1.2,max(1.001,zoom-0.01))':mwx='1':x='iw-mw'";
+    m_mapPanZoom["zoomoutright"]="zoompan=z='if(lte(zoom,1.0),1.2,max(1.001,zoom-0.01))':mwx='1':x='iw-mw':mhhy='1':y='(ih-mh)/2";
+    m_mapPanZoom["zoomoutbottomright"]="zoompan=z='if(lte(zoom,1.0),1.2,max(1.001,zoom-0.01))':mwx='1':x='iw-mw':mhy='1':y='ih-mh'";
+    m_mapPanZoom["zoomoutbottom"]="zoompan=z='if(lte(zoom,1.0),1.2,max(1.001,zoom-0.01))':mwhx='1':x='(iw-mw)/2':mhy='1':y='ih-mh'";
+    m_mapPanZoom["zoomoutbottomleft"]="zoompan=z='if(lte(zoom,1.0),1.2,max(1.001,zoom-0.01))':mhy='1':y='ih-mh'";
+    m_mapPanZoom["zoomoutleft"]="zoompan=z='if(lte(zoom,1.0),1.2,max(1.001,zoom-0.01))':mhhy='1':y='(ih-mh)/2'";
 }
 GlobalContext* GlobalContext::instance()  
 {  
