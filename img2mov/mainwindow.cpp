@@ -18,6 +18,10 @@
 #include <QFileInfo>
 #include <QStandardPaths>
 #include <QDebug>
+#ifdef TEST_QSS
+#include <QStyleFactory> 
+#include "norwegianwoodstyle.h"
+#endif
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -92,6 +96,28 @@ MainWindow::MainWindow(QWidget *parent)
         connect(m_tbZoomPan, SIGNAL(clicked()), this, SLOT(assignZoomPan()));
         hbox->addWidget(m_tbZoomPan);
     }
+#endif
+#ifdef TEST_QSS
+    m_originalPalette = QApplication::palette();
+    QHBoxLayout* hboxqss = new QHBoxLayout;
+    mainLayout->addLayout(hboxqss);
+    {
+        m_useStylePaletteCheckBox = new QCheckBox(tr("&Use style's standard palette"),this);
+        m_useStylePaletteCheckBox->setChecked(true);
+        connect(m_useStylePaletteCheckBox, SIGNAL(toggled(bool)),
+                this, SLOT(changePalette()));
+        hboxqss->addWidget(m_useStylePaletteCheckBox);
+    }
+    {
+        m_styleComboBox = new QComboBox;
+        m_styleComboBox->addItem("NorwegianWood");
+        m_styleComboBox->addItems(QStyleFactory::keys());
+        connect(m_styleComboBox, SIGNAL(activated(QString)),
+                //! [1] //! [2]
+                this, SLOT(changeStyle(QString)));
+        hboxqss->addWidget(m_styleComboBox);
+    }
+    //changeStyle("NorwegianWood");
 #endif
     m_centralWidget->setLayout(mainLayout);
 
@@ -178,4 +204,26 @@ void MainWindow::assignZoomPan()
     m_globalContext->m_qsWholePanZoom = m_leZoomPan->text();
     qDebug()<<"MainWindow::assignZoomPan. panzoom: "<<m_globalContext->m_qsWholePanZoom;
 }
+#endif
+#ifdef TEST_QSS
+void MainWindow::changeStyle(const QString &styleName)
+//! [5] //! [6]
+{
+    if (styleName == "NorwegianWood") {
+        QApplication::setStyle(new NorwegianWoodStyle);
+    } else {
+        QApplication::setStyle(QStyleFactory::create(styleName));
+    }
+    changePalette();
+}
+//! [7]
+void MainWindow::changePalette()
+//! [7] //! [8]
+{
+    if (m_useStylePaletteCheckBox->isChecked())
+        QApplication::setPalette(QApplication::style()->standardPalette());
+    else
+        QApplication::setPalette(m_originalPalette);
+}
+//! [8]
 #endif

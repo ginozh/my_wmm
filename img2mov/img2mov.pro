@@ -48,7 +48,8 @@ SOURCES += main.cpp \
     videorectitem.cpp \
     musiclabel.cpp \
     combobox.cpp \
-    comm.cpp
+    comm.cpp \
+    norwegianwoodstyle.cpp
 
 HEADERS  += mainwindow.h \
     ffmpeg.h \
@@ -71,4 +72,5 @@ HEADERS  += mainwindow.h \
     comm.h \
     videorectitem.h \
     musiclabel.h \
-    combobox.h
+    combobox.h \
+    norwegianwoodstyle.h

@@ -12,6 +12,7 @@ class GraphicsScene;
 class VideoPlayer;
 class TabWidget;
 #define TEST_ZOOMPAN
+#define TEST_QSS
 enum ATTR_TYPE
 {
     ATTR_NOTHING =0
@@ -19,6 +20,18 @@ enum ATTR_TYPE
     ,ATTR_MUSIC = 0x2
     ,ATTR_TEXT =0x4
     ,ATTR_ROTATE =0x8
+};
+class FilterInfo
+{
+public:
+    FilterInfo(const QString& qsFilter="", const QString& qsDescribe="")
+        : m_qsFilter(qsFilter)
+        ,m_qsDescribe(qsDescribe)
+    {
+    }
+public:
+    QString m_qsFilter;
+    QString m_qsDescribe;
 };
 
 // image
@@ -124,6 +137,7 @@ public:
     QString m_qsWholePanZoom; //for test
 #endif
     QMap<QString/*panzoom*/, QString /*filter*/> m_mapPanZoom;
+    QMap<QString/*visualeffect*/, FilterInfo> m_mapVisulEffect;
 };
 
 #endif

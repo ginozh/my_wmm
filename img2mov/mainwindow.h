@@ -7,6 +7,9 @@
 #include "menu.h"
 #include "tabwidget.h"
 #include "comm.h"
+#ifdef TEST_QSS
+#include <QCheckBox>
+#endif
 
 QT_FORWARD_DECLARE_CLASS(QAction)
 QT_FORWARD_DECLARE_CLASS(QTextEdit)
@@ -35,6 +38,10 @@ public slots:
 #ifdef TEST_ZOOMPAN
     void assignZoomPan();
 #endif
+#ifdef TEST_QSS
+    void changeStyle(const QString &styleName);
+    void changePalette();
+#endif
 private:
     QWidget *m_centralWidget;
     //TabWidget *m_tabWidget;
@@ -50,6 +57,11 @@ private:
 #ifdef TEST_ZOOMPAN
     QLineEdit* m_leZoomPan;
     QToolButton *m_tbZoomPan;
+#endif
+#ifdef TEST_QSS
+    QPalette m_originalPalette;
+    QComboBox *m_styleComboBox;
+    QCheckBox *m_useStylePaletteCheckBox;
 #endif
 };
 

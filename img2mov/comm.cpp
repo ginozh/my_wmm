@@ -43,6 +43,8 @@ GlobalAnimationAttr::GlobalAnimationAttr()
     //m_qsPanZoom="zoompan=z='zoom+0.001':s=512x384";
     //m_qsPanZoom="zoompan=z='zoom+0.001':x='if(gte(zoom,1.5),x,x+1)':y='y':s=512x384";
     //m_qsPanZoom="scale=8000:-1,zoompan=z='zoom+0.001':x='if(gte(zoom,1.5),x,x+1)':y='y':s=512x384";
+    //
+    //single transition: fade=t=in:d=1
     m_iTransitionDuration = 1500;
 }
 GlobalVideoAttr::GlobalVideoAttr()
@@ -135,6 +137,42 @@ GlobalContext::GlobalContext()
     m_mapPanZoom["zoomoutbottom"]="zoompan=z='if(lte(zoom,1.0),1.2,max(1.001,zoom-0.01))':mwhx='1':x='(iw-mw)/2':mhy='1':y='ih-mh'";
     m_mapPanZoom["zoomoutbottomleft"]="zoompan=z='if(lte(zoom,1.0),1.2,max(1.001,zoom-0.01))':mhy='1':y='ih-mh'";
     m_mapPanZoom["zoomoutleft"]="zoompan=z='if(lte(zoom,1.0),1.2,max(1.001,zoom-0.01))':mhhy='1':y='(ih-mh)/2'";
+
+    m_mapVisulEffect["none"]=FilterInfo();
+    //http://superuser.com/questions/901099/ffmpeg-apply-blur-over-face
+    //http://video.stackexchange.com/questions/8264/how-to-blur-a-short-scene-in-a-video/8293#8293
+    m_mapVisulEffect["blur"]=FilterInfo("boxblur=2:1:cr=0:ar=0", "Blur"); 
+    m_mapVisulEffect["edgedetection"]=FilterInfo("edgedetect=low=0.1:high=0.4", "Edge detection");
+    m_mapVisulEffect["posterize"]=FilterInfo("elbg='l=5:s=1'", "Posterize");//耗时较长
+    m_mapVisulEffect["threshold"]=FilterInfo("edgedetect=mode=colormix:high=0.5:low=0.5", "Threshold");
+    m_mapVisulEffect["blackwhite"]=FilterInfo("lutyuv='u=128:v=128'", "Black and white");
+    m_mapVisulEffect["blackwhiteorange"]=FilterInfo("", "Black and white - orange filter");
+    m_mapVisulEffect["blackwhitered"]=FilterInfo("", "Black and white - red filter");
+    m_mapVisulEffect["blackwhiteyellow"]=FilterInfo("", "Black and white - yellow filter");
+    m_mapVisulEffect["cyantone"]=FilterInfo("", "Cyan tone");
+    m_mapVisulEffect["sepiatone"]=FilterInfo("lutyuv='u=101:v=151'", "Sepia tone"); //./rgb2yuv.sh
+    //无源文件生成一个视频 -f lavfi -i life,edgedetect,negate,fade=in:0:100 -frames:v 200
+    //./ffmpeg_g -y -f lavfi -i color=c=black:s=512x384 -framerate 25 -loop 1 -i jpg/512img003.jpg   -filter_complex "[1:v][0:v]overlay=x='-512+n*512/50'[out]"  -map "[out]" -t 2 jpg/zoompan.avi
+    m_mapVisulEffect["cinematic"]=FilterInfo("", "Cinematic");
+    m_mapVisulEffect["cinematicoverlayleft1"]=FilterInfo("", "Cinematic - overlay left 1");
+    m_mapVisulEffect["cinematicoverlayleft2"]=FilterInfo("", "Cinematic - overlay left 2");
+    m_mapVisulEffect["cinematicoverlayright1"]=FilterInfo("", "Cinematic - overlay right 1");
+    m_mapVisulEffect["cinematicoverlayright2"]=FilterInfo("", "Cinematic - overlay right 2");
+    m_mapVisulEffect["mirrorhorizontal"]=FilterInfo("hflip", "Mirror horizontal");
+    m_mapVisulEffect["mirrorvertical"]=FilterInfo("vflip", "Mirror vertical");
+    //./ffmpeg_r.exe -v debug  -y -framerate 25 -loop 1 -i jpg/512img003.jpg   -vf "scale=s=1280*720,setsar=1:1"  -pix_fmt yuv420p  -t 2 jpg/zoompan.avi
+    //./ffmpeg_r.exe -y -i jpg/zoompan.avi   -f lavfi -i nullsrc=s=hd720,lutrgb=128:128:128 -f lavfi -i nullsrc=s=hd720,geq='r=128+30*sin(2*PI*X/400+T):g=128+30*sin(2*PI*X/400+T):b=128+30*sin(2*PI*X/400+T)' -lavfi '[0][1][2]displace'  -t 2 jpg/zoompan1.avi
+    m_mapVisulEffect["3dripple"]=FilterInfo("", "3D ripple");
+    m_mapVisulEffect["fadeinblack"]=FilterInfo("fade=t=in:d=1:color=black", "Fade in from black");
+    m_mapVisulEffect["fadeinwhite"]=FilterInfo("fade=t=in:d=1:color=white", "Fade in from white");
+    m_mapVisulEffect["fadeoutblack"]=FilterInfo("fade=t=out:st=1:d=1:color=black", "Fade out to black");
+    m_mapVisulEffect["fadeoutwhite"]=FilterInfo("fade=t=out:st=1:d=1:color=white", "Fade out to white");
+    //颜色渐变 ./ffmpeg_g -y -f lavfi -i haldclutsrc=8 -vf "hue=H=2*PI*t:s=sin(2*PI*t)+1, curves=cross_process" -t 2 jpg/zoompan.avi
+    m_mapVisulEffect["huecycleentirecolor"]=FilterInfo("hue='H=2*PI*t: s=sin(2*PI*t)+1'", "Hue - cycle entire color spectrum");
+    //prei0r
+    m_mapVisulEffect["pixelate"]=FilterInfo("", "Pixelate");
+    m_mapVisulEffect["spin360"]=FilterInfo("", "Spin 360"); //rotate,zoomincenter
+    m_mapVisulEffect["warp"]=FilterInfo("", "Warp");
 }
 GlobalContext* GlobalContext::instance()  
 {  

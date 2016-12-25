@@ -60,8 +60,8 @@ int main(int argc, char *argv[])
     qInstallMsgHandler(myMessageHandler);
 #endif
 #endif
-    qDebug("hello");
-    qDebug() << "world";
+    //qDebug("hello");
+    //qDebug() << "world";
     QCoreApplication::setApplicationVersion(QT_VERSION_STR);
 
     QCommandLineParser parser;
@@ -76,5 +76,12 @@ int main(int argc, char *argv[])
     //mainWindow.show();
     mainWindow.showMaximized();
 
+    QFile file("qss/stylesheet.qss");  
+    if (!file.open(QFile::ReadOnly)) {
+        QMessageBox::warning(NULL, "Codecs",
+                QString("Cannot read file %1").arg(file.errorString()));
+    }
+    app.setStyleSheet(file.readAll()); 
+    file.close();
     return app.exec();
 }
