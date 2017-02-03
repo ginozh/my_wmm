@@ -196,6 +196,7 @@ void MainWindow::createStackWidget(QVBoxLayout *mainLayout)
         {
             QVBoxLayout* vbox = new QVBoxLayout;
             qwidgetmusic->setLayout(vbox);
+            vbox->setAlignment(Qt::AlignHCenter);
             {
                 QLabel * lbl = new QLabel(tr("STEP3:SELECT A MUSIC"));
                 vbox->addWidget(lbl);
