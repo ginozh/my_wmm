@@ -58,6 +58,10 @@ SOURCES       = main.cpp \
 		videoplayer.cpp \
 		slider.cpp \
 		musics.cpp \
+		preview.cpp \
+		themeslist.cpp \
+		save.cpp \
+		format.cpp \
 		comm.cpp release/moc_mainwindow.cpp \
 		release/moc_mediasedit.cpp \
 		release/moc_image.cpp \
@@ -65,7 +69,11 @@ SOURCES       = main.cpp \
 		release/moc_themes.cpp \
 		release/moc_videoplayer.cpp \
 		release/moc_slider.cpp \
-		release/moc_musics.cpp
+		release/moc_musics.cpp \
+		release/moc_preview.cpp \
+		release/moc_themeslist.cpp \
+		release/moc_save.cpp \
+		release/moc_format.cpp
 OBJECTS       = release/main.o \
 		release/mainwindow.o \
 		release/ffmpeg.o \
@@ -81,6 +89,10 @@ OBJECTS       = release/main.o \
 		release/videoplayer.o \
 		release/slider.o \
 		release/musics.o \
+		release/preview.o \
+		release/themeslist.o \
+		release/save.o \
+		release/format.o \
 		release/comm.o \
 		release/moc_mainwindow.o \
 		release/moc_mediasedit.o \
@@ -89,7 +101,11 @@ OBJECTS       = release/main.o \
 		release/moc_themes.o \
 		release/moc_videoplayer.o \
 		release/moc_slider.o \
-		release/moc_musics.o
+		release/moc_musics.o \
+		release/moc_preview.o \
+		release/moc_themeslist.o \
+		release/moc_save.o \
+		release/moc_format.o
 
 DIST          =  mainwindow.h \
 		ffmpeg.h \
@@ -104,6 +120,10 @@ DIST          =  mainwindow.h \
 		videoplayer.h \
 		slider.h \
 		musics.h \
+		preview.h \
+		themeslist.h \
+		save.h \
+		format.h \
 		comm.h main.cpp \
 		mainwindow.cpp \
 		ffmpeg.c \
@@ -119,6 +139,10 @@ DIST          =  mainwindow.h \
 		videoplayer.cpp \
 		slider.cpp \
 		musics.cpp \
+		preview.cpp \
+		themeslist.cpp \
+		save.cpp \
+		format.cpp \
 		comm.cpp
 QMAKE_TARGET  = movemaker
 DESTDIR        = release/ #avoid trailing-slash linebreak
@@ -142,7 +166,7 @@ dist:
 	$(ZIP) movemaker.zip $(SOURCES) $(DIST) movemaker.pro ../../msys32/mingw32/share/qt5/mkspecs/features/spec_pre.prf ../../msys32/mingw32/share/qt5/mkspecs/qdevice.pri ../../msys32/mingw32/share/qt5/mkspecs/features/device_config.prf ../../msys32/mingw32/share/qt5/mkspecs/common/angle.conf ../../msys32/mingw32/share/qt5/mkspecs/qconfig.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_3dcore.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_3dcore_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_3dinput.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_3dinput_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_3dlogic.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_3dlogic_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_3dquick.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_3dquick_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_3dquickinput.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_3dquickinput_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_3dquickrender.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_3dquickrender_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_3drender.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_3drender_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_axbase.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_axbase_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_axcontainer.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_axcontainer_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_axserver.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_axserver_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_bluetooth.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_bluetooth_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_bootstrap_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_clucene_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_concurrent.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_concurrent_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_core.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_core_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_dbus.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_dbus_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_designer.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_designer_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_designercomponents_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_enginio.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_enginio_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_gui.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_gui_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_help.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_help_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_labscontrols_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_labstemplates_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_location.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_location_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_multimedia.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_multimedia_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_multimediawidgets.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_multimediawidgets_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_network.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_network_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_nfc.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_nfc_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_opengl.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_opengl_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_openglextensions.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_openglextensions_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_platformsupport_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_positioning.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_positioning_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_printsupport.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_printsupport_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_qml.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_qml_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_qmldevtools_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_qmltest.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_qmltest_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_qtmultimediaquicktools_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_quick.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_quick_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_quickparticles_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_quickwidgets.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_quickwidgets_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_script.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_script_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_scripttools.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_scripttools_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_sensors.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_sensors_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_serialbus.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_serialbus_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_serialport.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_serialport_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_sql.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_sql_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_svg.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_svg_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_testlib.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_testlib_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_uiplugin.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_uitools.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_uitools_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_webchannel.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_webchannel_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_webkit.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_webkit_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_webkitwidgets.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_webkitwidgets_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_websockets.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_websockets_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_widgets.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_widgets_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_winextras.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_winextras_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_xml.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_xml_private.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_xmlpatterns.pri ../../msys32/mingw32/share/qt5/mkspecs/modules/qt_lib_xmlpatterns_private.pri ../../msys32/mingw32/share/qt5/mkspecs/features/qt_functions.prf ../../msys32/mingw32/share/qt5/mkspecs/features/qt_config.prf ../../msys32/mingw32/share/qt5/mkspecs/features/win32/qt_config.prf ../../msys32/mingw32/share/qt5/mkspecs/win32-g++/qmake.conf ../../msys32/mingw32/share/qt5/mkspecs/features/spec_post.prf ../../msys32/mingw32/share/qt5/mkspecs/features/exclusive_builds.prf ../../msys32/mingw32/share/qt5/mkspecs/features/default_pre.prf ../../msys32/mingw32/share/qt5/mkspecs/features/win32/default_pre.prf ../../msys32/mingw32/share/qt5/mkspecs/features/resolve_config.prf ../../msys32/mingw32/share/qt5/mkspecs/features/exclusive_builds_post.prf ../../msys32/mingw32/share/qt5/mkspecs/features/default_post.prf ../../msys32/mingw32/share/qt5/mkspecs/features/build_pass.prf ../../msys32/mingw32/share/qt5/mkspecs/features/win32/rtti.prf ../../msys32/mingw32/share/qt5/mkspecs/features/precompile_header.prf ../../msys32/mingw32/share/qt5/mkspecs/features/warn_on.prf ../../msys32/mingw32/share/qt5/mkspecs/features/qt.prf ../../msys32/mingw32/share/qt5/mkspecs/features/resources.prf ../../msys32/mingw32/share/qt5/mkspecs/features/moc.prf ../../msys32/mingw32/share/qt5/mkspecs/features/win32/opengl.prf ../../msys32/mingw32/share/qt5/mkspecs/features/uic.prf ../../msys32/mingw32/share/qt5/mkspecs/features/file_copies.prf ../../msys32/mingw32/share/qt5/mkspecs/features/win32/windows.prf ../../msys32/mingw32/share/qt5/mkspecs/features/testcase_targets.prf ../../msys32/mingw32/share/qt5/mkspecs/features/exceptions.prf ../../msys32/mingw32/share/qt5/mkspecs/features/yacc.prf ../../msys32/mingw32/share/qt5/mkspecs/features/lex.prf movemaker.pro  NO_PCH_SOURCES RESOURCES HEADERS SOURCES OBJECTIVE_SOURCES FORMS YACCSOURCES YACCSOURCES LEXSOURCES 
 
 clean: compiler_clean 
-	-$(DEL_FILE) release/main.o release/mainwindow.o release/ffmpeg.o release/ffmpeg_filter.o release/ffmpeg_opt.o release/cmdutils.o release/ffmpeg_dxva2.o release/flowlayout.o release/mediasedit.o release/image.o release/element.o release/themes.o release/videoplayer.o release/slider.o release/musics.o release/comm.o release/moc_mainwindow.o release/moc_mediasedit.o release/moc_image.o release/moc_element.o release/moc_themes.o release/moc_videoplayer.o release/moc_slider.o release/moc_musics.o
+	-$(DEL_FILE) release/main.o release/mainwindow.o release/ffmpeg.o release/ffmpeg_filter.o release/ffmpeg_opt.o release/cmdutils.o release/ffmpeg_dxva2.o release/flowlayout.o release/mediasedit.o release/image.o release/element.o release/themes.o release/videoplayer.o release/slider.o release/musics.o release/preview.o release/themeslist.o release/save.o release/format.o release/comm.o release/moc_mainwindow.o release/moc_mediasedit.o release/moc_image.o release/moc_element.o release/moc_themes.o release/moc_videoplayer.o release/moc_slider.o release/moc_musics.o release/moc_preview.o release/moc_themeslist.o release/moc_save.o release/moc_format.o
 
 distclean: clean 
 	-$(DEL_FILE) $(DESTDIR_TARGET)
@@ -160,9 +184,9 @@ compiler_no_pch_compiler_make_all:
 compiler_no_pch_compiler_clean:
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: release/moc_mainwindow.cpp release/moc_mediasedit.cpp release/moc_image.cpp release/moc_element.cpp release/moc_themes.cpp release/moc_videoplayer.cpp release/moc_slider.cpp release/moc_musics.cpp
+compiler_moc_header_make_all: release/moc_mainwindow.cpp release/moc_mediasedit.cpp release/moc_image.cpp release/moc_element.cpp release/moc_themes.cpp release/moc_videoplayer.cpp release/moc_slider.cpp release/moc_musics.cpp release/moc_preview.cpp release/moc_themeslist.cpp release/moc_save.cpp release/moc_format.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) release/moc_mainwindow.cpp release/moc_mediasedit.cpp release/moc_image.cpp release/moc_element.cpp release/moc_themes.cpp release/moc_videoplayer.cpp release/moc_slider.cpp release/moc_musics.cpp
+	-$(DEL_FILE) release/moc_mainwindow.cpp release/moc_mediasedit.cpp release/moc_image.cpp release/moc_element.cpp release/moc_themes.cpp release/moc_videoplayer.cpp release/moc_slider.cpp release/moc_musics.cpp release/moc_preview.cpp release/moc_themeslist.cpp release/moc_save.cpp release/moc_format.cpp
 release/moc_mainwindow.cpp: ../../msys32/mingw32/include/QtWidgets/QMainWindow \
 		../../msys32/mingw32/include/QtWidgets/qmainwindow.h \
 		../../msys32/mingw32/include/QtWidgets/QStackedLayout \
@@ -248,7 +272,20 @@ release/moc_mainwindow.cpp: ../../msys32/mingw32/include/QtWidgets/QMainWindow \
 		../ffmpeg-3.0.2/libswresample/swresample.h \
 		../ffmpeg-3.0.2/libswresample/version.h \
 		themes.h \
+		themeslist.h \
 		musics.h \
+		../../msys32/mingw32/include/QtWidgets/QPushButton \
+		../../msys32/mingw32/include/QtWidgets/qpushbutton.h \
+		../../msys32/mingw32/include/QtMultimedia/QMediaPlayer \
+		../../msys32/mingw32/include/QtMultimedia/qmediaplayer.h \
+		../../msys32/mingw32/include/QtWidgets/QTableWidget \
+		../../msys32/mingw32/include/QtWidgets/qtablewidget.h \
+		slider.h \
+		../../msys32/mingw32/include/QtWidgets/QSlider \
+		../../msys32/mingw32/include/QtWidgets/qslider.h \
+		preview.h \
+		save.h \
+		format.h \
 		mainwindow.h
 	/C/msys32/mingw32/bin/moc.exe $(DEFINES) -D__GNUC__ -DWIN32 -IC:/msys32/mingw32/share/qt5/mkspecs/win32-g++ -IC:/qtproject/movemaker -IC:/qtproject/ffmpeg-3.0.2 -IC:/msys32/mingw32/include/QtMultimediaWidgets -IC:/msys32/mingw32/include/QtWidgets -IC:/msys32/mingw32/include/QtMultimedia -IC:/msys32/mingw32/include/QtGui -IC:/msys32/mingw32/include/QtNetwork -IC:/msys32/mingw32/include/QtCore -IC:/msys32/mingw32/include/c++/5.4.0 -IC:/msys32/mingw32/include/c++/5.4.0/i686-w64-mingw32 -IC:/msys32/mingw32/include/c++/5.4.0/backward -IC:/msys32/mingw32/lib/gcc/i686-w64-mingw32/5.4.0/include -IC:/msys32/mingw32/include -IC:/msys32/mingw32/lib/gcc/i686-w64-mingw32/5.4.0/include-fixed -IC:/msys32/mingw32/i686-w64-mingw32/include mainwindow.h -o release/moc_mainwindow.cpp
 
@@ -430,6 +467,14 @@ release/moc_element.cpp: ../../msys32/mingw32/include/QtWidgets/QWidget \
 
 release/moc_themes.cpp: ../../msys32/mingw32/include/QtWidgets/QWidget \
 		../../msys32/mingw32/include/QtWidgets/qwidget.h \
+		themeslist.h \
+		flowlayout.h \
+		../../msys32/mingw32/include/QtWidgets/QLayout \
+		../../msys32/mingw32/include/QtWidgets/qlayout.h \
+		../../msys32/mingw32/include/QtCore/QRect \
+		../../msys32/mingw32/include/QtCore/qrect.h \
+		../../msys32/mingw32/include/QtWidgets/QStyle \
+		../../msys32/mingw32/include/QtWidgets/qstyle.h \
 		themes.h
 	/C/msys32/mingw32/bin/moc.exe $(DEFINES) -D__GNUC__ -DWIN32 -IC:/msys32/mingw32/share/qt5/mkspecs/win32-g++ -IC:/qtproject/movemaker -IC:/qtproject/ffmpeg-3.0.2 -IC:/msys32/mingw32/include/QtMultimediaWidgets -IC:/msys32/mingw32/include/QtWidgets -IC:/msys32/mingw32/include/QtMultimedia -IC:/msys32/mingw32/include/QtGui -IC:/msys32/mingw32/include/QtNetwork -IC:/msys32/mingw32/include/QtCore -IC:/msys32/mingw32/include/c++/5.4.0 -IC:/msys32/mingw32/include/c++/5.4.0/i686-w64-mingw32 -IC:/msys32/mingw32/include/c++/5.4.0/backward -IC:/msys32/mingw32/lib/gcc/i686-w64-mingw32/5.4.0/include -IC:/msys32/mingw32/include -IC:/msys32/mingw32/lib/gcc/i686-w64-mingw32/5.4.0/include-fixed -IC:/msys32/mingw32/i686-w64-mingw32/include themes.h -o release/moc_themes.cpp
 
@@ -456,8 +501,49 @@ release/moc_slider.cpp: ../../msys32/mingw32/include/QtWidgets/QSlider \
 
 release/moc_musics.cpp: ../../msys32/mingw32/include/QtWidgets/QWidget \
 		../../msys32/mingw32/include/QtWidgets/qwidget.h \
+		../../msys32/mingw32/include/QtWidgets/QLabel \
+		../../msys32/mingw32/include/QtWidgets/qlabel.h \
+		../../msys32/mingw32/include/QtWidgets/QPushButton \
+		../../msys32/mingw32/include/QtWidgets/qpushbutton.h \
+		../../msys32/mingw32/include/QtMultimedia/QMediaPlayer \
+		../../msys32/mingw32/include/QtMultimedia/qmediaplayer.h \
+		../../msys32/mingw32/include/QtWidgets/QTableWidget \
+		../../msys32/mingw32/include/QtWidgets/qtablewidget.h \
+		slider.h \
+		../../msys32/mingw32/include/QtWidgets/QSlider \
+		../../msys32/mingw32/include/QtWidgets/qslider.h \
 		musics.h
 	/C/msys32/mingw32/bin/moc.exe $(DEFINES) -D__GNUC__ -DWIN32 -IC:/msys32/mingw32/share/qt5/mkspecs/win32-g++ -IC:/qtproject/movemaker -IC:/qtproject/ffmpeg-3.0.2 -IC:/msys32/mingw32/include/QtMultimediaWidgets -IC:/msys32/mingw32/include/QtWidgets -IC:/msys32/mingw32/include/QtMultimedia -IC:/msys32/mingw32/include/QtGui -IC:/msys32/mingw32/include/QtNetwork -IC:/msys32/mingw32/include/QtCore -IC:/msys32/mingw32/include/c++/5.4.0 -IC:/msys32/mingw32/include/c++/5.4.0/i686-w64-mingw32 -IC:/msys32/mingw32/include/c++/5.4.0/backward -IC:/msys32/mingw32/lib/gcc/i686-w64-mingw32/5.4.0/include -IC:/msys32/mingw32/include -IC:/msys32/mingw32/lib/gcc/i686-w64-mingw32/5.4.0/include-fixed -IC:/msys32/mingw32/i686-w64-mingw32/include musics.h -o release/moc_musics.cpp
+
+release/moc_preview.cpp: ../../msys32/mingw32/include/QtWidgets/QWidget \
+		../../msys32/mingw32/include/QtWidgets/qwidget.h \
+		preview.h
+	/C/msys32/mingw32/bin/moc.exe $(DEFINES) -D__GNUC__ -DWIN32 -IC:/msys32/mingw32/share/qt5/mkspecs/win32-g++ -IC:/qtproject/movemaker -IC:/qtproject/ffmpeg-3.0.2 -IC:/msys32/mingw32/include/QtMultimediaWidgets -IC:/msys32/mingw32/include/QtWidgets -IC:/msys32/mingw32/include/QtMultimedia -IC:/msys32/mingw32/include/QtGui -IC:/msys32/mingw32/include/QtNetwork -IC:/msys32/mingw32/include/QtCore -IC:/msys32/mingw32/include/c++/5.4.0 -IC:/msys32/mingw32/include/c++/5.4.0/i686-w64-mingw32 -IC:/msys32/mingw32/include/c++/5.4.0/backward -IC:/msys32/mingw32/lib/gcc/i686-w64-mingw32/5.4.0/include -IC:/msys32/mingw32/include -IC:/msys32/mingw32/lib/gcc/i686-w64-mingw32/5.4.0/include-fixed -IC:/msys32/mingw32/i686-w64-mingw32/include preview.h -o release/moc_preview.cpp
+
+release/moc_themeslist.cpp: ../../msys32/mingw32/include/QtWidgets/QWidget \
+		../../msys32/mingw32/include/QtWidgets/qwidget.h \
+		flowlayout.h \
+		../../msys32/mingw32/include/QtWidgets/QLayout \
+		../../msys32/mingw32/include/QtWidgets/qlayout.h \
+		../../msys32/mingw32/include/QtCore/QRect \
+		../../msys32/mingw32/include/QtCore/qrect.h \
+		../../msys32/mingw32/include/QtWidgets/QStyle \
+		../../msys32/mingw32/include/QtWidgets/qstyle.h \
+		themeslist.h
+	/C/msys32/mingw32/bin/moc.exe $(DEFINES) -D__GNUC__ -DWIN32 -IC:/msys32/mingw32/share/qt5/mkspecs/win32-g++ -IC:/qtproject/movemaker -IC:/qtproject/ffmpeg-3.0.2 -IC:/msys32/mingw32/include/QtMultimediaWidgets -IC:/msys32/mingw32/include/QtWidgets -IC:/msys32/mingw32/include/QtMultimedia -IC:/msys32/mingw32/include/QtGui -IC:/msys32/mingw32/include/QtNetwork -IC:/msys32/mingw32/include/QtCore -IC:/msys32/mingw32/include/c++/5.4.0 -IC:/msys32/mingw32/include/c++/5.4.0/i686-w64-mingw32 -IC:/msys32/mingw32/include/c++/5.4.0/backward -IC:/msys32/mingw32/lib/gcc/i686-w64-mingw32/5.4.0/include -IC:/msys32/mingw32/include -IC:/msys32/mingw32/lib/gcc/i686-w64-mingw32/5.4.0/include-fixed -IC:/msys32/mingw32/i686-w64-mingw32/include themeslist.h -o release/moc_themeslist.cpp
+
+release/moc_save.cpp: ../../msys32/mingw32/include/QtWidgets/QWidget \
+		../../msys32/mingw32/include/QtWidgets/qwidget.h \
+		../../msys32/mingw32/include/QtWidgets/QToolButton \
+		../../msys32/mingw32/include/QtWidgets/qtoolbutton.h \
+		format.h \
+		save.h
+	/C/msys32/mingw32/bin/moc.exe $(DEFINES) -D__GNUC__ -DWIN32 -IC:/msys32/mingw32/share/qt5/mkspecs/win32-g++ -IC:/qtproject/movemaker -IC:/qtproject/ffmpeg-3.0.2 -IC:/msys32/mingw32/include/QtMultimediaWidgets -IC:/msys32/mingw32/include/QtWidgets -IC:/msys32/mingw32/include/QtMultimedia -IC:/msys32/mingw32/include/QtGui -IC:/msys32/mingw32/include/QtNetwork -IC:/msys32/mingw32/include/QtCore -IC:/msys32/mingw32/include/c++/5.4.0 -IC:/msys32/mingw32/include/c++/5.4.0/i686-w64-mingw32 -IC:/msys32/mingw32/include/c++/5.4.0/backward -IC:/msys32/mingw32/lib/gcc/i686-w64-mingw32/5.4.0/include -IC:/msys32/mingw32/include -IC:/msys32/mingw32/lib/gcc/i686-w64-mingw32/5.4.0/include-fixed -IC:/msys32/mingw32/i686-w64-mingw32/include save.h -o release/moc_save.cpp
+
+release/moc_format.cpp: ../../msys32/mingw32/include/QtWidgets/QWidget \
+		../../msys32/mingw32/include/QtWidgets/qwidget.h \
+		format.h
+	/C/msys32/mingw32/bin/moc.exe $(DEFINES) -D__GNUC__ -DWIN32 -IC:/msys32/mingw32/share/qt5/mkspecs/win32-g++ -IC:/qtproject/movemaker -IC:/qtproject/ffmpeg-3.0.2 -IC:/msys32/mingw32/include/QtMultimediaWidgets -IC:/msys32/mingw32/include/QtWidgets -IC:/msys32/mingw32/include/QtMultimedia -IC:/msys32/mingw32/include/QtGui -IC:/msys32/mingw32/include/QtNetwork -IC:/msys32/mingw32/include/QtCore -IC:/msys32/mingw32/include/c++/5.4.0 -IC:/msys32/mingw32/include/c++/5.4.0/i686-w64-mingw32 -IC:/msys32/mingw32/include/c++/5.4.0/backward -IC:/msys32/mingw32/lib/gcc/i686-w64-mingw32/5.4.0/include -IC:/msys32/mingw32/include -IC:/msys32/mingw32/lib/gcc/i686-w64-mingw32/5.4.0/include-fixed -IC:/msys32/mingw32/i686-w64-mingw32/include format.h -o release/moc_format.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
@@ -580,7 +666,20 @@ release/main.o: main.cpp ../../msys32/mingw32/include/QtWidgets/QApplication \
 		../ffmpeg-3.0.2/libswresample/swresample.h \
 		../ffmpeg-3.0.2/libswresample/version.h \
 		themes.h \
-		musics.h
+		themeslist.h \
+		musics.h \
+		../../msys32/mingw32/include/QtWidgets/QPushButton \
+		../../msys32/mingw32/include/QtWidgets/qpushbutton.h \
+		../../msys32/mingw32/include/QtMultimedia/QMediaPlayer \
+		../../msys32/mingw32/include/QtMultimedia/qmediaplayer.h \
+		../../msys32/mingw32/include/QtWidgets/QTableWidget \
+		../../msys32/mingw32/include/QtWidgets/qtablewidget.h \
+		slider.h \
+		../../msys32/mingw32/include/QtWidgets/QSlider \
+		../../msys32/mingw32/include/QtWidgets/qslider.h \
+		preview.h \
+		save.h \
+		format.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/main.o main.cpp
 
 release/mainwindow.o: mainwindow.cpp ../../msys32/mingw32/include/QtWidgets/QVBoxLayout \
@@ -675,19 +774,27 @@ release/mainwindow.o: mainwindow.cpp ../../msys32/mingw32/include/QtWidgets/QVBo
 		../ffmpeg-3.0.2/libswresample/swresample.h \
 		../ffmpeg-3.0.2/libswresample/version.h \
 		themes.h \
+		themeslist.h \
 		musics.h \
-		videoplayer.h \
+		../../msys32/mingw32/include/QtWidgets/QPushButton \
+		../../msys32/mingw32/include/QtWidgets/qpushbutton.h \
 		../../msys32/mingw32/include/QtMultimedia/QMediaPlayer \
 		../../msys32/mingw32/include/QtMultimedia/qmediaplayer.h \
+		../../msys32/mingw32/include/QtWidgets/QTableWidget \
+		../../msys32/mingw32/include/QtWidgets/qtablewidget.h \
+		slider.h \
+		../../msys32/mingw32/include/QtWidgets/QSlider \
+		../../msys32/mingw32/include/QtWidgets/qslider.h \
+		preview.h \
+		save.h \
+		format.h \
+		videoplayer.h \
 		../../msys32/mingw32/include/QtGui/QMovie \
 		../../msys32/mingw32/include/QtGui/qmovie.h \
 		../../msys32/mingw32/include/QtCore/QBuffer \
 		../../msys32/mingw32/include/QtCore/qbuffer.h \
 		../../msys32/mingw32/include/QtWidgets/QGraphicsScene \
-		../../msys32/mingw32/include/QtWidgets/qgraphicsscene.h \
-		slider.h \
-		../../msys32/mingw32/include/QtWidgets/QSlider \
-		../../msys32/mingw32/include/QtWidgets/qslider.h
+		../../msys32/mingw32/include/QtWidgets/qgraphicsscene.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/mainwindow.o mainwindow.cpp
 
 release/ffmpeg.o: ffmpeg.c config.h \
@@ -1350,9 +1457,35 @@ release/element.o: element.cpp ../../msys32/mingw32/include/QtWidgets/QLabel \
 		../ffmpeg-3.0.2/libswresample/version.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/element.o element.cpp
 
-release/themes.o: themes.cpp themes.h \
+release/themes.o: themes.cpp ../../msys32/mingw32/include/QtWidgets/QHBoxLayout \
+		../../msys32/mingw32/include/QtWidgets/qboxlayout.h \
+		../../msys32/mingw32/include/QtWidgets/QScrollArea \
+		../../msys32/mingw32/include/QtWidgets/qscrollarea.h \
+		../../msys32/mingw32/include/QtGui/QPalette \
+		../../msys32/mingw32/include/QtGui/qpalette.h \
+		themes.h \
 		../../msys32/mingw32/include/QtWidgets/QWidget \
-		../../msys32/mingw32/include/QtWidgets/qwidget.h
+		../../msys32/mingw32/include/QtWidgets/qwidget.h \
+		themeslist.h \
+		flowlayout.h \
+		../../msys32/mingw32/include/QtWidgets/QLayout \
+		../../msys32/mingw32/include/QtWidgets/qlayout.h \
+		../../msys32/mingw32/include/QtCore/QRect \
+		../../msys32/mingw32/include/QtCore/qrect.h \
+		../../msys32/mingw32/include/QtWidgets/QStyle \
+		../../msys32/mingw32/include/QtWidgets/qstyle.h \
+		videoplayer.h \
+		../../msys32/mingw32/include/QtMultimedia/QMediaPlayer \
+		../../msys32/mingw32/include/QtMultimedia/qmediaplayer.h \
+		../../msys32/mingw32/include/QtGui/QMovie \
+		../../msys32/mingw32/include/QtGui/qmovie.h \
+		../../msys32/mingw32/include/QtCore/QBuffer \
+		../../msys32/mingw32/include/QtCore/qbuffer.h \
+		../../msys32/mingw32/include/QtWidgets/QGraphicsScene \
+		../../msys32/mingw32/include/QtWidgets/qgraphicsscene.h \
+		slider.h \
+		../../msys32/mingw32/include/QtWidgets/QSlider \
+		../../msys32/mingw32/include/QtWidgets/qslider.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/themes.o themes.cpp
 
 release/videoplayer.o: videoplayer.cpp ../../msys32/mingw32/include/QtWidgets/QtWidgets \
@@ -1534,9 +1667,29 @@ release/musics.o: musics.cpp ../../msys32/mingw32/include/QtWidgets/QVBoxLayout 
 		../../msys32/mingw32/include/QtCore/qstandardpaths.h \
 		../../msys32/mingw32/include/QtWidgets/QMessageBox \
 		../../msys32/mingw32/include/QtWidgets/qmessagebox.h \
+		../../msys32/mingw32/include/QtWidgets/QStyle \
+		../../msys32/mingw32/include/QtWidgets/qstyle.h \
+		../../msys32/mingw32/include/QtWidgets/QAbstractButton \
+		../../msys32/mingw32/include/QtWidgets/qabstractbutton.h \
+		../../msys32/mingw32/include/QtWidgets/QHeaderView \
+		../../msys32/mingw32/include/QtWidgets/qheaderview.h \
+		../../msys32/mingw32/include/QtWidgets/QToolButton \
+		../../msys32/mingw32/include/QtWidgets/qtoolbutton.h \
+		../../msys32/mingw32/include/QtCore/QDate \
+		../../msys32/mingw32/include/QtCore/qdatetime.h \
+		../../msys32/mingw32/include/QtCore/QDateTime \
 		musics.h \
 		../../msys32/mingw32/include/QtWidgets/QWidget \
 		../../msys32/mingw32/include/QtWidgets/qwidget.h \
+		../../msys32/mingw32/include/QtWidgets/QPushButton \
+		../../msys32/mingw32/include/QtWidgets/qpushbutton.h \
+		../../msys32/mingw32/include/QtMultimedia/QMediaPlayer \
+		../../msys32/mingw32/include/QtMultimedia/qmediaplayer.h \
+		../../msys32/mingw32/include/QtWidgets/QTableWidget \
+		../../msys32/mingw32/include/QtWidgets/qtablewidget.h \
+		slider.h \
+		../../msys32/mingw32/include/QtWidgets/QSlider \
+		../../msys32/mingw32/include/QtWidgets/qslider.h \
 		comm.h \
 		../../msys32/mingw32/include/QtGui/QFont \
 		../../msys32/mingw32/include/QtGui/qfont.h \
@@ -1549,6 +1702,87 @@ release/musics.o: musics.cpp ../../msys32/mingw32/include/QtWidgets/QVBoxLayout 
 		../../msys32/mingw32/include/QtCore/QMap \
 		../../msys32/mingw32/include/QtCore/qmap.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/musics.o musics.cpp
+
+release/preview.o: preview.cpp ../../msys32/mingw32/include/QtWidgets/QHBoxLayout \
+		../../msys32/mingw32/include/QtWidgets/qboxlayout.h \
+		../../msys32/mingw32/include/QtWidgets/QVBoxLayout \
+		../../msys32/mingw32/include/QtWidgets/QLabel \
+		../../msys32/mingw32/include/QtWidgets/qlabel.h \
+		../../msys32/mingw32/include/QtWidgets/QCheckBox \
+		../../msys32/mingw32/include/QtWidgets/qcheckbox.h \
+		../../msys32/mingw32/include/QtWidgets/QPlainTextEdit \
+		../../msys32/mingw32/include/QtWidgets/qplaintextedit.h \
+		../../msys32/mingw32/include/QtGui/QFont \
+		../../msys32/mingw32/include/QtGui/qfont.h \
+		../../msys32/mingw32/include/QtGui/QFontMetrics \
+		../../msys32/mingw32/include/QtGui/qfontmetrics.h \
+		../../msys32/mingw32/include/QtCore/QDebug \
+		../../msys32/mingw32/include/QtCore/qdebug.h \
+		preview.h \
+		../../msys32/mingw32/include/QtWidgets/QWidget \
+		../../msys32/mingw32/include/QtWidgets/qwidget.h \
+		videoplayer.h \
+		../../msys32/mingw32/include/QtMultimedia/QMediaPlayer \
+		../../msys32/mingw32/include/QtMultimedia/qmediaplayer.h \
+		../../msys32/mingw32/include/QtGui/QMovie \
+		../../msys32/mingw32/include/QtGui/qmovie.h \
+		../../msys32/mingw32/include/QtCore/QBuffer \
+		../../msys32/mingw32/include/QtCore/qbuffer.h \
+		../../msys32/mingw32/include/QtWidgets/QGraphicsScene \
+		../../msys32/mingw32/include/QtWidgets/qgraphicsscene.h \
+		slider.h \
+		../../msys32/mingw32/include/QtWidgets/QSlider \
+		../../msys32/mingw32/include/QtWidgets/qslider.h \
+		comm.h \
+		../../msys32/mingw32/include/QtCore/QString \
+		../../msys32/mingw32/include/QtCore/qstring.h \
+		../../msys32/mingw32/include/QtGui/QColor \
+		../../msys32/mingw32/include/QtGui/qcolor.h \
+		../../msys32/mingw32/include/QtCore/QRect \
+		../../msys32/mingw32/include/QtCore/qrect.h \
+		../../msys32/mingw32/include/QtCore/QMap \
+		../../msys32/mingw32/include/QtCore/qmap.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/preview.o preview.cpp
+
+release/themeslist.o: themeslist.cpp ../../msys32/mingw32/include/QtWidgets/QToolButton \
+		../../msys32/mingw32/include/QtWidgets/qtoolbutton.h \
+		themeslist.h \
+		../../msys32/mingw32/include/QtWidgets/QWidget \
+		../../msys32/mingw32/include/QtWidgets/qwidget.h \
+		flowlayout.h \
+		../../msys32/mingw32/include/QtWidgets/QLayout \
+		../../msys32/mingw32/include/QtWidgets/qlayout.h \
+		../../msys32/mingw32/include/QtCore/QRect \
+		../../msys32/mingw32/include/QtCore/qrect.h \
+		../../msys32/mingw32/include/QtWidgets/QStyle \
+		../../msys32/mingw32/include/QtWidgets/qstyle.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/themeslist.o themeslist.cpp
+
+release/save.o: save.cpp ../../msys32/mingw32/include/QtWidgets/QHBoxLayout \
+		../../msys32/mingw32/include/QtWidgets/qboxlayout.h \
+		../../msys32/mingw32/include/QtWidgets/QVBoxLayout \
+		../../msys32/mingw32/include/QtWidgets/QStackedLayout \
+		../../msys32/mingw32/include/QtWidgets/qstackedlayout.h \
+		../../msys32/mingw32/include/QtWidgets/QToolButton \
+		../../msys32/mingw32/include/QtWidgets/qtoolbutton.h \
+		../../msys32/mingw32/include/QtCore/QDebug \
+		../../msys32/mingw32/include/QtCore/qdebug.h \
+		save.h \
+		../../msys32/mingw32/include/QtWidgets/QWidget \
+		../../msys32/mingw32/include/QtWidgets/qwidget.h \
+		format.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/save.o save.cpp
+
+release/format.o: format.cpp ../../msys32/mingw32/include/QtWidgets/QHBoxLayout \
+		../../msys32/mingw32/include/QtWidgets/qboxlayout.h \
+		../../msys32/mingw32/include/QtWidgets/QGridLayout \
+		../../msys32/mingw32/include/QtWidgets/qgridlayout.h \
+		../../msys32/mingw32/include/QtCore/QDebug \
+		../../msys32/mingw32/include/QtCore/qdebug.h \
+		format.h \
+		../../msys32/mingw32/include/QtWidgets/QWidget \
+		../../msys32/mingw32/include/QtWidgets/qwidget.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/format.o format.cpp
 
 release/comm.o: comm.cpp comm.h \
 		../../msys32/mingw32/include/QtGui/QFont \
@@ -1594,6 +1828,18 @@ release/moc_slider.o: release/moc_slider.cpp
 
 release/moc_musics.o: release/moc_musics.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/moc_musics.o release/moc_musics.cpp
+
+release/moc_preview.o: release/moc_preview.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/moc_preview.o release/moc_preview.cpp
+
+release/moc_themeslist.o: release/moc_themeslist.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/moc_themeslist.o release/moc_themeslist.cpp
+
+release/moc_save.o: release/moc_save.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/moc_save.o release/moc_save.cpp
+
+release/moc_format.o: release/moc_format.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/moc_format.o release/moc_format.cpp
 
 ####### Install
 

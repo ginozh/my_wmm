@@ -7,6 +7,8 @@
 #include "mediasedit.h"
 #include "themes.h"
 #include "musics.h"
+#include "preview.h"
+#include "save.h"
 
 class MainWindow : public QMainWindow
 {
@@ -20,22 +22,23 @@ protected:
 private:
     void createMenu(QVBoxLayout *mainLayout);
     void createTabBar(QVBoxLayout *mainLayout);
-    void createStackWidget(QVBoxLayout *mainLayout);
+    void createStackWidget();
     void createPageUpDown(QVBoxLayout *mainLayout);
 private:
-    QVBoxLayout *mainLayout;
+    // QVBoxLayout *mainLayout;
     QStackedLayout* m_stackedLayout;
-    QWidget* qwidgetmedia;
-    // MediasEdit* qwidgetmedia;
+    // MediasEdit* m_qwidgetmedia;
     MediasEdit* m_mediasEdit;
     Themes* m_themes;
     Musics* m_musics;
+    Preview* m_preview;
 
 
-    QWidget* qwidgettheme;
-    QWidget* qwidgetmusic;
-    QWidget* qwidgetpreview;
-    QWidget* qwidgetsave;
+    QWidget* m_qwidgetmedia;
+    QWidget* m_qwidgettheme;
+    QWidget* m_qwidgetmusic;
+    QWidget* m_qwidgetpreview;
+    Save* m_save;
 
     QToolButton* m_mediaButton;
     QToolButton* m_themeButton;

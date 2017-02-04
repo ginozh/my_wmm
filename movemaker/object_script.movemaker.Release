@@ -14,6 +14,10 @@ INPUT(
 ./release/videoplayer.o
 ./release/slider.o
 ./release/musics.o
+./release/preview.o
+./release/themeslist.o
+./release/save.o
+./release/format.o
 ./release/comm.o
 ./release/moc_mainwindow.o
 ./release/moc_mediasedit.o
@@ -23,4 +27,8 @@ INPUT(
 ./release/moc_videoplayer.o
 ./release/moc_slider.o
 ./release/moc_musics.o
+./release/moc_preview.o
+./release/moc_themeslist.o
+./release/moc_save.o
+./release/moc_format.o
 );

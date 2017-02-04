@@ -13,13 +13,14 @@ MainWindow::MainWindow(QWidget *parent)
     , m_mediasEdit(new MediasEdit(this))
     , m_themes(new Themes(this))
     , m_musics(new Musics(this))
+    , m_preview(new Preview(this))
 {
     setWindowTitle(tr("Movie Maker"));
 
     QWidget* centralWidget = new QWidget(this);
 
     setCentralWidget(centralWidget);
-    mainLayout = new QVBoxLayout;
+    QVBoxLayout* mainLayout = new QVBoxLayout;
 
     createMenu(mainLayout);
 
@@ -74,51 +75,24 @@ void MainWindow::createTabBar(QVBoxLayout *mainLayout)
         hhoxtabbar->addWidget(nullWidget);
     }
 #endif
-    {
-        m_mediaButton = new QToolButton(this);
-        m_mediaButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-        m_mediaButton->setIcon(QIcon("images/media.png"));
-        m_mediaButton->setText("ADD MEDIA FILE");
-        connect(m_mediaButton, SIGNAL(clicked(bool)),
-                this, SLOT(handleTabChange()));
-        hhoxtabbar->addWidget(m_mediaButton);
-    }
-    {
-        m_themeButton = new QToolButton(this);
-        m_themeButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-        m_themeButton->setIcon(QIcon("images/theme.png"));
-        m_themeButton->setText("SELECT THEME");
-        connect(m_themeButton, SIGNAL(clicked(bool)),
-                this, SLOT(handleTabChange()));
-        hhoxtabbar->addWidget(m_themeButton);
-    }
-    {
-        m_musicButton = new QToolButton(this);
-        m_musicButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-        m_musicButton->setIcon(QIcon("images/music.png"));
-        m_musicButton->setText("SELECT MUSIC");
-        connect(m_musicButton, SIGNAL(clicked(bool)),
-                this, SLOT(handleTabChange()));
-        hhoxtabbar->addWidget(m_musicButton);
-    }
-    {
-        m_previewButton = new QToolButton(this);
-        m_previewButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-        m_previewButton->setIcon(QIcon("images/preview.png"));
-        m_previewButton->setText("PREVIEW");
-        connect(m_previewButton, SIGNAL(clicked(bool)),
-                this, SLOT(handleTabChange()));
-        hhoxtabbar->addWidget(m_previewButton);
-    }
-    {
-        m_saveButton = new QToolButton(this);
-        m_saveButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-        m_saveButton->setIcon(QIcon("images/save.png"));
-        m_saveButton->setText("SAVE AND SHARE");
-        connect(m_saveButton, SIGNAL(clicked(bool)),
-                this, SLOT(handleTabChange()));
-        hhoxtabbar->addWidget(m_saveButton);
-    }
+#define NEW_TAB(var_name, var_png, var_text) do \
+    { \
+        var_name = new QToolButton(this); \
+        var_name->setStyleSheet("border-style: flat;"); \
+        var_name->setToolButtonStyle(Qt::ToolButtonTextUnderIcon); \
+        var_name->setIcon(QIcon(var_png)); \
+        var_name->setText(var_text); \
+        connect(var_name, SIGNAL(clicked(bool)), \
+                this, SLOT(handleTabChange())); \
+        hhoxtabbar->addWidget(var_name); \
+    }while(0)
+
+    NEW_TAB(m_mediaButton, "images/media.png", "ADD MEDIA FILE");
+    NEW_TAB(m_themeButton, "images/theme.png", "SELECT THEME");
+    NEW_TAB(m_musicButton, "images/music.png", "SELECT MUSIC");
+    NEW_TAB(m_previewButton, "images/preview.png", "PREVIEW");
+    NEW_TAB(m_saveButton, "images/save.png", "SAVE AND SHARE");
+#undef NEW_TAB
 #if 0
     {
         QWidget* nullWidget = new QWidget;
@@ -128,14 +102,14 @@ void MainWindow::createTabBar(QVBoxLayout *mainLayout)
 #endif
 }
 
-void MainWindow::createStackWidget(QVBoxLayout *mainLayout)
+void MainWindow::createStackWidget()
 {
     {
-        qwidgetmedia = new QWidget;
-        m_stackedLayout->addWidget(qwidgetmedia);
+        m_qwidgetmedia = new QWidget;
+        m_stackedLayout->addWidget(m_qwidgetmedia);
         {
             QVBoxLayout* vbox = new QVBoxLayout;
-            qwidgetmedia->setLayout(vbox);
+            m_qwidgetmedia->setLayout(vbox);
             {
                 QToolButton* m_boldButton = new QToolButton(this);
                 m_boldButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -161,44 +135,31 @@ void MainWindow::createStackWidget(QVBoxLayout *mainLayout)
         }
     }
     {
-        qwidgettheme = new QWidget;
-        m_stackedLayout->addWidget(qwidgettheme);
+        m_qwidgettheme = new QWidget;
+        m_stackedLayout->addWidget(m_qwidgettheme);
         {
             QVBoxLayout* vbox = new QVBoxLayout;
-            qwidgettheme->setLayout(vbox);
+            m_qwidgettheme->setLayout(vbox);
             {
-                QLabel * lbl = new QLabel(tr("STEP2:SELECT A THEME"));
+                QLabel * lbl = new QLabel(tr("STEP 2:SELECT A THEME"));
                 vbox->addWidget(lbl);
 
                 lbl->setAlignment(Qt::AlignCenter);
             }
             {
-                QHBoxLayout* hbox = new QHBoxLayout;
-                vbox->addLayout(hbox);
-                {
-                    QScrollArea* m_scrollArea = new QScrollArea;
-                    hbox->addWidget(m_scrollArea);
-
-                    m_scrollArea->setBackgroundRole(QPalette::Light);
-                    m_scrollArea->setWidgetResizable (true);
-                    m_scrollArea->setWidget(m_themes);
-                }
-                {
-                    VideoPlayer* m_player = new VideoPlayer(this);
-                    hbox->addWidget(m_player);
-                }
+                vbox->addWidget(m_themes);
             }
         }
     }
     {
-        qwidgetmusic = new QWidget;
-        m_stackedLayout->addWidget(qwidgetmusic);
+        m_qwidgetmusic = new QWidget;
+        m_stackedLayout->addWidget(m_qwidgetmusic);
         {
             QVBoxLayout* vbox = new QVBoxLayout;
-            qwidgetmusic->setLayout(vbox);
+            m_qwidgetmusic->setLayout(vbox);
             vbox->setAlignment(Qt::AlignHCenter);
             {
-                QLabel * lbl = new QLabel(tr("STEP3:SELECT A MUSIC"));
+                QLabel * lbl = new QLabel(tr("STEP 3:SELECT A MUSIC"));
                 vbox->addWidget(lbl);
 
                 lbl->setAlignment(Qt::AlignCenter);
@@ -211,28 +172,36 @@ void MainWindow::createStackWidget(QVBoxLayout *mainLayout)
         }
     }
     {
-        qwidgetpreview = new QWidget;
-        m_stackedLayout->addWidget(qwidgetpreview);
+        m_qwidgetpreview = new QWidget;
+        m_stackedLayout->addWidget(m_qwidgetpreview);
         {
-            QHBoxLayout* hbox = new QHBoxLayout;
-            qwidgetpreview->setLayout(hbox);
+            QVBoxLayout* vbox = new QVBoxLayout;
+            m_qwidgetpreview->setLayout(vbox);
+            vbox->setAlignment(Qt::AlignHCenter);
             {
-                QLabel * lbl = new QLabel(tr("preview"));
-                hbox->addWidget(lbl);
+                QLabel * lbl = new QLabel(tr("STEP 4:PREVIEW"));
+                vbox->addWidget(lbl);
+
+                lbl->setAlignment(Qt::AlignCenter);
+            }
+            {
+                vbox->addWidget(m_preview);
             }
         }
     }
     {
-        qwidgetsave = new QWidget;
-        m_stackedLayout->addWidget(qwidgetsave);
+        m_save = new Save;
+        m_stackedLayout->addWidget(m_save);
+#if 0
         {
             QHBoxLayout* hbox = new QHBoxLayout;
-            qwidgetsave->setLayout(hbox);
+            m_save->setLayout(hbox);
             {
                 QLabel * lbl = new QLabel(tr("save"));
                 hbox->addWidget(lbl);
             }
         }
+#endif
     }
 }
 
@@ -263,18 +232,18 @@ void MainWindow::handleTabChange()
     qDebug()<< "MainWindow::handleTabChange. qwidget: " << qwidget;
     // qwidget->raise();
     if(m_mediaButton == qwidget)
-        m_stackedLayout->setCurrentWidget(qwidgetmedia);
+        m_stackedLayout->setCurrentWidget(m_qwidgetmedia);
     else if(m_themeButton == qwidget)
-        m_stackedLayout->setCurrentWidget(qwidgettheme);
+        m_stackedLayout->setCurrentWidget(m_qwidgettheme);
     else if(m_musicButton == qwidget)
-        m_stackedLayout->setCurrentWidget(qwidgetmusic);
+        m_stackedLayout->setCurrentWidget(m_qwidgetmusic);
     else if(m_previewButton == qwidget)
-        m_stackedLayout->setCurrentWidget(qwidgetpreview);
+        m_stackedLayout->setCurrentWidget(m_qwidgetpreview);
     else if(m_saveButton == qwidget)
-        m_stackedLayout->setCurrentWidget(qwidgetsave);
+        m_stackedLayout->setCurrentWidget(m_save);
 }
 void MainWindow::showEvent(QShowEvent *event)
 {
-    createStackWidget(mainLayout);
+    createStackWidget();
     QMainWindow::showEvent(event);
 }

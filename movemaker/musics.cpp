@@ -79,6 +79,7 @@ Musics::Musics(QWidget *parent)
     }
     {
         musicTable = new QTableWidget(0, 4);
+        musicTable->setStyleSheet("border-style: flat;");
         layout->addWidget(musicTable);
         musicTable->setSelectionBehavior(QAbstractItemView::SelectRows);
         QStringList labels;
@@ -95,7 +96,7 @@ Musics::Musics(QWidget *parent)
 #define NEW_TABLE_ITEM(var_name, var_label) \
         QTableWidgetItem *var_name = new QTableWidgetItem(tr(var_label)); \
         var_name->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter); \
-        var_name->setFlags(var_name->flags() ^ Qt::ItemIsEditable);  \
+        /*var_name->setFlags(var_name->flags() ^ Qt::ItemIsEditable);*/  \
         musicTable->setItem(row, col++, var_name);
 
         NEW_TABLE_ITEM(col1, "null")
@@ -103,12 +104,6 @@ Musics::Musics(QWidget *parent)
         NEW_TABLE_ITEM(col3, "01:25")
         NEW_TABLE_ITEM(col4, "POP")
 #undef NEW_TABLE_ITEM
-#if 0
-        musicTable->setItem(row, 0, "");
-        musicTable->setItem(row, 1, "music_name");
-        musicTable->setItem(row, 2, "01:25");
-        musicTable->setItem(row, 3, "POP");
-#endif
     }
     {
         QHBoxLayout* hbox = new QHBoxLayout;

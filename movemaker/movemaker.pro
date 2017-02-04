@@ -41,6 +41,10 @@ SOURCES += main.cpp \
     videoplayer.cpp \
     slider.cpp \
     musics.cpp \
+    preview.cpp \
+    themeslist.cpp \
+    save.cpp \
+    format.cpp \
     comm.cpp
 
 HEADERS  += mainwindow.h \
@@ -56,4 +60,8 @@ HEADERS  += mainwindow.h \
     videoplayer.h \
     slider.h \
     musics.h \
+    preview.h \
+    themeslist.h \
+    save.h \
+    format.h \
     comm.h
