@@ -92,6 +92,7 @@ static const char *const var_names[] = {   "X",   "Y",   "W",   "H",   "SW",   "
     ,   "roll"
     ,   "slide"
     ,   "slideupt"
+    ,   "slideleftt"
     ,   "slidedownt"
     ,   "splith"
     ,   "splitv"
@@ -130,6 +131,7 @@ enum                                   { VAR_X, VAR_Y, VAR_W, VAR_H, VAR_SW, VAR
     , VAR_ROLL
     , VAR_SLIDE
     , VAR_SLIDEUPT
+    , VAR_SLIDELEFTT
     , VAR_SLIDEDOWNT
     , VAR_SPLITH
     , VAR_SPLITV
@@ -268,6 +270,7 @@ DEFINE_ANIMATION_EXPR(uint8_t, revealleft, 1,(xpartlen=W) , , ((x>=W-xchange)?bo
 DEFINE_ANIMATION_EXPR(uint8_t, roll, 1, (xpartlen=M_PI*90/180,xchange=xpartlen*N/(t*f),tmp1=tan(xchange),tmp2=sin(xchange), tmp3=cos(xchange)), ,((tmp1>=(H-y)/(W-x) || x<=(H-W*tmp1-y)*tmp1|| tmp1<=0)? bottom[x]:*(_top+(int)((H-y)*tmp3-(W-x)*tmp2)*top_linesize+(int)((W-x)*tmp3+(H-y)*tmp2))  ))
 DEFINE_ANIMATION_EXPR(uint8_t, slide, 1, (ypartlen=H), ,((y>=H-ychange)? bottom[x]:(*(top+((int)ychange)*top_linesize+x) ) ))
 DEFINE_ANIMATION_EXPR(uint8_t, slideupt, 1, (ypartlen=H), ,((y>=H-ychange)? (H>=ychange?(*(_bottom+((int)(y-(H-ychange)))*bottom_linesize+x)):bottom[x] ):(*(top+((int)ychange)*top_linesize+x) ) ))
+DEFINE_ANIMATION_EXPR(uint8_t, slideleftt, 1, (xpartlen=W), ,((x>=W-xchange)? (W>=xchange?(*(_bottom+((int)y)*bottom_linesize+x-(int)(W-xchange))):bottom[x] ):(*(_top+((int)y)*top_linesize+x+(int)xchange) ) ))
 DEFINE_ANIMATION_EXPR(uint8_t, slidedownt, 1, (ypartlen=H), ,((y<ychange)? (H>=ychange?(*(_bottom+((int)(H-ychange+y))*bottom_linesize+x)):bottom[x] ):(*(_top+((int)(y-ychange))*top_linesize+x) ) ))
 DEFINE_ANIMATION_EXPR(uint8_t, splith, 1,(ypartlen=H/2) , , ((abs(y-hhalf)<=ychange)?bottom[x]:top[x]) )
 DEFINE_ANIMATION_EXPR(uint8_t, splitv, 1,(xpartlen=W/2) , , ((abs(x-whalf)<=xchange)?bottom[x]:top[x]) )
@@ -381,6 +384,7 @@ const BlendFuncDef blendfuncs[] = {
     {.func_arg = animation_expr_roll},
     {.func_arg = animation_expr_slide},
     {.func_arg = animation_expr_slideupt},
+    {.func_arg = animation_expr_slideleftt},
     {.func_arg = animation_expr_slidedownt},
     {.func_arg = animation_expr_splith},
     {.func_arg = animation_expr_splitv},

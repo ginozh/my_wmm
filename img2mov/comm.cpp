@@ -150,6 +150,7 @@ GlobalContext::GlobalContext()
     m_mapVisulEffect["blackwhitered"]=FilterInfo("", "Black and white - red filter");
     m_mapVisulEffect["blackwhiteyellow"]=FilterInfo("", "Black and white - yellow filter");
     m_mapVisulEffect["cyantone"]=FilterInfo("", "Cyan tone");
+    // ./ffmpeg_r.exe -y -framerate 24 -loop 1 -t 2 -i jpg/512img003.jpg -vf "lutyuv='u=101:v=151'" jpg/color.avi
     m_mapVisulEffect["sepiatone"]=FilterInfo("lutyuv='u=101:v=151'", "Sepia tone"); //./rgb2yuv.sh
     //无源文件生成一个视频 -f lavfi -i life,edgedetect,negate,fade=in:0:100 -frames:v 200
     //./ffmpeg_g -y -f lavfi -i color=c=black:s=512x384 -framerate 25 -loop 1 -i jpg/512img003.jpg   -filter_complex "[1:v][0:v]overlay=x='-512+n*512/50'[out]"  -map "[out]" -t 2 jpg/zoompan.avi

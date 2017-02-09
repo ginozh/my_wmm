@@ -4287,7 +4287,7 @@ static int64_t getmaxrss(void)
 static void log_callback_null(void *ptr, int level, const char *fmt, va_list vl)
 {
 }
-#define CALL_FFMPEG
+// #define CALL_FFMPEG
 #ifdef CALL_FFMPEG
 static int qt_ffmpeg(int argc, char **argv)
 #else
