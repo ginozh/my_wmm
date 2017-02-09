@@ -77,6 +77,7 @@ void Image::mousePressEvent(QMouseEvent *event)
 {
     m_focus=true;
     update();
+    qDebug()<<"Image. mousePressEvent";
     emit selectedImageSignal();
     if (event && (event->buttons() & Qt::RightButton))
     {

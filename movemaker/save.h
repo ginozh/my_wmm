@@ -4,6 +4,7 @@
 #include <QToolButton>
 #include <QStackedLayout>
 #include "format.h"
+#include "device.h"
 
 class Save : public QWidget
 {
@@ -28,6 +29,7 @@ private:
     QToolButton* m_btnVimeo;
 
     Format* m_format;
+    Device* m_device;
 };
 
 #endif // SAVE_H

@@ -18,6 +18,7 @@ INPUT(
 ./release/themeslist.o
 ./release/save.o
 ./release/format.o
+./release/device.o
 ./release/comm.o
 ./release/moc_mainwindow.o
 ./release/moc_mediasedit.o
@@ -31,4 +32,5 @@ INPUT(
 ./release/moc_themeslist.o
 ./release/moc_save.o
 ./release/moc_format.o
+./release/moc_device.o
 );

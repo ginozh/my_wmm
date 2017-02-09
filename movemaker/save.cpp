@@ -45,9 +45,9 @@ void Save::handleTabChange()
     // qwidget->raise();
     if(m_btnFormat == qwidget)
         m_stackedLayout->setCurrentWidget(m_format);
-#if 0
     else if(m_btnDevice == qwidget)
-        m_stackedLayout->setCurrentWidget(qwidgettheme);
+        m_stackedLayout->setCurrentWidget(m_device);
+#if 0
     else if(m_btnYoutube == qwidget)
         m_stackedLayout->setCurrentWidget(qwidgetmusic);
     else if(m_btnFacebook == qwidget)
@@ -65,4 +65,7 @@ void Save::createStackWidget()
 {
     m_format = new Format;
     m_stackedLayout->addWidget(m_format);
+
+    m_device = new Device;
+    m_stackedLayout->addWidget(m_device);
 }

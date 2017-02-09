@@ -18,6 +18,7 @@ INPUT(
 ./debug/themeslist.o
 ./debug/save.o
 ./debug/format.o
+./debug/device.o
 ./debug/comm.o
 ./debug/moc_mainwindow.o
 ./debug/moc_mediasedit.o
@@ -31,4 +32,5 @@ INPUT(
 ./debug/moc_themeslist.o
 ./debug/moc_save.o
 ./debug/moc_format.o
+./debug/moc_device.o
 );

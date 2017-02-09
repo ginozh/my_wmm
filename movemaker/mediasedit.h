@@ -22,6 +22,7 @@ private:
     Element* initialImage(const GlobalImageAttr& newGlobalImageAttr, int& idx);
 public slots:
     void addMedias();
+    //void selectedImage(QWidget*);
 protected:
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 private:
