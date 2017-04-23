@@ -46,19 +46,22 @@ w_scale1=$(echo "$w_single - $w_interval" |bc); h_scale1=$(echo "$h_single - $w_
 #zoom out && fade out black
 zoom_rate=1.2;
 interval=$(echo "$zoom_rate - 1" | bc );
-./ffmpeg.exe -y  -framerate $f -i ${arr_files[0]} -loop 1  -vf "scale=$w*$h,zoompan=z='if(lte(zoom,1.0),$zoom_rate,max(1.001,zoom-0.01))':mwhx='1':x='(iw-mw)/2':mhhy='1':y='(ih-mh)/2'" -t $t -pix_fmt yuv420p ${arr_files[0]}.zoom.mp4
-./ffmpeg.exe -y -i ${arr_files[0]}.zoom.mp4 -vf "fade=t=out:st=1:d=1:color=black" jpg/simple2.mp4 #${arr_files[0]}.zoom.fade.mp4
+#./ffmpeg.exe -y  -framerate 25 -i jpg/img001.jpg -loop 1  -vf "scale=512*384,zoompan=z='if(lte(zoom,1.0),1.2,max(1.001,zoom-0.01))':mwhx='1':x='(iw-mw)/2':mhhy='1':y='(ih-mh)/2'" -t 4 -pix_fmt yuv420p jpg/img001.jpg.zoom.mp4
+./ffmpeg.exe -y  -framerate $f -i ${arr_files[0]} -loop 1  -vf "scale=$w*$h,zoompan=z='if(lte(zoom,1.0),$zoom_rate,max(1.001,zoom-0.01))':mwhx='1':x='(iw-mw)/2':mhhy='1':y='(ih-mh)/2'" -t $t -pix_fmt yuv420p ${arr_files[0]}.zoom.mp4 #zoom参数不能变，否则会抖动
+t_duration=0.5;
+t_start=$(echo "$t - $t_duration" | bc)
+./ffmpeg.exe -y -i ${arr_files[0]}.zoom.mp4 -vf "fade=t=out:st=$t_start:d=$t_duration:color=black" jpg/simple2.mp4 #${arr_files[0]}.zoom.fade.mp4
 
 #4, 3th frame
 #pan left && fade in black
-#./ffmpeg.exe -y  -framerate 24 -i ${arr_files[0]} -loop 1  -vf "scale=$w*$h,zoompan=z='$zoom_rate':y='(zoom-1)*ih/2':ox='0.2*iw':x='max(x-(zoom-1)*iw/2/$f,0)'" -pix_fmt yuv420p -t $t ${arr_files[0]}.zoom.mp4
-./ffmpeg.exe -y  -framerate $f -i ${arr_files[1]} -loop 1  -vf "scale=$w*$h,zoompan=z='$zoom_rate':y='(zoom-1)*ih/2':x='min(x+(zoom-1)*iw/2/$f,$interval*iw)'" -pix_fmt yuv420p -t $t ${arr_files[1]}.zoom.mp4
-./ffmpeg.exe -y -i ${arr_files[1]}.zoom.mp4 -vf "fade=t=in:d=1:color=black" jpg/simple3.mp4 #${arr_files[1]}.zoom.fade.mp4
+#./ffmpeg.exe -y  -framerate 25 -i jpg/img001.jpg -loop 1  -vf "scale=512*384,zoompan=z='1.2':y='(zoom-1)*ih/2':x='min(x+(zoom-1)*iw/2/25,0.2*iw)'" -pix_fmt yuv420p -t 4 jpg/img001.jpg.zoom.mp4
+./ffmpeg.exe -y  -framerate $f -i ${arr_files[1]} -loop 1  -vf "scale=$w*$h,zoompan=z='$zoom_rate':y='(zoom-1)*ih/2':x='min(x+(zoom-1)*iw/$t/$f,$interval*iw)'" -pix_fmt yuv420p -t $t ${arr_files[1]}.zoom.mp4
+./ffmpeg.exe -y -i ${arr_files[1]}.zoom.mp4 -vf "fade=t=in:d=$t_duration:color=black" jpg/simple3.mp4 #${arr_files[1]}.zoom.fade.mp4
 
 #5, 4th frame
 #pan right && reveal right
-./ffmpeg.exe -y  -framerate $f -i ${arr_files[2]} -loop 1  -vf "zoompan=z='$zoom_rate':y='(zoom-1)*ih/2':ox='$interval*iw':x='max(x-(zoom-1)*iw/2/$f,0)'" -pix_fmt yuv420p -t $t ${arr_files[2]}.zoom.mp4
-./ffmpeg.exe -y -i jpg/simple3.mp4 -i ${arr_files[2]}.zoom.mp4 -filter_complex "blend=all_expr='if(revealright,$t,$t)'" jpg/simple4.mp4
+./ffmpeg.exe -y  -framerate $f -i ${arr_files[2]} -loop 1  -vf "zoompan=z='$zoom_rate':y='(zoom-1)*ih/2':ox='$interval*iw':x='max(x-(zoom-1)*iw/$t/$f,0)'" -pix_fmt yuv420p -t $t ${arr_files[2]}.zoom.mp4
+./ffmpeg.exe -y -i jpg/simple3.mp4 -i ${arr_files[2]}.zoom.mp4 -filter_complex "blend=all_expr='if(revealright,0.5,$t)'" jpg/simple4.mp4
 
 #6, together
 file="simple.txt";
