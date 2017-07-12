@@ -1278,6 +1278,8 @@ static OutputStream *new_output_stream(OptionsContext *o, AVFormatContext *oc, e
     if (qscale >= 0) {
         ost->enc_ctx->flags |= AV_CODEC_FLAG_QSCALE;
         ost->enc_ctx->global_quality = FF_QP2LAMBDA * qscale;
+        av_log(NULL, AV_LOG_DEBUG, "new_output_stream nb: %f qscale:%f global_quality: %d.\n",
+                (o->nb_qscale>=1? o->qscale[0].u.dbl:0), qscale, ost->enc_ctx->global_quality);
     }
 
     MATCH_PER_STREAM_OPT(disposition, str, ost->disposition, oc, st);
@@ -2776,6 +2778,7 @@ static int opt_qscale(void *optctx, const char *opt, const char *arg)
     OptionsContext *o = optctx;
     char *s;
     int ret;
+    av_log(NULL, AV_LOG_DEBUG, "opt_qscale. arg: %s\n", arg);
     if(!strcmp(opt, "qscale")){
         av_log(NULL, AV_LOG_WARNING, "Please use -q:a or -q:v, -qscale is ambiguous\n");
         return parse_option(o, "q:v", arg, options);

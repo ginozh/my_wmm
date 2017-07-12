@@ -256,7 +256,7 @@ DEFINE_ANIMATION_EXPR(uint8_t, circles, 1, (xpartlen=(W/5)/2, ypartlen=xpartlen*
 DEFINE_ANIMATION_EXPR(uint8_t, diamond, 1, (xpartlen=W), ,(( (x<=whalf && ( (y<=hhalf && x>=W-y*W/H-xchange) ||(y>=hhalf && x>=y*W/H-xchange)) ) || (x>=whalf && (( y<=hhalf && x<=xchange+W*y/H) ||(y>=hhalf && x<=xchange-W*y/H+W)))  )? bottom[x]:top[x] ) )
 DEFINE_ANIMATION_EXPR(uint8_t, heart, 1, xpartlen=(W+H)/2, , (( (x<=whalf && ((y>=hhalf && x>=y-hhalf+whalf-xchange) || (y<=hhalf && x>=hhalf-y+whalf-xchange) || (y<=hhalf && x>=whalf-xchange/2 && x<=sqrt(xchange*xchange/4-y*y+y*H-y*xchange-hhalf*hhalf+hhalf*xchange)+whalf-xchange/2 ) || (y<=hhalf && x<=whalf-xchange/2 && x>=-sqrt(xchange*xchange/4-y*y+y*H-y*xchange-hhalf*hhalf+hhalf*xchange)+whalf-xchange/2)) ) || (x>=whalf && ((y>=hhalf && x<=whalf+xchange+hhalf-y) || (y<=hhalf && x<=whalf+xchange+y-hhalf) || (x>=whalf+xchange/2 && x<=sqrt(xchange*xchange/4-y*y+y*H-y*xchange-hhalf*hhalf+hhalf*xchange)+whalf+xchange/2 ) || (x<=whalf+xchange/2 && x>=-sqrt(xchange*xchange/4-y*y+y*H-y*xchange-hhalf*hhalf+hhalf*xchange)+whalf+xchange/2)  ) ) )? bottom[x]:top[x] ) )
 DEFINE_ANIMATION_EXPR(uint8_t, rectangle, 1, (xpartlen=W/2, ypartlen=H/2), ,(( abs(W/2-x)<=xchange && abs(H/2-y)<=ychange)? bottom[x]:top[x] ) )
-DEFINE_ANIMATION_EXPR(uint8_t, wheel, 1, (xpartlen=M_PI*90/180, xchange=xpartlen*N/(t*f),tmp1=tan(xchange)), ,(( (((x>=whalf && y<hhalf) ||(x<=whalf && y>=hhalf)) && tmp1>=(whalf-x)/(y-hhalf))|| (((x<=whalf && y<hhalf) || (x>=whalf && y>hhalf)) && tmp1>=(y-hhalf)/(x-whalf)) || tmp1<0)? bottom[x]:top[x] ) )
+DEFINE_ANIMATION_EXPR(uint8_t, wheel, 1, (xpartlen=M_PI*90/180, xchange=xpartlen*N/(t*f),tmp1=tan(xchange)), ,( (T>=t || ( (((x>=whalf && y<hhalf) ||(x<=whalf && y>=hhalf)) && tmp1>=(whalf-x)/(y-hhalf))|| (((x<=whalf && y<hhalf) || (x>=whalf && y>hhalf)) && tmp1>=(y-hhalf)/(x-whalf)) || tmp1<0))? bottom[x]:top[x] ) )
 // reveals
 //insetbottomleft
 DEFINE_ANIMATION_EXPR(uint8_t, insetbottoml, 1, (xpartlen=W, ypartlen=H), ,((W-xchange<=x && ychange>=y)? bottom[x]:top[x] ) )
@@ -271,6 +271,7 @@ DEFINE_ANIMATION_EXPR(uint8_t, roll, 1, (xpartlen=M_PI*90/180,xchange=xpartlen*N
 DEFINE_ANIMATION_EXPR(uint8_t, slide, 1, (ypartlen=H), ,((y>=H-ychange)? bottom[x]:(*(top+((int)ychange)*top_linesize+x) ) ))
 DEFINE_ANIMATION_EXPR(uint8_t, slideupt, 1, (ypartlen=H), ,((y>=H-ychange)? (H>=ychange?(*(_bottom+((int)(y-(H-ychange)))*bottom_linesize+x)):bottom[x] ):(*(top+((int)ychange)*top_linesize+x) ) ))
 DEFINE_ANIMATION_EXPR(uint8_t, slideleftt, 1, (xpartlen=W), ,((x>=W-xchange)? (W>=xchange?(*(_bottom+((int)y)*bottom_linesize+x-(int)(W-xchange))):bottom[x] ):(*(_top+((int)y)*top_linesize+x+(int)xchange) ) ))
+//DEFINE_ANIMATION_EXPR(uint8_t, sliderightt, 1, (xpartlen=W), ,((x<xchange)? (W>=xchange?(*(_bottom+((int)y)*bottom_linesize+x-(int)(W-xchange))):bottom[x] ):(*(_top+((int)y)*top_linesize+x+(int)xchange) ) ))
 DEFINE_ANIMATION_EXPR(uint8_t, slidedownt, 1, (ypartlen=H), ,((y<ychange)? (H>=ychange?(*(_bottom+((int)(H-ychange+y))*bottom_linesize+x)):bottom[x] ):(*(_top+((int)(y-ychange))*top_linesize+x) ) ))
 DEFINE_ANIMATION_EXPR(uint8_t, splith, 1,(ypartlen=H/2) , , ((abs(y-hhalf)<=ychange)?bottom[x]:top[x]) )
 DEFINE_ANIMATION_EXPR(uint8_t, splitv, 1,(xpartlen=W/2) , , ((abs(x-whalf)<=xchange)?bottom[x]:top[x]) )

@@ -19,7 +19,7 @@
     { "colors"     , OPT_EXIT, {.func_arg = show_colors },      "show available color names" },
     { "loglevel"   , HAS_ARG,  {.func_arg = opt_loglevel},      "set logging level", "loglevel" },
     { "v",           HAS_ARG,  {.func_arg = opt_loglevel},      "set logging level", "loglevel" },
-    { "report"     , 0,        {(void*)opt_report}, "generate a report" },
+    { "report"     , HAS_ARG,        {(void*)opt_report}, "generate a report" }, //storm
     { "max_alloc"  , HAS_ARG,  {.func_arg = opt_max_alloc},     "set maximum size of a single allocated block", "bytes" },
     { "cpuflags"   , HAS_ARG | OPT_EXPERT, { .func_arg = opt_cpuflags }, "force specific cpu flags", "flags" },
     { "hide_banner", OPT_BOOL | OPT_EXPERT, {&hide_banner},     "do not show program banner", "hide_banner" },

@@ -3763,14 +3763,14 @@ static int lockmgr(void **mtx, enum AVLockOp op)
    }
    return 1;
 }
-
+//#include <unistd.h> //storm
 /* Called from the main */
 int main(int argc, char **argv)
 {
     int flags;
     VideoState *is;
     char dummy_videodriver[] = "SDL_VIDEODRIVER=dummy";
-
+    //sleep(1); //storm
     av_log_set_flags(AV_LOG_SKIP_REPEATED);
     parse_loglevel(argc, argv, options);
 

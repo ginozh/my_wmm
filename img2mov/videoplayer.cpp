@@ -73,7 +73,7 @@ VideoPlayer::VideoPlayer(QWidget *parent)
         controlLayout->setGeometry(QRect(0, 550*dFactorY, iFrameWidth, 20*dFactorY));
         controlLayout->setMargin(0);
         {
-//#define OPEN_FILE
+#define OPEN_FILE
 #ifdef OPEN_FILE
             QAbstractButton *openButton = new QPushButton(tr("Open..."));
             controlLayout->addWidget(openButton);
@@ -132,6 +132,7 @@ void VideoPlayer::openFile()
     //QMessageBox::information(this, "info", QString(tr("open fileName: %1")).arg(fileName));
 
     if (!fileName.isEmpty()) {
+#if 0
         //QString vfileName("C:/QtProjects/qtmovie/first.avi");
         //QMessageBox::information(this, "info", QString(tr("open fileName: %1")).arg(vfileName));
         //mediaPlayer.setMedia(QUrl::fromLocalFile(vfileName));
@@ -147,6 +148,26 @@ void VideoPlayer::openFile()
 #endif
 
         playButton->setEnabled(true);
+#endif
+        QFile file(fileName);
+        if (!file.open(QFile::ReadOnly)) {
+            QMessageBox::warning(this, tr("Codecs"),
+                                 tr("Cannot read file %1:\n%2")
+                                 .arg(fileName)
+                                 .arg(file.errorString()));
+            return;
+        }
+        m_playData = file.readAll();
+        m_playBuffer.setBuffer(&m_playData);
+        m_playBuffer.open(QIODevice::ReadOnly);
+        qDebug() << "VideoPlayer::openFile. fileName: " << fileName <<" m_playData: "<< m_playData.size()
+            << " m_playBuffer: " << m_playBuffer.size();
+
+        mediaPlayer.setMedia(QUrl::fromLocalFile(fileName), &m_playBuffer);
+        mediaPlayer.setNotifyInterval(40); //1秒25帧,即40毫秒通知一次
+
+        playButton->setEnabled(true);
+        file.close();
     }
 }
 #endif

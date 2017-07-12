@@ -68,6 +68,7 @@ static av_cold int buffer_open(URLContext *h, const char *uri, int flags)
         data = sbuffer->ptr;
         in_size = sbuffer->in_len;
         dc->out_size = sbuffer->out_len;
+        av_log(NULL, AV_LOG_DEBUG, "sbuffer: %p ptr: %p\n", sbuffer, sbuffer->ptr);
 #if 0
         data=(void*)atol  (data);
         next = av_x_if_null(memchr(opt, ',', data), data);

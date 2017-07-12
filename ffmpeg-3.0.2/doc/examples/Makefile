@@ -11,6 +11,7 @@ CFLAGS += -Wall -g
 CFLAGS := $(shell pkg-config --cflags $(FFMPEG_LIBS)) $(CFLAGS)
 LDLIBS := $(shell pkg-config --libs $(FFMPEG_LIBS)) $(LDLIBS)
 
+#http_multiclient                  #storm 
 EXAMPLES=       avio_dir_cmd                       \
                 avio_reading                       \
                 decoding_encoding                  \
@@ -18,7 +19,7 @@ EXAMPLES=       avio_dir_cmd                       \
                 extract_mvs                        \
                 filtering_video                    \
                 filtering_audio                    \
-                http_multiclient                   \
+                                   \
                 metadata                           \
                 muxing                             \
                 remuxing                           \
@@ -26,6 +27,7 @@ EXAMPLES=       avio_dir_cmd                       \
                 scaling_video                      \
                 transcode_aac                      \
                 transcoding                        \
+                simple_filter                        \
 
 OBJS=$(addsuffix .o,$(EXAMPLES))
 

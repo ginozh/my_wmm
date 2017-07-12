@@ -142,6 +142,7 @@ static inline int mpeg1_decode_block_intra(MpegEncContext *s,
     uint8_t *const scantable     = s->intra_scantable.permutated;
     const uint16_t *quant_matrix = s->intra_matrix;
     const int qscale             = s->qscale;
+    av_log(NULL, AV_LOG_DEBUG, "mpeg1_decode_block_intra qscale: %d\n", qscale); //storm
 
     /* DC coefficient */
     component = (n <= 3 ? 0 : n - 4 + 1);
@@ -229,6 +230,7 @@ static inline int mpeg1_decode_block_inter(MpegEncContext *s,
     uint8_t *const scantable     = s->intra_scantable.permutated;
     const uint16_t *quant_matrix = s->inter_matrix;
     const int qscale             = s->qscale;
+    av_log(NULL, AV_LOG_DEBUG, "mpeg1_decode_block_inter qscale: %d\n", qscale); //storm
 
     {
         OPEN_READER(re, &s->gb);
@@ -313,6 +315,7 @@ static inline int mpeg1_fast_decode_block_inter(MpegEncContext *s,
     RLTable *rl              = &ff_rl_mpeg1;
     uint8_t *const scantable = s->intra_scantable.permutated;
     const int qscale         = s->qscale;
+    av_log(NULL, AV_LOG_DEBUG, "mpeg1_fast_decode_block_inter qscale: %d\n", qscale); //storm
 
     {
         OPEN_READER(re, &s->gb);
@@ -395,6 +398,7 @@ static inline int mpeg2_decode_block_non_intra(MpegEncContext *s,
     const uint16_t *quant_matrix;
     const int qscale = s->qscale;
     int mismatch;
+    av_log(NULL, AV_LOG_DEBUG, "mpeg2_decode_block_non_intra qscale: %d\n", qscale); //storm
 
     mismatch = 1;
 
@@ -480,6 +484,7 @@ static inline int mpeg2_fast_decode_block_non_intra(MpegEncContext *s,
     RLTable *rl              = &ff_rl_mpeg1;
     uint8_t *const scantable = s->intra_scantable.permutated;
     const int qscale         = s->qscale;
+    av_log(NULL, AV_LOG_DEBUG, "mpeg2_fast_decode_block_non_intra qscale: %d\n", qscale); //storm
     OPEN_READER(re, &s->gb);
     i = -1;
 
@@ -548,6 +553,7 @@ static inline int mpeg2_decode_block_intra(MpegEncContext *s,
     const uint16_t *quant_matrix;
     const int qscale = s->qscale;
     int mismatch;
+    av_log(NULL, AV_LOG_DEBUG, "mpeg2_decode_block_intra qscale: %d\n", qscale); //storm
 
     /* DC coefficient */
     if (n < 4) {
@@ -633,6 +639,7 @@ static inline int mpeg2_fast_decode_block_intra(MpegEncContext *s,
     uint8_t *const scantable = s->intra_scantable.permutated;
     const uint16_t *quant_matrix;
     const int qscale = s->qscale;
+    av_log(NULL, AV_LOG_DEBUG, "mpeg2_fast_decode_block_intra qscale: %d\n", qscale); //storm
 
     /* DC coefficient */
     if (n < 4) {

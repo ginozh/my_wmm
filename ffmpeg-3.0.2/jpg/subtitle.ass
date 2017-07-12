@@ -14,11 +14,11 @@ PlayResY: 384
 ;下 1 2 3
 Format: Name,    Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding
 ;Style:  Default, Arial,    16,       &Hffffff,      &Hffffff,        &H0,           &H0,        0,       0,      0,         0,         100,    100,    0,       0,     1,           1,       0,      2,          10,      10,      10,      0,       0
-Style:  Default, 楷体,    16,       &Hffffff,      &Hffffff,        &H0,           &H0,        0,       0,      0,         0,         100,    100,    0,       0,     1,           1,       0,      2,          10,      10,      10,      0,       0
+Style:  Default, 楷体,    26,       &Hffffff,      &H0,        &Hff0000,           &H0000ff,        0,       0,      0,         0,         100,    100,    0,       0,     1,           1,       2,      5,          10,      10,      10,      0,       0
 
 [Events]
 Format:   Layer, Start,      End,        Style,  Name, MarginL, MarginR, MarginV, Effect, Text
-;Dialogue: 0,     0:00:00.00, 0:00:01.94, Default,    , 0,       0,       50,           ,  Oh, stupid.
+Dialogue: 0,     0:00:00.00, 0:00:04.00, Default,    , 0,       0,       50,           ,  My Love
 
 ;字体属性
 ;bold Italics Underline Strikeout
@@ -77,5 +77,5 @@ Format:   Layer, Start,      End,        Style,  Name, MarginL, MarginR, MarginV
 
 ;Contemporary
 ;drop down 1
-Dialogue: 0,     0:00:00.00, 0:00:01.94, Default,    , 0,       0,       0,              , {\move(300,0,300,220,0,1000)}Oh, -\N-stupid.你好吗
+;Dialogue: 0,     0:00:00.00, 0:00:01.94, Default,    , 0,       0,       0,              , {\move(300,0,300,220,0,1000)}Oh, -\N-stupid.你好吗
 ;Dialogue: 0,     0:00:00.00, 0:00:01.94, Default,    , 0,       0,       0,              , {\alpha&H7f&}{\p1}m 0 0 l 100 0 100 100 0 100{\p0}

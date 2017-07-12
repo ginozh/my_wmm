@@ -89,6 +89,7 @@ void *av_malloc(size_t size)
     ptr = malloc(size + ALIGN);
     if (!ptr)
         return ptr;
+    av_log(NULL, AV_LOG_DEBUG, "malloc %d malloc size: %d\n", (size_t)ptr, size + ALIGN); //storm
     diff              = ((~(long)ptr)&(ALIGN - 1)) + 1;
     ptr               = (char *)ptr + diff;
     ((char *)ptr)[-1] = diff;
@@ -96,13 +97,17 @@ void *av_malloc(size_t size)
     if (size) //OS X on SDK 10.6 has a broken posix_memalign implementation
     if (posix_memalign(&ptr, ALIGN, size))
         ptr = NULL;
+    av_log(NULL, AV_LOG_DEBUG, "malloc %d posix_memalign size: %d\n", (size_t)ptr, size); //storm
 #elif HAVE_ALIGNED_MALLOC
     ptr = _aligned_malloc(size, ALIGN);
+    //av_log(NULL, AV_LOG_DEBUG, "malloc %d _aligned_malloc size: %d\n", (size_t)ptr, size); //storm
 #elif HAVE_MEMALIGN
 #ifndef __DJGPP__
     ptr = memalign(ALIGN, size);
+    av_log(NULL, AV_LOG_DEBUG, "malloc %d memalign ALIGN size: %d\n", (size_t)ptr, size); //storm
 #else
     ptr = memalign(size, ALIGN);
+    av_log(NULL, AV_LOG_DEBUG, "malloc %d memalign size: %d\n", (size_t)ptr, size); //storm
 #endif
     /* Why 64?
      * Indeed, we should align it:
@@ -130,6 +135,7 @@ void *av_malloc(size_t size)
      */
 #else
     ptr = malloc(size);
+    av_log(NULL, AV_LOG_DEBUG, "malloc %d malloc 138 size: %d\n", (size_t)ptr, size); //storm
 #endif
     if(!ptr && !size) {
         size = 1;
@@ -161,6 +167,7 @@ void *av_realloc(void *ptr, size_t size)
     ptr = realloc((char *)ptr - diff, size + diff);
     if (ptr)
         ptr = (char *)ptr + diff;
+    av_log(NULL, AV_LOG_DEBUG, "realloc %d size: %d\n", (size_t)ptr, size); //storm
     return ptr;
 #elif HAVE_ALIGNED_MALLOC
     return _aligned_realloc(ptr, size + !size, ALIGN);
@@ -231,11 +238,14 @@ void av_free(void *ptr)
     if (ptr) {
         int v= ((char *)ptr)[-1];
         av_assert0(v>0 && v<=ALIGN);
+        av_log(NULL, AV_LOG_DEBUG, "free %d free\n", (size_t)((char *)ptr - v)); //storm
         free((char *)ptr - v);
     }
 #elif HAVE_ALIGNED_MALLOC
+    //av_log(NULL, AV_LOG_DEBUG, "free %d _aligned_free\n", (size_t)ptr); //storm
     _aligned_free(ptr);
 #else
+    //av_log(NULL, AV_LOG_DEBUG, "free %d free 248\n", (size_t)ptr); //storm
     free(ptr);
 #endif
 }

@@ -5,6 +5,29 @@
 #include <QObject> 
 #include <QFontMetrics> 
 #include <QFont> 
+#include <cstddef>     /* offsetof */
+#include<QVector>
+
+QString createAss();
+void testDate();
+void testAudio();
+void testArg();
+void testMemoryLeak();
+
+int main(int argc, char *argv[])
+{
+    QCoreApplication a(argc, argv);
+
+    // testDate();
+
+    // testAudio();
+
+    // testArg();
+
+    testMemoryLeak();
+
+    return a.exec();
+}
 
 QString createAss()
 {
@@ -25,6 +48,7 @@ QString createAss()
     qDebug(qs.toLatin1());
     return qs;
 }
+
 #if 0
 class Task : public QObject
 {
@@ -55,21 +79,8 @@ private:
 signals:
     void finished();
 };
-#include "main.moc"
-#endif
-
-int main(int argc, char *argv[])
+void testTask()
 {
-    QCoreApplication a(argc, argv);
-
-#if 1
-    QString start = QDateTime(QDate::currentDate()).addMSecs(10).toString("yyyy/MM/dd hh:mm:ss.zzz");
-    start.chop(1);
-    qDebug() << "date: " << start;//.chop(1);
-    qDebug() << "date: " << QDateTime(QDate::currentDate()).addMSecs(2000).toString("hh:mm:ss.zz");
-#endif
-
-#if 0
 	// Task parented to the application so that it
     // will be deleted by the application.
     Task *task = new Task(&a);
@@ -80,10 +91,20 @@ int main(int argc, char *argv[])
 
     // This will run the task from the application event loop.
     QTimer::singleShot(0, task, SLOT(run()));
-
+}
+#include "main.moc"
 #endif
 
-#if 0
+void testDate()
+{
+    QString start = QDateTime(QDate::currentDate()).addMSecs(10).toString("yyyy/MM/dd hh:mm:ss.zzz");
+    start.chop(1);
+    qDebug() << "date: " << start;//.chop(1);
+    qDebug() << "date: " << QDateTime(QDate::currentDate()).addMSecs(2000).toString("hh:mm:ss.zz");
+}
+
+void testAudio()
+{
     int m_iStartTime = 1212;
     int m_iStartPoint = 0;
     int m_iEntPoint = 31233;
@@ -96,7 +117,131 @@ int main(int argc, char *argv[])
             arg((float)m_iStartPoint/1000).
             arg(iRealLength<=m_duration?((float)m_iEntPoint/1000):((float)(m_duration-m_iStartTime+m_iStartPoint)/1000));
     qDebug() << test;
-#endif 
+}
 
-    return a.exec();
+typedef struct STEffectDefine {
+    // const char *name;
+    QString name;
+    const char *help;
+    QString description;
+    QVector<int> offset;
+    QVector<int> type;
+} STEffectsDefine;
+
+typedef struct STEffectContext {
+    STEffectContext(){frames=25;zoom=1.2;off_oy=0.2;}
+    //common
+    int frames;
+
+    //
+    double zoom;
+    double off_oy;
+}STEffectContext;
+enum AVOptionType{
+    AV_OPT_TYPE_FLAGS,
+    AV_OPT_TYPE_INT,
+    AV_OPT_TYPE_INT64,
+    AV_OPT_TYPE_DOUBLE,
+    AV_OPT_TYPE_FLOAT,
+    AV_OPT_TYPE_STRING,
+};
+#define OFFSET(x) offsetof(struct STEffectContext, x)
+#if 1
+static const STEffectsDefine effects[] = {
+    { "panup", "", "zoompan=z='%1':x='(zoom-1)*iw/2':oy='%2*ih':y='max(y-(zoom-1)*ih/2/%3,0)'", {OFFSET( zoom), OFFSET(off_oy), OFFSET(frames)} ,{AV_OPT_TYPE_DOUBLE, AV_OPT_TYPE_DOUBLE, AV_OPT_TYPE_INT}},
+    //{ NULL }
+};
+#endif
+void testArg()
+{
+#if 0
+    QString test("arg1: %1 arg2: %2");
+    qDebug() << test;
+    qDebug() << test.arg("arg1").arg("arg2").arg("arg3");
+    qDebug() << "end";
+    return;
+#endif
+    // QMap<QString/*name*/, STEffectsDefine> mapstEffects;
+    // mapstEffects.insert("panup", STEffectsDefine());
+    STEffectContext c;
+    //STEffectsDefine o;
+    QString qsEffectName = "panup";
+    char buf[128];
+    int ret;
+    //for(int i=0; !effects[i].name.isEmpty() ;i++)
+    for(uint32_t i=0; i<sizeof(effects[0])/sizeof(effects);i++)
+    {
+        //QVector<QString> vecValue(20);
+        if(effects[i].name.compare(qsEffectName)==0)
+        {
+            QString desc = effects[i].description;
+            for(int32_t j=0; j<effects[i].offset.size(); j++)
+            {
+                switch (effects[i].type[j]){
+                case AV_OPT_TYPE_DOUBLE: 
+                    ret = snprintf(buf, sizeof(buf), "%.3f" ,     *(double *)(((char*)&c)+effects[i].offset[j])); 
+                    break;
+                case AV_OPT_TYPE_INT: ret = snprintf(buf, sizeof(buf), "%d" ,     *(int  *)(((char*)&c)+effects[i].offset[j])); break;
+                }
+                qDebug() << "i: " << i << " j: " << j << " type: " << effects[i].type[j] << " offset: " << effects[i].offset[j]<< " buf: " << buf;
+                if ((uint32_t)ret >= sizeof(buf))
+                {
+                    qDebug()<<"error";
+                }
+                desc = desc.arg(buf);
+                //vecValue[j] = buf;
+            }
+#if 0
+            for(int j=0; j<effects[i].offset.size(); j++)
+            {
+                desc = desc.arg(vecValue[j]);
+            }
+#endif
+#if 0
+            switch(effects[i].offset.size()){
+            case 1: desc.arg(vecValue[0]);break;
+            case 2: desc.arg(vecValue[0]).arg(vecValue[1]);break;
+            case 3: desc.arg(vecValue[0]).arg(vecValue[1]).arg(vecValue[2]);break;
+            case 4: desc.arg(vecValue[0]).arg(vecValue[1]).arg(vecValue[2]).arg(vecValue[3]);break;
+            case 5: desc.arg(vecValue[0]).arg(vecValue[1]).arg(vecValue[2]).arg(vecValue[3]).arg(vecValue[4]);break;
+            }
+#endif
+            /*if(effects[i].offset.size()==3)
+                qDebug() << desc.arg(vecValue[0]).arg(vecValue[1]).arg(vecValue[2]);*/
+            //qDebug() << effects[i].description.arg(vecValue[0]).arg(vecValue[1]).arg(vecValue[2]).arg(vecValue[3]).arg(vecValue[4]).arg(vecValue[5]);
+            qDebug() << desc;
+            break;
+        }
+    }
+    /*
+    if( effects[0].offset.size() == 3)
+        qDebug() << effects[0].description.arg(*(double*)(((char*)&c)+effects[0].offset[0]));
+    */
+    return;
+#if 0
+    // 1, 解析xml中的属性key、value: zoom=1.2 off_oy=0.2 frames=25
+    // panup "zoompan=z='1.2':x='(zoom-1)*iw/2':oy='0.2*ih':y='max(y-(zoom-1)*ih/2/25,0)'"
+    QString panup = "zoompan=z='%1':x='(zoom-1)*iw/2':oy='%2*ih':y='max(y-(zoom-1)*ih/2/%3,0)'";
+    QVector<int> b;
+    QVector<int> c = {1, 2, 3}; //{ b.clear(), b << 1 << 2 << 3;}
+    qDebug() << c;
+    // qDebug() << offsetof(struct STEffectContext, zoom_expr_str);
+    struct STEffectContext a;
+    // qDebug() << &(((struct STEffectContext*)0)->zoom_expr_str); //offsetof(struct STEffectContext, zoom_expr_str);
+#endif
+}
+typedef struct La
+{
+    QString a;
+    int b;
+}La;
+void testMemoryLeak()
+{
+    QVector<La*> vLa;
+    vLa.push_back(new La());
+    La* a=new La();
+    for(int i=0; i<vLa.count(); i++)
+    {
+        qDebug()<<"i: "<<i<<" address: "<<(size_t)vLa[i];
+    }
 }

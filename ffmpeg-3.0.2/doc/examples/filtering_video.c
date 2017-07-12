@@ -37,7 +37,8 @@
 #include <libavfilter/buffersrc.h>
 #include <libavutil/opt.h>
 
-const char *filter_descr = "scale=78:24,transpose=cclock";
+//const char *filter_descr = "scale=78:24,transpose=cclock";
+const char *filter_descr = "scale=1024:576,pad=1024:768:0:(768-576)/2:black,scale=1024:768";
 /* other way:
    scale=78:24 [scl]; [scl] transpose=cclock // assumes "[in]" and "[out]" to be input output pads respectively
  */
@@ -176,7 +177,7 @@ static void display_frame(const AVFrame *frame, AVRational time_base)
     int x, y;
     uint8_t *p0, *p;
     int64_t delay;
-
+return ;
     if (frame->pts != AV_NOPTS_VALUE) {
         if (last_pts != AV_NOPTS_VALUE) {
             /* sleep roughly the right amount of time;
@@ -202,7 +203,7 @@ static void display_frame(const AVFrame *frame, AVRational time_base)
     fflush(stdout);
 }
 
-int main(int argc, char **argv)
+int callmain(int argc, char **argv)
 {
     int ret;
     AVPacket packet;
@@ -275,6 +276,14 @@ end:
         fprintf(stderr, "Error occurred: %s\n", av_err2str(ret));
         exit(1);
     }
-
-    exit(0);
+    return 0;
+    //exit(0);
+}
+int main(int argc, char **argv)
+{
+    int i=0;
+    for(;i<24;i++)
+    {
+        callmain(argc, argv);
+    }
 }

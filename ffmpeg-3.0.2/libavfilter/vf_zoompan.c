@@ -218,6 +218,7 @@ static int output_single_frame(AVFilterContext *ctx, AVFrame *in, double *var_va
     py[1] = py[2] = AV_CEIL_RSHIFT(y, s->desc->log2_chroma_h);
     py[0] = py[3] = y;
 
+    //av_log(ctx, AV_LOG_INFO, "x: %d y: %d px[1]: %d px[2]: %d py[1]: %d py[2]: %d\n", x, y, px[1], px[2], py[1], py[2]);
     s->sws = sws_alloc_context();
     if (!s->sws) {
         ret = AVERROR(ENOMEM);

@@ -9,15 +9,17 @@ arr_files=("jpg/img001.jpg" "jpg/img002.jpg" "jpg/img003.jpg")
 w_r=4;h_r=3; #w:h 4:3
 #w_r=16;h_r=9;
 w=512;h=384;
+#w=1024;h=768;
 
 #1, single original video
 t=4; #s
 t_s=12;
 t_e=12;
 f=24; #framerate
-w_tmp=$(echo "$w/(3*$w_r)" | bc)
-w=$(echo "$w_tmp*3*$w_r" | bc );h=$(echo "$w*$h_r/$w_r" | bc )
+w_tmp=$(echo "$w/(3*$w_r*2)" | bc)
+w=$(echo "$w_tmp*3*$w_r*2" | bc );h=$(echo "$w*$h_r/$w_r" | bc )
 echo "w: $w h: $h"
+exit;
 #<<COMMENT
 #time ./ffmpeg_r.exe -y  -framerate 24 -i jpg/512img002.jpg -vf "scale=512x384" -t 2 jpg/zoom.512.2.avi;
 for file in ${arr_files[0]} ${arr_files[1]} ${arr_files[2]};do
@@ -25,7 +27,7 @@ for file in ${arr_files[0]} ${arr_files[1]} ${arr_files[2]};do
     time ./ffmpeg.exe -y  -framerate $f -loop 1 -i $file -pix_fmt yuv420p -vf "scale=$w*$h" -t $t $file.mp4
 done
 #COMMENT
-
+exit;
 #2, first frame
 #2.1, bottom
 w_interval=10;
@@ -48,8 +50,9 @@ zoom_rate=1.2;
 interval=$(echo "$zoom_rate - 1" | bc );
 #./ffmpeg.exe -y  -framerate 25 -i jpg/img001.jpg -loop 1  -vf "scale=512*384,zoompan=z='if(lte(zoom,1.0),1.2,max(1.001,zoom-0.01))':mwhx='1':x='(iw-mw)/2':mhhy='1':y='(ih-mh)/2'" -t 4 -pix_fmt yuv420p jpg/img001.jpg.zoom.mp4
 ./ffmpeg.exe -y  -framerate $f -i ${arr_files[0]} -loop 1  -vf "scale=$w*$h,zoompan=z='if(lte(zoom,1.0),$zoom_rate,max(1.001,zoom-0.01))':mwhx='1':x='(iw-mw)/2':mhhy='1':y='(ih-mh)/2'" -t $t -pix_fmt yuv420p ${arr_files[0]}.zoom.mp4 #zoom参数不能变，否则会抖动
-t_duration=0.5;
+t_duration=1;
 t_start=$(echo "$t - $t_duration" | bc)
+echo "fade=t=out:st=$t_start:d=$t_duration:color=black"
 ./ffmpeg.exe -y -i ${arr_files[0]}.zoom.mp4 -vf "fade=t=out:st=$t_start:d=$t_duration:color=black" jpg/simple2.mp4 #${arr_files[0]}.zoom.fade.mp4
 
 #4, 3th frame

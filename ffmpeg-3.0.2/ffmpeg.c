@@ -22,6 +22,7 @@
  * @file
  * multimedia converter based on the FFmpeg libraries
  */
+//#define CALL_FFMPEG
 
 #include "config.h"
 #include <ctype.h>
@@ -486,6 +487,7 @@ static void ffmpeg_cleanup(int ret)
 {
     int i, j;
 
+    av_log(NULL, AV_LOG_INFO, "ffmpeg_cleanup ret: %d\n", ret);
     if (do_benchmark) {
         int maxrss = getmaxrss() / 1024;
         av_log(NULL, AV_LOG_INFO, "bench: maxrss=%ikB\n", maxrss);
@@ -4287,7 +4289,6 @@ static int64_t getmaxrss(void)
 static void log_callback_null(void *ptr, int level, const char *fmt, va_list vl)
 {
 }
-// #define CALL_FFMPEG
 #ifdef CALL_FFMPEG
 static int qt_ffmpeg(int argc, char **argv)
 #else
@@ -4371,9 +4372,9 @@ int main(int argc, char **argv)
 #ifdef CALL_FFMPEG
 
 #include "libavutil/file.h"
-#define c 50
-#define len 10*1024
-char *argvv[c];//[len];
+#define CNT 500
+#define LEN 10*1024
+char *argvv[CNT];//[LEN];
 
 static int test_ass(int argc, char **argv)
 {
@@ -4385,24 +4386,24 @@ static int test_ass(int argc, char **argv)
     uint8_t* out_buffer;
     int ret;
     out_buffer = av_mallocz(out_len);
-    for(int j=0; j<c; j++)
+    for(int j=0; j<CNT; j++)
     {
-        argvv[j]=av_mallocz(len);
+        argvv[j]=av_mallocz(LEN);
     }
     //./ffmpeg_r.exe -y -i jpg/mp3.512.5.avi -vf ass=jpg/subtitle.ass jpg/subt.mp3.512.5.avi
-    snprintf(argvv[i++], len, "./ffmpeg");
-    snprintf(argvv[i++], len, "-y");
-    snprintf(argvv[i++], len, "-v");
-    snprintf(argvv[i++], len, "trace");
-    snprintf(argvv[i++], len, "-i");
+    snprintf(argvv[i++], LEN, "./ffmpeg");
+    snprintf(argvv[i++], LEN, "-y");
+    snprintf(argvv[i++], LEN, "-v");
+    snprintf(argvv[i++], LEN, "trace");
+    snprintf(argvv[i++], LEN, "-i");
     ret = av_file_map("jpg/mp3.512.5.avi", &in_buffer1, &in_len1, 0, NULL);
     if (ret < 0)
         exit_program(1);
     sinbuffer1.ptr = in_buffer1;
     sinbuffer1.in_len = in_len1;
     sinbuffer1.out_len = NULL;
-    snprintf(argvv[i++], len, "buffer:video/avi;nobase64,%zu", (size_t)&sinbuffer1);
-    snprintf(argvv[i++], len, "-vf");
+    snprintf(argvv[i++], LEN, "buffer:video/avi;nobase64,%zu", (size_t)&sinbuffer1);
+    snprintf(argvv[i++], LEN, "-vf");
 #if 1
     ret = av_file_map("jpg/subtitle.ass", &in_buffer2, &in_len2, 0, NULL);
     if (ret < 0)
@@ -4410,15 +4411,109 @@ static int test_ass(int argc, char **argv)
     sinbuffer2.ptr = in_buffer2;
     sinbuffer2.in_len = in_len2;
     sinbuffer2.out_len = NULL;
-    snprintf(argvv[i++], len, "ass=buffer|%zu", (size_t)&sinbuffer2);
+    snprintf(argvv[i++], LEN, "ass=buffer|%zu", (size_t)&sinbuffer2);
 #else
-    snprintf(argvv[i++], len, "ass=jpg/subtitle.ass");
+    snprintf(argvv[i++], LEN, "ass=jpg/subtitle.ass");
 #endif
-    snprintf(argvv[i++], len, "jpg/txt.avi");
+    snprintf(argvv[i++], LEN, "jpg/txt.avi");
     qt_ffmpeg(i, argvv);
     av_file_unmap(in_buffer1, in_len1);
     av_file_unmap(in_buffer2, in_len2);
-    for(int j=0; j<c; j++)
+    for(int j=0; j<CNT; j++)
+    {
+        av_freep  (&argvv[j]);
+    }
+    exit_program(received_nb_signals ? 255 : main_return_code);
+    return main_return_code;
+}
+static int test_muliti_input(int argc, char **argv)
+{
+    struct to_buffer *sinbuffer, sinbuffer1, sinbuffer2, soutbuffer;
+    uint8_t* in_buffer, *in_buffer1, *in_buffer2;
+    size_t /*in_len,*/ in_len1, in_len2;
+    int i=0;
+    size_t out_len = 10*1024*1024;
+    uint8_t* out_buffer;
+    int ret;
+    out_buffer = av_mallocz(out_len);
+    for(int j=0; j<CNT; j++)
+    {
+        argvv[j]=av_mallocz(LEN);
+    }
+// ./ffmpeg -y -f concat -i "buffer:text/txt;testconcat.txt"  -c copy jpg/mm.avi
+    snprintf(argvv[i++], LEN, "./ffmpeg");
+    snprintf(argvv[i++], LEN, "-y");
+    snprintf(argvv[i++], LEN, "-v");
+    snprintf(argvv[i++], LEN, "trace");
+
+    for (int z=0; z<2; z++)
+    {
+        if(z==0)
+        {
+            ret = av_file_map("jpg/loop.512.1.avi", &in_buffer, &in_len1, 0, NULL);
+        }
+        else
+        {
+            ret = av_file_map("jpg/loop.512.2.avi", &in_buffer, &in_len1, 0, NULL);
+        }
+        if (ret < 0)
+            exit_program(1);
+        sinbuffer = av_malloc(sizeof(struct to_buffer));
+        sinbuffer->ptr = in_buffer;
+        sinbuffer->in_len = in_len1;
+        sinbuffer->out_len = NULL;
+#if 0
+        snprintf(argvv[i++], LEN, "-ss");
+        snprintf(argvv[i++], LEN, "1");
+        snprintf(argvv[i++], LEN, "-t");
+        snprintf(argvv[i++], LEN, "1");
+#endif
+        snprintf(argvv[i++], LEN, "-i");
+        snprintf(argvv[i++], LEN, "buffer:image/jpg;nobase64,%zu", (size_t)sinbuffer);
+    }
+    snprintf(argvv[i++], LEN, "-filter_complex");
+    snprintf(argvv[i++], LEN, "[0:v]trim=0:1[v1];[1:v]trim=0:1[v2];[v1][v2] concat=n=2:v=1");
+#if 0
+    ret = av_file_map("jpg/512.1.avi", &in_buffer1, &in_len1, 0, NULL);
+    if (ret < 0)
+        exit_program(1);
+    sinbuffer1.ptr = in_buffer1;
+    sinbuffer1.in_len = in_len1;
+    sinbuffer1.out_len = NULL;
+    snprintf(argvv[i++], LEN, "-t");
+    snprintf(argvv[i++], LEN, "1");
+    snprintf(argvv[i++], LEN, "-i");
+    snprintf(argvv[i++], LEN, "buffer:image/jpg;nobase64,%zu", (size_t)&sinbuffer1);
+
+    ret = av_file_map("jpg/512.2.avi", &in_buffer2, &in_len2, 0, NULL);
+    if (ret < 0)
+        exit_program(1);
+    sinbuffer2.ptr = in_buffer2;
+    sinbuffer2.in_len = in_len2;
+    sinbuffer2.out_len = NULL;
+    snprintf(argvv[i++], LEN, "-t");
+    snprintf(argvv[i++], LEN, "1");
+    snprintf(argvv[i++], LEN, "-i");
+    snprintf(argvv[i++], LEN, "buffer:image/jpg;nobase64,%zu", (size_t)&sinbuffer2);
+#endif
+    snprintf(argvv[i++], LEN, "-f");
+    snprintf(argvv[i++], LEN, "avi");
+#if 1
+    snprintf(argvv[i++], LEN, "jpg/mm.avi");
+#else
+    soutbuffer.ptr = out_buffer;
+    soutbuffer.in_len = out_len;
+    soutbuffer.out_len = &out_len;
+    snprintf(argvv[i++], LEN, "buffer:video/avi;nobase64,%zu", (size_t)&soutbuffer);
+#endif
+    qt_ffmpeg(i, argvv);
+#if 0
+    av_file_unmap(in_buffer1, in_len1);
+    av_file_unmap(in_buffer2, in_len2);
+    //av_freep(&in_buffer);
+#endif
+    av_freep(&out_buffer);
+    for(int j=0; j<CNT; j++)
     {
         av_freep  (&argvv[j]);
     }
@@ -4439,18 +4534,18 @@ static int test_concat(int argc, char **argv)
     uint8_t* out_buffer;
     int ret;
     out_buffer = av_mallocz(out_len);
-    for(int j=0; j<c; j++)
+    for(int j=0; j<CNT; j++)
     {
-        argvv[j]=av_mallocz(len);
+        argvv[j]=av_mallocz(LEN);
     }
 // ./ffmpeg -y -f concat -i "buffer:text/txt;testconcat.txt"  -c copy jpg/mm.avi
-    snprintf(argvv[i++], len, "./ffmpeg");
-    snprintf(argvv[i++], len, "-y");
-    snprintf(argvv[i++], len, "-v");
-    snprintf(argvv[i++], len, "trace");
-    snprintf(argvv[i++], len, "-f");
-    snprintf(argvv[i++], len, "concat");
-    snprintf(argvv[i++], len, "-i");
+    snprintf(argvv[i++], LEN, "./ffmpeg");
+    snprintf(argvv[i++], LEN, "-y");
+    snprintf(argvv[i++], LEN, "-v");
+    snprintf(argvv[i++], LEN, "trace");
+    snprintf(argvv[i++], LEN, "-f");
+    snprintf(argvv[i++], LEN, "concat");
+    snprintf(argvv[i++], LEN, "-i");
     ret = av_file_map("jpg/512.1.avi", &in_buffer1, &in_len1, 0, NULL);
     if (ret < 0)
         exit_program(1);
@@ -4464,30 +4559,46 @@ static int test_concat(int argc, char **argv)
     sinbuffer2.in_len = in_len2;
     sinbuffer2.out_len = NULL;
 
-    in_buffer = av_mallocz(len);
+    in_buffer = av_mallocz(LEN);
     // cat testconcat.txt
-    // file buffer:video/avi;jpg/512.1.avi
-    // file buffer:video/avi;jpg/512.2.avi
-    snprintf(in_buffer, len, "file buffer:video/avi;nobase64,%zu\nfile buffer:video/avi;nobase64,%zu\n", (size_t)&sinbuffer1, (size_t)&sinbuffer2);
+    // file 'buffer:video/avi;jpg/512.1.avi'
+    // format avi
+    // duration 1
+    // file 'buffer:video/avi;jpg/512.2.avi'
+    // format avi
+    // duration 1
+#if 0
+    snprintf(in_buffer, LEN
+            , "file 'buffer:video/avi;nobase64,%zu'\nformat avi\nduration 00:00:01.00\nfile 'buffer:video/avi;nobase64,%zu'\nformat avi\nduration 00:00:01.00\n"
+            , (size_t)&sinbuffer1, (size_t)&sinbuffer2);
+#else
+    snprintf(in_buffer, LEN
+            , "file 'jpg/512.1.avi'\nfile 'jpg/512.2.avi'\n"
+            );
+#endif
     sinbuffer.ptr = in_buffer;
     sinbuffer.in_len = strlen(in_buffer);
     sinbuffer.out_len = NULL;
-    snprintf(argvv[i++], len, "buffer:image/jpg;nobase64,%zu", (size_t)&sinbuffer);
-    snprintf(argvv[i++], len, "-c");
-    snprintf(argvv[i++], len, "copy");
-    snprintf(argvv[i++], len, "-f");
-    snprintf(argvv[i++], len, "avi");
-    //snprintf(argvv[i++], len, "jpg/mm.avi");
+    snprintf(argvv[i++], LEN, "buffer:image/jpg;nobase64,%zu", (size_t)&sinbuffer);
+    ////snprintf(argvv[i++], LEN, "videolist.txt");
+    //snprintf(argvv[i++], LEN, "-c");
+    //snprintf(argvv[i++], LEN, "copy");
+    snprintf(argvv[i++], LEN, "-f");
+    snprintf(argvv[i++], LEN, "avi");
+#if 1
+    snprintf(argvv[i++], LEN, "jpg/mm.avi");
+#else
     soutbuffer.ptr = out_buffer;
     soutbuffer.in_len = out_len;
     soutbuffer.out_len = &out_len;
-    snprintf(argvv[i++], len, "buffer:video/avi;nobase64,%zu", (size_t)&soutbuffer);
+    snprintf(argvv[i++], LEN, "buffer:video/avi;nobase64,%zu", (size_t)&soutbuffer);
+#endif
     qt_ffmpeg(i, argvv);
     av_file_unmap(in_buffer1, in_len1);
     av_file_unmap(in_buffer2, in_len2);
     av_freep(&in_buffer);
     av_freep(&out_buffer);
-    for(int j=0; j<c; j++)
+    for(int j=0; j<CNT; j++)
     {
         av_freep  (&argvv[j]);
     }
@@ -4508,25 +4619,25 @@ static int call_main(int argc, char **argv)
     int ret;
 #define IN_BUFFER_PTR
 #ifndef IN_BUFFER_PTR
-    in_buffer = av_mallocz(len);
+    in_buffer = av_mallocz(LEN);
 #endif
     out_buffer = av_mallocz(out_len);
-    for(int j=0; j<c; j++)
+    for(int j=0; j<CNT; j++)
     {
-        argvv[j]=av_mallocz(len);
+        argvv[j]=av_mallocz(LEN);
     }
-    //memset(argvv, 0, c*len);
-    snprintf(argvv[i++], len, "./ffmpeg");
-    snprintf(argvv[i++], len, "-y");
-    snprintf(argvv[i++], len, "-v");
-    snprintf(argvv[i++], len, "trace");
-    snprintf(argvv[i++], len, "-framerate");
-    snprintf(argvv[i++], len, "2");
-    snprintf(argvv[i++], len, "-loop");
-    snprintf(argvv[i++], len, "1");
-    snprintf(argvv[i++], len, "-t");
-    snprintf(argvv[i++], len, "1");
-    snprintf(argvv[i++], len, "-i");
+    //memset(argvv, 0, CNT*LEN);
+    snprintf(argvv[i++], LEN, "./ffmpeg");
+    snprintf(argvv[i++], LEN, "-y");
+    snprintf(argvv[i++], LEN, "-v");
+    snprintf(argvv[i++], LEN, "trace");
+    snprintf(argvv[i++], LEN, "-framerate");
+    snprintf(argvv[i++], LEN, "2");
+    snprintf(argvv[i++], LEN, "-loop");
+    snprintf(argvv[i++], LEN, "1");
+    snprintf(argvv[i++], LEN, "-t");
+    snprintf(argvv[i++], LEN, "1");
+    snprintf(argvv[i++], LEN, "-i");
 #ifdef IN_BUFFER_PTR
     ret = av_file_map("jpg/img001.jpg", &in_buffer, &in_len, 0, NULL);
     if (ret < 0)
@@ -4534,33 +4645,33 @@ static int call_main(int argc, char **argv)
     sinbuffer.ptr = in_buffer;
     sinbuffer.in_len = in_len;
     sinbuffer.out_len = NULL;
-    snprintf(argvv[i++], len, "buffer:image/jpg;nobase64,%zu", (size_t)&sinbuffer);
-    //snprintf(argvv[i++], len, "buffer:image/jpg;nobase64,%zu,%d", (size_t)in_buffer, in_len);
+    snprintf(argvv[i++], LEN, "buffer:image/jpg;nobase64,%zu", (size_t)&sinbuffer);
+    //snprintf(argvv[i++], LEN, "buffer:image/jpg;nobase64,%zu,%d", (size_t)in_buffer, in_len);
 #else
-    snprintf(in_buffer, len, "/9j//gAQTGF2YzU3LjI0LjEwMgD/2wBDAAgEBAQEBAUFBQUFBQYGBgYGBgYGBgYGBgYHBwcICAgHBwcGBgcHCAgICAkJCQgICAgJCQoKCgwMCwsODg4RERT/xAGiAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgsBAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKCxAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/wAARCAAIAAgDARIAAhIAAxIA/9oADAMBAAIRAxEAPwDR4x5ey1/4Wl9n+1faPP0X/hJf+Eg/snyPsXl/ZP7W+xf2p/pO3/kBf2L8/wBu/sf/AEWs7/m+v/P/AEI9fGe341/11/3fG+w+t/VfhzT6p9V/tH6x9e5vrv8AY/P/AGV/sfwf9yf1z/aT7M9D6tlP9k+3+vR+sctvqnsP33tdv4luX6vy+/z8/tva+57L2Xvnnn//2Q==");
+    snprintf(in_buffer, LEN, "/9j//gAQTGF2YzU3LjI0LjEwMgD/2wBDAAgEBAQEBAUFBQUFBQYGBgYGBgYGBgYGBgYHBwcICAgHBwcGBgcHCAgICAkJCQgICAgJCQoKCgwMCwsODg4RERT/xAGiAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgsBAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKCxAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/wAARCAAIAAgDARIAAhIAAxIA/9oADAMBAAIRAxEAPwDR4x5ey1/4Wl9n+1faPP0X/hJf+Eg/snyPsXl/ZP7W+xf2p/pO3/kBf2L8/wBu/sf/AEWs7/m+v/P/AEI9fGe341/11/3fG+w+t/VfhzT6p9V/tH6x9e5vrv8AY/P/AGV/sfwf9yf1z/aT7M9D6tlP9k+3+vR+sctvqnsP33tdv4luX6vy+/z8/tva+57L2Xvnnn//2Q==");
     sinbuffer.ptr = in_buffer;
     sinbuffer.in_len = strlen(in_buffer);
     sinbuffer.out_len = NULL;
-    snprintf(argvv[i++], len, "buffer:image/jpg;base64,%zu", (size_t)&sinbuffer);
-    //snprintf(argvv[i++], len, "buffer:image/jpg;base64,%zu,%d", (size_t)in_buffer, strlen(in_buffer));
+    snprintf(argvv[i++], LEN, "buffer:image/jpg;base64,%zu", (size_t)&sinbuffer);
+    //snprintf(argvv[i++], LEN, "buffer:image/jpg;base64,%zu,%d", (size_t)in_buffer, strlen(in_buffer));
 #endif
-    snprintf(argvv[i++], len, "-pix_fmt");
-    snprintf(argvv[i++], len, "yuv420p");
-    snprintf(argvv[i++], len, "-vcodec");
-    snprintf(argvv[i++], len, "mpeg4");
-    snprintf(argvv[i++], len, "-f");
-    snprintf(argvv[i++], len, "avi");
+    snprintf(argvv[i++], LEN, "-pix_fmt");
+    snprintf(argvv[i++], LEN, "yuv420p");
+    snprintf(argvv[i++], LEN, "-vcodec");
+    snprintf(argvv[i++], LEN, "mpeg4");
+    snprintf(argvv[i++], LEN, "-f");
+    snprintf(argvv[i++], LEN, "avi");
 #define OUT_BUFFER_PTR
 #ifdef OUT_BUFFER_PTR
     soutbuffer.ptr = out_buffer;
     soutbuffer.in_len = out_len;
     soutbuffer.out_len = &out_len;
-    snprintf(argvv[i++], len, "buffer:video/avi;nobase64,%zu", (size_t)&soutbuffer);
-    //snprintf(argvv[i++], len, "buffer:video/avi;nobase64,%zu,%d", (size_t)out_buffer, out_len);
+    snprintf(argvv[i++], LEN, "buffer:video/avi;nobase64,%zu", (size_t)&soutbuffer);
+    //snprintf(argvv[i++], LEN, "buffer:video/avi;nobase64,%zu,%d", (size_t)out_buffer, out_len);
 #else
-    snprintf(argvv[i++], len, "jpg/out.avi");
+    snprintf(argvv[i++], LEN, "jpg/out.avi");
 #endif
-    //snprintf(argvv[i++], len, "buffer:video/avi;base64,b2s=");
+    //snprintf(argvv[i++], LEN, "buffer:video/avi;base64,b2s=");
     qt_ffmpeg(i, argvv);
     av_file_unmap(in_buffer, in_len);
 #ifdef OUT_BUFFER_PTR
@@ -4571,7 +4682,7 @@ static int call_main(int argc, char **argv)
     av_freep(&in_buffer);
 #endif
     av_freep(&out_buffer);
-    for(int j=0; j<c; j++)
+    for(int j=0; j<CNT; j++)
     {
         av_freep  (&argvv[j]);
     }
@@ -4585,9 +4696,11 @@ int main(int argc, char **argv)
     for(int i=0; i<1; i++)
     {
         //call_main(argc, argv);
-        //test_concat(argc, argv);
-        test_ass(argc, argv);
-        sleep(1);
+        test_concat(argc, argv);
+        //test_muliti_input(argc, argv);
+        //test_ass(argc, argv);
+        //sleep(1);
+        //qt_ffmpeg(argc, argv);
     }
 }
 #endif

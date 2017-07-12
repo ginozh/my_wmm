@@ -40,6 +40,7 @@ typedef struct ConcatStream {
 
 typedef struct {
     char *url;
+    char *format; //storm
     int64_t start_time;
     int64_t file_start_time;
     int64_t file_inpoint;
@@ -120,8 +121,9 @@ static int add_file(AVFormatContext *avf, char *filename, ConcatFile **rfile,
 #endif
     proto = avio_find_protocol_name(filename);
     proto_len = proto ? strlen(proto) : 0;
-    if (!memcmp(filename, proto, proto_len) &&
-        (filename[proto_len] == ':' || filename[proto_len] == ',')) {
+    if ((!memcmp(filename, proto, proto_len) &&
+        (filename[proto_len] == ':' || filename[proto_len] == ','))
+            ||!memcmp(avf->filename, "buffer", strlen("buffer")) ) { //storm
         url = filename;
         filename = NULL;
     } else {
@@ -145,7 +147,7 @@ static int add_file(AVFormatContext *avf, char *filename, ConcatFile **rfile,
     file = &cat->files[cat->nb_files++];
     memset(file, 0, sizeof(*file));
     *rfile = file;
-
+    av_log(NULL, AV_LOG_DEBUG, "concat url: %s proto: %s\n", url, proto); //storm
     file->url        = url;
     file->start_time = AV_NOPTS_VALUE;
     file->duration   = AV_NOPTS_VALUE;
@@ -291,6 +293,7 @@ static int open_file(AVFormatContext *avf, unsigned fileno)
     ConcatContext *cat = avf->priv_data;
     ConcatFile *file = &cat->files[fileno];
     int ret;
+    AVInputFormat *file_iformat = NULL; //storm
 
     if (cat->avf)
         avformat_close_input(&cat->avf);
@@ -303,13 +306,26 @@ static int open_file(AVFormatContext *avf, unsigned fileno)
 
     if ((ret = ff_copy_whitelists(cat->avf, avf)) < 0)
         return ret;
-
+#if 1
+    //if (!(file_iformat = av_find_input_format("image2")))  //storm
+    if (file->format && !(file_iformat = av_find_input_format(file->format))) { //storm
+        av_log(NULL, AV_LOG_ERROR, "Unknown input format: '%s'\n", file->format);
+        //exit_program(1);
+    }
+    if ((ret = avformat_open_input(&cat->avf, file->url, file_iformat, NULL)) < 0 || //storm
+        (ret = avformat_find_stream_info(cat->avf, NULL)) < 0) {
+        av_log(avf, AV_LOG_ERROR, "Impossible to open '%s'\n", file->url);
+        avformat_close_input(&cat->avf);
+        return ret;
+    }
+#else
     if ((ret = avformat_open_input(&cat->avf, file->url, NULL, NULL)) < 0 ||
         (ret = avformat_find_stream_info(cat->avf, NULL)) < 0) {
         av_log(avf, AV_LOG_ERROR, "Impossible to open '%s'\n", file->url);
         avformat_close_input(&cat->avf);
         return ret;
     }
+#endif
     cat->cur_file = file;
     if (file->start_time == AV_NOPTS_VALUE)
         file->start_time = !fileno ? 0 :
@@ -344,6 +360,8 @@ static int concat_read_close(AVFormatContext *avf)
         avformat_close_input(&cat->avf);
     for (i = 0; i < cat->nb_files; i++) {
         av_freep(&cat->files[i].url);
+        if(cat->files[i].format) 
+            av_freep(&cat->files[i].format); //storm
         av_freep(&cat->files[i].streams);
         av_dict_free(&cat->files[i].metadata);
     }
@@ -378,7 +396,7 @@ static int concat_read_header(AVFormatContext *avf)
             }
             if ((ret = add_file(avf, filename, &file, &nb_files_alloc)) < 0)
                 goto fail;
-        } else if (!strcmp(keyword, "duration") || !strcmp(keyword, "inpoint") || !strcmp(keyword, "outpoint")) {
+        } else if (!strcmp(keyword, "duration") || !strcmp(keyword, "inpoint") || !strcmp(keyword, "outpoint") ) {
             char *dur_str = get_keyword(&cursor);
             int64_t dur;
             if (!file) {
@@ -391,12 +409,24 @@ static int concat_read_header(AVFormatContext *avf)
                        line, keyword, dur_str);
                 goto fail;
             }
-            if (!strcmp(keyword, "duration"))
+            if (!strcmp(keyword, "duration")) {
                 file->duration = dur;
+                av_log(NULL, AV_LOG_DEBUG, "file->duration: %d\n", file->duration);
+            }
             else if (!strcmp(keyword, "inpoint"))
                 file->inpoint = dur;
             else if (!strcmp(keyword, "outpoint"))
                 file->outpoint = dur;
+        } else if (!strcmp(keyword, "format")) { //storm
+            char *dur_str = get_keyword(&cursor);
+            if(dur_str)
+            {
+                int size=strlen(dur_str)+1;
+                if (!(file->format = av_malloc(size)))
+                    FAIL(AVERROR(ENOMEM));
+                av_strlcpy(file->format, dur_str, size);
+                av_log(NULL, AV_LOG_DEBUG, "format: -%s- size: %d\n", file->format, size);
+            }
         } else if (!strcmp(keyword, "file_packet_metadata")) {
             char *metadata;
             if (!file) {

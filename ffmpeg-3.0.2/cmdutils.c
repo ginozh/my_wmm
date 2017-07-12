@@ -488,7 +488,7 @@ static void check_options(const OptionDef *po)
 void parse_loglevel(int argc, char **argv, const OptionDef *options)
 {
     int idx = locate_option(argc, argv, options, "loglevel");
-    const char *env;
+    // const char *env; //storm
 
     check_options(options);
 
@@ -497,8 +497,9 @@ void parse_loglevel(int argc, char **argv, const OptionDef *options)
     if (idx && argv[idx + 1])
         opt_loglevel(NULL, "loglevel", argv[idx + 1]);
     idx = locate_option(argc, argv, options, "report");
-    if ((env = getenv("FFREPORT")) || idx) {
-        init_report(env);
+    // if ((env = getenv("FFREPORT")) || idx)  // storm
+    if (idx && argv[idx + 1]) {
+        init_report(argv[idx + 1]);// init_report(env); //storm
         if (report_file) {
             int i;
             fprintf(report_file, "Command line:\n");
@@ -980,7 +981,8 @@ static int init_report(const char *env)
         return AVERROR(ENOMEM);
     }
 
-    report_file = fopen(filename.str, "w");
+    //report_file = fopen(filename.str, "w"); //storm
+    report_file = fopen(filename.str, "a+"); //storm
     if (!report_file) {
         int ret = AVERROR(errno);
         av_log(NULL, AV_LOG_ERROR, "Failed to open report \"%s\": %s\n",

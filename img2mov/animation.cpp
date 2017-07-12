@@ -147,7 +147,7 @@ void Animation::createAnimation()
     if(m_globalContext && m_globalContext->m_player)
     {
         m_timerPauseAnimation.setSingleShot(true);
-        m_timerPauseAnimation.setInterval(1500+300); //uncomplete
+        m_timerPauseAnimation.setInterval(4000); //uncomplete
         connect(&m_timerPauseAnimation, SIGNAL(timeout()), m_globalContext->m_player->MediaPlayer(), SLOT(pause()));
         m_timerPauseAnimation.start();
     }
