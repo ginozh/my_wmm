@@ -199,7 +199,7 @@ perl -e "
 #FFREPORT=file=jpg/log.txt:level=16 ./ffmpeg -y -v warning -i /c/QtProjects/qtmovie/jpg/1.jpg -filter_complex "scale=1024:575.5,pad=1024:768:0:(768-575.5)/2:black,scale=1024:768" /c/QtProjects/qtmovie/jpg/1_scale.jpg
 time ./ffmpeg -y -report -v warning -i /c/QtProjects/qtmovie/jpg/1.jpg -filter_complex "scale=1024:575.5,pad=1024:768:0:(768-575.5)/2:black,scale=1024:768" /c/QtProjects/qtmovie/jpg/1_scale.jpg
 COMMENT
-##<<COMMENT
+<<COMMENT
 # 变形 + pad黑色
 w=1024;
 h=768;
@@ -234,7 +234,7 @@ echo
 #time ./ffmpeg_r -y -i /c/QtProjects/qtmovie/jpg/1.jpg -filter_complex "scale=1024:576,pad=1024:768:512:(768-576)/2:black,scale=1024:768" /c/QtProjects/qtmovie/jpg/1_ori_scale.jpg
 #time ./doc/examples/filtering_video.exe /c/QtProjects/qtmovie/jpg/1.jpg
 ##./ffmpeg -y -i /c/QtProjects/qtmovie/jpg/1_1280_719.jpg -filter_complex "scale=1024:575,pad=1024:768:0:(768-575)/2:black,scale=1024:768" /c/QtProjects/qtmovie/jpg/1_scale.jpg
-##COMMENT
+COMMENT
 
 #add music argv && zoom
 #./ffmpeg.exe -y -i /c/shareproject/effect_video/example/tmp_1.avi -i jpg/lovechina1.mp3 \
@@ -337,25 +337,47 @@ off3=$r1;
 COMMENT
 
 <<COMMENT
-#循环叠加特效视频+ music
-./ffmpeg_r.exe -y -i jpg/drawbox.avi \
+#循环叠加特效视频+ music: video, effect, music, ass
+#问题：使用这种方式, 如果没有anullsrc，那么最后的视频长度将是视频和音频的最小值!uncomplete tmp
+./ffmpeg_r.exe -y -i /c/Users/user/Videos/output.avi \
     -itsoffset 0 \
-    -i /c/shareproject/effect_video/example/happy/1.flv \
+    -i /c/shareproject/effect_video/example/templates/Happy/videos/1.flv \
     -itsoffset 5.5 \
-    -i /c/shareproject/effect_video/example/happy/1.flv \
+    -i /c/shareproject/effect_video/example/templates/Happy/videos/1.flv \
+    -i jpg/longlovechina2.wav \
+    -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=48000 \
     -filter_complex \
     " \
-    [0:v][1:v]overlay=x=0:y=0[video1]; \
-    [video1][2:v]overlay=x=0:y=0[last]; \
-    [last]ass=jpg/subtitle.ass \
+    [0:v][1:v]overlay=x=0:y=0,setpts=PTS-STARTPTS[video1]; \
+    [video1][2:v]overlay=x=0:y=0,setpts=PTS-STARTPTS[last]; \
+    [last]ass=jpg/subtitle.ass[vout]; \
+    [3:a]atrim=0:5,asetpts=PTS-STARTPTS[aud1]; \
+    [4:a]atrim=0:5,asetpts=PTS-STARTPTS[aud2]; \
+    [aud1][aud2]concat=n=2:v=0:a=1[aout] \
     " \
-    -t 10 \
+    -t 10 -map "[vout]" -map "[aout]" \
     jpg/drawbox1.avi 
 #ffmpeg -i INPUT1 -i INPUT2 -i INPUT3 -filter_complex amix=inputs=3:duration=first:dropout_transition=3 OUTPUT
 
     #"movie=filename=/c/shareproject/effect_video/example/happy/1.flv:loop=200,hue=s=0[lizhi1] 
 
 COMMENT
+#<<COMMENT
+#叠加所有: video, effect, music, ass
+#[video1]ass=jpg/subtitle.ass[vout]; 
+./ffmpeg_r.exe -y -i /c/Users/user/Videos/output.avi \
+    -itsoffset 1 \
+    -i /c/shareproject/effect_video/example/templates/Happy/videos/1.flv \
+    -i jpg/longlovechina2.wav \
+    -filter_complex \
+    " \
+    [0:v][1:v]overlay=x=0:y=0,setpts=PTS-STARTPTS,ass=jpg/subtitle.ass[vout]; \
+    [2:a]asetpts=PTS-STARTPTS[aout] \
+    " \
+    -map "[vout]" -map "[aout]" \
+    -vcodec h264 -preset ultrafast -t 2 -b:v 3000k \
+    jpg/drawbox1.avi 
+#COMMENT
 
 
 #增加大量粒子视频

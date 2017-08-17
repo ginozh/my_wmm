@@ -1,0 +1,3 @@
+file jpg/pic0.avi
+file jpg/transition.avi
+file jpg/pic2.avi

@@ -6,7 +6,8 @@
 #include <QFontMetrics> 
 #include <QFont> 
 #include <cstddef>     /* offsetof */
-#include<QVector>
+#include <QVector>
+#include <QtMath>
 
 QString createAss();
 void testDate();
@@ -24,9 +25,40 @@ int main(int argc, char *argv[])
 
     // testArg();
 
-    testMemoryLeak();
+    // testMemoryLeak();
 
-    return a.exec();
+    double speed=0.25;
+    //speed=2.1;
+    QString vf;
+    if(speed<0.5 || speed>2.0)
+    {
+        double divisor=1;
+        QString onevf;
+        if(speed<0.5)
+        {
+            divisor=0.5;
+            onevf="atempo=0.5";
+        }
+        else if(speed>2.0)
+        {
+            divisor=2.0;
+            onevf="atempo=2.0";
+        }
+        int bei=qFloor(qLn(speed)/qLn(divisor));
+        double base=qPow(divisor, bei);
+        double x=speed/base;
+        do{
+            vf.append(vf.isEmpty()?"":",").append(onevf);
+        }while((--bei)>0);
+        if(x!=1)
+        {
+            vf.append(vf.isEmpty()?"":",").append(QString("atempo=%1").arg(x));
+        }
+        qDebug()<<"speed: "<<speed<<" divisor: "<<divisor<<" bei: "<<bei<<" base: "<<base<<" x: "<<x;
+        qDebug()<<"vf: "<<vf;
+    }
+
+    return 0;//a.exec();
 }
 
 QString createAss()

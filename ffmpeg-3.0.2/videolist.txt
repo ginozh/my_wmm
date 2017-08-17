@@ -1,0 +1,4 @@
+file 'jpg/love_start.avi'
+duration 1
+file 'jpg/black.avi'
+duration 1
