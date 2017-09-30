@@ -13,16 +13,23 @@ cscope*
 *.dll
 *.exe
 *.lib
+tmp.sh
 
+*.user
 *.ver
 *.pc
 *.def
 */debug/*
+*/release/*
 *.log
+*/build*
 
 */jpg/*
+*/images/*
 *.jpg
 *.yuv
+*.mov
+log.txt
 
 *.gz
 *.tar
@@ -30,10 +37,12 @@ cscope*
 
 *.version
 *.config
-
+*.fate
+*.texi
 
 *.log
 
 ori_ffmpeg*
 soft*
 ffvcl*
+faac-1.28
