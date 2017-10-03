@@ -362,7 +362,7 @@ COMMENT
     #"movie=filename=/c/shareproject/effect_video/example/happy/1.flv:loop=200,hue=s=0[lizhi1] 
 
 COMMENT
-#<<COMMENT
+<<COMMENT
 #叠加所有: video, effect, music, ass
 #[video1]ass=jpg/subtitle.ass[vout]; 
 ./ffmpeg_r.exe -y -i /c/Users/user/Videos/output.avi \
@@ -377,7 +377,7 @@ COMMENT
     -map "[vout]" -map "[aout]" \
     -vcodec h264 -preset ultrafast -t 2 -b:v 3000k \
     jpg/drawbox1.avi 
-#COMMENT
+COMMENT
 
 
 #增加大量粒子视频
@@ -436,5 +436,7 @@ COMMENT
 #    'scale=ih*16/9:-1,boxblur=luma_radius=min(h\,w)/20:luma_power=1:chroma_radius=min(cw\,ch)/20:chroma_power=1[bg];[bg][0:v]overlay=(W-w)/2:(H-h)/2,crop=h=iw*9/16,scale=512*384' /c/shareproject/effect_video/example/tmp_0.mp4
 COMMENT
 
-<<COMMENT
-COMMENT
+#<<COMMENT
+ffmpeg -i  -filter_complex "[0:v]colorchannelmixer=0.98786:0.01538:0.00378:0.0:0.00698:0.99372:0.00336:0.0:0.00544:0.01068:0.98262:0.0[colorchannelmixed]; \
+[colorchannelmixed]eq=0.85:0.0175:0.02:1.0:1.0:1.0:1.0:1.0[color_effect]" -map [color_effect] -c:v png output_image
+#COMMENT

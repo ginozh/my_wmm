@@ -14,6 +14,7 @@ cscope*
 *.exe
 *.lib
 tmp.sh
+tmp1.sh
 
 *.user
 *.ver

@@ -27,37 +27,9 @@ int main(int argc, char *argv[])
 
     // testMemoryLeak();
 
-    double speed=0.25;
-    //speed=2.1;
-    QString vf;
-    if(speed<0.5 || speed>2.0)
-    {
-        double divisor=1;
-        QString onevf;
-        if(speed<0.5)
-        {
-            divisor=0.5;
-            onevf="atempo=0.5";
-        }
-        else if(speed>2.0)
-        {
-            divisor=2.0;
-            onevf="atempo=2.0";
-        }
-        int bei=qFloor(qLn(speed)/qLn(divisor));
-        double base=qPow(divisor, bei);
-        double x=speed/base;
-        do{
-            vf.append(vf.isEmpty()?"":",").append(onevf);
-        }while((--bei)>0);
-        if(x!=1)
-        {
-            vf.append(vf.isEmpty()?"":",").append(QString("atempo=%1").arg(x));
-        }
-        qDebug()<<"speed: "<<speed<<" divisor: "<<divisor<<" bei: "<<bei<<" base: "<<base<<" x: "<<x;
-        qDebug()<<"vf: "<<vf;
-    }
+    // createASpeed();
 
+    qDebug()<<"qLn: "<<qLn(10)<<" qPow: "<<qPow(3.3,2);
     return 0;//a.exec();
 }
 
@@ -275,5 +247,38 @@ void testMemoryLeak()
     for(int i=0; i<vLa.count(); i++)
     {
         qDebug()<<"i: "<<i<<" address: "<<(size_t)vLa[i];
+    }
+}
+void createASpeed()
+{
+    double speed=0.25;
+    //speed=2.1;
+    QString vf;
+    if(speed<0.5 || speed>2.0)
+    {
+        double divisor=1;
+        QString onevf;
+        if(speed<0.5)
+        {
+            divisor=0.5;
+            onevf="atempo=0.5";
+        }
+        else if(speed>2.0)
+        {
+            divisor=2.0;
+            onevf="atempo=2.0";
+        }
+        int bei=qFloor(qLn(speed)/qLn(divisor));
+        double base=qPow(divisor, bei);
+        double x=speed/base;
+        do{
+            vf.append(vf.isEmpty()?"":",").append(onevf);
+        }while((--bei)>0);
+        if(x!=1)
+        {
+            vf.append(vf.isEmpty()?"":",").append(QString("atempo=%1").arg(x));
+        }
+        qDebug()<<"speed: "<<speed<<" divisor: "<<divisor<<" bei: "<<bei<<" base: "<<base<<" x: "<<x;
+        qDebug()<<"vf: "<<vf;
     }
 }
