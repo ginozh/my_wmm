@@ -7,12 +7,13 @@
 * @brief  ui interface
 * @date 1/2/2017
 */
-
 #include <QMainWindow>
 #include <QImage>
 #include <QPaintEvent>
 #include <QTimer>
-#include <videothread.h>
+
+#include "FFmpegReader.h"
+#include "PlayerPrivate.h"
 //#include "QWidgetPlayer.h"
 
 namespace Ui {
@@ -36,7 +37,7 @@ protected:
 private:
     Ui::MainWindow *ui;
 
-    VideoThread *mPlayer; //解析视音频类对象
+    PlayerPrivate *mPlayer; //解析视音频类对象
 
     QImage mImage; //记录当前的图像
 
@@ -61,7 +62,7 @@ private slots:
     void slot_fullScreen();     //全屏槽
     void slot_subWindow();      //正常屏槽
 
-    void slotStateChanged(VideoThread::PlayState mPlayState);   //播放状态改变槽
+    ////void slotStateChanged(VideoThread::PlayState mPlayState);   //播放状态改变槽
     void changeVRMode();
 
 signals:

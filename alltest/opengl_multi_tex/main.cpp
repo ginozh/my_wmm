@@ -13,7 +13,7 @@
 #include <iostream>
 using namespace std;
 
-
+#if 0
 int render(GenericShaderContext *gs, const uchar* bits, const uchar* bits1)
 {
 #ifdef OUTPUT_WASTE
@@ -70,6 +70,7 @@ int render(GenericShaderContext *gs, const uchar* bits, const uchar* bits1)
 #endif
     return 0;
 }
+#endif
 void opengl()
 {
     static int i=0;
@@ -85,6 +86,7 @@ void opengl()
         qDebug()<<"gs is null ";
         return;
     }
+#if 0
     qDebug()<<"gs->program: "<<gs->program<<" gs->v_shader: "<<gs->v_shader;
     if (!glIsShader(gs->f_shader)) {
         qInfo()<<"error gs->f_shader is not shader";
@@ -105,7 +107,7 @@ void opengl()
     if (status != GL_TRUE) {
         qInfo()<<"error glGetProgramiv";
     }
-
+#endif
     {
         QString fileName="c:\\shareproject\\jpg\\512img001.jpg";
         QImage image(fileName);
@@ -113,8 +115,8 @@ void opengl()
             qDebug()<<"image.isNull";
             return;
         }
-        //image = image.convertToFormat(QImage::Format_RGBA8888);
-        image = image.convertToFormat(QImage::Format_RGB888);
+        image = image.convertToFormat(QImage::Format_RGBA8888);
+        //image = image.convertToFormat(QImage::Format_RGB888);
         unsigned char *pixels = (unsigned char *) image.bits();
 
         QString fileName2="c:\\shareproject\\jpg\\512img002.jpg";
@@ -123,18 +125,21 @@ void opengl()
             qDebug()<<"image2.isNull";
             return;
         }
-        //image = image.convertToFormat(QImage::Format_RGBA8888);
-        image2 = image2.convertToFormat(QImage::Format_RGB888);
+        image2 = image2.convertToFormat(QImage::Format_RGBA8888);
+        //image2 = image2.convertToFormat(QImage::Format_RGB888);
         unsigned char *pixels2 = (unsigned char *) image2.bits();
         //f->glReadPixels(0,0,gs->w,gs->h,GL_RGBA,GL_UNSIGNED_BYTE, imagefrag.bits());
-        render(gs, pixels, pixels2);
+        //render(gs, pixels, pixels2);
+        GlobalContext::instance()->fragRenderForOtherThread("ColourDistance", pixels, pixels2);
+        
         //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, gs->w, gs->h, 0, PIXEL_FORMAT, GL_UNSIGNED_BYTE, pixels);
         //glDrawArrays(GL_TRIANGLES, 0, 6);
         glFlush();
         //glFinish();
-        QImage imagefrag(gs->w,gs->h,QImage::Format_RGB888);
+        //QImage imagefrag(gs->w,gs->h,QImage::Format_RGB888);
+        QImage imagefrag(gs->w,gs->h,QImage::Format_RGBA8888);
         unsigned char *mask_pixels = (unsigned char *) imagefrag.bits();
-        glReadPixels(0, 0, gs->w, gs->h, PIXEL_FORMAT, GL_UNSIGNED_BYTE, (GLvoid *)mask_pixels);
+        glReadPixels(0, 0, gs->w, gs->h, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *)mask_pixels);
         //glReadPixels(0, 0, gs->w, gs->h, PIXEL_FORMAT, GL_UNSIGNED_BYTE, (GLvoid *)pixels);
         imagefrag.save("c:\\shareproject\\jpg\\512img004_frag.jpg");
         //screenshot("c:\\shareproject\\jpg\\512img005_frag.bmp");
@@ -144,7 +149,8 @@ void opengl()
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    GlobalContext::instance();
+    GlobalContext::instance()->initialOpengl(512,384);
+    GlobalContext::instance()->createProgram("ColourDistance");
 
     opengl();
     return 0;//a.exec();

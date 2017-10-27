@@ -20,12 +20,14 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    videothread.cpp \
+    FFmpegReader.cpp \
+    PlayerPrivate.cpp \
     cmdutils.c \
 
 
 HEADERS  += mainwindow.h \
-    videothread.h \
+    FFmpegReader.h \
+    PlayerPrivate.h \
     avversion.h \
     cmdutils.h \
     colorspace.h \
@@ -35,6 +37,7 @@ FORMS    += mainwindow.ui
 LIBS += -L$$PWD/ffmpeg/lib/ -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lpostproc -lswresample -lswscale  -lavresample \
         -L$$PWD/gl/lib/x64/ -lfreeglut -lglew32 #-lglew32s
 LIBS += -lSDL
+#LIBS += -lSDL2
 
 INCLUDEPATH += $$PWD/ffmpeg/include/ \
                 $$PWD/gl/include/ \

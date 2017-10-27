@@ -1,5 +1,6 @@
 #QT += quick
 
+
 # To make threaded gl check...
 #QT += core-private gui-private
 QT += core gui widgets
@@ -9,8 +10,10 @@ CONFIG += opengl_off
 CONFIG -= app_bundle
 TARGET = opengl_off 
 
-HEADERS += logorenderer.h
-SOURCES += logorenderer.cpp main.cpp
+HEADERS += fragrenderer.h
+#HEADERS += logorenderer.h
+SOURCES += fragrenderer.cpp main.cpp
+#SOURCES += logorenderer.cpp main.cpp
 
 #RESOURCES += textureinthread.qrc
 

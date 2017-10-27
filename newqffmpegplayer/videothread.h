@@ -1,12 +1,5 @@
 #ifndef VideoThread_H
 #define VideoThread_H
-/**
-* Copyright(C) 2009-2012
-* @author Jing HUANG   matrixvis.cn
-* @file videothread.h
-* @brief  the decoding thread
-* @date 1/2/2017
-*/
 
 #include <QThread>
 #include <QImage>

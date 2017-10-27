@@ -40,9 +40,9 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWind
 
     av_register_all(); //初始化FFMPEG  调用了这个才能正常使用编码器和解码器
 
-    mPlayer = new VideoThread;    //解析音视频类对象
+    mPlayer = new PlayerPrivate;    //解析音视频类对象
     connect(mPlayer,SIGNAL(sig_GetOneFrame(QImage)),this,SLOT(slotGetOneFrame(QImage)));
-    connect(mPlayer,SIGNAL(sig_TotalTimeChanged(qint64)),this,SLOT(slotTotalTimeChanged(qint64)));
+    //connect(mPlayer,SIGNAL(sig_TotalTimeChanged(qint64)),this,SLOT(slotTotalTimeChanged(qint64)));
     //connect(mPlayer,SIGNAL(sig_StateChanged(VideoThread::PlayerState)),this,SLOT(slotStateChanged(VideoThread::PlayerState)));
 
     mTimer = new QTimer;    //定时器-获取当前视频时间
@@ -146,13 +146,15 @@ void MainWindow::slotTotalTimeChanged(qint64 uSec){       //视频的总时间
 
 void MainWindow::slotSliderMoved(int value){      //slider变化
     if (QObject::sender() == ui->horizontalSlider){
+#ifdef VIDEO_THREAD
         mPlayer->seek((qint64)value * 1000000);
+#endif
     }
 }
 
 void MainWindow::slotTimerTimeOut(){      //当前视频的正在播放的时间
     if (QObject::sender() == mTimer){
-
+#ifdef VIDEO_THREAD
         qint64 Sec = mPlayer->getCurrentTime();
         blockSignals(true);
         ui->horizontalSlider->setValue(Sec);
@@ -164,19 +166,29 @@ void MainWindow::slotTimerTimeOut(){      //当前视频的正在播放的时间
 
         QString str = QString("%1:%2").arg(mStr.right(2)).arg(sStr.right(2));
         ui->label_currenttime->setText(str);        //显示时间的label
+#endif
     }
 }
 
 void MainWindow::slotBtnClick(){         //按钮监听事件
     if (QObject::sender() == ui->pushButton_play){   //播放按钮
-        mPlayer->stop(true);      //如果在播放则先停止
-        //mPlayer->setFileName("c:/Users/Public/Videos/SampleVideos/Wildlife.wmv");
-        mPlayer->setFileName("c:/shareproject/jpg/IMG_1924.MP4");
+        mPlayer->start();
+#if 0
+        mPlayer->setFileName("c:/Users/Public/Videos/SampleVideos/Wildlife.wmv");
+        while(1){
+            QImage img = mPlayer->GetFrame(1);
+            av_log(NULL, AV_LOG_INFO, "image isnull: %d\n", img.isNull());
+            //emit sig_GetOneFrame(img);
+            slotGetOneFrame(img);
+            //sleep(delay);
+        }
+#endif
         mTimer->start();
-        mPlayer->play();
     }
     else if (QObject::sender() == ui->pushButton_pause){  //暂停按钮
+#ifdef VIDEO_THREAD
         mPlayer->pause();
+#endif
     }
     else if (QObject::sender() == ui->pushButton_two){    //显示另一个屏播放按钮
 #if 0
@@ -194,24 +206,28 @@ void MainWindow::slotBtnClick(){         //按钮监听事件
 #endif
     }
     else if (QObject::sender() == ui->pushButton_stop){   //停止播放按钮
+#ifdef VIDEO_THREAD
         mPlayer->stop(true);
+#endif
     }
     else if (QObject::sender() == ui->pushButton_open){    //打开文件按钮
         QString s=QFileDialog::getOpenFileName(this,tr("open the movie"),"/",tr("mov files(*.wmv *.mov *.flv *.rmvb *.mp4 *.avi);;all files(*)"));
         if (!s.isEmpty()){
             s.replace("/","\\");
+#ifdef VIDEO_THREAD
             mPlayer->stop(true);      //如果在播放则先停止
             mPlayer->setFileName(s);
+#endif
             mTimer->start();
         }
     }
 }
 
-
+#if 0
 void MainWindow::slotStateChanged(VideoThread::PlayState mPlayState){   //播放状态改变时槽，可以加一些变化隐藏等动作
 
 }
-
+#endif
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
@@ -228,10 +244,12 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         widget_ext->modifyEyeSeparation(-0.01);
         break;
 #endif
+#ifdef VIDEO_THREAD
     case Qt::Key_Space:
         if(mPlayer->isPlaying()) mPlayer->pause();
         else mPlayer->play();
         break;
+#endif
     default:
         break;
     }
@@ -252,12 +270,14 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::KeyPress)
     {
+#ifdef VIDEO_THREAD
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
         if (keyEvent->key() == Qt::Key_Space)
         {
             if(mPlayer->isPlaying()) mPlayer->pause();
             else mPlayer->play();
         }
+#endif
 
     }
     return QObject::eventFilter(obj, event);

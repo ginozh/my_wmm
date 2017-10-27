@@ -1,20 +1,13 @@
-/**
- * Copyright(C) 2009-2012
- * @author Jing HUANG   matrixvis.cn
- * @file videothread.cpp
- * @brief
- * @date 1/2/2017
- */
-
 #include "videothread.h"
 #define mVideoState mis
 
 #include <stdio.h>
 #include <QDebug>
 #include <assert.h>
+#if 0
 const char program_name[] = "avplay";
 const int program_birth_year = 2003;
-
+#endif
 static int64_t sws_flags = SWS_BICUBIC;
 
 #define FF_ALLOC_EVENT   (SDL_USEREVENT)
@@ -23,8 +16,8 @@ static int64_t sws_flags = SWS_BICUBIC;
 
 static int packet_queue_put(PacketQueue *q, AVPacket *pkt);
 
-int rdftspeed = 20;
-AVPacket flush_pkt;
+static int rdftspeed = 20;
+static AVPacket flush_pkt;
 /* packet queue handling */
 static void packet_queue_init(PacketQueue *q)
 {
@@ -780,7 +773,7 @@ static double compute_target_time(double frame_current_pts, PlayerState *is)
     }
     is->frame_timer += delay;
 
-    av_log(NULL, AV_LOG_TRACE, "video: delay=%0.3f pts=%0.3f A-V=%f\n",
+    av_log(NULL, AV_LOG_INFO, "video: delay=%0.3f pts=%0.3f A-V=%f\n",
             delay, frame_current_pts, -diff);
 
     return is->frame_timer;
@@ -804,8 +797,11 @@ retry:
             /* dequeue the picture */
             vp = &is->pictq[is->pictq_rindex];
 
-            if (time < vp->target_clock)
+            av_log(NULL, AV_LOG_INFO, "time: %lf target_clock: %lf\n",time, vp->target_clock);
+            if (time < vp->target_clock) //还未到时间则不会显示图像 key storm
+            {
                 return;
+            }
             /* update current video pts */
             is->video_current_pts = vp->pts;
             is->video_current_pts_drift = is->video_current_pts - time;
@@ -920,7 +916,7 @@ retry:
             if (is->audio_st && is->video_st)
                 av_diff = get_audio_clock(is) - get_video_clock(is);
             //printf("%7.2f A-V:%7.3f s:%3.1f aq=%5dKB vq=%5dKB sq=%5dB f=%"PRId64"/%"PRId64"   \r\n",
-            printf("%7.2f A-V:%7.3f s:%3.1f aq=%5dKB vq=%5dKB sq=%5dB f=%ld/%ld   \r\n",
+            av_log(NULL, AV_LOG_INFO, "%7.2f A-V:%7.3f s:%3.1f aq=%5dKB vq=%5dKB sq=%5dB f=%ld/%ld   \r\n",
                     get_master_clock(is), av_diff, FFMAX(is->skip_frames - 1, 0), aqsize / 1024,
                     vqsize / 1024, sqsize, is->pts_ctx.num_faulty_dts, is->pts_ctx.num_faulty_pts);
             fflush(stdout);
@@ -1169,7 +1165,7 @@ static int get_video_frame(PlayerState *is, AVFrame *frame, int64_t *pts, AVPack
         is->skip_frames_index += 1;
         if (is->skip_frames_index >= is->skip_frames) {
             is->skip_frames_index -= FFMAX(is->skip_frames, 1.0);
-            printf("skip_frames_index: %f is->skip_frames: %f\n",is->skip_frames_index, is->skip_frames);
+            av_log(NULL, AV_LOG_INFO,"skip_frames_index: %f is->skip_frames: %f\n",is->skip_frames_index, is->skip_frames);
             return 1;
         }
         av_frame_unref(frame);
@@ -1348,7 +1344,7 @@ static int video_thread(void *arg)
             if (av_cmp_q(tb, is->video_st->time_base)) {
                 av_unused int64_t pts1 = pts_int;
                 pts_int = av_rescale_q(pts_int, tb, is->video_st->time_base);
-                av_log(NULL, AV_LOG_TRACE, "video_thread(): "
+                av_log(NULL, AV_LOG_INFO, "video_thread(): "
                         //"tb:%d/%d pts:%"PRId64" -> tb:%d/%d pts:%"PRId64"\n",
                         "tb:%d/%d pts:%ld -> tb:%d/%d pts:%ld\n",
                         tb.num, tb.den, pts1,
@@ -1356,7 +1352,7 @@ static int video_thread(void *arg)
             }
             pts = pts_int * av_q2d(is->video_st->time_base);
             //printf("get_video_frame ret: %d pts: %\n", ret);
-            printf("video_thread(): idx: %d "
+            av_log(NULL, AV_LOG_INFO,"video_thread(): idx: %d "
                     //"tb:%d/%d pts:%"PRId64" -> tb:%d/%d pts:%"PRId64"\n",
                     "tb:%d/%d pts:%ld -> tb:%d/%d pts:%ld\n",
                     ++idx, tb.num, tb.den, pts,
@@ -1531,7 +1527,7 @@ static int synchronize_audio(PlayerState *is, short *samples,
                         samples_size = wanted_size;
                     }
                 }
-                av_log(NULL, AV_LOG_TRACE, "diff=%f adiff=%f sample_diff=%d apts=%0.3f vpts=%0.3f %f\n",
+                av_log(NULL, AV_LOG_INFO, "diff=%f adiff=%f sample_diff=%d apts=%0.3f vpts=%0.3f %f\n",
                         diff, avg_diff, samples_size - samples_size1,
                         is->audio_clock, is->video_clock, is->audio_diff_threshold);
             }
@@ -2730,7 +2726,7 @@ void show_usage(void)
     printf("usage: %s [options] input_file\n", program_name);
     printf("\n");
 }
-
+#if 0
 void show_help_default(const char *opt, const char *arg)
 {
     av_log_set_callback(log_callback_help);
@@ -2754,7 +2750,7 @@ void show_help_default(const char *opt, const char *arg)
             "mouse click         seek to percentage in file corresponding to fraction of width\n"
           );
 }
-
+#endif
 void VideoThread::opt_input_file(void *optctx, const char *filename)
 {
     if (input_filename) {
