@@ -1,7 +1,7 @@
 #!/bin/bash
 
 <<COMMENT
-@author: ginozhang
+@author: storm
 @date: 2016-09-11
 @description: 
 COMMENT

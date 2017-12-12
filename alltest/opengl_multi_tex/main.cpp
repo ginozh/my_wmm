@@ -130,7 +130,7 @@ void opengl()
         unsigned char *pixels2 = (unsigned char *) image2.bits();
         //f->glReadPixels(0,0,gs->w,gs->h,GL_RGBA,GL_UNSIGNED_BYTE, imagefrag.bits());
         //render(gs, pixels, pixels2);
-        GlobalContext::instance()->fragRenderForOtherThread("ColourDistance", pixels, pixels2);
+        GlobalContext::instance()->fragRenderForOtherThread("ColourDistance", pixels, 1.0, 2.0, pixels2);
         
         //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, gs->w, gs->h, 0, PIXEL_FORMAT, GL_UNSIGNED_BYTE, pixels);
         //glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -153,5 +153,5 @@ int main(int argc, char *argv[])
     GlobalContext::instance()->createProgram("ColourDistance");
 
     opengl();
-    return 0;//a.exec();
+    return NULL;//app.exec();
 }

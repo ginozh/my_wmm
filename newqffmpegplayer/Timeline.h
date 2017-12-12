@@ -7,21 +7,6 @@
 #include <QThread>
 #include "SDL.h"
 
-/*
-
- * */
-#if 0
-class VideoThread : public QThread{
-    Q_OBJECT
-public:
-    explicit VideoThread(){}
-    ~VideoThread(){}
-protected:
-    void run()                    //QThread的run函数
-    {
-    }
-private:
-};
 #endif
 class Timeline
 {

@@ -13,4 +13,8 @@ QMAKE_CXXFLAGS += -static-libgcc -static-libstdc++ -ggdb
 
 LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lpostproc -lswresample -lswscale  -lavresample 
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    filter_crop.cpp \
+
+
+HEADERS  += filter_crop.h \

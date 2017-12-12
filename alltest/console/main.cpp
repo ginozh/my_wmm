@@ -8,16 +8,28 @@
 #include <cstddef>     /* offsetof */
 #include <QVector>
 #include <QtMath>
+#include <iostream>
+#include <tr1/memory>
+using namespace std;
 
 QString createAss();
 void testDate();
 void testAudio();
 void testArg();
 void testMemoryLeak();
+void testDouble();
+void testSharePtr();
+void testLevelDB();
 
 int main(int argc, char *argv[])
 {
+	cout << "programe start" << endl;
     QCoreApplication a(argc, argv);
+
+    testLevelDB();
+    //testSharePtr();
+
+    //testDouble();
 
     // testDate();
 
@@ -29,8 +41,80 @@ int main(int argc, char *argv[])
 
     // createASpeed();
 
-    qDebug()<<"qLn: "<<qLn(10)<<" qPow: "<<qPow(3.3,2);
+    //qDebug()<<"qLn: "<<qLn(10)<<" qPow: "<<qPow(3.3,2);
+
+	cout << "programe end" << endl;
     return 0;//a.exec();
+}
+#include "leveldb/db.h"
+#include "leveldb/write_batch.h"
+#include "leveldb/slice.h"
+
+void testLevelDB()
+{
+    leveldb::DB *db;
+    leveldb::Options options;
+    options.create_if_missing = true;
+    leveldb::Status status = leveldb::DB::Open(options, "./test", &db);
+    if(status.ok()){
+        leveldb::Slice key = "key";
+        leveldb::Slice value = "value";
+        db->Put(leveldb::WriteOptions(), key, value);
+
+        std::string strvalue = "";
+        db->Get(leveldb::ReadOptions(), key, &strvalue);
+        cout << "testLevelDB strvalue: " <<strvalue<< endl;
+        delete db;
+    }
+    else
+    {
+        cout << "testLevelDB error status is not ok" << endl;
+    }
+}
+
+class A {
+public:
+	A() {
+		cout << "construct A!!!" << endl;
+	}
+	~A() {
+		cout << "destruct A!!!" << endl;
+	}
+};
+class B: public A {
+public:
+	B() {
+		cout << "construct B!!!" << endl;
+	}
+	~B() {
+		cout << "destruct B!!!" << endl;
+	}
+};
+std::shared_ptr<B>  createSharePtr()
+{
+	std::shared_ptr<B> ptrB1(new B());
+	return ptrB1;
+}
+void testSharePtr()
+{
+	cout << "testSharePtr start" << endl;
+	createSharePtr();
+	//std::shared_ptr<B> p = createSharePtr();
+	cout << "testSharePtr end" << endl;
+}
+
+void testDouble()
+{
+    double video_pts_offset=0;
+    double pts=252.035;
+    int num=30222000;
+    int den=504187;
+    double dframenumber=(double)(pts+video_pts_offset) * (double)num/(double)den;
+    //int64_t framenumber = round(dframenumber) + 1;
+    int64_t framenumber = round((double)(pts+video_pts_offset) * (double)num/(double)den) + 1;
+    printf("dframenumber: %f\n", dframenumber);
+    printf("framenumber: %d\n", framenumber);
+    qDebug() << fixed << qSetRealNumberPrecision(6)<<"framenumber: "<<framenumber<<" dframenumber: "<<(double)dframenumber;
 }
 
 QString createAss()

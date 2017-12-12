@@ -23,6 +23,8 @@ SOURCES += main.cpp\
     FFmpegReader.cpp \
     PlayerPrivate.cpp \
     cmdutils.c \
+    Timeline.cpp \
+    Clip.cpp \
 
 
 HEADERS  += mainwindow.h \
@@ -31,6 +33,8 @@ HEADERS  += mainwindow.h \
     avversion.h \
     cmdutils.h \
     colorspace.h \
+    Timeline.h \
+    Clip.h \
 
 FORMS    += mainwindow.ui
 

@@ -7,7 +7,7 @@ using namespace cv;
 using namespace std;
 int main( int argc, char** argv )
 {
-    String imageName( "C:\\QtProjects\\qtmovie\\jpg\\1.jpg" ); // by default
+    String imageName( "C:\\shareproject\\jpg\\1.jpg" ); // by default
     if( argc > 1)
     {
         imageName = argv[1];

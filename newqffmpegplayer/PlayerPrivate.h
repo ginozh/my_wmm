@@ -16,10 +16,12 @@ public:
 protected:
     void run(){
 #if 1
-        Timeline* t = new Timeline();
+        t = new Timeline();
 
         FFmpegReader* r = NULL;
         Clip* c1 = NULL;
+        Effect* e = NULL; //: filter,motion,video/pic attribute
+        //Transition* ts = NULL; //: mask, fragment, ffmpeg
 
         r = new FFmpegReader();
         r->setFileName("c:/shareproject/jpg/IMG_1924.MP4");
@@ -37,6 +39,7 @@ protected:
             QImage img = t->GetFrame(1);
             av_log(NULL, AV_LOG_INFO, "image isnull: %d\n", img.isNull());
             if(img.isNull()){
+                QThread::msleep(100);
                 break;
             }
             else{
@@ -86,5 +89,7 @@ protected:
     }
 signals:
     void sig_GetOneFrame(QImage);   //每获取到一帧图像 就发送此信号
+private:
+    Timeline* t = NULL;
 };
 #endif
