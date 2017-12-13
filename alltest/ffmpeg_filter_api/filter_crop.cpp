@@ -1,4 +1,3 @@
-
 #include "filter_crop.h"
 
 static const char *const var_names[] = {

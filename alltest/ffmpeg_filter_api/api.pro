@@ -19,7 +19,11 @@ LIBS += -lavcodec -lavdevice c:/shareproject/ffmpeg-3.3/libavfilter/avfilter-6.d
 SOURCES += main.cpp \
     filter_crop.cpp \
     filter_pad.cpp \
+    image_avframe.cpp \
+    filter_overlay.cpp \
 
 
 HEADERS  += filter_crop.h \
     filter_pad.h \
+    image_avframe.h \
+    filter_overlay.h \

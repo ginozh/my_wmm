@@ -28,6 +28,8 @@ extern "C" {
 }
 #include "filter_crop.h"
 #include "filter_pad.h"
+#include "filter_overlay.h"
+#include "image_avframe.h"
 
 static AVFormatContext *fmt_ctx;
 static AVCodecContext *dec_ctx;
@@ -77,6 +79,56 @@ static int open_input_file(const char *filename)
     return 0;
 }
 
+//w:320 h:240 fmt:yuvj444p sar:1/1 -> w:320 h:240 fmt:yuva420p sar:1/1 flags:0x2
+void convertFormat(AVFrame *&frame, int format)
+{
+#if 1
+    AVFrame *pFrameRGB=NULL;
+    uint8_t *out_buffer_rgb=NULL; //解码后的rgb数据
+#endif
+    struct SwsContext *img_convert_ctx;  //用于解码后的视频格式转换
+
+    pFrameRGB = av_frame_alloc();
+    memset(pFrameRGB, 0, sizeof(AVFrame));
+    //
+    img_convert_ctx = sws_getContext(frame->width, frame->height,
+            //pCodecCtx->pix_fmt, frame->width, frame->height,
+            (AVPixelFormat)frame->format, frame->width, frame->height,
+            (AVPixelFormat)format, sws_flags, NULL, NULL, NULL);
+
+    int numBytes = avpicture_get_size((AVPixelFormat)format, frame->width,frame->height);
+
+    out_buffer_rgb = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
+    qDebug()<<"convertFormat new out_buffer_rgb: "<<out_buffer_rgb<<" size: "<<(numBytes * sizeof(uint8_t));
+    avpicture_fill((AVPicture *) pFrameRGB, out_buffer_rgb, (AVPixelFormat)format,
+            frame->width, frame->height);
+
+    sws_scale(img_convert_ctx,
+            (uint8_t const * const *) frame->data,
+            frame->linesize, 0, frame->height, pFrameRGB->data,
+            pFrameRGB->linesize);
+#if 0
+    qDebug()<<"convertFormat free out_buffer_rgb: "<<out_buffer_rgb;
+    av_free(out_buffer_rgb); 
+    qDebug()<<"convertFormat free pFrameRGB: "<<pFrameRGB;
+    av_frame_free(&pFrameRGB);
+    ////av_free(pFrameRGB);
+#endif
+    sws_freeContext(img_convert_ctx);
+
+    pFrameRGB->format = format;
+    pFrameRGB->width  = frame->width;
+    pFrameRGB->height = frame->height;
+    int ret = av_frame_copy_props(pFrameRGB, frame);
+    if (ret < 0) {
+        av_frame_unref(pFrameRGB);
+        fprintf(stderr, "Could not av_frame_copy_props\n");
+        exit(1);
+    }
+
+    frame = pFrameRGB;
+}
+
 void displayFrame(AVFrame *frame)
 {
 #if 1
@@ -84,14 +136,15 @@ void displayFrame(AVFrame *frame)
     uint8_t *out_buffer_rgb=NULL; //解码后的rgb数据
 #endif
     struct SwsContext *img_convert_ctx;  //用于解码后的视频格式转换
-    AVCodecContext *pCodecCtx = dec_ctx;
+    ////AVCodecContext *pCodecCtx = dec_ctx;
     static int idx=0;
     idx++;
 
     pFrameRGB = av_frame_alloc();
-    //将解码后的YUV数据转换成RGB32
+    //
     img_convert_ctx = sws_getContext(frame->width, frame->height,
-            pCodecCtx->pix_fmt, frame->width, frame->height,
+            //pCodecCtx->pix_fmt, frame->width, frame->height,
+            (AVPixelFormat)frame->format, frame->width, frame->height,
             AV_PIX_FMT_RGBA, sws_flags, NULL, NULL, NULL);
 
     int numBytes = avpicture_get_size(AV_PIX_FMT_RGBA, frame->width,frame->height);
@@ -128,13 +181,19 @@ int main(int argc, char *argv[])
     AVFrame *frame = av_frame_alloc();
     AVFrame *filt_frame = av_frame_alloc();
 
-    //crop
+#if 1
+    //overlay
+    AVFrame *overlay_frame = NULL;
+    AVCodecContext *overlay_ctx=NULL;
+    OverlayContext oc, *s=&oc;
+#endif
 #if 0
+    //crop
     CropContext cc, *s=&cc;
     char w[]="256";//"640";
     char h[]="192";//"360";
 #endif
-#if 1
+#if 0
     //pad
     PadContext pc, *s=&pc;
     char w[]="1024";
@@ -147,13 +206,14 @@ int main(int argc, char *argv[])
         perror("Could not allocate frame");
         exit(1);
     }
-    if (argc != 2) {
-        fprintf(stderr, "Usage: %s file\n", argv[0]);
+    if (argc != 3) {
+        fprintf(stderr, "Usage: %s file jpg_overlay\n", argv[0]);
         exit(1);
     }
 
     av_register_all();
     avfilter_register_all();
+
 
     if ((ret = open_input_file(argv[1])) < 0)
     {
@@ -165,11 +225,21 @@ int main(int argc, char *argv[])
     crop_init(s, w, h , x, y, 1, 0);
     crop_config_input(dec_ctx, s);
 #endif
-#if 1
+#if 0
     //pad
     pad_init(s, w, h , x, y);
     pad_config_input(dec_ctx, s);
 #endif
+#if 1
+    //overlay
+    image_to_avframe(argv[2], overlay_ctx, overlay_frame);
+    convertFormat(overlay_frame, AV_PIX_FMT_YUVA420P);
+    displayFrame(overlay_frame);
+    overlay_init(s, x, y);
+    overlay_config_input_main(dec_ctx, s);
+    overlay_config_input_overlay(dec_ctx, overlay_frame, s);
+#endif
+
 
     /* read all packets */
     while (1) {
@@ -200,12 +270,17 @@ int main(int argc, char *argv[])
                     crop_filter_frame(dec_ctx, s, frame);
                     displayFrame(frame);
 #endif
-#if 1
+#if 0
     //pad
                     AVFrame* out=NULL;
                     pad_filter_frame(dec_ctx, s, frame, out);
                     ///av_log(NULL, AV_LOG_INFO, "out: %d\n", (int)out);
                     displayFrame(out);
+#endif
+#if 1
+    //overlay
+                    overlay_blend(dec_ctx, s, frame, overlay_frame, 1);
+                    displayFrame(frame);
 #endif
 
                     av_frame_unref(frame);
@@ -219,9 +294,14 @@ end:
     //crop
     crop_uninit(s);
 #endif
-#if 1
+#if 0
     //pad
     pad_uninit(s);
+#endif
+#if 1
+    //overlay
+    image_avframe_close(overlay_ctx);
+    overlay_uninit(s);
 #endif
     ///avfilter_graph_free(&filter_graph);
     avcodec_free_context(&dec_ctx);
