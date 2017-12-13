@@ -36,7 +36,7 @@ static inline int normalize_double(int *n, double d)
 }
 void crop_init(CropContext* s, char* w, char*h, char* x, char* y, int keep_aspect, int exact)
 {
-#if 0
+#if 1
     memset(s, 0, sizeof(CropContext));
     s->w_expr=w;
     s->h_expr=h;
@@ -45,7 +45,7 @@ void crop_init(CropContext* s, char* w, char*h, char* x, char* y, int keep_aspec
     s->keep_aspect=keep_aspect;
     s->exact=exact;
 #endif
-    av_log(NULL, AV_LOG_INFO, "CROP_VAR_VARS_NB: %d sizeof(double*): %d\n",CROP_VAR_VARS_NB, sizeof(double*));
+    ///av_log(NULL, AV_LOG_INFO, "CROP_VAR_VARS_NB: %d sizeof(double*): %d\n",CROP_VAR_VARS_NB, sizeof(double*));
     ////s->var_values = (double*)av_malloc(CROP_VAR_VARS_NB*sizeof(double*));
 }
 

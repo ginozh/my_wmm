@@ -36,23 +36,6 @@ enum EvalMode {
     EVAL_MODE_NB
 };
 
-typedef struct PadContext {
-    const AVClass *class1;
-    int w, h;               ///< output dimensions, a value of 0 will result in the input size
-    int x, y;               ///< offsets of the input area with respect to the padded area
-    int in_w, in_h;         ///< width and height for the padded input video, which has to be aligned to the chroma values in order to avoid chroma issues
-    int inlink_w, inlink_h;
-
-    char *w_expr;           ///< width  expression string
-    char *h_expr;           ///< height expression string
-    char *x_expr;           ///< width  expression string
-    char *y_expr;           ///< height expression string
-    uint8_t rgba_color[4];  ///< color for the padding area
-    FFDrawContext draw;
-    FFDrawColor color;
-
-    int eval_mode;          ///< expression evaluation mode
-} PadContext;
 void pad_init(PadContext* s, char* w, char*h, char* x, char* y)
 {
     memset(s, 0, sizeof(PadContext));
@@ -225,10 +208,11 @@ static int frame_needs_copy(PadContext *s, AVFrame *frame)
     return 0;
 }
 
-int pad_filter_frame(AVCodecContext *ctx, PadContext* s, AVFrame *in)
+int pad_filter_frame(AVCodecContext *ctx, PadContext* s, AVFrame * &in, AVFrame * &out)
 {
-    AVFrame *out;
+    //AVFrame& *out=*pout;
     int needs_copy;
+    double time = av_gettime_relative() / 1000.0;
 
     needs_copy = frame_needs_copy(s, in);
 
@@ -314,7 +298,17 @@ int pad_filter_frame(AVCodecContext *ctx, PadContext* s, AVFrame *in)
 
     out->width  = s->w;
     out->height = s->h;
-
+#if 1
     if (in != out)
+    {
         av_frame_free(&in);
+        in = out;
+    }
+#endif
+
+    av_log(NULL, AV_LOG_INFO, "pad_filter_frame waste_time: %f\n", av_gettime_relative() / 1000.0-time);
+    return 0;
+}
+void pad_uninit(PadContext* /* s*/)
+{
 }

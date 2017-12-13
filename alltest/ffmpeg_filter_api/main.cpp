@@ -27,6 +27,7 @@ extern "C" {
 #include <libavutil/time.h>
 }
 #include "filter_crop.h"
+#include "filter_pad.h"
 
 static AVFormatContext *fmt_ctx;
 static AVCodecContext *dec_ctx;
@@ -121,27 +122,26 @@ void displayFrame(AVFrame *frame)
 
 int main(int argc, char *argv[])
 {
+    av_log(NULL, AV_LOG_INFO, "main\n");
     int ret;
     AVPacket packet;
     AVFrame *frame = av_frame_alloc();
     AVFrame *filt_frame = av_frame_alloc();
 
     //crop
+#if 0
     CropContext cc, *s=&cc;
     char w[]="256";//"640";
     char h[]="192";//"360";
+#endif
+#if 1
+    //pad
+    PadContext pc, *s=&pc;
+    char w[]="1024";
+    char h[]="786";
+#endif
     char x[]="0";
     char y[]="0";
-    //1, crop
-    {
-        memset(s, 0, sizeof(CropContext));
-        s->w_expr=w;
-        s->h_expr=h;
-        s->x_expr=x;
-        s->y_expr=y;
-        s->keep_aspect=1;
-        s->exact=0;
-    }
 
     if (!frame || !filt_frame) {
         perror("Could not allocate frame");
@@ -156,10 +156,20 @@ int main(int argc, char *argv[])
     avfilter_register_all();
 
     if ((ret = open_input_file(argv[1])) < 0)
+    {
+        av_log(NULL, AV_LOG_ERROR, "error open file: %s\n", argv[1]);
         goto end;
-
-    /////crop_init(s, w, h , x, y, 1, 0);
+    }
+#if 0
+    //crop
+    crop_init(s, w, h , x, y, 1, 0);
     crop_config_input(dec_ctx, s);
+#endif
+#if 1
+    //pad
+    pad_init(s, w, h , x, y);
+    pad_config_input(dec_ctx, s);
+#endif
 
     /* read all packets */
     while (1) {
@@ -185,9 +195,19 @@ int main(int argc, char *argv[])
                 if (ret >= 0) {
                     frame->pts = av_frame_get_best_effort_timestamp(frame);
 
+#if 0
+    //crop
                     crop_filter_frame(dec_ctx, s, frame);
-
                     displayFrame(frame);
+#endif
+#if 1
+    //pad
+                    AVFrame* out=NULL;
+                    pad_filter_frame(dec_ctx, s, frame, out);
+                    ///av_log(NULL, AV_LOG_INFO, "out: %d\n", (int)out);
+                    displayFrame(out);
+#endif
+
                     av_frame_unref(frame);
                 }
             }
@@ -195,7 +215,14 @@ int main(int argc, char *argv[])
         av_packet_unref(&packet);
     }
 end:
+#if 0
+    //crop
     crop_uninit(s);
+#endif
+#if 1
+    //pad
+    pad_uninit(s);
+#endif
     ///avfilter_graph_free(&filter_graph);
     avcodec_free_context(&dec_ctx);
     avformat_close_input(&fmt_ctx);
