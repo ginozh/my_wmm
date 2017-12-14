@@ -8,8 +8,8 @@ TARGET = console
 CONFIG += console
 CONFIG -= app_bundle
 
-QMAKE_CFLAGS += -static-libgcc -static-libstdc++ -ggdb
-QMAKE_CXXFLAGS += -static-libgcc -static-libstdc++ -ggdb
+QMAKE_CFLAGS += -static-libgcc -static-libstdc++ -ggdb -Wno-unused-parameter
+QMAKE_CXXFLAGS += -static-libgcc -static-libstdc++ -ggdb -Wno-unused-parameter
 
 INCLUDEPATH += c:/shareproject/ffmpeg-3.3
 
@@ -22,6 +22,7 @@ SOURCES += main.cpp \
     image_avframe.cpp \
     filter_overlay.cpp \
     filter_zoompan.cpp \
+    filter_blend.cpp \
 
 
 HEADERS  += filter_crop.h \
@@ -29,5 +30,6 @@ HEADERS  += filter_crop.h \
     image_avframe.h \
     filter_overlay.h \
     filter_zoompan.h \
+    filter_blend.h \
 
 
