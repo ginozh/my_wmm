@@ -333,8 +333,8 @@ int testVideoFilter(int argc, char *argv[])
 
                     blend_frame(s, scale_frame, pblend_frame, out, frame_count_out++, pts);
                     displayFrame(out);
-                    ////av_frame_free(&scale_frame); //uncomplete
-                    ////av_frame_free(&out); //uncomplete
+                    av_frame_free(&scale_frame); //uncomplete
+                    av_frame_free(&out); //uncomplete
 #endif
 
                     av_frame_unref(frame); //uncomplete
