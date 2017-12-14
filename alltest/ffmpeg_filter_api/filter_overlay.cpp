@@ -97,7 +97,7 @@ static int set_expr(AVExpr **pexpr, const char *expr, const char *option, void *
 
 
 
-av_cold int overlay_init(OverlayContext *s, char* x, char* y)
+av_cold int overlay_init(OverlayContext *s, const char* x, const char* y)
 {
     memset(s, 0, sizeof(OverlayContext));
     s->x_expr=x;

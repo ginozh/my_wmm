@@ -21,9 +21,13 @@ SOURCES += main.cpp \
     filter_pad.cpp \
     image_avframe.cpp \
     filter_overlay.cpp \
+    filter_zoompan.cpp \
 
 
 HEADERS  += filter_crop.h \
     filter_pad.h \
     image_avframe.h \
     filter_overlay.h \
+    filter_zoompan.h \
+
+

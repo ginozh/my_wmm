@@ -30,6 +30,7 @@ extern "C" {
 #include "filter_pad.h"
 #include "filter_overlay.h"
 #include "image_avframe.h"
+#include "filter_zoompan.h"
 
 static AVFormatContext *fmt_ctx;
 static AVCodecContext *dec_ctx;
@@ -40,6 +41,25 @@ static int video_stream_index = -1;
 ///static int64_t last_pts = AV_NOPTS_VALUE;
 static int64_t sws_flags = SWS_BILINEAR;//SWS_BICUBIC;
 
+static int open_input_file(const char *filename);
+//w:320 h:240 fmt:yuvj444p sar:1/1 -> w:320 h:240 fmt:yuva420p sar:1/1 flags:0x2
+AVFrame* convertFormat(AVFrame *frame, int format);
+
+void displayFrame(AVFrame *frame);
+
+int testVideoFilter(int argc, char *argv[]);
+
+int testZoomPan(int argc, char *argv[]);
+
+int main(int argc, char *argv[])
+{
+    av_log(NULL, AV_LOG_INFO, "main\n");
+
+    ////testVideoFilter(argc, argv);
+
+    testZoomPan(argc, argv);
+    return 0;
+}
 static int open_input_file(const char *filename)
 {
     int ret;
@@ -79,17 +99,14 @@ static int open_input_file(const char *filename)
     return 0;
 }
 
-//w:320 h:240 fmt:yuvj444p sar:1/1 -> w:320 h:240 fmt:yuva420p sar:1/1 flags:0x2
-void convertFormat(AVFrame *&frame, int format)
+AVFrame* convertFormat(AVFrame *frame, int format)
 {
-#if 1
-    AVFrame *pFrameRGB=NULL;
-    uint8_t *out_buffer_rgb=NULL; //解码后的rgb数据
-#endif
+    AVFrame *pFrame=NULL;
+    uint8_t *out_buffer=NULL; //解码后的rgb数据
     struct SwsContext *img_convert_ctx;  //用于解码后的视频格式转换
 
-    pFrameRGB = av_frame_alloc();
-    memset(pFrameRGB, 0, sizeof(AVFrame));
+    pFrame = av_frame_alloc();
+    memset(pFrame, 0, sizeof(AVFrame));
     //
     img_convert_ctx = sws_getContext(frame->width, frame->height,
             //pCodecCtx->pix_fmt, frame->width, frame->height,
@@ -98,49 +115,51 @@ void convertFormat(AVFrame *&frame, int format)
 
     int numBytes = avpicture_get_size((AVPixelFormat)format, frame->width,frame->height);
 
-    out_buffer_rgb = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
-    qDebug()<<"convertFormat new out_buffer_rgb: "<<out_buffer_rgb<<" size: "<<(numBytes * sizeof(uint8_t));
-    avpicture_fill((AVPicture *) pFrameRGB, out_buffer_rgb, (AVPixelFormat)format,
+    out_buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
+    qDebug()<<"convertFormat new out_buffer: "<<out_buffer<<" size: "<<(numBytes * sizeof(uint8_t));
+    avpicture_fill((AVPicture *) pFrame, out_buffer, (AVPixelFormat)format,
             frame->width, frame->height);
 
     sws_scale(img_convert_ctx,
             (uint8_t const * const *) frame->data,
-            frame->linesize, 0, frame->height, pFrameRGB->data,
-            pFrameRGB->linesize);
+            frame->linesize, 0, frame->height, pFrame->data,
+            pFrame->linesize);
 #if 0
-    qDebug()<<"convertFormat free out_buffer_rgb: "<<out_buffer_rgb;
-    av_free(out_buffer_rgb); 
-    qDebug()<<"convertFormat free pFrameRGB: "<<pFrameRGB;
-    av_frame_free(&pFrameRGB);
-    ////av_free(pFrameRGB);
+    qDebug()<<"convertFormat free out_buffer: "<<out_buffer;
+    av_free(out_buffer); 
+    qDebug()<<"convertFormat free pFrame: "<<pFrame;
+    av_frame_free(&pFrame);
+    ////av_free(pFrame);
 #endif
     sws_freeContext(img_convert_ctx);
 
-    pFrameRGB->format = format;
-    pFrameRGB->width  = frame->width;
-    pFrameRGB->height = frame->height;
-    int ret = av_frame_copy_props(pFrameRGB, frame);
+    pFrame->format = format;
+    pFrame->width  = frame->width;
+    pFrame->height = frame->height;
+    int ret = av_frame_copy_props(pFrame, frame);
     if (ret < 0) {
-        av_frame_unref(pFrameRGB);
+        av_frame_unref(pFrame);
         fprintf(stderr, "Could not av_frame_copy_props\n");
         exit(1);
     }
 
-    frame = pFrameRGB;
+    ////frame = pFrame;
+    return pFrame;
 }
+
 
 void displayFrame(AVFrame *frame)
 {
 #if 1
-    AVFrame *pFrameRGB=NULL;
-    uint8_t *out_buffer_rgb=NULL; //解码后的rgb数据
+    AVFrame *pFrame=NULL;
+    uint8_t *out_buffer=NULL; //解码后的rgb数据
 #endif
     struct SwsContext *img_convert_ctx;  //用于解码后的视频格式转换
     ////AVCodecContext *pCodecCtx = dec_ctx;
     static int idx=0;
     idx++;
 
-    pFrameRGB = av_frame_alloc();
+    pFrame = av_frame_alloc();
     //
     img_convert_ctx = sws_getContext(frame->width, frame->height,
             //pCodecCtx->pix_fmt, frame->width, frame->height,
@@ -149,33 +168,33 @@ void displayFrame(AVFrame *frame)
 
     int numBytes = avpicture_get_size(AV_PIX_FMT_RGBA, frame->width,frame->height);
 
-    if(!out_buffer_rgb)
-        out_buffer_rgb = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
-    qDebug()<<"frame2RGBA new out_buffer_rgb: "<<out_buffer_rgb<<" size: "<<(numBytes * sizeof(uint8_t));
-    avpicture_fill((AVPicture *) pFrameRGB, out_buffer_rgb, AV_PIX_FMT_RGBA,
+    if(!out_buffer)
+        out_buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
+    qDebug()<<"displayFrame new out_buffer: "<<out_buffer<<" size: "<<(numBytes * sizeof(uint8_t));
+    avpicture_fill((AVPicture *) pFrame, out_buffer, AV_PIX_FMT_RGBA,
             frame->width, frame->height);
 
     sws_scale(img_convert_ctx,
             (uint8_t const * const *) frame->data,
-            frame->linesize, 0, frame->height, pFrameRGB->data,
-            pFrameRGB->linesize);
+            frame->linesize, 0, frame->height, pFrame->data,
+            pFrame->linesize);
     //把这个RGB数据 用QImage加载
-    //QImage tmpImg((uchar *)out_buffer_rgb,frame->width,frame->height,QImage::Format_RGB32);
-    ////QImage tmpImg((uchar *)out_buffer_rgb,frame->width,frame->height,QImage::Format_RGB32);
-    QImage tmpImg((uchar *)out_buffer_rgb,frame->width,frame->height,QImage::Format_RGBA8888);
+    //QImage tmpImg((uchar *)out_buffer,frame->width,frame->height,QImage::Format_RGB32);
+    ////QImage tmpImg((uchar *)out_buffer,frame->width,frame->height,QImage::Format_RGB32);
+    QImage tmpImg((uchar *)out_buffer,frame->width,frame->height,QImage::Format_RGBA8888);
     tmpImg.save(QString("images/%1.jpg").arg(idx));
 
-    qDebug()<<"frame2RGBA free out_buffer_rgb: "<<out_buffer_rgb;
-    av_free(out_buffer_rgb); 
-    qDebug()<<"frame2RGBA free pFrameRGB: "<<pFrameRGB;
-    av_frame_free(&pFrameRGB);
-    ////av_free(pFrameRGB);
+    qDebug()<<"displayFrame free out_buffer: "<<out_buffer;
+    av_free(out_buffer); 
+    qDebug()<<"displayFrame free pFrame: "<<pFrame;
+    av_frame_free(&pFrame);
+    ////av_free(pFrame);
     sws_freeContext(img_convert_ctx);
 }
 
-int main(int argc, char *argv[])
+int testVideoFilter(int argc, char *argv[])
 {
-    av_log(NULL, AV_LOG_INFO, "main\n");
+    av_log(NULL, AV_LOG_INFO, "testVideoFilter\n");
     int ret;
     AVPacket packet;
     AVFrame *frame = av_frame_alloc();
@@ -207,7 +226,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
     if (argc != 3) {
-        fprintf(stderr, "Usage: %s file jpg_overlay\n", argv[0]);
+        fprintf(stderr, "Usage: %s videofile jpgfile\n", argv[0]);
         exit(1);
     }
 
@@ -233,7 +252,7 @@ int main(int argc, char *argv[])
 #if 1
     //overlay
     image_to_avframe(argv[2], overlay_ctx, overlay_frame);
-    convertFormat(overlay_frame, AV_PIX_FMT_YUVA420P);
+    overlay_frame=convertFormat(overlay_frame, AV_PIX_FMT_YUVA420P);
     displayFrame(overlay_frame);
     overlay_init(s, x, y);
     overlay_config_input_main(dec_ctx, s);
@@ -315,6 +334,40 @@ end:
         exit(1);
     }
 
-    exit(0);
+    return 0;
+}
+
+int testZoomPan(int argc, char *argv[])
+{
+    AVFrame *overlay_frame = NULL;
+    AVCodecContext *overlay_ctx=NULL;
+    ZPContext zc, *s=&zc;
+    AVRational framerate;
+    int64_t frame_count=10;
+
+    av_log(NULL, AV_LOG_INFO, "testZoomPan\n");
+    if (argc != 3) {
+        fprintf(stderr, "Usage: %s jpgfile\n", argv[0]);
+        exit(1);
+    }
+    av_register_all();
+
+    image_to_avframe(argv[2], overlay_ctx, overlay_frame);
+    overlay_frame=convertFormat(overlay_frame, AV_PIX_FMT_YUVA420P);
+
+    framerate.num=24;
+    framerate.den=1;
+    zoompan_init(s, "zoom+0.01", overlay_frame->width, overlay_frame->height, "0", "0", QString::number(frame_count).toStdString().c_str(), framerate);
+    zoompan_filter_frame(overlay_ctx, s, overlay_frame, 0, 0);
+
+    for(int i=0; i<frame_count; i++)
+    {
+        AVFrame* pFrame=convertFormat(overlay_frame, AV_PIX_FMT_YUVA420P);
+        request_frame(overlay_ctx, s, i, pFrame);
+        displayFrame(pFrame);
+        av_frame_free(&pFrame);
+    }
+    //av_frame_free(&overlay_frame); //error uncomplete
+////    sws_freeContext(overlay_ctx);
     return 0;
 }

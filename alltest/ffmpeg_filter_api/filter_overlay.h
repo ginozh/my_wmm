@@ -49,7 +49,7 @@ typedef struct OverlayContext {
     const AVPixFmtDescriptor *main_desc; ///< format descriptor for main input
 
     double var_values[OVERLAY_VAR_VARS_NB];
-    char *x_expr, *y_expr;
+    const char *x_expr, *y_expr;
 
     int eof_action;             ///< action to take on EOF from source
 
@@ -58,7 +58,7 @@ typedef struct OverlayContext {
     void (*blend_image)(OverlayContext *s, AVFrame *dst, const AVFrame *src, int x, int y);
 } OverlayContext;
 
-av_cold int overlay_init(OverlayContext *s, char* x, char* y);
+av_cold int overlay_init(OverlayContext *s, const char* x, const char* y);
 int overlay_config_input_main(AVCodecContext *c, OverlayContext *s);
 int overlay_config_input_overlay(AVCodecContext *ctx, AVFrame *overlay_frame, OverlayContext* s);
 AVFrame *overlay_blend(AVCodecContext *ctx, OverlayContext* s, AVFrame *mainpic,
