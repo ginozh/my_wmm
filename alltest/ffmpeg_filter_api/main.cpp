@@ -196,7 +196,10 @@ void displayFrame(AVFrame *frame)
     ////av_free(pFrame);
     sws_freeContext(img_convert_ctx);
 }
-
+#define FILTER_BLEND
+//#define FILTER_OVERLAY
+//#define FILTER_CROP
+//#define FILTER_PAD
 int testVideoFilter(int argc, char *argv[])
 {
     av_log(NULL, AV_LOG_INFO, "testVideoFilter\n");
@@ -204,28 +207,28 @@ int testVideoFilter(int argc, char *argv[])
     AVPacket packet;
     AVFrame *frame = av_frame_alloc();
     AVFrame *filt_frame = av_frame_alloc();
+    int64_t frame_count_out=1;
+    double pts;
 
-#if 1
+#ifdef FILTER_BLEND
     //blend
     AVFrame *pblend_frame = NULL;
     AVCodecContext *blend_ctx=NULL;
     BlendContext bc, *s=&bc;
-    double pts;
-    int64_t frame_count_out=1;
 #endif
-#if 0
+#ifdef FILTER_OVERLAY
     //overlay
     AVFrame *overlay_frame = NULL;
     AVCodecContext *overlay_ctx=NULL;
     OverlayContext oc, *s=&oc;
 #endif
-#if 0
+#ifdef FILTER_CROP
     //crop
     CropContext cc, *s=&cc;
     char w[]="256";//"640";
     char h[]="192";//"360";
 #endif
-#if 0
+#ifdef FILTER_PAD
     //pad
     PadContext pc, *s=&pc;
     char w[]="1024";
@@ -252,30 +255,29 @@ int testVideoFilter(int argc, char *argv[])
         av_log(NULL, AV_LOG_ERROR, "error open file: %s\n", argv[1]);
         goto end;
     }
-#if 0
+#ifdef FILTER_CROP
     //crop
     crop_init(s, w, h , x, y, 1, 0);
-    crop_config_input(dec_ctx, s);
+    //crop_config_input(dec_ctx, s);
 #endif
-#if 0
+#ifdef FILTER_PAD
     //pad
     pad_init(s, w, h , x, y);
-    pad_config_input(dec_ctx, s);
 #endif
-#if 0
+#ifdef FILTER_OVERLAY
     //overlay
     image_to_avframe(argv[2], overlay_ctx, overlay_frame);
-    overlay_frame=convertFormat(overlay_frame, AV_PIX_FMT_YUVA420P);
+    //overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUVA420P);
+    overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
     displayFrame(overlay_frame);
     overlay_init(s, x, y);
-    overlay_config_input_main(dec_ctx, s);
-    overlay_config_input_overlay(dec_ctx, overlay_frame, s);
 #endif
-#if 1
+#ifdef FILTER_BLEND
     //blend
     image_to_avframe(argv[2], blend_ctx, pblend_frame);
     //pblend_frame=convertFormat(pblend_frame, AV_PIX_FMT_YUVA420P);
     pblend_frame=convertFormat(pblend_frame, pblend_frame->width, pblend_frame->height,AV_PIX_FMT_YUVA420P);
+    //pblend_frame=convertFormat(pblend_frame, pblend_frame->width, pblend_frame->height,AV_PIX_FMT_RGBA);
     displayFrame(pblend_frame);
 #endif
 
@@ -304,26 +306,37 @@ int testVideoFilter(int argc, char *argv[])
                 if (ret >= 0) {
                     frame->pts = av_frame_get_best_effort_timestamp(frame);
 
-#if 0
+#ifdef FILTER_CROP
     //crop
-                    crop_filter_frame(dec_ctx, s, frame);
-                    displayFrame(frame);
+                    AVFrame* scale_frame=convertFormat(frame, frame->width, frame->height, AV_PIX_FMT_RGBA);
+                    crop_config_input(scale_frame, s);
+                    pts = (double)frame_count_out/25;
+                    crop_filter_frame(s, scale_frame, frame_count_out++, pts);
+                    displayFrame(scale_frame);
 #endif
-#if 0
+#ifdef FILTER_PAD
     //pad
+                    AVFrame* scale_frame=convertFormat(frame, frame->width, frame->height, AV_PIX_FMT_RGBA);
+                    pad_config_input(scale_frame, s);
                     AVFrame* out=NULL;
-                    pad_filter_frame(dec_ctx, s, frame, out);
+                    pad_filter_frame(s, scale_frame, out);
                     ///av_log(NULL, AV_LOG_INFO, "out: %d\n", (int)out);
                     displayFrame(out);
 #endif
-#if 0
+#ifdef FILTER_OVERLAY
     //overlay
-                    overlay_blend(dec_ctx, s, frame, overlay_frame, 1);
-                    displayFrame(frame);
+                    AVFrame* scale_frame=convertFormat(frame, frame->width, frame->height, AV_PIX_FMT_RGBA);
+                    overlay_config_input_main(scale_frame, s);
+                    overlay_config_input_overlay(scale_frame, overlay_frame, s);
+                    pts = (double)frame_count_out/25;
+                    overlay_blend(s, scale_frame, overlay_frame, frame_count_out++, pts);
+                    displayFrame(scale_frame);
 #endif
-#if 1
+#ifdef FILTER_BLEND
     //blend
+                    //AVFrame* scale_frame=convertFormat(frame, pblend_frame->width, pblend_frame->height, AV_PIX_FMT_RGBA);
                     AVFrame* scale_frame=convertFormat(frame, pblend_frame->width, pblend_frame->height, AV_PIX_FMT_YUVA420P);
+                    //displayFrame(scale_frame);
 
                     blend_init(s, scale_frame, pblend_frame, "if(crossfade,1.5,2)");
                     AVFrame* out=copy_frame(scale_frame);
@@ -344,20 +357,20 @@ int testVideoFilter(int argc, char *argv[])
         av_packet_unref(&packet);
     }
 end:
-#if 0
+#ifdef FILTER_CROP
     //crop
     crop_uninit(s);
 #endif
-#if 0
+#ifdef FILTER_PAD
     //pad
     pad_uninit(s);
 #endif
-#if 0
+#ifdef FILTER_OVERLAY
     //overlay
     image_avframe_close(overlay_ctx);
     overlay_uninit(s);
 #endif
-#if 1
+#ifdef FILTER_BLEND
     //blend
     image_avframe_close(blend_ctx);
     blend_uninit(s);

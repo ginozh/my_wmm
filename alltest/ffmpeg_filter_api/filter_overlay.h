@@ -59,9 +59,13 @@ typedef struct OverlayContext {
 } OverlayContext;
 
 av_cold int overlay_init(OverlayContext *s, const char* x, const char* y);
-int overlay_config_input_main(AVCodecContext *c, OverlayContext *s);
-int overlay_config_input_overlay(AVCodecContext *ctx, AVFrame *overlay_frame, OverlayContext* s);
-AVFrame *overlay_blend(AVCodecContext *ctx, OverlayContext* s, AVFrame *mainpic,
-                         const AVFrame *second, int64_t frame_count_out);
+//int overlay_config_input_main(AVCodecContext *c, OverlayContext *s);
+int overlay_config_input_main(AVFrame* frame, OverlayContext *s);
+//int overlay_config_input_overlay(AVCodecContext *ctx, AVFrame *overlay_frame, OverlayContext* s);
+int overlay_config_input_overlay(AVFrame *frame, AVFrame *overlay_frame, OverlayContext* s);
+//AVFrame *overlay_blend(AVCodecContext *ctx, OverlayContext* s, AVFrame *mainpic,
+//                         const AVFrame *second, int64_t frame_count_out);
+AVFrame *overlay_blend(OverlayContext* s, AVFrame *mainpic,
+                         const AVFrame *second, int64_t frame_count_out, double pts);
 av_cold void overlay_uninit(OverlayContext *s);
 #endif

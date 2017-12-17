@@ -105,7 +105,7 @@ av_cold int overlay_init(OverlayContext *s, const char* x, const char* y)
     s->eof_action=EOF_ACTION_REPEAT;
     s->eval_mode=EVAL_MODE_FRAME;
     s->allow_packed_rgb=0;
-    s->format=OVERLAY_FORMAT_YUV420;
+    s->format=OVERLAY_FORMAT_RGB;//OVERLAY_FORMAT_YUV420;
 
     if (s->allow_packed_rgb) {
         av_log(NULL, AV_LOG_WARNING,
@@ -121,7 +121,7 @@ static const enum AVPixelFormat alpha_pix_fmts[] = {
     AV_PIX_FMT_BGRA, AV_PIX_FMT_GBRAP, AV_PIX_FMT_NONE
 };
 
-int overlay_config_input_overlay(AVCodecContext *ctx, AVFrame *overlay_frame, OverlayContext* s)
+int overlay_config_input_overlay(AVFrame *frame, AVFrame *overlay_frame, OverlayContext* s)
 {
     int ret;
     //const AVPixFmtDescriptor *pix_desc = av_pix_fmt_desc_get(ctx->pix_fmt);
@@ -131,8 +131,8 @@ int overlay_config_input_overlay(AVCodecContext *ctx, AVFrame *overlay_frame, Ov
 
     /* Finish the configuration by evaluating the expressions
        now when both inputs are configured. */
-    s->var_values[OVERLAY_VAR_MAIN_W   ] = s->var_values[OVERLAY_VAR_MW] = ctx->width;//ctx->inputs[MAIN   ]->w;
-    s->var_values[OVERLAY_VAR_MAIN_H   ] = s->var_values[OVERLAY_VAR_MH] = ctx->height;//ctx->inputs[MAIN   ]->h;
+    s->var_values[OVERLAY_VAR_MAIN_W   ] = s->var_values[OVERLAY_VAR_MW] = frame->width;//ctx->inputs[MAIN   ]->w;
+    s->var_values[OVERLAY_VAR_MAIN_H   ] = s->var_values[OVERLAY_VAR_MH] = frame->height;//ctx->inputs[MAIN   ]->h;
     s->var_values[OVERLAY_VAR_OVERLAY_W] = s->var_values[OVERLAY_VAR_OW] = overlay_frame->width;//ctx->inputs[OVERLAY]->w;
     s->var_values[OVERLAY_VAR_OVERLAY_H] = s->var_values[OVERLAY_VAR_OH] = overlay_frame->height;//ctx->inputs[OVERLAY]->h;
     s->var_values[OVERLAY_VAR_HSUB]  = 1<<pix_desc->log2_chroma_w;
@@ -143,8 +143,8 @@ int overlay_config_input_overlay(AVCodecContext *ctx, AVFrame *overlay_frame, Ov
     s->var_values[OVERLAY_VAR_T]     = NAN;
     s->var_values[OVERLAY_VAR_POS]   = NAN;
 
-    if ((ret = set_expr(&s->x_pexpr,      s->x_expr,      "x",      ctx)) < 0 ||
-        (ret = set_expr(&s->y_pexpr,      s->y_expr,      "y",      ctx)) < 0)
+    if ((ret = set_expr(&s->x_pexpr,      s->x_expr,      "x",      NULL)) < 0 ||
+        (ret = set_expr(&s->y_pexpr,      s->y_expr,      "y",      NULL)) < 0)
         return ret;
 
     s->overlay_is_packed_rgb =
@@ -155,15 +155,15 @@ int overlay_config_input_overlay(AVCodecContext *ctx, AVFrame *overlay_frame, Ov
 
     if (s->eval_mode == EVAL_MODE_INIT) {
         eval_expr(s);
-        av_log(ctx, AV_LOG_VERBOSE, "x:%f xi:%d y:%f yi:%d\n",
+        av_log(NULL, AV_LOG_VERBOSE, "x:%f xi:%d y:%f yi:%d\n",
                s->var_values[OVERLAY_VAR_X], s->x,
                s->var_values[OVERLAY_VAR_Y], s->y);
     }
 
-    av_log(ctx, AV_LOG_INFO,
+    av_log(NULL, AV_LOG_INFO,
            "main w:%d h:%d fmt:%s overlay w:%d h:%d fmt:%s eof_action:%s\n",
-           ctx->width, ctx->height,
-           av_get_pix_fmt_name(ctx->pix_fmt),
+           frame->width, frame->height,
+           av_get_pix_fmt_name((AVPixelFormat)frame->format),
            overlay_frame->width, overlay_frame->height,
            av_get_pix_fmt_name((AVPixelFormat)overlay_frame->format),
            eof_action_str[s->eof_action]);
@@ -446,9 +446,9 @@ static void blend_image_gbrp(OverlayContext *s, AVFrame *dst, const AVFrame *src
 }
 
 
-int overlay_config_input_main(AVCodecContext *c, OverlayContext *s)
+int overlay_config_input_main(AVFrame* frame, OverlayContext *s)
 {
-    const AVPixFmtDescriptor *pix_desc = av_pix_fmt_desc_get(c->pix_fmt);
+    const AVPixFmtDescriptor *pix_desc = av_pix_fmt_desc_get((AVPixelFormat)frame->format);
 
     av_image_fill_max_pixsteps(s->main_pix_step,    NULL, pix_desc);
 
@@ -458,8 +458,8 @@ int overlay_config_input_main(AVCodecContext *c, OverlayContext *s)
     s->main_desc = pix_desc;
 
     s->main_is_packed_rgb =
-        ff_fill_rgba_map(s->main_rgba_map, c->pix_fmt) >= 0;
-    s->main_has_alpha = ff_fmt_is_in(c->pix_fmt, (const int*)alpha_pix_fmts);
+        ff_fill_rgba_map(s->main_rgba_map, (AVPixelFormat)frame->format) >= 0;
+    s->main_has_alpha = ff_fmt_is_in((AVPixelFormat)frame->format, (const int*)alpha_pix_fmts);
     switch (s->format) {
     case OVERLAY_FORMAT_YUV420:
         s->blend_image = blend_image_yuv420;
@@ -480,16 +480,15 @@ int overlay_config_input_main(AVCodecContext *c, OverlayContext *s)
     return 0;
 }
 
-AVFrame *overlay_blend(AVCodecContext *ctx, OverlayContext* s, AVFrame *mainpic,
-                         const AVFrame *second, int64_t frame_count_out)
+AVFrame *overlay_blend(OverlayContext* s, AVFrame *mainpic,
+                         const AVFrame *second, int64_t frame_count_out, double pts)
 {
     double time = av_gettime_relative() / 1000.0;
     if (s->eval_mode == EVAL_MODE_FRAME) {
         int64_t pos = av_frame_get_pkt_pos(mainpic);
 
         s->var_values[OVERLAY_VAR_N] = frame_count_out;//inlink->frame_count_out;
-        s->var_values[OVERLAY_VAR_T] = mainpic->pts == AV_NOPTS_VALUE ?
-            NAN : mainpic->pts * av_q2d(ctx->time_base);
+        s->var_values[OVERLAY_VAR_T] = pts;//mainpic->pts == AV_NOPTS_VALUE ?  NAN : mainpic->pts * av_q2d(ctx->time_base);
         s->var_values[OVERLAY_VAR_POS] = pos == -1 ? NAN : pos;
 
         s->var_values[OVERLAY_VAR_OVERLAY_W] = s->var_values[OVERLAY_VAR_OW] = second->width;
@@ -498,7 +497,7 @@ AVFrame *overlay_blend(AVCodecContext *ctx, OverlayContext* s, AVFrame *mainpic,
         s->var_values[OVERLAY_VAR_MAIN_H   ] = s->var_values[OVERLAY_VAR_MH] = mainpic->height;
 
         eval_expr(s);
-        av_log(ctx, AV_LOG_INFO, "n:%f t:%f pos:%f x:%f xi:%d y:%f yi:%d\n",
+        av_log(NULL, AV_LOG_INFO, "n:%f t:%f pos:%f x:%f xi:%d y:%f yi:%d\n",
                s->var_values[OVERLAY_VAR_N], s->var_values[OVERLAY_VAR_T], s->var_values[OVERLAY_VAR_POS],
                s->var_values[OVERLAY_VAR_X], s->x,
                s->var_values[OVERLAY_VAR_Y], s->y);

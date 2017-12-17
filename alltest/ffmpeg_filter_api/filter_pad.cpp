@@ -47,22 +47,22 @@ void pad_init(PadContext* s, char* w, char*h, char* x, char* y)
     s->rgba_color[3] = 255; //0:0:0:black
 }
 
-int pad_config_input(AVCodecContext *ctx, PadContext *s)
+int pad_config_input(AVFrame* frame, PadContext *s)
 {
     int ret;
     double var_values[VARS_NB], res;
     char *expr;
 
-    ff_draw_init(&s->draw, ctx->pix_fmt, 0);
+    ff_draw_init(&s->draw, (AVPixelFormat)frame->format, 0);
     ff_draw_color(&s->draw, &s->color, s->rgba_color);
 
-    var_values[VAR_IN_W]  = var_values[VAR_IW] = ctx->width;
-    var_values[VAR_IN_H]  = var_values[VAR_IH] = ctx->height;
+    var_values[VAR_IN_W]  = var_values[VAR_IW] = frame->width;
+    var_values[VAR_IN_H]  = var_values[VAR_IH] = frame->height;
     var_values[VAR_OUT_W] = var_values[VAR_OW] = NAN;
     var_values[VAR_OUT_H] = var_values[VAR_OH] = NAN;
-    var_values[VAR_A]     = (double) ctx->width / ctx->height;
-    var_values[VAR_SAR]   = ctx->sample_aspect_ratio.num ?
-        (double) ctx->sample_aspect_ratio.num / ctx->sample_aspect_ratio.den : 1;
+    var_values[VAR_A]     = (double) frame->width / frame->height;
+    var_values[VAR_SAR]   = frame->sample_aspect_ratio.num ?
+        (double) frame->sample_aspect_ratio.num / frame->sample_aspect_ratio.den : 1;
     var_values[VAR_DAR]   = var_values[VAR_A] * var_values[VAR_SAR];
     var_values[VAR_HSUB]  = 1 << s->draw.hsub_max;
     var_values[VAR_VSUB]  = 1 << s->draw.vsub_max;
@@ -70,45 +70,45 @@ int pad_config_input(AVCodecContext *ctx, PadContext *s)
     /* evaluate width and height */
     av_expr_parse_and_eval(&res, (expr = s->w_expr),
                            var_names, var_values,
-                           NULL, NULL, NULL, NULL, NULL, 0, ctx);
+                           NULL, NULL, NULL, NULL, NULL, 0, NULL);
     s->w = var_values[VAR_OUT_W] = var_values[VAR_OW] = res;
     if ((ret = av_expr_parse_and_eval(&res, (expr = s->h_expr),
                                       var_names, var_values,
-                                      NULL, NULL, NULL, NULL, NULL, 0, ctx)) < 0)
+                                      NULL, NULL, NULL, NULL, NULL, 0, NULL)) < 0)
         goto eval_fail;
     s->h = var_values[VAR_OUT_H] = var_values[VAR_OH] = res;
     if (!s->h)
-        var_values[VAR_OUT_H] = var_values[VAR_OH] = s->h = ctx->height;
+        var_values[VAR_OUT_H] = var_values[VAR_OH] = s->h = frame->height;
 
     /* evaluate the width again, as it may depend on the evaluated output height */
     if ((ret = av_expr_parse_and_eval(&res, (expr = s->w_expr),
                                       var_names, var_values,
-                                      NULL, NULL, NULL, NULL, NULL, 0, ctx)) < 0)
+                                      NULL, NULL, NULL, NULL, NULL, 0, NULL)) < 0)
         goto eval_fail;
     s->w = var_values[VAR_OUT_W] = var_values[VAR_OW] = res;
     if (!s->w)
-        var_values[VAR_OUT_W] = var_values[VAR_OW] = s->w = ctx->width;
+        var_values[VAR_OUT_W] = var_values[VAR_OW] = s->w = frame->width;
 
     /* evaluate x and y */
     av_expr_parse_and_eval(&res, (expr = s->x_expr),
                            var_names, var_values,
-                           NULL, NULL, NULL, NULL, NULL, 0, ctx);
+                           NULL, NULL, NULL, NULL, NULL, 0, NULL);
     s->x = var_values[VAR_X] = res;
     if ((ret = av_expr_parse_and_eval(&res, (expr = s->y_expr),
                                       var_names, var_values,
-                                      NULL, NULL, NULL, NULL, NULL, 0, ctx)) < 0)
+                                      NULL, NULL, NULL, NULL, NULL, 0, NULL)) < 0)
         goto eval_fail;
     s->y = var_values[VAR_Y] = res;
     /* evaluate x again, as it may depend on the evaluated y value */
     if ((ret = av_expr_parse_and_eval(&res, (expr = s->x_expr),
                                       var_names, var_values,
-                                      NULL, NULL, NULL, NULL, NULL, 0, ctx)) < 0)
+                                      NULL, NULL, NULL, NULL, NULL, 0, NULL)) < 0)
         goto eval_fail;
     s->x = var_values[VAR_X] = res;
 
     /* sanity check params */
     if (s->w < 0 || s->h < 0 || s->x < 0 || s->y < 0) {
-        av_log(ctx, AV_LOG_ERROR, "Negative values are not acceptable.\n");
+        av_log(NULL, AV_LOG_ERROR, "Negative values are not acceptable.\n");
         return AVERROR(EINVAL);
     }
 
@@ -116,22 +116,22 @@ int pad_config_input(AVCodecContext *ctx, PadContext *s)
     s->h    = ff_draw_round_to_sub(&s->draw, 1, -1, s->h);
     s->x    = ff_draw_round_to_sub(&s->draw, 0, -1, s->x);
     s->y    = ff_draw_round_to_sub(&s->draw, 1, -1, s->y);
-    s->in_w = ff_draw_round_to_sub(&s->draw, 0, -1, ctx->width);
-    s->in_h = ff_draw_round_to_sub(&s->draw, 1, -1, ctx->height);
-    s->inlink_w = ctx->width;
-    s->inlink_h = ctx->height;
+    s->in_w = ff_draw_round_to_sub(&s->draw, 0, -1, frame->width);
+    s->in_h = ff_draw_round_to_sub(&s->draw, 1, -1, frame->height);
+    s->inlink_w = frame->width;
+    s->inlink_h = frame->height;
 
-    av_log(ctx, AV_LOG_VERBOSE, "w:%d h:%d -> w:%d h:%d x:%d y:%d color:0x%02X%02X%02X%02X\n",
-           ctx->width, ctx->height, s->w, s->h, s->x, s->y,
+    av_log(NULL, AV_LOG_VERBOSE, "w:%d h:%d -> w:%d h:%d x:%d y:%d color:0x%02X%02X%02X%02X\n",
+           frame->width, frame->height, s->w, s->h, s->x, s->y,
            s->rgba_color[0], s->rgba_color[1], s->rgba_color[2], s->rgba_color[3]);
 
     if (s->x <  0 || s->y <  0                      ||
         s->w <= 0 || s->h <= 0                      ||
-        (unsigned)s->x + (unsigned)ctx->width > s->w ||
-        (unsigned)s->y + (unsigned)ctx->height > s->h) {
-        av_log(ctx, AV_LOG_ERROR,
+        (unsigned)s->x + (unsigned)frame->width > s->w ||
+        (unsigned)s->y + (unsigned)frame->height > s->h) {
+        av_log(NULL, AV_LOG_ERROR,
                "Input area %d:%d:%d:%d not within the padded area 0:0:%d:%d or zero-sized\n",
-               s->x, s->y, s->x + ctx->width, s->y + ctx->height, s->w, s->h);
+               s->x, s->y, s->x + frame->width, s->y + frame->height, s->w, s->h);
         return AVERROR(EINVAL);
     }
 
@@ -208,7 +208,7 @@ static int frame_needs_copy(PadContext *s, AVFrame *frame)
     return 0;
 }
 
-int pad_filter_frame(AVCodecContext *ctx, PadContext* s, AVFrame * &in, AVFrame * &out)
+int pad_filter_frame(PadContext* s, AVFrame * &in, AVFrame * &out)
 {
     //AVFrame& *out=*pout;
     int needs_copy;
@@ -217,7 +217,7 @@ int pad_filter_frame(AVCodecContext *ctx, PadContext* s, AVFrame * &in, AVFrame 
     needs_copy = frame_needs_copy(s, in);
 
     if (needs_copy) {
-        av_log(ctx, AV_LOG_DEBUG, "Direct padding impossible allocating new frame\n");
+        av_log(NULL, AV_LOG_DEBUG, "Direct padding impossible allocating new frame\n");
         //new frame
         ///c/shareproject/ffmpeg-3.3/doc/examples/encode_video.c
         ///c/shareproject/ffmpeg-3.3/libavutil/frame.c
@@ -228,7 +228,7 @@ int pad_filter_frame(AVCodecContext *ctx, PadContext* s, AVFrame * &in, AVFrame 
             exit(1);
         }
         memset(frame, 0, sizeof(AVFrame));
-        frame->format = ctx->pix_fmt;
+        frame->format = in->format;
         frame->width  = s->w;
         frame->height = s->h;
         ret = av_frame_get_buffer(frame, 32);

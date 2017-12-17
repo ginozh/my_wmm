@@ -45,7 +45,9 @@ typedef struct CropContext {
     ///double var_values[20];
 } CropContext;
 void crop_init(CropContext* s, char* w, char*h, char* x, char* y, int keep_aspect, int exact);
-int crop_config_input(AVCodecContext *c, CropContext* s);
-void crop_filter_frame(AVCodecContext *c, CropContext* s, AVFrame* frame);
+//int crop_config_input(AVCodecContext *c, CropContext* s);
+int crop_config_input(AVFrame* frame, CropContext* s);
+//void crop_filter_frame(AVCodecContext *c, CropContext* s, AVFrame* frame);
+void crop_filter_frame(CropContext* s, AVFrame* frame, int64_t frame_count_out , double pts);
 av_cold void crop_uninit(CropContext* s);
 #endif
