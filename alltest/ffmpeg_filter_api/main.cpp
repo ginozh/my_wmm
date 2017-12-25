@@ -32,6 +32,7 @@ extern "C" {
 #include "image_avframe.h"
 #include "filter_zoompan.h"
 #include "filter_blend.h"
+#include "filter_colorchannelmixer.h"
 
 static AVFormatContext *fmt_ctx;
 static AVCodecContext *dec_ctx;
@@ -42,7 +43,8 @@ static int video_stream_index = -1;
 ///static int64_t last_pts = AV_NOPTS_VALUE;
 static int64_t sws_flags = SWS_BILINEAR;//SWS_BICUBIC;
 
-AVFrame* copy_frame(AVFrame* in);
+//AVFrame* copy_frame(AVFrame* in, int width, int height);
+AVFrame* copy_frame(AVFrame* in, int format, int width, int height);
 static int open_input_file(const char *filename);
 //w:320 h:240 fmt:yuvj444p sar:1/1 -> w:320 h:240 fmt:yuva420p sar:1/1 flags:0x2
 //AVFrame* convertFormat(AVFrame *frame, int format);
@@ -52,15 +54,18 @@ void displayFrame(AVFrame *frame);
 
 int testVideoFilter(int argc, char *argv[]);
 int testZoomPan(int argc, char *argv[]);
+int testPicLut(int argc, char *argv[]);
 ///int testBlend(int argc, char *argv[]);
 
 int main(int argc, char *argv[])
 {
     av_log(NULL, AV_LOG_INFO, "main\n");
 
-    testVideoFilter(argc, argv);
+    //testVideoFilter(argc, argv);
 
-    ////testZoomPan(argc, argv);
+    //testZoomPan(argc, argv);
+    
+    testPicLut(argc, argv);
 
     ////testBlend(argc, argv);
     return 0;
@@ -110,21 +115,35 @@ AVFrame* convertFormat(AVFrame *frame, int dstW, int dstH, int format)
     uint8_t *out_buffer=NULL; //解码后的rgb数据
     struct SwsContext *img_convert_ctx;  //用于解码后的视频格式转换
 
-    pFrame = av_frame_alloc();
-    memset(pFrame, 0, sizeof(AVFrame));
-    //
+    double time = av_gettime_relative() / 1000.0;
     img_convert_ctx = sws_getContext(frame->width, frame->height,
             //pCodecCtx->pix_fmt, frame->width, frame->height,
             (AVPixelFormat)frame->format, dstW, dstH,
             (AVPixelFormat)format, sws_flags, NULL, NULL, NULL);
 
+    //pFrame = copy_frame(frame, format, dstW, dstH);
+#if 1
+    pFrame = av_frame_alloc();
+    memset(pFrame, 0, sizeof(AVFrame));
+    //
+
     int numBytes = avpicture_get_size((AVPixelFormat)format, dstW, dstH);
 
     out_buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
-    qDebug()<<"convertFormat new out_buffer: "<<out_buffer<<" size: "<<(numBytes * sizeof(uint8_t));
+    qDebug()<<"convertFormat new out_buffer: "<<out_buffer<<" size: "<<(numBytes * sizeof(uint8_t))
+        <<" width: "<<dstW<<" height: "<<dstH<<" format: "<<format;
     avpicture_fill((AVPicture *) pFrame, out_buffer, (AVPixelFormat)format,
             dstW, dstH);
-
+    pFrame->format = format;
+    pFrame->width  = dstW;
+    pFrame->height = dstH;
+    int ret = av_frame_copy_props(pFrame, frame);
+    if (ret < 0) {
+        av_frame_unref(pFrame);
+        fprintf(stderr, "Could not av_frame_copy_props\n");
+        exit(1);
+    }
+#endif
     sws_scale(img_convert_ctx,
             (uint8_t const * const *) frame->data,
             frame->linesize, 0, frame->height, pFrame->data,
@@ -138,17 +157,8 @@ AVFrame* convertFormat(AVFrame *frame, int dstW, int dstH, int format)
 #endif
     sws_freeContext(img_convert_ctx);
 
-    pFrame->format = format;
-    pFrame->width  = dstW;
-    pFrame->height = dstH;
-    int ret = av_frame_copy_props(pFrame, frame);
-    if (ret < 0) {
-        av_frame_unref(pFrame);
-        fprintf(stderr, "Could not av_frame_copy_props\n");
-        exit(1);
-    }
-
     ////frame = pFrame;
+    av_log(NULL, AV_LOG_INFO, "convertFormat waste_time: %f\n", av_gettime_relative() / 1000.0-time);
     return pFrame;
 }
 
@@ -339,7 +349,7 @@ int testVideoFilter(int argc, char *argv[])
                     //displayFrame(scale_frame);
 
                     blend_init(s, scale_frame, pblend_frame, "if(crossfade,1.5,2)");
-                    AVFrame* out=copy_frame(scale_frame);
+                    AVFrame* out=copy_frame(scale_frame, scale_frame->format, scale_frame->width, scale_frame->height);
 
                     //pts = frame->pts == AV_NOPTS_VALUE ? NAN : frame->pts * av_q2d(dec_ctx->time_base);
                     pts = (double)frame_count_out/25;
@@ -390,6 +400,98 @@ end:
     return 0;
 }
 
+void colorTemperatureToRGB(float kelvin, ColorChannelMixerContext *s)
+{
+    float temp = kelvin / 100;
+    float red, green, blue;
+
+    if( temp <= 66 )
+    { 
+        red = 255; 
+        green = temp;
+        green = 99.4708025861 * qLn(green) - 161.1195681661;
+        
+        if( temp <= 19){
+            blue = 0;
+        } 
+        else {
+            blue = temp-10;
+            blue = 138.5177312231 * qLn(blue) - 305.0447927307;
+        }
+    } 
+    else 
+    {
+        red = temp - 60;
+        red = 329.698727446 * qPow(red, -0.1332047592);
+        
+        green = temp - 60;
+        green = 288.1221695283 * qPow(green, -0.0755148492 );
+
+        blue = 255;
+    }
+    qDebug()<<"red: "<<red<<" green: "<<green<<" blue: "<<blue;
+#if 0
+    lutrgb=QString("lutrgb=%1:%2:%3")
+        .arg(red<0?0:(red>255?255:red))
+        .arg(green<0?0:(green>255?255:green))
+        .arg(blue<0?0:(blue>255?255:blue))
+        ;
+#endif
+    // colorbalance=.667:0.772:1
+#if 0
+    lutrgb=QString("colorbalance=rm=%1:gm=%2:bm=%3")
+        .arg(red<0?0:(red>255?1:(red*2/255-1)))
+        .arg(green<0?0:(green>255?1:(green*2/255-1)))
+        .arg(blue<0?0:(blue>255?1:(blue*2/255-1)))
+        ;
+#endif
+    s->rr = red<0?0:(red>255?1:(red*4/255-2));
+    s->gg = green<0?0:(green>255?1:(green*4/255-2));
+    s->bb = blue<0?0:(blue>255?1:(blue*4/255-2));
+#if 0
+    lutrgb=QString("colorchannelmixer=%1:0:0:0: 0:%2:0:0: 0:0:%3")
+        .arg(red<0?0:(red>255?1:(red*4/255-2)))
+        .arg(green<0?0:(green>255?1:(green*4/255-2)))
+        .arg(blue<0?0:(blue>255?1:(blue*4/255-2)))
+        ;
+#endif
+}
+int testPicLut(int argc, char *argv[])
+{
+    AVFrame *overlay_frame = NULL;
+    AVCodecContext *overlay_ctx=NULL;
+    ColorChannelMixerContext cc, *s=&cc;
+    int64_t frame_count=100;
+
+    av_log(NULL, AV_LOG_INFO, "testPicLut\n");
+    if (argc != 3) {
+        fprintf(stderr, "Usage: %s any jpgfile\n", argv[0]);
+        exit(1);
+    }
+    av_register_all();
+
+    image_to_avframe(argv[2], overlay_ctx, overlay_frame);
+    //overlay_frame=convertFormat(overlay_frame, AV_PIX_FMT_YUVA420P);
+    //overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUVA420P);
+    overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
+
+
+    for(int i=-100; i<frame_count; i+=10)
+    {
+        colorchannelmixer_init(s);
+        AVFrame* pFrame=copy_frame(overlay_frame, overlay_frame->format, overlay_frame->width, overlay_frame->height);
+        colorTemperatureToRGB(i*195+20500, s);
+        colorchannelmixer_config_output(s, overlay_frame->format);
+        qDebug()<<"testPicLut s->rr: "<<s->rr<<" s->gg: "<<s->gg<<" s->rr: "<<s->rr;
+        colorchannelmixer_filter_frame(s, overlay_frame, pFrame);
+        displayFrame(pFrame);
+        av_frame_free(&pFrame);
+        colorchannelmixer_uninit(s);
+    }
+    //av_frame_free(&overlay_frame); //error uncomplete
+////    sws_freeContext(overlay_ctx);
+    return 0;
+}
 int testZoomPan(int argc, char *argv[])
 {
     AVFrame *overlay_frame = NULL;
@@ -407,17 +509,19 @@ int testZoomPan(int argc, char *argv[])
 
     image_to_avframe(argv[2], overlay_ctx, overlay_frame);
     //overlay_frame=convertFormat(overlay_frame, AV_PIX_FMT_YUVA420P);
-    overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUVA420P);
+    //overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUVA420P);
+    overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
 
     framerate.num=24;
     framerate.den=1;
-    zoompan_init(s, "zoom+0.01", overlay_frame->width, overlay_frame->height, "0", "0", QString::number(frame_count).toStdString().c_str(), framerate);
-    zoompan_filter_frame(overlay_ctx, s, overlay_frame, 0, 0);
+    zoompan_init(s, "zoom+0.01", overlay_frame->width, overlay_frame->height, "0", "0", QString::number(frame_count).toStdString().c_str());
+    zoompan_filter_frame(s, overlay_frame, 0, 0);
 
     for(int i=0; i<frame_count; i++)
     {
-        AVFrame* pFrame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUVA420P);
-        request_frame(overlay_ctx, s, i, pFrame);
+        //AVFrame* pFrame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUVA420P);
+        AVFrame* pFrame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
+        request_frame(s, overlay_frame, i, pFrame);
         displayFrame(pFrame);
         av_frame_free(&pFrame);
     }
@@ -426,7 +530,7 @@ int testZoomPan(int argc, char *argv[])
     return 0;
 }
 
-AVFrame* copy_frame(AVFrame* in)
+AVFrame* copy_frame(AVFrame* in, int format, int width, int height)
 {
     AVFrame* frame = av_frame_alloc();
     if (!frame) {
@@ -434,9 +538,9 @@ AVFrame* copy_frame(AVFrame* in)
         exit(1);
     }
     memset(frame, 0, sizeof(AVFrame));
-    frame->format = in->format;
-    frame->width  = in->width;
-    frame->height = in->height;
+    frame->format = format;
+    frame->width  = width;
+    frame->height = height;
     int ret = av_frame_get_buffer(frame, 32);
     if (ret < 0) {
         fprintf(stderr, "Could not allocate the video frame data\n");

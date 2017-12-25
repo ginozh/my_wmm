@@ -117,7 +117,7 @@ enum                                   { VAR_X, VAR_Y, VAR_W, VAR_H, VAR_SW, VAR
     , VAR_FANIN
     , VAR_TEST
     , VAR_VARS_NB };
-
+#if 0
 #define DEFINE_ANIMATION_EXPR(type, name, div, expr_before_xexchange, expr_before_expr, expr)\
 static inline int animation_expr_## name(const uint8_t *_top, ptrdiff_t top_linesize,          \
                                const uint8_t *_bottom, ptrdiff_t bottom_linesize,    \
@@ -142,6 +142,52 @@ static inline int animation_expr_## name(const uint8_t *_top, ptrdiff_t top_line
     f = 25; if(f){} \
     tant = tan(N*M_PI/(2*f*t));if(tant){} \
     change_rate=N/(t*f); if(change_rate){} \
+    if(xchange){} if(ychange){} \
+    wh = W/H; \
+    whalf = W/2; hhalf = H/2; \
+    if(W){} if(T){} if(N){} if(H){} if(xpartlen){} if(ypartlen){} if(wh){} if(whalf){} if(hhalf){} \
+    if(tmp1){} if(tmp2){} if(tmp3){} \
+\
+    expr_before_xexchange; \
+    xchange=xpartlen*change_rate; \
+    ychange=ypartlen*change_rate; \
+    for (y = 0; y < height; y++) {                                             \
+        for (x = 0; x < width; x++) {                                          \
+            expr_before_expr; \
+            dst[x] = expr; \
+        }\
+        dst    += dst_linesize;                                                \
+        top    += top_linesize;                                                \
+        bottom += bottom_linesize;                                             \
+    }\
+    return 0;\
+}
+#endif
+#define DEFINE_ANIMATION_EXPR(type, name, div, expr_before_xexchange, expr_before_expr, expr)\
+static inline int animation_expr_## name(const uint8_t *_top, ptrdiff_t top_linesize,          \
+                               const uint8_t *_bottom, ptrdiff_t bottom_linesize,    \
+                               uint8_t *_dst, ptrdiff_t dst_linesize,                \
+                               ptrdiff_t width, ptrdiff_t height,              \
+                               FilterParams *param, double *values, int /*starty*/)\
+{\
+    const type *top = (type*)_top;                                             \
+    const type *bottom = (type*)_bottom;                                       \
+    type *dst = (type*)_dst;                                                   \
+    AVExpr *e = param->e;                                                      \
+    int y, x;                                                                  \
+    double W=values[VAR_W]; \
+    double T=values[VAR_T]; \
+    double N=values[VAR_N]; \
+    double H=values[VAR_H]; \
+    double f, tant, xpartlen=0, ypartlen=0, change_rate, xchange, ychange, wh, whalf, hhalf; \
+    double tmp1=0, tmp2=0, tmp3=0; \
+    double t=e->param[1]->value;\
+    double at=e->param[2]->value;\
+    double tn=e->param[1]->value;\
+    t = t <= at? t:at;\
+    f = 25; if(f){} \
+    tant = tan(N*M_PI/(2*tn));if(tant){} \
+    change_rate=N/(tn); if(change_rate){} \
     if(xchange){} if(ychange){} \
     wh = W/H; \
     whalf = W/2; hhalf = H/2; \
@@ -221,7 +267,8 @@ DEFINE_ANIMATION_EXPR(uint8_t, filledvup, 1, xpartlen=W*3/2, , ( ( abs(whalf-x)<
 // dissolves
 DEFINE_ANIMATION_EXPR(uint8_t, barsh, 1, ypartlen=H/54 , ,((  y%((int)(ypartlen))>=0 && y%((int)(ypartlen))<=ychange)? bottom[x]:top[x] ) )
 DEFINE_ANIMATION_EXPR(uint8_t, barsvertical, 1, xpartlen=W/72, ,((  x%((int)(xpartlen))>=0 && x%((int)(xpartlen))<=xchange)? bottom[x]:top[x] ) )
-DEFINE_ANIMATION_EXPR(uint8_t, crossfade, 1, , , (bottom[x]*(T>=t?1:(T/t))+top[x]*(1-(T>=t?1:(T/t)))) )
+//DEFINE_ANIMATION_EXPR(uint8_t, crossfade, 1, , , (bottom[x]*(T>=t?1:(T/t))+top[x]*(1-(T>=t?1:(T/t)))) )
+DEFINE_ANIMATION_EXPR(uint8_t, crossfade, 1, , , (bottom[x]*(N>=tn?1:(N/tn))+top[x]*(1-(N>=tn?1:(N/tn)))) )
 // patterns and shapes
 DEFINE_ANIMATION_EXPR(uint8_t, checkerb, 1, (xpartlen=W/12,ypartlen=H/18) , ,(( (((int)floor(y/ypartlen))%2==0 && x%((int)xpartlen)>=0 && x%((int)xpartlen)<=xchange) ||(((int)floor(y/ypartlen))%2==1 &&  ((((int)x)%((int)xpartlen)>=xpartlen/2 && ((int)x)%((int)xpartlen)<=xchange+xpartlen/2) || ( xchange>=xpartlen/2 && ((int)x)%((int)xpartlen)<=xchange-xpartlen/2) ) ) )? bottom[x]:top[x] ) )
 DEFINE_ANIMATION_EXPR(uint8_t, circle, 1, xpartlen=W/2, ,((( (x-whalf)*(x-whalf)+(y-hhalf)*(y-hhalf)<=xchange*xchange) )? bottom[x]:top[x] ) )
@@ -240,7 +287,8 @@ DEFINE_ANIMATION_EXPR(uint8_t, iris, 1, (xpartlen=whalf, ypartlen=hhalf), ,( (ab
 DEFINE_ANIMATION_EXPR(uint8_t, revealdown, 1, (ypartlen=H), ,( (y<=ychange)? bottom[x]:top[x] ) )
 DEFINE_ANIMATION_EXPR(uint8_t, revealright, 1, (xpartlen=W), ,( (x<=xchange)? bottom[x]:top[x] ) )
 DEFINE_ANIMATION_EXPR(uint8_t, revealleft, 1,(xpartlen=W) , , ((x>=W-xchange)?bottom[x]:top[x]) )
-DEFINE_ANIMATION_EXPR(uint8_t, roll, 1, (xpartlen=M_PI*90/180,xchange=xpartlen*N/(t*f),tmp1=tan(xchange),tmp2=sin(xchange), tmp3=cos(xchange)), ,((tmp1>=(H-y)/(W-x) || x<=(H-W*tmp1-y)*tmp1|| tmp1<=0)? bottom[x]:*(_top+(int)((H-y)*tmp3-(W-x)*tmp2)*top_linesize+(int)((W-x)*tmp3+(H-y)*tmp2))  ))
+//roll uncomplete
+DEFINE_ANIMATION_EXPR(uint8_t, roll, 1, (xpartlen=M_PI*90/180,xchange=xpartlen*N/(tn),tmp1=tan(xchange),tmp2=sin(xchange), tmp3=cos(xchange)), ,((tmp1>=(H-y)/(W-x) || x<=(H-W*tmp1-y)*tmp1|| tmp1<=0)? bottom[x]:*(_top+(int)((H-y)*tmp3-(W-x)*tmp2)*top_linesize+(int)((W-x)*tmp3+(H-y)*tmp2))  ))
 DEFINE_ANIMATION_EXPR(uint8_t, slide, 1, (ypartlen=H), ,((y>=H-ychange)? bottom[x]:(*(top+((int)ychange)*top_linesize+x) ) ))
 DEFINE_ANIMATION_EXPR(uint8_t, slideupt, 1, (ypartlen=H), ,((y>=H-ychange)? (H>=ychange?(*(_bottom+((int)(y-(H-ychange)))*bottom_linesize+x)):bottom[x] ):(*(top+((int)ychange)*top_linesize+x) ) ))
 DEFINE_ANIMATION_EXPR(uint8_t, slideleftt, 1, (xpartlen=W), ,((x>=W-xchange)? (W>=xchange?(*(_bottom+((int)y)*bottom_linesize+x-(int)(W-xchange))):bottom[x] ):(*(_top+((int)y)*top_linesize+x+(int)xchange) ) ))
@@ -250,7 +298,7 @@ DEFINE_ANIMATION_EXPR(uint8_t, splith, 1,(ypartlen=H/2) , , ((abs(y-hhalf)<=ycha
 DEFINE_ANIMATION_EXPR(uint8_t, splitv, 1,(xpartlen=W/2) , , ((abs(x-whalf)<=xchange)?bottom[x]:top[x]) )
 // shatters
 // sweeps and curls
-DEFINE_ANIMATION_EXPR(uint8_t, fanin, 1, (xpartlen=M_PI*180/180,xchange=xpartlen*N/(t*f),tmp1=tan(xchange)), ,(( (x<=W/5 && (xchange>=xpartlen/2 || tmp1*abs(W/5-x) >=abs(hhalf-y))) || (x>=W*4/5 && (xchange>=xpartlen/2 || tmp1*(x-4*W/5)>=abs(hhalf-y))) || (x>=W/5 && x<=W*4/5 && xchange>=xpartlen/2 && (-tmp1*(x-W/5)<=abs(hhalf-y) || -tmp1*(4*W/5-x)<=abs(hhalf-y)) )  ) ? bottom[x]:top[x]  ))
+DEFINE_ANIMATION_EXPR(uint8_t, fanin, 1, (xpartlen=M_PI*180/180,xchange=xpartlen*N/tn,tmp1=tan(xchange)), ,(( (x<=W/5 && (xchange>=xpartlen/2 || tmp1*abs(W/5-x) >=abs(hhalf-y))) || (x>=W*4/5 && (xchange>=xpartlen/2 || tmp1*(x-4*W/5)>=abs(hhalf-y))) || (x>=W/5 && x<=W*4/5 && xchange>=xpartlen/2 && (-tmp1*(x-W/5)<=abs(hhalf-y) || -tmp1*(4*W/5-x)<=abs(hhalf-y)) )  ) ? bottom[x]:top[x]  ))
 // Wipes
 // Cinematic
 // Contemporary
@@ -619,7 +667,9 @@ AVFrame *blend_frame(BlendContext *s, AVFrame *top_buf,
 {
     int plane;
 
-    av_log(NULL, AV_LOG_INFO, "blend_frame pts: %f frame_count_out: %ld\n", pts, frame_count_out);
+    //av_log(NULL, AV_LOG_INFO, "blend_frame pts: %f frame_count_out: %ld\n", pts, frame_count_out);
+    qDebug()<<"blend_frame blend_frame pts: "<<pts<<" frame_count_out: "<<frame_count_out
+        <<" nb_planes: "<<s->nb_planes;
     for (plane = 0; plane < s->nb_planes; plane++) {
         int hsub = plane == 1 || plane == 2 ? s->hsub : 0;
         int vsub = plane == 1 || plane == 2 ? s->vsub : 0;
@@ -735,7 +785,9 @@ av_cold int blend_init(BlendContext *s, AVFrame* top, AVFrame* bottom, const cha
 
     if (!s->tblend) {
         if (top->format != bottom->format) {
-            av_log(NULL, AV_LOG_ERROR, "inputs must be of same pixel format top->format: %d bottom->format: %d\n", top->format, bottom->format);
+            //av_log(NULL, AV_LOG_ERROR, "inputs must be of same pixel format top->format: %d bottom->format: %d\n", top->format, bottom->format);
+            qInfo()<<"blend_init error inputs must be of same pixel format top->format: "<<top->format
+                <<" bottom->format: "<<bottom->format;
             return AVERROR(EINVAL);
         }
         if (top->width                       != bottom->width ||
@@ -743,11 +795,16 @@ av_cold int blend_init(BlendContext *s, AVFrame* top, AVFrame* bottom, const cha
             toplink->sample_aspect_ratio.num != bottomlink->sample_aspect_ratio.num ||
             toplink->sample_aspect_ratio.den != bottomlink->sample_aspect_ratio.den*/
             ) {
+#if 0
             av_log(NULL, AV_LOG_ERROR, "First input link top parameters "
                    "(size %dx%d) do not match the corresponding "
                    "second input link bottom parameters (%dx%d)\n",
                    top->width, top->height,
                    bottom->width, bottom->height);
+#endif
+            qInfo()<<"blend_init error First input link top parameters (size "<<top->width<<"x"
+                <<top->height<<" do not match the corresponding second input link bottom parameters "
+                <<bottom->width<<"x"<<bottom->height;
             return AVERROR(EINVAL);
         }
     }
@@ -763,6 +820,7 @@ av_cold int blend_init(BlendContext *s, AVFrame* top, AVFrame* bottom, const cha
 
     is_16bit = pix_desc->comp[0].depth == 16;
     s->nb_planes = av_pix_fmt_count_planes((AVPixelFormat)top->format);
+    qDebug()<<"blend_init top->format: "<<top->format <<" nb_planes: "<<s->nb_planes;
 
 #if 0
     if (!s->tblend)
@@ -881,8 +939,13 @@ static void blend_expr_8bit(const uint8_t *_top, ptrdiff_t top_linesize,
     bottom_linesize /= 1;                                                    
     //printf ("cntExpr: %d\n", ++cntExpr) ; //why 75(50 frame) time? 2 frame == 3 
     //av_log(NULL, AV_LOG_VERBOSE, "cntExpr:  %d\n", ++cntExpr) ;
+#if 0
     av_log(NULL, AV_LOG_INFO, "values[VAR_N]: %f values[VAR_T]: %f values[VAR_W]: %f values[VAR_H]: %f values[VAR_SW]: %f values[VAR_SH]: %f e->type: %d\n"
             , values[VAR_N], values[VAR_T], values[VAR_W], values[VAR_H], values[VAR_SW], values[VAR_SH], e->type) ;
+#endif
+    qDebug()<<"blend_expr_8bit values[VAR_N]: "<<values[VAR_N]<<" values[VAR_T]:"<< values[VAR_T]
+        <<" values[VAR_W]: "<<values[VAR_W]<<" values[VAR_H]: "<<values[VAR_H]<<" values[VAR_SW]: "
+        <<values[VAR_SW]<<" values[VAR_SH]: "<<values[VAR_SH]<<" e->type: "<<e->type;
     if(e->type == AVExpr::e_if)
     {
         FuncDef blend_fun = blendfuncs[e->param[0]->a.const_index].func_arg;

@@ -55,10 +55,9 @@ typedef struct ZPcontext {
     int finished;
     AVRational framerate;
 } ZPContext;
-av_cold int zoompan_init(ZPcontext *s, const char* zoom, int w, int h, const char* x, const char* y, const char* duration
-        , AVRational framerate);
-int zoompan_filter_frame(AVCodecContext *ctx,ZPContext *s, AVFrame *in, int64_t frame_count_in
+av_cold int zoompan_init(ZPcontext *s, const char* zoom, int w, int h, const char* x, const char* y, const char* duration/* , AVRational framerate*/);
+int zoompan_filter_frame(/*AVCodecContext *ctx,*/ZPContext *s, AVFrame *in, int64_t frame_count_in
         , int64_t frame_count_out);
-int request_frame(AVCodecContext *ctx,ZPContext *s, int64_t frame_count_in, AVFrame* &out);
+int request_frame(/*AVCodecContext *ctx,*/ZPContext *s, AVFrame *in, int64_t frame_count_in, AVFrame* &out);
 
 #endif
