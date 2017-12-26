@@ -27,6 +27,7 @@ SOURCES += main.cpp \
     filter_blend.cpp \
     filter_colorchannelmixer.cpp \
     filter_eq.cpp \
+    filter_rotate.cpp \
 
 
 HEADERS  += filter_crop.h \
@@ -36,5 +37,6 @@ HEADERS  += filter_crop.h \
     filter_zoompan.h \
     filter_blend.h \
     filter_eq.h \
+    filter_rotate.h \
 
 

@@ -34,6 +34,7 @@ extern "C" {
 #include "filter_blend.h"
 #include "filter_colorchannelmixer.h"
 #include "filter_eq.h"
+#include "filter_rotate.h"
 
 static AVFormatContext *fmt_ctx;
 static AVCodecContext *dec_ctx;
@@ -472,7 +473,6 @@ int testPicLut(int argc, char *argv[])
     //黑白 eq=saturation=0
     AVFrame *overlay_frame = NULL;
     AVCodecContext *overlay_ctx=NULL;
-    EQContext ec, *s=&ec;
     int64_t frame_count=100;
 
     av_log(NULL, AV_LOG_INFO, "testPicLut\n");
@@ -484,22 +484,42 @@ int testPicLut(int argc, char *argv[])
 
     image_to_avframe(argv[2], overlay_ctx, overlay_frame);
     //overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
-    overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUV420P);
+    overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUVA420P);
     displayFrame(overlay_frame);
-    AVFrame* pFrame=copy_frame(overlay_frame, overlay_frame->format, overlay_frame->width, overlay_frame->height);
 
-    double time = av_gettime_relative() / 1000.0;
-    double brightness=0; // -100~100 -1.0~1.0 0
-    double contrast=0;   // -100~100 -2.0~2.0 1
-    double saturation=200; // -100~100 0.0~3.0  1
-    //eq_initialize(s, brightness/100, contrast/50, (saturation+100)*3/200);
-    //eq_initialize(s, 0, 1, 0);
-    eq_initialize(s, brightness, contrast, saturation);
-    eq_filter_frame(s, overlay_frame, 1, pFrame);
-    av_log(NULL, AV_LOG_INFO, "eq_filter_frame waste_time: %f\n", av_gettime_relative() / 1000.0-time);
-    displayFrame(pFrame);
-    av_frame_free(&pFrame);
-    eq_uninit(s);
+    {
+        EQContext ec, *s=&ec;
+        AVFrame* pFrame=copy_frame(overlay_frame, overlay_frame->format, overlay_frame->width, overlay_frame->height);
+        double time = av_gettime_relative() / 1000.0;
+        double brightness=0; // -100~100 -1.0~1.0 0
+        double contrast=0;   // -100~100 -2.0~2.0 1
+        double saturation=200; // -100~100 0.0~3.0  1
+        //eq_initialize(s, brightness/100, contrast/50, (saturation+100)*3/200);
+        //eq_initialize(s, 0, 1, 0);
+        eq_initialize(s, brightness, contrast, saturation);
+        eq_filter_frame(s, overlay_frame, 1, pFrame);
+        av_log(NULL, AV_LOG_INFO, "eq_filter_frame waste_time: %f\n", av_gettime_relative() / 1000.0-time);
+        displayFrame(pFrame);
+        av_frame_free(&pFrame);
+        eq_uninit(s);
+    }
+
+    {
+        RotContext ec, *s=&ec;
+        AVFrame* pFrame=copy_frame(overlay_frame, overlay_frame->format, overlay_frame->width, overlay_frame->height);
+        char angle[]="90*PI/180";
+        //char* outw=QString::number(pFrame->width).toStdString().c_str();
+        //char* outh=QString::number(pFrame->height).toStdString().c_str();
+        char outw[]="512";
+        char outh[]="384";
+        char color[]="black";
+        rotate_init(s, angle, outw, outh, color);
+        config_props(s, overlay_frame);
+        rotate_filter_frame(s, overlay_frame, 1, pFrame);
+        displayFrame(pFrame);
+        av_frame_free(&pFrame);
+        rotate_uninit(s);
+    }
 
     return 0;
 }
