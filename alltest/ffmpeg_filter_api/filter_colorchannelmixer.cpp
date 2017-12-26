@@ -1,4 +1,5 @@
 #include "filter_colorchannelmixer.h"
+#include <QDebug>
 
 #define R 0
 #define G 1
@@ -82,6 +83,8 @@ int colorchannelmixer_filter_frame(ColorChannelMixerContext *s, AVFrame *in, AVF
     const uint8_t goffset = s->rgba_map[G];
     const uint8_t boffset = s->rgba_map[B];
     const uint8_t aoffset = s->rgba_map[A];
+    qDebug()<<"colorchannelmixer_filter_frame roffset: "<<roffset<<" goffset: "<<goffset
+        <<" boffset: "<<boffset<<" aoffset: "<<aoffset;
     const uint8_t *srcrow = in->data[0];
     uint8_t *dstrow;
     int i, j;

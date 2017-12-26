@@ -46,7 +46,7 @@ typedef struct RotContext {
                                     int x, int y, int max_x, int max_y);
 } RotContext;
 av_cold int rotate_init(RotContext* rot, char* angle, char* outw, char* outh, char* color);
-int config_props(RotContext *rot, AVFrame *in);
+int rotate_config_props(RotContext *rot, AVFrame *in);
 int rotate_filter_frame(RotContext *rot, AVFrame *in,int frame_count_out, AVFrame* &out);
 av_cold void rotate_uninit(RotContext *rot);
 #endif

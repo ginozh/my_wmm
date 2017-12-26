@@ -35,6 +35,8 @@ extern "C" {
 #include "filter_colorchannelmixer.h"
 #include "filter_eq.h"
 #include "filter_rotate.h"
+#include "filter_hflip.h"
+#include "filter_vflip.h"
 
 static AVFormatContext *fmt_ctx;
 static AVCodecContext *dec_ctx;
@@ -483,11 +485,12 @@ int testPicLut(int argc, char *argv[])
     av_register_all();
 
     image_to_avframe(argv[2], overlay_ctx, overlay_frame);
-    //overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
-    overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUVA420P);
-    displayFrame(overlay_frame);
 
     {
+        //overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
+        overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUVA420P);
+        displayFrame(overlay_frame);
+
         EQContext ec, *s=&ec;
         AVFrame* pFrame=copy_frame(overlay_frame, overlay_frame->format, overlay_frame->width, overlay_frame->height);
         double time = av_gettime_relative() / 1000.0;
@@ -505,6 +508,8 @@ int testPicLut(int argc, char *argv[])
     }
 
     {
+        overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
+        //overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUVA420P);
         RotContext ec, *s=&ec;
         AVFrame* pFrame=copy_frame(overlay_frame, overlay_frame->format, overlay_frame->width, overlay_frame->height);
         char angle[]="90*PI/180";
@@ -514,13 +519,36 @@ int testPicLut(int argc, char *argv[])
         char outh[]="384";
         char color[]="black";
         rotate_init(s, angle, outw, outh, color);
-        config_props(s, overlay_frame);
+        rotate_config_props(s, overlay_frame);
         rotate_filter_frame(s, overlay_frame, 1, pFrame);
         displayFrame(pFrame);
         av_frame_free(&pFrame);
         rotate_uninit(s);
     }
+    {
+        overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
+        //overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUVA420P);
+        HFlipContext ec, *s=&ec;
+        AVFrame* pFrame=copy_frame(overlay_frame, overlay_frame->format, overlay_frame->width, overlay_frame->height);
 
+        hflip_init(s);
+        hflip_config_props(s, overlay_frame);
+        hflip_filter_frame(s, overlay_frame, pFrame);
+        displayFrame(pFrame);
+        av_frame_free(&pFrame);
+    }
+    {
+        overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
+        //overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUVA420P);
+        VFlipContext ec, *s=&ec;
+        AVFrame* pFrame=copy_frame(overlay_frame, overlay_frame->format, overlay_frame->width, overlay_frame->height);
+
+        vflip_init(s);
+        vflip_config(s, overlay_frame);
+        vflip_filter_frame(s, overlay_frame, pFrame);
+        displayFrame(pFrame);
+        av_frame_free(&pFrame);
+    }
     return 0;
 }
 

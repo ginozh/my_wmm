@@ -364,7 +364,7 @@ int rotate_filter_frame(RotContext *rot, AVFrame *in,int frame_count_out, AVFram
     return 0;
 }
 
-int config_props(RotContext *rot, AVFrame *in)
+int rotate_config_props(RotContext *rot, AVFrame *in)
 {
     const AVPixFmtDescriptor *pixdesc = av_pix_fmt_desc_get((AVPixelFormat)in->format);
     int ret;
