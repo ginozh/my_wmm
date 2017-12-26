@@ -26,6 +26,7 @@ SOURCES += main.cpp \
     filter_zoompan.cpp \
     filter_blend.cpp \
     filter_colorchannelmixer.cpp \
+    filter_eq.cpp \
 
 
 HEADERS  += filter_crop.h \
@@ -34,6 +35,6 @@ HEADERS  += filter_crop.h \
     filter_overlay.h \
     filter_zoompan.h \
     filter_blend.h \
-    filter_colorchannelmixer.h \
+    filter_eq.h \
 
 

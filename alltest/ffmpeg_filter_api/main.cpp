@@ -33,6 +33,7 @@ extern "C" {
 #include "filter_zoompan.h"
 #include "filter_blend.h"
 #include "filter_colorchannelmixer.h"
+#include "filter_eq.h"
 
 static AVFormatContext *fmt_ctx;
 static AVCodecContext *dec_ctx;
@@ -49,12 +50,18 @@ static int open_input_file(const char *filename);
 //w:320 h:240 fmt:yuvj444p sar:1/1 -> w:320 h:240 fmt:yuva420p sar:1/1 flags:0x2
 //AVFrame* convertFormat(AVFrame *frame, int format);
 AVFrame* convertFormat(AVFrame *frame, int dstW, int dstH, int format);
+#define BYTE uint8_t
+BYTE** CreatImage(BYTE* image, unsigned int width, unsigned int height);
+int TempltExcute(BYTE** imageBuf0, int w, int h, int* templt, int tw, int x, int y);
+void SetPixel2(BYTE** imageBuf1, int x, int y, int a);
+int GetAsh(BYTE** imageBuf, int x, int y);
 
 void displayFrame(AVFrame *frame);
 
 int testVideoFilter(int argc, char *argv[]);
 int testZoomPan(int argc, char *argv[]);
 int testPicLut(int argc, char *argv[]);
+int testColorChannelMixer(int argc, char *argv[]);
 ///int testBlend(int argc, char *argv[]);
 
 int main(int argc, char *argv[])
@@ -66,6 +73,8 @@ int main(int argc, char *argv[])
     //testZoomPan(argc, argv);
     
     testPicLut(argc, argv);
+
+    //testColorChannelMixer(argc, argv);
 
     ////testBlend(argc, argv);
     return 0;
@@ -456,11 +465,14 @@ void colorTemperatureToRGB(float kelvin, ColorChannelMixerContext *s)
         ;
 #endif
 }
+
 int testPicLut(int argc, char *argv[])
 {
+    //saturation: 饱和度, brightness: 亮度, contrast: 对比度
+    //黑白 eq=saturation=0
     AVFrame *overlay_frame = NULL;
     AVCodecContext *overlay_ctx=NULL;
-    ColorChannelMixerContext cc, *s=&cc;
+    EQContext ec, *s=&ec;
     int64_t frame_count=100;
 
     av_log(NULL, AV_LOG_INFO, "testPicLut\n");
@@ -471,18 +483,452 @@ int testPicLut(int argc, char *argv[])
     av_register_all();
 
     image_to_avframe(argv[2], overlay_ctx, overlay_frame);
+    //overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
+    overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUV420P);
+    displayFrame(overlay_frame);
+    AVFrame* pFrame=copy_frame(overlay_frame, overlay_frame->format, overlay_frame->width, overlay_frame->height);
+
+    double time = av_gettime_relative() / 1000.0;
+    double brightness=0; // -100~100 -1.0~1.0 0
+    double contrast=0;   // -100~100 -2.0~2.0 1
+    double saturation=200; // -100~100 0.0~3.0  1
+    //eq_initialize(s, brightness/100, contrast/50, (saturation+100)*3/200);
+    //eq_initialize(s, 0, 1, 0);
+    eq_initialize(s, brightness, contrast, saturation);
+    eq_filter_frame(s, overlay_frame, 1, pFrame);
+    av_log(NULL, AV_LOG_INFO, "eq_filter_frame waste_time: %f\n", av_gettime_relative() / 1000.0-time);
+    displayFrame(pFrame);
+    av_frame_free(&pFrame);
+    eq_uninit(s);
+
+    return 0;
+}
+
+int testColorChannelMixer(int argc, char *argv[])
+{
+    AVFrame *overlay_frame = NULL;
+    AVCodecContext *overlay_ctx=NULL;
+    ColorChannelMixerContext cc, *s=&cc;
+    int64_t frame_count=100;
+
+    av_log(NULL, AV_LOG_INFO, "ColorChannelMixer\n");
+    if (argc != 3) {
+        fprintf(stderr, "Usage: %s any jpgfile\n", argv[0]);
+        exit(1);
+    }
+    av_register_all();
+
+    image_to_avframe(argv[2], overlay_ctx, overlay_frame);
     //overlay_frame=convertFormat(overlay_frame, AV_PIX_FMT_YUVA420P);
     //overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUVA420P);
     overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
+    displayFrame(overlay_frame);
 
-
+#if 0
     for(int i=-100; i<frame_count; i+=10)
     {
         colorchannelmixer_init(s);
         AVFrame* pFrame=copy_frame(overlay_frame, overlay_frame->format, overlay_frame->width, overlay_frame->height);
         colorTemperatureToRGB(i*195+20500, s);
         colorchannelmixer_config_output(s, overlay_frame->format);
-        qDebug()<<"testPicLut s->rr: "<<s->rr<<" s->gg: "<<s->gg<<" s->rr: "<<s->rr;
+        qDebug()<<"ColorChannelMixer s->rr: "<<s->rr<<" s->gg: "<<s->gg<<" s->rr: "<<s->rr;
+        colorchannelmixer_filter_frame(s, overlay_frame, pFrame);
+        displayFrame(pFrame);
+        av_frame_free(&pFrame);
+        colorchannelmixer_uninit(s);
+    }
+#endif
+    //负片
+    {
+        AVFrame* pFrame=copy_frame(overlay_frame, overlay_frame->format, overlay_frame->width, overlay_frame->height);
+        AVFrame* in=overlay_frame;
+        AVFrame* out=pFrame;
+        {
+#define R 0
+#define G 1
+#define B 2
+#define A 3
+            uint8_t rgba_map[4];
+            ff_fill_rgba_map(s->rgba_map, (AVPixelFormat)overlay_frame->format);
+            const uint8_t roffset = s->rgba_map[R];
+            const uint8_t goffset = s->rgba_map[G];
+            const uint8_t boffset = s->rgba_map[B];
+            const uint8_t aoffset = s->rgba_map[A];
+            const uint8_t *srcrow = in->data[0];
+            uint8_t *dstrow;
+            int i, j;
+
+            dstrow = out->data[0];
+            for (i = 0; i < in->height; i++) {
+                const uint8_t *src = srcrow;
+                uint8_t *dst = dstrow;
+
+                for (j = 0; j < in->width * 4; j += 4) {
+                    const uint8_t rin = src[j + roffset];
+                    const uint8_t gin = src[j + goffset];
+                    const uint8_t bin = src[j + boffset];
+                    const uint8_t ain = src[j + aoffset];
+                    dst[j + roffset] = 255-rin;
+                    dst[j + goffset] = 255-gin;
+                    dst[j + boffset] = 255-bin;
+                    //dst[j + aoffset] = ;
+                }
+                srcrow += in->linesize[0];
+                dstrow += out->linesize[0];
+            }
+        }
+        displayFrame(pFrame);
+        av_frame_free(&pFrame);
+    }
+    //Emboss 浮雕
+    {
+        AVFrame* pFrame=copy_frame(overlay_frame, overlay_frame->format, overlay_frame->width, overlay_frame->height);
+        AVFrame* in=overlay_frame;
+        AVFrame* out=pFrame;
+        {
+            int r = 0, g = 0, b = 0;
+            int width=in->width;
+            int height=in->height;
+            uint8_t* tempPixel = out->data[0];
+            uint8_t* pixel= in->data[0];
+
+            //int sum = width * height *4;
+            //memcpy(tempPixel, pixel, sum);		
+            for(int i = 0; i < height-1; i++) 
+            {
+                for (int j = 0; j < (width-1)*4; j+=4) 
+                {
+                    //处理像素值
+                    b = abs(pixel[i*width*4+j] 
+                            -pixel[(i+1)*width*4+j+4]+128);
+                    g = abs(pixel[i*width*4+j+1]
+                            -pixel[(i+1)*width*4+j+5]+128);
+                    r = abs(pixel[i*width*4+j+2]
+                            -pixel[(i+1)*width*4+j+6]+128);
+
+                    //对于越界的像素值进行处理
+                    if (r>255)
+                        r=255;
+
+                    if (g>255)
+                        g=255;
+
+                    if (b>255)
+                        b=255;
+
+                    tempPixel[i*width*4 + j]		= b;//blue
+                    tempPixel[i*width*4 + j + 1]	= g;//green
+                    tempPixel[i*width*4 + j + 2]	= r;//red
+                }
+            }
+            for (int k = width * 4 * (height-1); k < width*4*height; k += 4) 
+            {
+                tempPixel[k]=128;
+                tempPixel[k+1]=128;
+                tempPixel[k+2]=128;
+            }
+
+            for (int l = (width-1) * 4; l < width*4*height; l += width*4) 
+            {
+                tempPixel[l]=128;
+                tempPixel[l+1]=128;
+                tempPixel[l+2]=128;
+            }
+        }
+        displayFrame(pFrame);
+        av_frame_free(&pFrame);
+    }
+    //黑白 no
+    {
+        AVFrame* pFrame=copy_frame(overlay_frame, overlay_frame->format, overlay_frame->width, overlay_frame->height);
+        AVFrame* in=overlay_frame;
+        AVFrame* out=pFrame;
+        {
+            int width=in->width;
+            int height=in->height;
+            uint8_t* tempPixel = out->data[0];
+            uint8_t* pixel= in->data[0];
+
+            int sum = width * height *4;
+            for(int i = 0; i < sum; i += 4)
+            {
+                //平均值法
+                tempPixel[i]	 = (pixel[i] + pixel[i+1] + pixel[i+2]) / 3; //blue
+                tempPixel[i + 1] = pixel[i];										 //green
+                tempPixel[i + 2] = pixel[i];										 //red
+            }
+        }
+        displayFrame(pFrame);
+        av_frame_free(&pFrame);
+    }
+    //雾化 HorFog 浓雾
+    {
+        AVFrame* pFrame=copy_frame(overlay_frame, overlay_frame->format, overlay_frame->width, overlay_frame->height);
+        AVFrame* in=overlay_frame;
+        AVFrame* out=pFrame;
+        {
+            int f = 10;
+            int k;
+            int n;
+            int width=in->width;
+            int height=in->height;
+            uint8_t* tempPixel = out->data[0];
+            uint8_t* pixel= in->data[0];
+
+            //int sum = width * height *4;
+            //memcpy(tempPixel, pixel, sum);		
+            for(int i = 0; i < height; i++) 
+            {
+                for (int j = 0; j < width*4; j+=4) 
+                {
+                    k = abs(rand() % f);
+                    n = j + k*4;
+
+                    if (n>(width-1) * 4)
+                        n = (width-1)*4;
+
+                    tempPixel[i*width*4 + j]     = pixel[i*width*4 + n];
+                    tempPixel[i*width*4 + j + 1] = pixel[i*width*4 + n + 1];
+                    tempPixel[i*width*4 + j + 2] = pixel[i*width*4 + n + 2];
+                    tempPixel[i*width*4 + j + 3] = pixel[i*width*4 + n + 3];
+                }
+            }
+        }
+        displayFrame(pFrame);
+        av_frame_free(&pFrame);
+    }
+    //垂直雾化 VerFog 浓雾
+    {
+        AVFrame* pFrame=copy_frame(overlay_frame, overlay_frame->format, overlay_frame->width, overlay_frame->height);
+        AVFrame* in=overlay_frame;
+        AVFrame* out=pFrame;
+        {
+            int f = 10;
+            int k;
+            int m;
+            int width=in->width;
+            int height=in->height;
+            uint8_t* tempPixel = out->data[0];
+            uint8_t* pixel= in->data[0];
+
+            //int sum = width * height *4;
+            //memcpy(tempPixel, pixel, sum);		
+            for(int i = 0; i < height; i++) 
+            {
+                for (int j = 0; j < width*4; j+=4) 
+                {
+                    k = abs(rand() % f);
+                    m = i + k;
+                    if (m>height-1)
+                        m = height-1;
+
+                    tempPixel[i*width*4 + j]     = pixel[m*width*4 + j];
+                    tempPixel[i*width*4 + j + 1] = pixel[m*width*4 + j + 1];
+                    tempPixel[i*width*4 + j + 2] = pixel[m*width*4 + j + 2];
+                    tempPixel[i*width*4 + j + 3] = pixel[m*width*4 + j + 3];
+                }
+            }
+        }
+        displayFrame(pFrame);
+        av_frame_free(&pFrame);
+    }
+    //复合雾化 ComFog 浓雾
+    {
+        AVFrame* pFrame=copy_frame(overlay_frame, overlay_frame->format, overlay_frame->width, overlay_frame->height);
+        AVFrame* in=overlay_frame;
+        AVFrame* out=pFrame;
+        {
+            int f = 10;
+            int k;
+            int m, n;
+            int width=in->width;
+            int height=in->height;
+            uint8_t* tempPixel = out->data[0];
+            uint8_t* pixel= in->data[0];
+
+            //int sum = width * height *4;
+            //memcpy(tempPixel, pixel, sum);		
+            for(int i = 0; i < height; i++) 
+            {
+                for (int j = 0; j < width*4; j+=4) 
+                {
+                    k = abs(rand() % f);
+                    m = i + k;
+                    n = j + k * 4;
+
+                    // 对超出图像区域的点进行相应处理
+                    if (m > height-1) 
+                        m = height-1;
+
+                    if (n > (width-1) * 4) 
+                        n = (width-1) * 4;
+
+                    // 更新像素数组
+                    tempPixel[i*width*4 + j]     = pixel[m*width*4 + n];
+                    tempPixel[i*width*4 + j + 1] = pixel[m*width*4 + n + 1];
+                    tempPixel[i*width*4 + j + 2] = pixel[m*width*4 + n + 2];
+                    tempPixel[i*width*4 + j + 3] = pixel[m*width*4 + n + 3];
+                }
+            }
+        }
+        displayFrame(pFrame);
+        av_frame_free(&pFrame);
+    }
+    //Mosaic 马赛克
+    {
+        AVFrame* pFrame=copy_frame(overlay_frame, overlay_frame->format, overlay_frame->width, overlay_frame->height);
+        AVFrame* in=overlay_frame;
+        AVFrame* out=pFrame;
+        {
+            int w=in->width;
+            int h=in->height;
+            int size=10; //马赛克方块的大小
+            uint8_t* tempPixel = out->data[0];
+            uint8_t* pixel= in->data[0];
+
+            BYTE** imageBuf0 = CreatImage(pixel, w, h);
+            BYTE** imageBuf1 = CreatImage(tempPixel, w, h);
+            int x = 0,y = 0;        //马赛克方格的左上角坐标
+            int tx = 0,ty = 0;      //马赛克方格的右下角坐标
+            int i, j;
+            while(true)
+            {
+                if(tx == w)  //如果已经处理完一行
+                {
+                    if(ty == h) break;
+
+                    //确定马赛克方格的上方边界
+                    y = ty;  
+
+                    //确定马赛克方格的下方边界
+                    if(y + size <= h)
+                        ty = y + size;
+                    else
+                        ty = h;
+
+                    //把方格位置移动到下一行首部
+                    x = 0;
+                }
+
+                //确定马赛克方格的左边边界
+                if(x + size <= w)
+                    tx = x + size;
+                else
+                    tx = w;
+
+                for(i = y;i < ty; i++)
+                    for(j = x; j<tx; j++)
+                    {
+                        //把马赛克方格填充为中点的象素
+                        imageBuf1[i][j*4]	  = imageBuf0[(y+ty) / 2][(x+tx)/2*4];
+                        imageBuf1[i][j*4 + 1] = imageBuf0[(y+ty) / 2][(x+tx)/2*4 + 1];
+                        imageBuf1[i][j*4 + 2] = imageBuf0[(y+ty) / 2][(x+tx)/2*4 + 2];
+                        imageBuf1[i][j*4 + 3] = imageBuf0[(y+ty) / 2][(x+tx)/2*4 + 3];
+                    }
+                //水平移动到下一个马赛克方格
+                x = tx;
+            }
+
+            free(imageBuf0);
+            free(imageBuf1);
+        }
+        displayFrame(pFrame);
+        av_frame_free(&pFrame);
+    }
+
+    //素描 LaplacianB
+    {
+        AVFrame* pFrame=copy_frame(overlay_frame, overlay_frame->format, overlay_frame->width, overlay_frame->height);
+        AVFrame* in=overlay_frame;
+        AVFrame* out=pFrame;
+        {
+            int w=in->width;
+            int h=in->height;
+            uint8_t* tempPixel = out->data[0];
+            uint8_t* pixel= in->data[0];
+
+            //定义临时图象存储空间
+            BYTE* tempImage;
+
+            tempImage = (BYTE*)malloc(sizeof(BYTE)*w*h*4);
+            //将图像转化为矩阵形式
+            BYTE** imageBuf0 = CreatImage(pixel, w, h);
+            BYTE** imageBuf1 = CreatImage(tempPixel, w, h);
+            BYTE** tempImageBuf = CreatImage(tempImage, w, h);
+            double scale = 2;
+            //拉普拉斯正相模板
+            int templt[9]={ 1, 1, 1, 1,-8, 1, 1, 1, 1 };
+            //噪声检测模板
+            int templtTest1[9]={ 1, 1,-1, 1, 0,-1, 1,-1,-1 };
+            int templtTest2[9]={ 1, 1, 1,-1, 0, 1,-1,-1,-1 };
+            //模糊处理模板
+            int templtAve[9]={ 1, 1, 1, 1, 4, 1, 1, 1, 1};
+            int x,y;
+            int a,b,b1,b2;
+
+            //依次对原图像的每个像素进行处理
+            for(y = 1; y < h - 1; y++)
+            {
+                for(x = 1; x < w - 1; x++)
+                {
+                    //拉普拉斯卷积运算
+                    a=TempltExcute(imageBuf0, w, h, templt, 3, x, y);
+                    //噪声检测
+                    b1=abs(TempltExcute(imageBuf0, w, h, templtTest1, 3, x, y));
+                    b2=abs(TempltExcute(imageBuf0, w, h, templtTest2, 3, x, y));
+                    b=b1>b2?b1:b2;
+                    if(b<25) a=0;
+                    else
+                    {
+                        a = (int)(a * scale);
+                        //过限处理
+                        if(a > 255) a = 255;
+                        else if(a < 32) a=0;
+                    }
+                    //反色处理
+                    a=255-a;
+                    SetPixel2(tempImageBuf, x, y, a);
+                }
+            }
+
+            //模糊处理
+            for(y = 1; y < h - 1; y++)
+            {
+                for(x = 1; x < w - 1; x++)
+                {
+                    a=TempltExcute(tempImageBuf, w, h, templtAve, 3, x, y) / 12;
+                    SetPixel2(imageBuf1, x, y, a);
+                }
+            }
+
+            free(tempImage);
+            free(imageBuf0);
+            free(imageBuf1);
+            free(tempImageBuf);
+
+        }
+        displayFrame(pFrame);
+        av_frame_free(&pFrame);
+    }
+    //黑白 grayscale
+    {
+        colorchannelmixer_init(s);
+        AVFrame* pFrame=copy_frame(overlay_frame, overlay_frame->format, overlay_frame->width, overlay_frame->height);
+        colorchannelmixer_set_rgb(s, .3, .4,.3,0,.3,.4,.3,0,.3,.4,.3);
+        colorchannelmixer_config_output(s, overlay_frame->format);
+        qDebug()<<"ColorChannelMixer s->rr: "<<s->rr<<" s->gg: "<<s->gg<<" s->rr: "<<s->rr;
+        colorchannelmixer_filter_frame(s, overlay_frame, pFrame);
+        displayFrame(pFrame);
+        av_frame_free(&pFrame);
+        colorchannelmixer_uninit(s);
+    }
+    //怀旧 sepia tones
+    {
+        colorchannelmixer_init(s);
+        AVFrame* pFrame=copy_frame(overlay_frame, overlay_frame->format, overlay_frame->width, overlay_frame->height);
+        colorchannelmixer_set_rgb(s, .393,.769,.189,0,.349,.686,.168,0,.272,.534,.131);
+        colorchannelmixer_config_output(s, overlay_frame->format);
+        qDebug()<<"ColorChannelMixer s->rr: "<<s->rr<<" s->gg: "<<s->gg<<" s->rr: "<<s->rr;
         colorchannelmixer_filter_frame(s, overlay_frame, pFrame);
         displayFrame(pFrame);
         av_frame_free(&pFrame);
@@ -553,4 +999,63 @@ AVFrame* copy_frame(AVFrame* in, int format, int width, int height)
         exit(1);
     }
     return frame;
+}
+//-----------------------------------------
+//	作用:		把线形存储的像素转化为二维数组形式
+//	参数:		
+//		image	线形存储的象素
+//		width	图像的宽度
+//		height	图象的高度
+//-----------------------------------------
+BYTE** CreatImage(BYTE* image, unsigned int width, unsigned int height)
+{
+	BYTE** imageBuf = (BYTE**)malloc(sizeof(BYTE*) * (height));
+	for(unsigned int y = 0; y < height; y++)
+	{
+		//使imageBuf中每个指针分别指向其下标表示的行的行首地址
+		imageBuf[y] = image + y * width * 4;
+	}
+
+	return imageBuf;
+}
+//-----------------------------------------
+//模板的卷积运算
+//-----------------------------------------
+int TempltExcute(BYTE** imageBuf0, int w, int h, int* templt, int tw, int x, int y)
+{
+	int i,j;
+	int m=0,px,py;
+	//分别对模板上每个位置进行计算
+	for(i=0; i<tw; i++)
+    {
+		for(j=0; j<tw; j++)
+		{
+			//计算像素在原图像上的位置
+			py=y-tw/2+i;
+			px=x-tw/2+j;
+			//将每个像素的灰度乘以权值再相加
+			m+=GetAsh(imageBuf0,px,py) * templt[i*tw+j];
+		}
+    }
+    return m;
+}
+
+
+//-----------------------------------------
+// 用a表示的灰度填充指定像素
+//-----------------------------------------
+void SetPixel2(BYTE** imageBuf1, int x, int y, int a)
+{
+	imageBuf1[y][x*4] = a;
+	imageBuf1[y][x*4+1] = a;
+	imageBuf1[y][x*4+2] = a;
+	imageBuf1[y][x*4+3]= 255;
+}
+
+int GetAsh(BYTE** imageBuf, int x, int y)
+{
+    int clr;
+    clr = (imageBuf[y][x*4] + imageBuf[y][x*4+1]
+            +imageBuf[y][x*4+2]) / 3;
+    return clr;
 }

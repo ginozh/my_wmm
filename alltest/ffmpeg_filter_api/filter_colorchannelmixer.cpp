@@ -62,6 +62,20 @@ int colorchannelmixer_config_output(ColorChannelMixerContext *s, int format)
     return 0;
 }
 
+int colorchannelmixer_set_rgb(ColorChannelMixerContext* s, double rr, double rg, double rb, double ra, double gr, double gg, double gb, double ga, double br, double bg, double bb, double ba)
+{
+    s->rr = rr;
+    s->rg = rg;
+    s->rb = rb;
+    s->gr = gr;
+    s->gg = gg;
+    s->gb = gb;
+    s->br = br;
+    s->bg = bg;
+    s->bb = bb;
+    return 0;
+}
+
 int colorchannelmixer_filter_frame(ColorChannelMixerContext *s, AVFrame *in, AVFrame* &out)
 {
     const uint8_t roffset = s->rgba_map[R];
