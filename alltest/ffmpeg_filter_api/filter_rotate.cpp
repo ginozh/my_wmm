@@ -1,5 +1,6 @@
 #include "filter_rotate.h"
 #include <QDebug>
+#define qInfo qDebug
 static const char * const var_names[] = {
     "in_w" , "iw",  ///< width of the input video
     "in_h" , "ih",  ///< height of the input video

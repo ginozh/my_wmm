@@ -1,5 +1,6 @@
 #include "filter_hflip.h"
 #include <QDebug>
+#define qInfo qDebug
 av_cold int hflip_init(HFlipContext *s)
 {
     memset(s, 0, sizeof(HFlipContext));

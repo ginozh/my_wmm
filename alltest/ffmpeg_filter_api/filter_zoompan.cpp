@@ -12,6 +12,7 @@ extern "C" {
 #include "libswscale/swscale.h"
 }
 #include <QDebug>
+#define qInfo qDebug
 
 static const char *const var_names[] = {
     "in_w",   "iw",

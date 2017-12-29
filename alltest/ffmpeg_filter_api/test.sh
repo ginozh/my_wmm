@@ -3,7 +3,7 @@
 <<COMMENT
 @author: storm
 @date: 2017-12-12
-@description: 
+@description:
 COMMENT
 
 rm images/*;

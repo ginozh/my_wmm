@@ -1,4 +1,5 @@
 #include "filter_overlay.h"
+#define qInfo qDebug
 
 static const char *const var_names[] = {
     "main_w",    "W", ///< width  of the main    video

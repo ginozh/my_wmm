@@ -1,5 +1,6 @@
 #include "filter_eq.h"
 #include <QDebug>
+#define qInfo qDebug
 static const char *const var_names[] = {
     "n",   // frame count
     "pos", // frame position

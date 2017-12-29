@@ -1,5 +1,6 @@
 #include "filter_colorchannelmixer.h"
 #include <QDebug>
+#define qInfo qDebug
 
 #define R 0
 #define G 1

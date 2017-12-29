@@ -12,6 +12,7 @@ extern "C" {
 #include "libavutil/error.h"
 }
 #include <QDebug>
+#define qInfo qDebug
 
 #define TOP    0
 #define BOTTOM 1
@@ -714,9 +715,12 @@ static av_cold int init(AVFilterContext *ctx)
 av_cold void blend_uninit(BlendContext *s)
 {
     int i;
-
-    av_frame_free(&s->prev_frame);
-
+#if 0
+    if(s->prev_frame)
+    {
+        av_frame_free(&s->prev_frame);
+    }
+#endif
     for (i = 0; i < FF_ARRAY_ELEMS(s->params); i++)
         av_expr_free(s->params[i].e);
 }

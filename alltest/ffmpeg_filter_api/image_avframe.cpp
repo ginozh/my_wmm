@@ -1,4 +1,5 @@
 #include "image_avframe.h"
+#define qInfo qDebug
 
 static int open_codec_context(int *stream_idx,
                               AVCodecContext **dec_ctx, AVFormatContext *fmt_ctx, enum AVMediaType type)
@@ -53,11 +54,11 @@ static int open_codec_context(int *stream_idx,
 
     return 0;
 }
-static AVFormatContext *fmt_ctx = NULL;
+//static AVFormatContext *fmt_ctx = NULL;
 static int video_stream_idx = -1;//, audio_stream_idx = -1;
 //static AVCodecContext *video_dec_ctx = NULL;//, *audio_dec_ctx;
 static AVStream *video_stream = NULL;//, *audio_stream = NULL;
-int image_to_avframe(const char *src_filename, AVCodecContext *&video_dec_ctx, AVFrame * &frame)
+int image_to_avframe(const char *src_filename, AVFormatContext *&fmt_ctx, AVCodecContext *&video_dec_ctx, AVFrame * &frame)
 {
     //int err, i;
     ///AVFrame *frame = NULL;
@@ -69,7 +70,7 @@ int image_to_avframe(const char *src_filename, AVCodecContext *&video_dec_ctx, A
 
     /* register all formats and codecs */
     av_register_all();
-#if 0
+#if 1
     fmt_ctx = avformat_alloc_context();
     if (!fmt_ctx) {
         av_log(NULL, AV_LOG_FATAL, "Could not allocate context.\n");
@@ -152,17 +153,18 @@ int image_to_avframe(const char *src_filename, AVCodecContext *&video_dec_ctx, A
             }
         }
     }
+    av_packet_unref(&pkt);
 
     return 0;
 fail:
-    image_avframe_close(video_dec_ctx);
+    image_avframe_close(fmt_ctx, video_dec_ctx);
     if(frame)
     {
         av_frame_free(&frame);
     }
     return ret;
 }
-int image_avframe_close(AVCodecContext *&video_dec_ctx)
+int image_avframe_close(AVFormatContext *&fmt_ctx, AVCodecContext *&video_dec_ctx)
 {
     if (video_dec_ctx)
     {

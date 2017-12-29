@@ -1,4 +1,5 @@
 #include "filter_crop.h"
+#define qInfo qDebug
 
 static const char *const var_names[] = {
     "in_w", "iw",   ///< width  of the input video
