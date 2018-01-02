@@ -31,13 +31,17 @@ av_cold int rotate_init(RotContext* rot, char* angle, char* outw, char* outh, ch
     rot->fillcolor_str=color;
     rot->use_bilinear=1;
     rot->fillcolor_enable = 1;
+    qDebug()<<"rotate_init angle: "<<angle<<" outw: "<<outw<<" outh: "
+        <<outh<<" color: "<<color;
 
     return 0;
 }
 
 av_cold void rotate_uninit(RotContext *rot)
 {
-    av_expr_free(rot->angle_expr);
+    qDebug()<<"rotate_uninit";
+    if(rot->angle_expr)
+        av_expr_free(rot->angle_expr);
     rot->angle_expr = NULL;
 }
 
@@ -371,6 +375,7 @@ int rotate_config_props(RotContext *rot, AVFrame *in)
     int ret;
     double res;
     char *expr;
+    qDebug()<<"rotate_config_props foramt: "<<in->format;
 
     ff_draw_init(&rot->draw, (AVPixelFormat)in->format, 0);
     ff_draw_color(&rot->draw, &rot->color, rot->fillcolor);

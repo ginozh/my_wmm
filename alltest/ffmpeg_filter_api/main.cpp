@@ -73,12 +73,12 @@ int main(int argc, char *argv[])
 {
     av_log(NULL, AV_LOG_INFO, "main\n");
 
-    testVideoFilter(argc, argv);
+    //testVideoFilter(argc, argv);
 
     //testZoomPan(argc, argv);
     //for(int i=0; i<1000;i++)
     {
-    //testPicLut(argc, argv);
+    testPicLut(argc, argv);
     //QThread::msleep(100);
     }
 
@@ -215,7 +215,8 @@ void displayFrame(AVFrame *frame)
     ////QImage tmpImg((uchar *)out_buffer,frame->width,frame->height,QImage::Format_RGB32);
     QImage tmpImg((uchar *)out_buffer,frame->width,frame->height,QImage::Format_RGBA8888);
     //tmpImg.save(QString("images/%1.jpg").arg(idx));
-    tmpImg.save(QString("/home/gino/ffmpeg-3.0.2/macjpg/%1.jpg").arg(idx));
+    //tmpImg.save(QString("/home/gino/ffmpeg-3.0.2/macjpg/%1.jpg").arg(idx));
+    tmpImg.save(QString("/c/shareproject/jpg/tmp/%1.jpg").arg(idx));
 
     qDebug()<<"displayFrame free out_buffer: "<<out_buffer;
     av_free(out_buffer); 
@@ -407,7 +408,7 @@ end:
     //blend
     tmp=pblend_frame->data[0];
     av_frame_free(&pblend_frame);
-    free(tmp);
+    av_free(tmp);
 #endif
     ///avfilter_graph_free(&filter_graph);
     avcodec_free_context(&dec_ctx);
@@ -521,7 +522,7 @@ int testPicLut(int argc, char *argv[])
         eq_uninit(s);
         uint8_t* tmp=overlay_frame->data[0];
         av_frame_free(&overlay_frame);
-        free(tmp);
+        av_free(tmp);
     }
 
     {
@@ -543,7 +544,7 @@ int testPicLut(int argc, char *argv[])
         rotate_uninit(s);
         uint8_t* tmp=overlay_frame->data[0];
         av_frame_free(&overlay_frame);
-        free(tmp);
+        av_free(tmp);
     }
     {
         AVFrame * overlay_frame=convertFormat(ori_frame, ori_frame->width, ori_frame->height, AV_PIX_FMT_RGBA);
@@ -558,7 +559,7 @@ int testPicLut(int argc, char *argv[])
         av_frame_free(&pFrame);
         uint8_t* tmp=overlay_frame->data[0];
         av_frame_free(&overlay_frame);
-        free(tmp);
+        av_free(tmp);
     }
     {
         AVFrame * overlay_frame=convertFormat(ori_frame, ori_frame->width, ori_frame->height, AV_PIX_FMT_RGBA);
@@ -573,7 +574,7 @@ int testPicLut(int argc, char *argv[])
         av_frame_free(&pFrame);
         uint8_t* tmp=overlay_frame->data[0];
         av_frame_free(&overlay_frame);
-        free(tmp);
+        av_free(tmp);
     }
     av_frame_free(&ori_frame);
     return 0;

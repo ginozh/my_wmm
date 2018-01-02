@@ -12,6 +12,8 @@ QMAKE_CFLAGS += -static-libgcc -static-libstdc++ -ggdb -Wno-unused-parameter -Wn
 QMAKE_CXXFLAGS += -static-libgcc -static-libstdc++ -ggdb -Wno-unused-parameter -Wno-switch
 
 INCLUDEPATH += /home/gino/ffmpeg-3.3
+INCLUDEPATH += c:/shareproject/ffmpeg-3.3
+INCLUDEPATH += /c/shareproject/ffmpeg-3.3
 
 #LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lpostproc -lswresample -lswscale  -lavresample 
 LIBS += -lavcodec -lavdevice -lavformat -lavutil -lpostproc -lswresample -lswscale  -lavresample 
