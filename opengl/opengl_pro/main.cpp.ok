@@ -1,0 +1,624 @@
+//#include <QtCore>
+#include <QApplication>
+//#define USEQT 
+#ifdef USEQT
+#include <QtWidgets>
+#include <QtOpenGL>
+#include "glextensions.h"
+#endif
+
+#ifndef USEQT
+
+#ifdef __APPLE__
+#include <OpenGL/gl3.h>
+#else
+#include <GL/glew.h>
+//#include <GL/wglew.h>
+#endif
+
+#include <GLFW/glfw3.h>
+
+#endif 
+
+#include <QDebug>
+#include <QOpenGLContext>
+#include <QOffscreenSurface>
+#include <QImage>
+#include <memory>
+
+
+#include <fstream>
+#include <iostream>
+using namespace std;
+bool writeBMP(const char filename[], unsigned char* data, unsigned int w, unsigned int h)
+{	
+    std::ofstream out_file;
+    /** 检查data */	
+    if(!data)                    
+    {		
+        std::cerr << "data corrupted! " << std::endl;
+        out_file.close();
+        return false;
+    }	
+    /** 创建位图文件信息和位图文件头结构 */
+    BITMAPFILEHEADER header;
+    BITMAPINFOHEADER bitmapInfoHeader;
+    //unsigned char textureColors = 0;/**< 用于将图像颜色从BGR变换到RGB */	
+    /** 打开文件,并检查错误 */	
+    out_file.open(filename, std::ios::out | std::ios::binary);
+    if (!out_file)	
+    {		
+        std::cerr << "Unable to open file " << filename << std::endl;
+        return false;
+    }	
+    /** 填充BITMAPFILEHEADER */
+    header.bfType = 0x4d42; //BITMAP_ID;
+    header.bfSize = w*h*3 + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+    header.bfReserved1 = 0;
+    header.bfReserved2 = 0;	header.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+    /** 写入位图文件头信息 */
+    out_file.write((char*)&header, sizeof(BITMAPFILEHEADER));
+    /** 填充BITMAPINFOHEADER */
+    bitmapInfoHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bitmapInfoHeader.biWidth = w;
+    bitmapInfoHeader.biHeight = h;
+    bitmapInfoHeader.biPlanes = 1;
+    bitmapInfoHeader.biBitCount = 24;
+    bitmapInfoHeader.biCompression = BI_RGB; // BI_RLE4 BI_RLE8	
+    bitmapInfoHeader.biSizeImage = w * h * 3; // 当压缩类型为BI_RGB是也可以设置为0
+    bitmapInfoHeader.biXPelsPerMeter = 0;
+    bitmapInfoHeader.biYPelsPerMeter = 0;
+    bitmapInfoHeader.biClrUsed = 0;
+    bitmapInfoHeader.biClrImportant = 0;
+    /** 写入位图文件信息 */
+    out_file.write((char*)&bitmapInfoHeader, sizeof(BITMAPINFOHEADER));
+    /** 将指针移到数据开始位置 */
+    out_file.seekp(header.bfOffBits, std::ios::beg);
+    /** 写入图像数据 */	
+    out_file.write((char*)data, bitmapInfoHeader.biSizeImage);
+    out_file.close();
+    return true;
+}
+bool screenshot(const char* filename)
+{	
+    GLenum lastBuffer;	
+    GLbyte* pBits = 0; 
+    // 图像数据	
+    unsigned long lImageSize;	
+    GLint iViewport[4]; 
+    // 视图大小	
+    glGetIntegerv(GL_VIEWPORT, iViewport);	
+    lImageSize = iViewport[2] * iViewport[3] * 3;
+    pBits = (GLbyte*)new unsigned char[lImageSize];
+    if (!pBits)		
+        return false;
+    // 从color buffer中读取数据	
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+    glPixelStorei(GL_PACK_SKIP_ROWS, 0);
+    glPixelStorei(GL_PACK_SKIP_PIXELS, 0);	
+    //	
+    glGetIntegerv(GL_READ_BUFFER, (GLint*)&lastBuffer);
+    glReadBuffer(GL_FRONT);
+    glReadPixels(0, 0, iViewport[2], iViewport[3], GL_BGR_EXT, GL_UNSIGNED_BYTE, pBits);
+    glReadBuffer(lastBuffer);
+    if (writeBMP(filename, (unsigned char*)pBits, iViewport[2], iViewport[3]))
+        return true;
+    return false;
+}
+
+#ifndef USEQT
+typedef struct {
+    //const AVClass *class;
+    GLuint        program;
+    GLuint        frame_tex;
+    GLFWwindow    *window;
+    GLuint        pos_buf;
+} GenericShaderContext;
+#endif
+
+#define PIXEL_FORMAT GL_RGB
+
+#ifndef USEQT 
+static const float position[12] = {
+    -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 1.0f};
+
+static const GLchar *v_shader_source =
+"attribute vec2 position;\n"
+"varying vec2 texCoord;\n"
+"void main(void) {\n"
+"  gl_Position = vec4(position, 0, 1);\n"
+"  texCoord = position;\n"
+"}\n";
+
+static const GLchar *f_shader_source =
+"vec4 INPUT(vec2 tc);\n"
+"\n"
+"vec4 rgb_to_xyz(vec4 color) {\n"
+"float var_R = (color.r); //R from 0.0 to 255.0\n"
+"float var_G = (color.g); //G from 0.0 to 255.0\n"
+"float var_B = (color.b); //B from 0.0 to 255.0\n"
+"\n"
+"if (var_R > 0.04045) {\n"
+"var_R = pow(((var_R + 0.055) / 1.055), 2.4);\n"
+"} else {\n"
+"var_R = var_R / 12.92;\n"
+"}\n"
+"if (var_G > 0.04045) {\n"
+"var_G = pow(((var_G + 0.055) / 1.055), 2.4);\n"
+"} else {\n"
+"var_G = var_G / 12.92;\n"
+"}\n"
+"\n"
+"if (var_B > 0.04045) {\n"
+"var_B = pow(((var_B + 0.055) / 1.055), 2.4);\n"
+"} else {\n"
+"var_B = var_B / 12.92;\n"
+"}\n"
+"\n"
+"var_R = var_R * 100.0;\n"
+"var_G = var_G * 100.0;\n"
+"var_B = var_B * 100.0;\n"
+"\n"
+"//Observer. = 2.0°, Illuminant = D65\n"
+"float X = var_R * 0.4124 + var_G * 0.3576 + var_B * 0.1805;\n"
+"float Y = var_R * 0.2126 + var_G * 0.7152 + var_B * 0.0722;\n"
+"float Z = var_R * 0.0193 + var_G * 0.1192 + var_B * 0.9505;\n"
+"\n"
+"return vec4(X, Y, Z, color.a);\n"
+"}\n"
+"\n"
+"vec4 xyz_to_lab(vec4 color) {\n"
+"\n"
+"float ref_X = 95.047; //Observer= 2.0°, Illuminant= D65\n"
+"float ref_Y = 100.000;\n"
+"float ref_Z = 108.883;\n"
+"\n"
+"float var_X = color.r / ref_X;\n"
+"float var_Y = color.g / ref_Y;\n"
+"float var_Z = color.b / ref_Z;\n"
+"\n"
+"if (var_X > 0.008856) {\n"
+"var_X = pow(var_X, (1.0 / 3.0));\n"
+"} else {\n"
+"var_X = (7.787 * var_X) + (16.0 / 116.0);\n"
+"}\n"
+"if (var_Y > 0.008856) {\n"
+"var_Y = pow(var_Y, (1.0 / 3.0));\n"
+"} else {\n"
+"var_Y = (7.787 * var_Y) + (16.0 / 116.0);\n"
+"}\n"
+"if (var_Z > 0.008856) {\n"
+"var_Z = pow(var_Z, (1.0 / 3.0));\n"
+"} else {\n"
+"var_Z = (7.787 * var_Z) + (16.0 / 116.0);\n"
+"}\n"
+"\n"
+"float L = (116.0 * var_Y) - 16.0;\n"
+"float a = 500.0 * (var_X - var_Y);\n"
+"float b = 200.0 * (var_Y - var_Z);\n"
+"\n"
+"return vec4(L, a, b, color.a);\n"
+"}\n"
+"\n"
+"vec4 lab_to_lch(vec4 color) {\n"
+"\n"
+"const float MPI = 3.14159265359;\n"
+"\n"
+"float var_H = atan(color.b, color.g); //in GLSL this is atan2\n"
+"\n"
+"if (var_H > 0.0) {\n"
+"var_H = (var_H / MPI) * 180.0;\n"
+"} else {\n"
+"var_H = 360.0 - (abs(var_H) / MPI) * 180.0;\n"
+"}\n"
+"\n"
+"float C = sqrt(pow(color.g, 2.0) + pow(color.b, 2.0));\n"
+"float H = var_H;\n"
+"\n"
+"return vec4(color.r, C, H, color.a);\n"
+"}\n"
+"// ---------------------------\n"
+"vec4 lch_to_lab(vec4 color) {\n"
+"float a = cos(radians(color.b)) * color.g;\n"
+"float b = sin(radians(color.b)) * color.g;\n"
+"\n"
+"return vec4(color.r, a, b, color.a);\n"
+"}\n"
+"\n"
+"vec4 lab_to_xyz(vec4 color) {\n"
+"float var_Y = (color.r + 16.0) / 116.0;\n"
+"float var_X = color.g / 500.0 + var_Y;\n"
+"float var_Z = var_Y - color.b / 200.0;\n"
+"\n"
+"if (pow(var_Y, 3.0) > 0.008856) {\n"
+"var_Y = pow(var_Y, 3.0);\n"
+"} else {\n"
+"var_Y = (var_Y - 16.0 / 116.0) / 7.787;\n"
+"}\n"
+"if (pow(var_X, 3.0) > 0.008856) {\n"
+"var_X = pow(var_X, 3.0);\n"
+"} else {\n"
+"var_X = (var_X - 16.0 / 116.0) / 7.787;\n"
+"}\n"
+"if (pow(var_Z, 3.0) > 0.008856) {\n"
+"var_Z = pow(var_Z, 3.0);\n"
+"} else {\n"
+"var_Z = (var_Z - 16.0 / 116.0) / 7.787;\n"
+"}\n"
+"\n"
+"float ref_X = 95.047; //Observer= 2.0 degrees, Illuminant= D65\n"
+"float ref_Y = 100.000;\n"
+"float ref_Z = 108.883;\n"
+"\n"
+"float X = ref_X * var_X;\n"
+"float Y = ref_Y * var_Y;\n"
+"float Z = ref_Z * var_Z;\n"
+"\n"
+"return vec4(X, Y, Z, color.a);\n"
+"}\n"
+"\n"
+"vec4 xyz_to_rgb(vec4 color) {\n"
+"float var_X = color.r / 100.0; //X from 0.0 to  95.047      (Observer = 2.0 degrees, Illuminant = D65);\n"
+"float var_Y = color.g / 100.0; //Y from 0.0 to 100.000;\n"
+"float var_Z = color.b / 100.0; //Z from 0.0 to 108.883;\n"
+"\n"
+"float var_R = var_X * 3.2406 + var_Y * -1.5372 + var_Z * -0.4986;\n"
+"float var_G = var_X * -0.9689 + var_Y * 1.8758 + var_Z * 0.0415;\n"
+"float var_B = var_X * 0.0557 + var_Y * -0.2040 + var_Z * 1.0570;\n"
+"\n"
+"if (var_R > 0.0031308) {\n"
+"var_R = 1.055 * pow(var_R, (1.0 / 2.4)) - 0.055;\n"
+"} else {\n"
+"var_R = 12.92 * var_R;\n"
+"}\n"
+"if (var_G > 0.0031308) {\n"
+"var_G = 1.055 * pow(var_G, (1.0 / 2.4)) - 0.055;\n"
+"} else {\n"
+"var_G = 12.92 * var_G;\n"
+"}\n"
+"if (var_B > 0.0031308) {\n"
+"var_B = 1.055 * pow(var_B, (1.0 / 2.4)) - 0.055;\n"
+"} else {\n"
+"var_B = 12.92 * var_B;\n"
+"}\n"
+"\n"
+"float R = var_R;\n"
+"float G = var_G;\n"
+"float B = var_B;\n"
+"\n"
+"return vec4(R, G, B, color.a);\n"
+"}\n"
+"\n"
+"\n"
+"vec4 rgb_to_lch(vec4 color) {\n"
+"vec4 xyz = rgb_to_xyz(color);\n"
+"vec4 lab = xyz_to_lab(xyz);\n"
+"vec4 lch = lab_to_lch(lab);\n"
+"return lch;\n"
+"}\n"
+"\n"
+"\n"
+"vec4 lch_to_rgb(vec4 color) {\n"
+"vec4 lab = lch_to_lab(color);\n"
+"vec4 xyz = lab_to_xyz(lab);\n"
+"vec4 rgb = xyz_to_rgb(xyz);\n"
+"return rgb;\n"
+"}\n"
+"\n"
+"vec4 rgb_to_lab(vec4 color) {\n"
+"vec4 xyz = rgb_to_xyz(color);\n"
+"vec4 lab = xyz_to_lab(xyz);\n"
+"return lab;\n"
+"}\n"
+"\n"
+"vec4 lab_to_rgb(vec4 color) {\n"
+"vec4 xyz = lab_to_xyz(color);\n"
+"vec4 rgb = xyz_to_rgb(xyz);\n"
+"return rgb;\n"
+"}\n"
+"\n"
+"float thrdB(float l)\n"
+"{\n"
+"if (l < 10.)\n"
+"return 0.;\n"
+"float valIn = (l - 15.) / 85.;\n"
+"float valOut = 1. - pow(1.-valIn,1.36);\n"
+"return valOut * 100.;\n"
+"}\n"
+"\n"
+"\n"
+"vec4 FUNCNAME(vec2 tc)\n"
+"{\n"
+"vec4 col = INPUT(tc);\n"
+"vec4 lab = rgb_to_lab(col);\n"
+"lab.r = thrdB(lab.r);\n"
+"return lab_to_rgb(lab);\n"
+"}\n"
+"\n"
+"uniform sampler2D tex;\n"
+"varying vec2 texCoord;\n"
+"vec4 INPUT(vec2 tc)\n"
+"{\n"
+"//return texture2D(tex, texCoord * 0.5 + 0.5);\n"
+"return texture2D(tex, tc);\n"
+"}\n"
+"void main() {\n"
+"//gl_FragColor = texture2D(tex, texCoord * 0.5 + 0.5);\n"
+"gl_FragColor = FUNCNAME(texCoord * 0.5 + 0.5);\n"
+"//gl_FragColor = FUNCNAME(texCoord);\n"
+"}\n";
+
+static GLuint build_shader(const GLchar *shader_source, GLenum type) {
+    GLuint shader = glCreateShader(type);
+    if (!shader || !glIsShader(shader)) {
+        return 0;
+    }
+    glShaderSource(shader, 1, &shader_source, 0);
+    glCompileShader(shader);
+    GLint status;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+	if (status != GL_TRUE) {
+		int length;
+        char *log;
+		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
+		//log =(char*) av_malloc(length);//new char[length];
+		//glGetShaderInfoLog(shader, length, &length, log);
+        //av_log(NULL, AV_LOG_ERROR, "build_shader error: %s\n", log);
+        //av_free  (log);
+	}
+    return status == GL_TRUE ? shader : 0;
+}
+
+static void vbo_setup(GenericShaderContext *gs) {
+    glGenBuffers(1, &gs->pos_buf);
+    glBindBuffer(GL_ARRAY_BUFFER, gs->pos_buf);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(position), position, GL_STATIC_DRAW);
+
+    GLint loc = glGetAttribLocation(gs->program, "position");
+    glEnableVertexAttribArray(loc);
+    glVertexAttribPointer(loc, 2, GL_FLOAT, GL_FALSE, 0, 0);
+}
+
+static void tex_setup(GenericShaderContext *gs) {
+
+    glGenTextures(1, &gs->frame_tex);
+    glActiveTexture(GL_TEXTURE0);
+
+    glBindTexture(GL_TEXTURE_2D, gs->frame_tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 384, 0, PIXEL_FORMAT, GL_UNSIGNED_BYTE, NULL);
+
+    glUniform1i(glGetUniformLocation(gs->program, "tex"), 0);
+}
+void opengl()
+{
+#if 0
+    QSurfaceFormat fmt;
+    fmt.setDepthBufferSize(24);
+    fmt.setSamples(4);
+    fmt.setVersion(3, 2);
+    fmt.setProfile(QSurfaceFormat::CoreProfile);
+    //QSurfaceFormat::setDefaultFormat(fmt)
+	QOffscreenSurface* offscreenSurface = new QOffscreenSurface();
+    offscreenSurface->setFormat(fmt);
+    offscreenSurface->create();
+
+	QOpenGLContext* m_context = new QOpenGLContext();
+    m_context->setFormat(fmt);
+    if (!m_context->create()) {
+        delete m_context;
+        m_context = 0;
+    }
+	if (!m_context->makeCurrent(offscreenSurface)) {
+        return;
+    }
+#endif
+
+#if 1
+    GenericShaderContext* gs = new GenericShaderContext;
+#if 1
+    if (!glfwInit())
+    {
+        qDebug()<<"glfwInit. error ";
+    }
+    glfwWindowHint(GLFW_VISIBLE, 0);
+    if(!(gs->window = glfwCreateWindow(512, 384, "", NULL, NULL)))
+    {
+        qDebug()<<"glfwCreateWindow. error ";
+    }
+
+
+    glfwMakeContextCurrent(gs->window);
+#endif
+    //av_log(NULL, AV_LOG_ERROR, "Fragment 1\n");
+#if 0
+    QGLFormat format;
+    format.setVersion(3,3);
+    format.setDoubleBuffer(true);
+#endif
+#ifndef __APPLE__
+    glewExperimental = GL_TRUE;
+    GLenum err = glewInit();
+    if(err != GLEW_OK)
+    {
+        //av_log(NULL, AV_LOG_ERROR, "glewInit. error: %s\n", glewGetErrorString(err));
+        qDebug()<<"glewInit. error: "<<glewGetErrorString(err);
+    }
+    //av_log(NULL, AV_LOG_ERROR, "Fragment 2\n");
+#endif
+
+    glViewport(0, 0, 512, 384);
+
+    // build_program
+    GLuint v_shader, f_shader;
+    v_shader = build_shader(v_shader_source, GL_VERTEX_SHADER);
+    //av_log(NULL, AV_LOG_ERROR, "Fragment 2.1\n");
+    f_shader = build_shader(f_shader_source, GL_FRAGMENT_SHADER);
+    if (!(v_shader && f_shader )) {
+        // av_log(NULL, AV_LOG_ERROR, "build_shader error\n");
+        // return -1;
+        qDebug()<<"build_shader error";
+    }
+    //av_log(NULL, AV_LOG_ERROR, "Fragment 3\n");
+
+    gs->program = glCreateProgram();
+    glAttachShader(gs->program, v_shader);
+    glAttachShader(gs->program, f_shader);
+    glLinkProgram(gs->program);
+
+    GLint status;
+    glGetProgramiv(gs->program, GL_LINK_STATUS, &status);
+    //end build_program
+    //av_log(NULL, AV_LOG_ERROR, "Fragment 4\n");
+    
+    glUseProgram(gs->program);
+    vbo_setup(gs);
+    //av_log(NULL, AV_LOG_ERROR, "Fragment 5\n");
+    tex_setup(gs);
+    //av_log(NULL, AV_LOG_ERROR, "Fragment 6\n");
+    qDebug()<<"Fragment 6";
+
+    QString fileName="c:\\shareproject\\jpg\\512img005.jpg";
+    QImage image(fileName);
+    if (image.isNull()) {
+        return;
+    }
+
+    //image = image.convertToFormat(QImage::Format_RGBA8888);
+    image = image.convertToFormat(QImage::Format_RGB888);
+	unsigned char *pixels = (unsigned char *) image.bits();
+    QImage imagefrag("c:\\shareproject\\jpg\\512img005.jpg");
+    //imagefrag = imagefrag.convertToFormat(QImage::Format_RGBA8888);
+    imagefrag = imagefrag.convertToFormat(QImage::Format_RGB888);
+    //f->glReadPixels(0,0,512,384,GL_RGBA,GL_UNSIGNED_BYTE, imagefrag.bits());
+    unsigned char *mask_pixels = (unsigned char *) imagefrag.bits();
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 384, 0, PIXEL_FORMAT, GL_UNSIGNED_BYTE, pixels);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glReadPixels(0, 0, 512, 384, PIXEL_FORMAT, GL_UNSIGNED_BYTE, (GLvoid *)mask_pixels);
+    //glReadPixels(0, 0, 512, 384, PIXEL_FORMAT, GL_UNSIGNED_BYTE, (GLvoid *)pixels);
+    imagefrag.save("c:\\shareproject\\jpg\\512img005_frag.jpg");
+    //screenshot("c:\\shareproject\\jpg\\512img005_frag.bmp");
+#endif
+}
+#endif
+/*
+http://jingyan.baidu.com/article/f0e83a25969bfe22e59101cb.html
+/c/Qt/5.6/Src/qtbase/examples/widgets/graphicsview/boxes/glbuffers.cpp
+/c/Qt/5.6/Src/qtbase/examples/opengl/hellogl2/glwidget.cpp
+ */
+#ifdef USEQT
+void opengl()
+{
+    QSurfaceFormat fmt;
+    fmt.setDepthBufferSize(24);
+    fmt.setSamples(4);
+    //fmt.setVersion(3, 2);
+    fmt.setProfile(QSurfaceFormat::CoreProfile);
+    //QSurfaceFormat::setDefaultFormat(fmt)
+	QOffscreenSurface* offscreenSurface = new QOffscreenSurface();
+    offscreenSurface->setFormat(fmt);
+    offscreenSurface->create();
+
+	QOpenGLContext* m_context = new QOpenGLContext();
+    m_context->setFormat(fmt);
+    if (!m_context->create()) {
+        delete m_context;
+        m_context = 0;
+    }
+#if 0
+    QOpenGLWidget *widget = new QOpenGLWidget();
+    widget->makeCurrent();
+    widget->setFormat(fmt);
+#endif
+	if (!m_context->makeCurrent(offscreenSurface)) {
+        return;
+    }
+    QOpenGLShader* m_vertexShader = new QOpenGLShader(QOpenGLShader::Vertex);
+    if(m_vertexShader->compileSourceFile(QLatin1String("basic.vsh")))
+        qDebug()<<"vertex compileSourceFile success";
+    QOpenGLShader* shader = new QOpenGLShader(QOpenGLShader::Fragment);
+    if(shader->compileSourceFile("Aibao.frag"))
+        qDebug()<<"frag compileSourceFile success";
+
+    QOpenGLShaderProgram *program = new QOpenGLShaderProgram();
+    program->addShader(m_vertexShader);
+    program->addShader(shader);
+    if (!program->link()) {
+        qWarning("Failed to compile and link shader program");
+        qWarning("Vertex shader log:");
+        qWarning() << m_vertexShader->log();
+        qWarning() << "Fragment shader log ( file =):";
+        qWarning() << shader->log();
+        qWarning("Shader program log:");
+        qWarning() << program->log();
+
+        delete shader;
+        delete program;
+    }
+    qDebug()<<"1";
+    program->bind();
+    qDebug()<<"2";
+    program->setUniformValue("tex", GLint(0));
+    qDebug()<<"3";
+    //1, 
+    GLuint m_texture;
+    glGenTextures(1, &m_texture);
+    qDebug()<<"4";
+
+    QString fileName="c:\\shareproject\\jpg\\512img004.jpg";
+    QImage image(fileName);
+    if (image.isNull()) {
+        return;
+    }
+
+    image = image.convertToFormat(QImage::Format_RGB888);
+
+    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+
+    qDebug()<<"5 width: "<<image.width()<<" height: "<<image.height();
+    f->glBindTexture(GL_TEXTURE_2D, m_texture);
+    f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.width(), image.height(), 0,
+        GL_RGB, GL_UNSIGNED_BYTE, image.bits());
+        //GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, image.bits());
+
+    f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    //glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+    f->glBindTexture(GL_TEXTURE_2D, 0);
+    qDebug()<<"6";
+
+    //2
+    ////glActiveTexture(GL_TEXTURE0);
+    ///glBindTexture(GL_TEXTURE_2D, m_texture);
+    ////std::shared_ptr<QImage> mask = std::shared_ptr<QImage>(new QImage(image));
+    ////unsigned char *pixels = (unsigned char *) mask->bits();
+    qDebug()<<"7";
+    QImage imagefrag(512,384,QImage::Format_RGB888);
+    unsigned char *pixels = (unsigned char *) imagefrag.bits();
+    //imagefrag = imagefrag.convertToFormat(QImage::Format_ARGB32);
+    //f->glReadPixels(0,0,512,384,GL_RGBA,GL_UNSIGNED_BYTE, imagefrag.bits());
+    f->glReadPixels(0, 0, 512, 384, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid *)pixels);
+    qDebug()<<"8";
+    imagefrag.save("c:\\shareproject\\jpg\\512img004_frag.jpg");
+
+    delete program;
+    offscreenSurface->destroy();
+    delete m_context;
+}
+#endif
+
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+
+    opengl();
+    return 0;//a.exec();
+}
