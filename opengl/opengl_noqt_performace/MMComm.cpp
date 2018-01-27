@@ -56,9 +56,10 @@ int MMGlobalContext::createProgram(QString effectname)
         qInfo()<<"MMGlobalContext::createProgram error createProgram m_gs is NULL";
         return -1;
     }
-#ifdef OUTPUT_WASTE
+//#ifdef OUTPUT_WASTE
     QTime startTime = QTime::currentTime();
-#endif
+    int dt;
+//#endif
     //GenericShaderContext* gs=m_gs;
 
     if(!mapEffectProgram.contains(effectname))
@@ -220,6 +221,8 @@ void MMGlobalContext::initialOpengl(int width, int height,bool bForce)
 }
 
 MMGlobalContext* MMGlobalContext::m_pInstance = NULL;
+QVector<GLuint> MMGlobalContext::textures;
+QVector<GLuint> MMGlobalContext::framebuffers;
 MMGlobalContext::MMGlobalContext()
 {
     for(int idx=0; idx<MAX_TEXTURES_CNT; idx++)
@@ -230,184 +233,6 @@ MMGlobalContext::MMGlobalContext()
 #if 0
     SDL_memset(&wanted_spec, 0, sizeof(wanted_spec));
 #endif
-#if 0
-    allEffects.insert("Motion050", STEffectsInfo(MMET_MOTION_FFMPEG, "panupleft"
-                , new ZPMincontext("1.4","0","max((zoom-1)*(1-on/duration)*ih,0)", 0, 0, 0, 0, "0", "(zoom-1)*ih" )));
-    allEffects.insert("Motion051", STEffectsInfo(MMET_MOTION_FFMPEG, "panup"
-                , new ZPMincontext("1.4","(iw-mw)/2","max((zoom- 1)*(1-on/duration)*ih,0)", 0, 0, 1, 0, "0", "(zoom-1)*ih" )));
-    allEffects.insert("Motion052", STEffectsInfo(MMET_MOTION_FFMPEG, "panupright"
-                , new ZPMincontext("1.4","(zoom-1)*iw","max((zoom-1)*(1-on/duration)*ih,0)", 0, 0, 0, 0, "0", "(zoom-1)*ih" )));
-    allEffects.insert("Motion053", STEffectsInfo(MMET_MOTION_FFMPEG, "pandownleft"
-                , new ZPMincontext("1.4","0","min(on*(zoom-1)*ih/duration,(zoom-1)*ih/2)", 0, 0, 0, 0, "0", "0" )));
-    allEffects.insert("Motion054", STEffectsInfo(MMET_MOTION_FFMPEG, "pandown"
-                , new ZPMincontext("1.4","(iw-mw)/2","min(on*(zoom-1)*ih/duration,(zoom-1)*ih)", 0, 0, 1, 0, "0", "0" )));
-    allEffects.insert("Motion055", STEffectsInfo(MMET_MOTION_FFMPEG, "pandownright"
-                , new ZPMincontext("1.4","(zoom-1)*iw","min(on*(zoom-1)*ih/duration,(zoom-1)*ih/2)", 0, 0, 0, 0, "0", "0" )));
-    allEffects.insert("Motion056", STEffectsInfo(MMET_MOTION_FFMPEG, "panrighttop"
-                , new ZPMincontext("1.4","min(on*(zoom-1)*iw/duration,iw)","0", 0, 0, 0, 0, "0", "0" )));
-    allEffects.insert("Motion057", STEffectsInfo(MMET_MOTION_FFMPEG, "panright"
-                , new ZPMincontext("1.4","min(on*(zoom-1)*iw/duration,(zoom-1)*iw/2)","(ih-mh)/2", 0, 0, 0, 1, "0", "0" )));
-    allEffects.insert("Motion058", STEffectsInfo(MMET_MOTION_FFMPEG, "panrightbottom"
-                , new ZPMincontext("1.4","min(on*(zoom-1)*iw/duration,(zoom-1)*iw/2)","(zoom-1)*ih/2", 0, 0, 0, 0, "0", "0" )));
-    allEffects.insert("Motion059", STEffectsInfo(MMET_MOTION_FFMPEG, "panlefttop"
-                , new ZPMincontext("1.4","max(floor((zoom-1)*(1-on/duration)*iw),0)","0", 0, 0, 0, 0, "0.2*iw", "0" )));
-    allEffects.insert("Motion061", STEffectsInfo(MMET_MOTION_FFMPEG, "panleft"
-                , new ZPMincontext("1.4","max(floor((zoom-1)*(1-on/duration)*iw),0)","(zoom-1)", 0, 0, 0, 0, "0.2*iw", "0" )));
-    allEffects.insert("Motion062", STEffectsInfo(MMET_MOTION_FFMPEG, "panleftbottom"
-                , new ZPMincontext("1.4","max(floor((zoom-1)*(1-on/duration)*iw),0)","(zoom-1)*ih/2", 0, 0, 0, 0, "0.2*iw", "0" )));
-    allEffects.insert("Motion063", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomincenter"
-                , new ZPMincontext("1+0.01*on","(iw-mw)/2","(ih-mh)/2", 0, 0, 1, 1, "0", "0" )));
-    allEffects.insert("Motion064", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomintopleft"
-                , new ZPMincontext("1+0.01*on","(iw-mw)/2","0", 0, 0, 1, 0, "0", "0" )));
-    allEffects.insert("Motion065", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomintopright"
-                , new ZPMincontext("1+0.01*on","iw-mw","0", 1, 0, 0, 0, "0", "0" )));
-    allEffects.insert("Motion066", STEffectsInfo(MMET_MOTION_FFMPEG, "zoominright"
-                , new ZPMincontext("1+0.01*on","(iw-mw)/2","0", 0, 0, 1, 0, "0", "0" )));
-    allEffects.insert("Motion067", STEffectsInfo(MMET_MOTION_FFMPEG, "zoominbottomright"
-                , new ZPMincontext("1+0.01*on","iw-mw","ih-mh", 1, 1, 0, 0, "0", "0" )));
-    allEffects.insert("Motion068", STEffectsInfo(MMET_MOTION_FFMPEG, "zoominbottom"
-                , new ZPMincontext("1+0.01*on","(iw-mw)/2","ih-mh", 0, 1, 1, 0, "0", "0" )));
-    allEffects.insert("Motion069", STEffectsInfo(MMET_MOTION_FFMPEG, "zoominbottomleft"
-                , new ZPMincontext("1+0.01*on","0","ih-mh", 0, 1, 0, 0, "0", "0" )));
-    allEffects.insert("Motion070", STEffectsInfo(MMET_MOTION_FFMPEG, "zoominleft"
-                , new ZPMincontext("1+0.01*on","0","(ih-mh)/2", 0, 0, 0, 1, "0", "0" )));
-    allEffects.insert("Motion071", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomoutcenter"
-                , new ZPMincontext("if(lte(on,1),1.4,max(1.001,1.4-0.01*on))","(iw-mw)/2","(ih-mh)/2", 0, 0, 1, 1, "0", "0" )));
-    allEffects.insert("Motion072", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomouttopleft"
-                , new ZPMincontext("if(lte(on,1),1.4,max(1.001,1.4-0.01*on))","0","0", 0, 0, 0, 0, "0", "0" )));
-    allEffects.insert("Motion073", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomouttop"
-                , new ZPMincontext("if(lte(on,1),1.4,max(1.001,1.4-0.01*on))","(iw-mw)/2","0", 0, 0, 1, 0, "0", "0" )));
-    allEffects.insert("Motion074", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomoutright"
-                , new ZPMincontext("if(lte(on,1),1.4,max(1.001,1.4-0.01*on))","iw-mw","(ih-mh)/2", 1, 0, 0, 1, "0", "0" )));
-    allEffects.insert("Motion075", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomoutbottomright"
-                , new ZPMincontext("if(lte(on,1),1.4,max(1.001,1.4-0.01*on))","iw-mw","ih-mh", 1, 1, 0, 0, "0", "0" )));
-    allEffects.insert("Motion076", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomoutbottom"
-                , new ZPMincontext("if(lte(on,1),1.4,max(1.001,1.4-0.01*on))","(iw-mw)/2","ih-mh", 0, 1, 1, 0, "0", "0" )));
-    allEffects.insert("Motion077", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomoutbottomleft"
-                , new ZPMincontext("if(lte(on,1),1.4,max(1.001,1.4-0.01*on))","0","ih-mh", 0, 1, 0, 0, "0", "0" )));
-    allEffects.insert("Motion078", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomoutleft"
-                , new ZPMincontext("if(lte(on,1),1.4,max(1.001,1.4-0.01*on))","0","(ih-mh)/2", 0, 0, 0, 1, "0", "0" )));
-
-    //trasition
-    allEffects.insert("Trans013", STEffectsInfo(MMET_TRANSITION_FRAG,"CrossZoom"));
-    allEffects.insert("Trans019", STEffectsInfo(MMET_TRANSITION_FRAG,"Fadegrayscale"));
-    allEffects.insert("Trans020", STEffectsInfo(MMET_TRANSITION_FRAG,"ButterFlyWaveScrawler"));
-    allEffects.insert("Trans021", STEffectsInfo(MMET_TRANSITION_FRAG,"ColourDistance"));
-    allEffects.insert("Trans022", STEffectsInfo(MMET_TRANSITION_FRAG,"CrazyParammetricFun"));
-    allEffects.insert("Trans023", STEffectsInfo(MMET_TRANSITION_FRAG,"Cube"));
-    allEffects.insert("Trans024", STEffectsInfo(MMET_TRANSITION_FRAG,"Dispersionblur"));
-    allEffects.insert("Trans026", STEffectsInfo(MMET_TRANSITION_FRAG,"Evaporate1"));
-    allEffects.insert("Trans027", STEffectsInfo(MMET_TRANSITION_FRAG,"Evaporate2"));
-    //allEffects.insert("Trans028", STEffectsInfo(MMET_TRANSITION_FRAG,"Flash"));
-    allEffects.insert("Trans029", STEffectsInfo(MMET_TRANSITION_FRAG,"Heart"));
-    allEffects.insert("Trans031", STEffectsInfo(MMET_TRANSITION_FRAG,"morph"));
-    allEffects.insert("Trans034", STEffectsInfo(MMET_TRANSITION_FRAG,"PageCurl"));
-    allEffects.insert("Trans035", STEffectsInfo(MMET_TRANSITION_FRAG,"Pinwheel"));
-    allEffects.insert("Trans036", STEffectsInfo(MMET_TRANSITION_FRAG,"PolkaDot"));
-    allEffects.insert("Trans037", STEffectsInfo(MMET_TRANSITION_FRAG,"ripper"));
-    allEffects.insert("Trans038", STEffectsInfo(MMET_TRANSITION_FRAG,"Star"));
-    allEffects.insert("Trans039", STEffectsInfo(MMET_TRANSITION_FRAG,"swap"));
-    allEffects.insert("Trans040", STEffectsInfo(MMET_TRANSITION_FRAG,"swirl"));
-    allEffects.insert("Trans042", STEffectsInfo(MMET_TRANSITION_FRAG,"undulating"));
-    allEffects.insert("Trans044", STEffectsInfo(MMET_TRANSITION_FRAG,"Flyeye"));
-    allEffects.insert("Trans046", STEffectsInfo(MMET_TRANSITION_FRAG,"DoorWay"));
-    allEffects.insert("Trans056", STEffectsInfo(MMET_TRANSITION_FRAG,"Pixelate"));
-    allEffects.insert("Trans058", STEffectsInfo(MMET_TRANSITION_FRAG,"Roll_anti_clockwise"));
-    allEffects.insert("Trans059", STEffectsInfo(MMET_TRANSITION_FRAG,"Roll_clockwise"));
-    allEffects.insert("Trans065", STEffectsInfo(MMET_TRANSITION_FRAG,"Row_split_2"));
-    allEffects.insert("Trans071", STEffectsInfo(MMET_TRANSITION_FRAG,"sweep_anti_clockwise"));
-    allEffects.insert("Trans072", STEffectsInfo(MMET_TRANSITION_FRAG,"sweep_clockwise"));
-    allEffects.insert("Trans073", STEffectsInfo(MMET_TRANSITION_FRAG,"Twrl"));
-    allEffects.insert("Trans074", STEffectsInfo(MMET_TRANSITION_FRAG,"wave"));
-    allEffects.insert("Trans081", STEffectsInfo(MMET_TRANSITION_FRAG,"Round_zoom_in"));
-    allEffects.insert("Trans082", STEffectsInfo(MMET_TRANSITION_FRAG,"Round_zoom_out"));
-    allEffects.insert("Trans083", STEffectsInfo(MMET_TRANSITION_FRAG,"Zoom"));
-
-    //trasition_ffmpeg
-	allEffects.insert("Trans500", STEffectsInfo(MMET_TRANSITION_FFMPEG,"bowtieh"));
-    allEffects.insert("Trans501", STEffectsInfo(MMET_TRANSITION_FFMPEG,"bowtiev"));
-    allEffects.insert("Trans502", STEffectsInfo(MMET_TRANSITION_FFMPEG,"diagboxout"));
-    allEffects.insert("Trans503", STEffectsInfo(MMET_TRANSITION_FFMPEG,"diagcrossout"));
-    allEffects.insert("Trans504", STEffectsInfo(MMET_TRANSITION_FFMPEG,"diagdownright"));
-    allEffects.insert("Trans505", STEffectsInfo(MMET_TRANSITION_FFMPEG,"filledvdown"));
-    allEffects.insert("Trans506", STEffectsInfo(MMET_TRANSITION_FFMPEG,"filledvleft"));
-    allEffects.insert("Trans507", STEffectsInfo(MMET_TRANSITION_FFMPEG,"filledvright"));
-    allEffects.insert("Trans508", STEffectsInfo(MMET_TRANSITION_FFMPEG,"filledvup"));
-    allEffects.insert("Trans509", STEffectsInfo(MMET_TRANSITION_FFMPEG,"barsh"));
-    allEffects.insert("Trans510", STEffectsInfo(MMET_TRANSITION_FFMPEG,"barsvertical"));
-    allEffects.insert("Trans511", STEffectsInfo(MMET_TRANSITION_FFMPEG,"crossfade"));
-    allEffects.insert("Trans512", STEffectsInfo(MMET_TRANSITION_FFMPEG,"checkerb"));
-    allEffects.insert("Trans513", STEffectsInfo(MMET_TRANSITION_FFMPEG,"circle"));
-    allEffects.insert("Trans514", STEffectsInfo(MMET_TRANSITION_FFMPEG,"circles"));
-    allEffects.insert("Trans515", STEffectsInfo(MMET_TRANSITION_FFMPEG,"diamond"));
-    //allEffects.insert("Trans516", STEffectsInfo(MMET_TRANSITION_FFMPEG,"heart"));
-    allEffects.insert("Trans517", STEffectsInfo(MMET_TRANSITION_FFMPEG,"rectangle"));
-    //allEffects.insert("Trans518", STEffectsInfo(MMET_TRANSITION_FFMPEG,"wheel"));
-    allEffects.insert("Trans519", STEffectsInfo(MMET_TRANSITION_FFMPEG,"insetbottoml"));
-    allEffects.insert("Trans520", STEffectsInfo(MMET_TRANSITION_FFMPEG,"insetbottomr"));
-    allEffects.insert("Trans521", STEffectsInfo(MMET_TRANSITION_FFMPEG,"insettopleft"));
-    allEffects.insert("Trans522", STEffectsInfo(MMET_TRANSITION_FFMPEG,"insettopr"));
-    allEffects.insert("Trans523", STEffectsInfo(MMET_TRANSITION_FFMPEG,"iris"));
-    allEffects.insert("Trans524", STEffectsInfo(MMET_TRANSITION_FFMPEG,"revealdown"));
-    allEffects.insert("Trans525", STEffectsInfo(MMET_TRANSITION_FFMPEG,"revealright"));
-    allEffects.insert("Trans526", STEffectsInfo(MMET_TRANSITION_FFMPEG,"revealleft"));
-    allEffects.insert("Trans527", STEffectsInfo(MMET_TRANSITION_FFMPEG,"roll"));
-    allEffects.insert("Trans528", STEffectsInfo(MMET_TRANSITION_FFMPEG,"slide"));
-    allEffects.insert("Trans529", STEffectsInfo(MMET_TRANSITION_FFMPEG,"slideupt"));
-    allEffects.insert("Trans530", STEffectsInfo(MMET_TRANSITION_FFMPEG,"slideleftt"));
-    allEffects.insert("Trans531", STEffectsInfo(MMET_TRANSITION_FFMPEG,"slidedownt"));
-    allEffects.insert("Trans532", STEffectsInfo(MMET_TRANSITION_FFMPEG,"splith"));
-    allEffects.insert("Trans533", STEffectsInfo(MMET_TRANSITION_FFMPEG,"splitv"));
-    allEffects.insert("Trans534", STEffectsInfo(MMET_TRANSITION_FFMPEG,"fanin"));
-
-    //Filter
-    allEffects.insert("Filter004", STEffectsInfo(MMET_FILTER_FRAG,"Aibao"));
-    allEffects.insert("Filter018", STEffectsInfo(MMET_FILTER_FRAG,"BW_Noise"));
-    allEffects.insert("Filter025", STEffectsInfo(MMET_FILTER_FRAG,"FuzzyImg"));
-    allEffects.insert("Filter035", STEffectsInfo(MMET_FILTER_FRAG,"Oldvideo"));
-    allEffects.insert("Filter037", STEffectsInfo(MMET_FILTER_FRAG,"Rainbow1"));
-    allEffects.insert("Filter038", STEffectsInfo(MMET_FILTER_FRAG,"Rainbow2"));
-    allEffects.insert("Filter046", STEffectsInfo(MMET_FILTER_FRAG,"VCRdistortion"));
-    allEffects.insert("Filter051", STEffectsInfo(MMET_FILTER_FRAG,"WS_OLD_PHOTO"));
-    allEffects.insert("Filter053", STEffectsInfo(MMET_FILTER_FRAG,"ChromaticAberration"));
-    allEffects.insert("Filter056", STEffectsInfo(MMET_FILTER_FRAG,"Fisheye"));
-    allEffects.insert("Filter059", STEffectsInfo(MMET_FILTER_FRAG,"Kaleidoscope"));
-    allEffects.insert("Filter064", STEffectsInfo(MMET_FILTER_FRAG,"Ribbon"));
-    allEffects.insert("Filter068", STEffectsInfo(MMET_FILTER_FRAG,"Water"));
-    allEffects.insert("Filter073", STEffectsInfo(MMET_FILTER_FRAG,"Flushed"));
-    allEffects.insert("Filter080", STEffectsInfo(MMET_FILTER_FRAG,"Vintage"));
-    allEffects.insert("Filter082", STEffectsInfo(MMET_FILTER_FRAG,"1977"));
-    allEffects.insert("Filter083", STEffectsInfo(MMET_FILTER_FRAG,"Aegean"));
-    allEffects.insert("Filter084", STEffectsInfo(MMET_FILTER_FRAG,"Amaro"));
-    allEffects.insert("Filter085", STEffectsInfo(MMET_FILTER_FRAG,"Brannan"));
-    allEffects.insert("Filter086", STEffectsInfo(MMET_FILTER_FRAG,"Earlybird"));
-    allEffects.insert("Filter088", STEffectsInfo(MMET_FILTER_FRAG,"Hefe"));
-    allEffects.insert("Filter090", STEffectsInfo(MMET_FILTER_FRAG,"Hudson"));
-    allEffects.insert("Filter091", STEffectsInfo(MMET_FILTER_FRAG,"InkWell"));
-    allEffects.insert("Filter092", STEffectsInfo(MMET_FILTER_FRAG,"Lomo"));
-    allEffects.insert("Filter093", STEffectsInfo(MMET_FILTER_FRAG,"LordKelvin"));
-    allEffects.insert("Filter094", STEffectsInfo(MMET_FILTER_FRAG,"Nashville"));
-    allEffects.insert("Filter097", STEffectsInfo(MMET_FILTER_FRAG,"Sierra"));
-    allEffects.insert("Filter099", STEffectsInfo(MMET_FILTER_FRAG,"Sunrise"));
-    allEffects.insert("Filter100", STEffectsInfo(MMET_FILTER_FRAG,"SunSet"));
-    allEffects.insert("Filter101", STEffectsInfo(MMET_FILTER_FRAG,"Sutro"));
-    allEffects.insert("Filter102", STEffectsInfo(MMET_FILTER_FRAG,"Toaster"));
-    allEffects.insert("Filter103", STEffectsInfo(MMET_FILTER_FRAG,"Valencia"));
-    allEffects.insert("Filter104", STEffectsInfo(MMET_FILTER_FRAG,"Walden"));
-    allEffects.insert("Filter105", STEffectsInfo(MMET_FILTER_FRAG,"XproII"));
-    allEffects.insert("Filter109", STEffectsInfo(MMET_FILTER_FRAG,"Vivid"));
-    allEffects.insert("Filter110", STEffectsInfo(MMET_FILTER_FRAG,"Canvas"));
-    allEffects.insert("Filter112", STEffectsInfo(MMET_FILTER_FRAG,"Classic"));
-    allEffects.insert("Filter113", STEffectsInfo(MMET_FILTER_FRAG,"ColorSketch"));
-    allEffects.insert("Filter115", STEffectsInfo(MMET_FILTER_FRAG,"Shadow"));
-    allEffects.insert("Filter116", STEffectsInfo(MMET_FILTER_FRAG,"Sharp"));
-    //allEffects.insert("Filter117", STEffectsInfo(MMET_FILTER_FRAG,"Sketch"));
-    allEffects.insert("Filter118", STEffectsInfo(MMET_FILTER_FRAG,"Textile"));
-    allEffects.insert("Filter119", STEffectsInfo(MMET_FILTER_FRAG,"Wash"));
-    allEffects.insert("Filter121", STEffectsInfo(MMET_FILTER_FRAG,"BrightLights"));
-    allEffects.insert("Filter122", STEffectsInfo(MMET_FILTER_FRAG,"Metropolis"));
-    allEffects.insert("Filter123", STEffectsInfo(MMET_FILTER_FRAG,"September"));
-#endif
 }
 MMGlobalContext* MMGlobalContext::instance()  
 {  
@@ -415,7 +240,7 @@ MMGlobalContext* MMGlobalContext::instance()
         m_pInstance = new MMGlobalContext();  
     return m_pInstance;  
 }  
-GLint MMGlobalContext::load2DTexture(int w, int h, const unsigned char *pixels)
+GLint MMGlobalContext::createAndSetupTexture()
 {
     GLuint textureId1=0;
 #ifndef __UBUNTU__
@@ -429,6 +254,38 @@ GLint MMGlobalContext::load2DTexture(int w, int h, const unsigned char *pixels)
     // Step3 设定filter参数
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+#endif
+    return textureId1;
+}
+// 创建两个纹理绑定到帧缓冲
+void MMGlobalContext::createBindFramebufferTexture(int w, int h)
+{
+    for (int ii = 0; ii < 2; ++ii) {
+        GLuint texture = createAndSetupTexture();
+        textures.push_back(texture);
+
+        //设置纹理大小和图像大小一致
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
+                GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+        // 创建一个帧缓冲
+        // https://www.khronos.org/opengl/wiki/Framebuffer_Object
+        GLuint fbo;
+        glGenFramebuffers(1, &fbo);
+        framebuffers.push_back(fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+        // 绑定纹理到帧缓冲
+        //     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+        //glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture, 0);
+        //glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_TEXTURE_2D, texture, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 , GL_TEXTURE_2D, texture, 0);
+    }
+}
+GLint MMGlobalContext::load2DTexture(int w, int h, const unsigned char *pixels)
+{
+    GLuint textureId1=createAndSetupTexture();
+#ifndef __UBUNTU__
     // Step4 加载纹理
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
             //GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, pixels);
@@ -444,15 +301,21 @@ int MMGlobalContext::fragRenderForOtherThread(const QString& effectname,
         const unsigned char* bits1
         )
 {
-#ifdef OUTPUT_WASTE
+    QString m_effectName2="WS_OLD_PHOTO";
+    int ii = 0;
+    GLuint fbo ;
+//#ifdef OUTPUT_WASTE
     QTime startTime = QTime::currentTime();
-#endif
+    int dt;
+//#endif
     int iRtn=0;
 #ifndef __UBUNTU__
     GLuint        program;
     //GLuint textureId0, textureId1, textureId2, textureId3, textureId4, textureId5;
     GLuint textureId[MAX_TEXTURES_CNT];
+    GLuint textureId2[MAX_TEXTURES_CNT];
     int cnt=0;
+    int cnt2=0;
     GLint status;
 #if 0
     QMap<QString, GLuint>::iterator i = mapEffectProgram.find(m_effectName);
@@ -535,6 +398,7 @@ int MMGlobalContext::fragRenderForOtherThread(const QString& effectname,
         textureId2=MMGlobalContext::load2DTexture(m_gs->w, m_gs->h, bits1);
     }
 #endif
+    startTime = QTime::currentTime();
     for(int idx=0; idx<cnt; idx++)
     {
         switch(idx){
@@ -591,17 +455,76 @@ int MMGlobalContext::fragRenderForOtherThread(const QString& effectname,
         }
     }
 
+    fbo = framebuffers[ii % 2];
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glViewport(0, 0, m_gs->w, m_gs->h);
+
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
+    dt = startTime.msecsTo(QTime::currentTime());
+    qDebug()<< "MMGlobalContext::fragRenderForOtherThread waste_time frag. time: " << dt;
+
     //glBindVertexArray(0);
+    ////glUseProgram(0);
+
+    {
+    //GLuint        program;
+    if(!mapEffectProgram.contains(m_effectName2))
+    {
+        qInfo()<<"MMGlobalContext::fragRenderForOtherThread error. no such effectname: "<<m_effectName2;
+        return -1;
+    }
+    program=mapEffectProgram[m_effectName2].program;
+    glUseProgram(program);
+
+    textureId2[cnt2++]=textures[ii % 2];
+    for(int idx=0; idx<mapEffectProgram[m_effectName2].textures.size(); idx++)
+    {
+        textureId2[cnt2++]=MMGlobalContext::load2DTexture(m_gs->w, m_gs->h, (const unsigned char*)mapEffectProgram[m_effectName2].textures[idx].image->bits());
+    }
+    startTime = QTime::currentTime();
+    for(int idx=0; idx<cnt2; idx++)
+    {
+        switch(idx){
+        case 0: glActiveTexture(GL_TEXTURE0); break;
+        case 1: glActiveTexture(GL_TEXTURE1); break;
+        case 2: glActiveTexture(GL_TEXTURE2); break;
+        case 3: glActiveTexture(GL_TEXTURE3); break;
+        case 4: glActiveTexture(GL_TEXTURE4); break;
+        case 5: glActiveTexture(GL_TEXTURE5); break;
+        case 6: glActiveTexture(GL_TEXTURE6); break;
+        case 7: glActiveTexture(GL_TEXTURE7); break;
+        case 8: glActiveTexture(GL_TEXTURE8); break;
+        case 9: glActiveTexture(GL_TEXTURE9); break;
+        }
+        glBindTexture(GL_TEXTURE_2D, textureId2[idx]);
+        glUniform1i(glGetUniformLocation(program, arrTexturesVar[idx].constData()), idx);
+    }
+
+    glUniform1f(glGetUniformLocation(program, "u_global_time"), globaltime);
+    glUniform1f(glGetUniformLocation(program, "u_total_time"), totaltime);
+
+    glUniform2f(glGetUniformLocation(program, "u_resolution"), m_gs->w, m_gs->h);
+
+    
+    //fbo = framebuffers[ii % 2];
+    //glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    //glViewport(0, 0, m_gs->w, m_gs->h);
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
     glUseProgram(0);
 
+    dt = startTime.msecsTo(QTime::currentTime());
+    qDebug()<< "MMGlobalContext::fragRenderForOtherThread waste_time frag. time: " << dt;
+    }
+
+
 END_fragRenderForOtherThread:
-#ifdef OUTPUT_WASTE
-    int dt = startTime.msecsTo(QTime::currentTime());
+//#ifdef OUTPUT_WASTE
+    dt = startTime.msecsTo(QTime::currentTime());
     qDebug()<< "MMGlobalContext::fragRenderForOtherThread waste_time frag. time: " << dt
         <<" start_time: "<<startTime.toString()<<" QThread::currentThreadId(): "<<QThread::currentThreadId();
-#endif
+//#endif
 
 #endif
     return iRtn;

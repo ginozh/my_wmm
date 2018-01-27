@@ -102,6 +102,7 @@ public:
     static MMGlobalContext* instance();
     //void initialOpengl(int width, int height); //必须在主线程中初始化
     void initialOpengl(int width, int height,bool bForce=false); //必须在主线程中初始化
+    static GLint createAndSetupTexture();
     static GLint load2DTexture(int w, int h,const unsigned char *pixels);
     //int fragRender(const QString& effectid, const uchar* bits);
     int fragRenderForOtherThread(const QString& effectid, 
@@ -109,6 +110,7 @@ public:
             const unsigned char* bits1=NULL);
     int ParseConfCreateProgram(const QString pathpre, const QString& effectname);
     int createProgram(QString effectname);
+    static void createBindFramebufferTexture(int w, int h);
 private:
 public:
     //QMap<QString/*effectname*/, GLuint/*program*/> mapEffectProgram;
@@ -127,6 +129,10 @@ public:
 #endif
     //QMap<QString /*id*/, STEffectsInfo > allEffects;
     QByteArray arrTexturesVar[MAX_TEXTURES_CNT];
+
+    //for 帧缓冲
+    static QVector<GLuint> textures;
+    static QVector<GLuint> framebuffers;
 };
 
 #endif

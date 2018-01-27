@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     outFile.close();
 
     outFile.open(QIODevice::WriteOnly | QIODevice::Append);
-    qInstallMessageHandler(myMessageHandler);
+    //qInstallMessageHandler(myMessageHandler);
 
     //test opengl
     QImage image1, image2;
@@ -52,15 +52,16 @@ int main(int argc, char *argv[])
     unsigned char *mask_pixels = (unsigned char *) mask.bits();
     {
 
-    QString m_effectName="Cube";
+    QString m_effectName="Cube", m_effectName2="WS_OLD_PHOTO";
     int64_t curr_effect_number=15;
     int64_t total_effect_number=30;
     //GenericShaderContext* gs=MMGlobalContext::instance()->m_gs; //storm
     //glfwMakeContextCurrent( gs->threadWin );
     MMGlobalContext::instance()->initialOpengl(image1.width(), image1.height());
+    MMGlobalContext::instance()->createBindFramebufferTexture(image1.width(), image1.height());
 
-    if(MMGlobalContext::instance()->ParseConfCreateProgram("./",m_effectName)==0)
-
+    if(MMGlobalContext::instance()->ParseConfCreateProgram("./",m_effectName)==0
+            && MMGlobalContext::instance()->ParseConfCreateProgram("./",m_effectName2)==0)
     {
         QTime startTime = QTime::currentTime();
         unsigned char *pixels = (unsigned char *) image1.bits();
@@ -68,6 +69,8 @@ int main(int argc, char *argv[])
         if(!MMGlobalContext::instance()->fragRenderForOtherThread(m_effectName, pixels
                     , curr_effect_number, total_effect_number, pixels2))
         {
+            int dt = startTime.msecsTo(QTime::currentTime());
+            qDebug()<< "opengl waste: " << dt;
             glFlush();
             glReadPixels(0, 0, image1.width(), image1.height(), GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *)mask_pixels);
         }
@@ -75,8 +78,10 @@ int main(int argc, char *argv[])
         {
             qInfo()<<"Transition::GetEffectFrame error. fragRenderForOtherThread is wrong ";
         }
-        int dt = startTime.msecsTo(QTime::currentTime());
-        qDebug()<< "opengl waste: " << dt;
+    }
+    else
+    {
+        qInfo()<<"Transition::GetEffectFrame error ParseConfCreateProgram";
     }
 
     }
