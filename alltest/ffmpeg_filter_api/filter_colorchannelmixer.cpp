@@ -249,5 +249,9 @@ int colorchannelmixer_filter_frame(ColorChannelMixerContext *s, AVFrame *in, AVF
 
 av_cold void colorchannelmixer_uninit(ColorChannelMixerContext *s)
 {
-    av_freep(&s->buffer);
+    if(s->buffer)
+    {
+        av_freep(&s->buffer);
+        s->buffer=NULL;
+    }
 }

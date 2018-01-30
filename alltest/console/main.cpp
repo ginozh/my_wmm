@@ -20,13 +20,20 @@ void testMemoryLeak();
 void testDouble();
 void testSharePtr();
 void testLevelDB();
+void testInt();
+void testSacle();
 
 int main(int argc, char *argv[])
 {
 	cout << "programe start" << endl;
     QCoreApplication a(argc, argv);
 
-    testLevelDB();
+    testSacle();
+
+    //testInt();
+
+    //testLevelDB();
+
     //testSharePtr();
 
     //testDouble();
@@ -365,4 +372,27 @@ void createASpeed()
         qDebug()<<"speed: "<<speed<<" divisor: "<<divisor<<" bei: "<<bei<<" base: "<<base<<" x: "<<x;
         qDebug()<<"vf: "<<vf;
     }
+}
+
+void testInt()
+{
+    int iRotate=-630, iHFlip=0, iVFlip=0;
+    if(iRotate>=360)
+    {
+        iRotate=iRotate%360;
+    }
+    else if(iRotate<0)
+    {
+        iRotate=iRotate%(-360)+360;
+    }
+    qDebug()<<"testInt iRotate: "<<iRotate;
+
+}
+void testSacle()
+{
+    QSize source_size(1024, 786);
+    //source_size.scale(1280, 720, Qt::KeepAspectRatio);
+    qDebug()<<"testSacle width: "<<source_size.width()<<" height: "<<source_size.height(); //938, 720
+    source_size.scale(1280, 720, Qt::KeepAspectRatioByExpanding);
+    qDebug()<<"testSacle width: "<<source_size.width()<<" height: "<<source_size.height(); //1280, 982
 }

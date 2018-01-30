@@ -1,4 +1,5 @@
 #include "filter_pad.h"
+#include <qDebug>
 
 static const char *const var_names[] = {
     "in_w",   "iw",
@@ -36,6 +37,14 @@ enum EvalMode {
     EVAL_MODE_NB
 };
 
+void pad_init_int(PadContext* s,int w, int h, int x, int y)
+{
+    memset(s, 0, sizeof(PadContext));
+    s->w=w;
+    s->h=h;
+    s->x=x;
+    s->y=y;
+}
 void pad_init(PadContext* s, char* w, char*h, char* x, char* y)
 {
     memset(s, 0, sizeof(PadContext));
@@ -49,9 +58,9 @@ void pad_init(PadContext* s, char* w, char*h, char* x, char* y)
 
 int pad_config_input(AVFrame* frame, PadContext *s)
 {
-    int ret;
-    double var_values[VARS_NB], res;
-    char *expr;
+    //int ret;
+    double var_values[VARS_NB];//, res;
+    //char *expr;
 
     ff_draw_init(&s->draw, (AVPixelFormat)frame->format, 0);
     ff_draw_color(&s->draw, &s->color, s->rgba_color);
@@ -66,7 +75,7 @@ int pad_config_input(AVFrame* frame, PadContext *s)
     var_values[VAR_DAR]   = var_values[VAR_A] * var_values[VAR_SAR];
     var_values[VAR_HSUB]  = 1 << s->draw.hsub_max;
     var_values[VAR_VSUB]  = 1 << s->draw.vsub_max;
-
+#if 0
     /* evaluate width and height */
     av_expr_parse_and_eval(&res, (expr = s->w_expr),
                            var_names, var_values,
@@ -105,7 +114,7 @@ int pad_config_input(AVFrame* frame, PadContext *s)
                                       NULL, NULL, NULL, NULL, NULL, 0, NULL)) < 0)
         goto eval_fail;
     s->x = var_values[VAR_X] = res;
-
+#endif
     /* sanity check params */
     if (s->w < 0 || s->h < 0 || s->x < 0 || s->y < 0) {
         av_log(NULL, AV_LOG_ERROR, "Negative values are not acceptable.\n");
@@ -120,10 +129,13 @@ int pad_config_input(AVFrame* frame, PadContext *s)
     s->in_h = ff_draw_round_to_sub(&s->draw, 1, -1, frame->height);
     s->inlink_w = frame->width;
     s->inlink_h = frame->height;
-
+#if 0
     av_log(NULL, AV_LOG_VERBOSE, "w:%d h:%d -> w:%d h:%d x:%d y:%d color:0x%02X%02X%02X%02X\n",
            frame->width, frame->height, s->w, s->h, s->x, s->y,
            s->rgba_color[0], s->rgba_color[1], s->rgba_color[2], s->rgba_color[3]);
+#endif
+    qDebug()<<"pad_config_input w: "<<frame->width<<" h: "<<frame->height<<" -> w: "<<s->w
+        <<" h: "<<s->h<<" x: "<<s->x<<" y: "<<s->y;
 
     if (s->x <  0 || s->y <  0                      ||
         s->w <= 0 || s->h <= 0                      ||
@@ -136,11 +148,12 @@ int pad_config_input(AVFrame* frame, PadContext *s)
     }
 
     return 0;
-
+#if 0
 eval_fail:
     av_log(NULL, AV_LOG_ERROR,
            "Error when evaluating the expression '%s'\n", expr);
     return ret;
+#endif
 
 }
 /* check whether each plane in this buffer can be padded without copying */
@@ -211,9 +224,9 @@ static int frame_needs_copy(PadContext *s, AVFrame *frame)
 int pad_filter_frame(PadContext* s, AVFrame * &in, AVFrame * &out)
 {
     //AVFrame& *out=*pout;
-    int needs_copy;
+    int needs_copy=1;
     double time = av_gettime_relative() / 1000.0;
-
+#if 0
     needs_copy = frame_needs_copy(s, in);
 
     if (needs_copy) {
@@ -255,7 +268,9 @@ int pad_filter_frame(PadContext* s, AVFrame * &in, AVFrame * &out)
 
         av_frame_copy_props(out, in);
 #endif
-    } else {
+    } 
+    else 
+    {
         int i;
 
         out = in;
@@ -266,6 +281,7 @@ int pad_filter_frame(PadContext* s, AVFrame * &in, AVFrame * &out)
                             (s->y >> vsub) * out->linesize[i];
         }
     }
+#endif
 
     /* top bar */
     if (s->y) {
@@ -298,7 +314,7 @@ int pad_filter_frame(PadContext* s, AVFrame * &in, AVFrame * &out)
 
     out->width  = s->w;
     out->height = s->h;
-#if 1
+#if 0
     if (in != out)
     {
         av_frame_free(&in);

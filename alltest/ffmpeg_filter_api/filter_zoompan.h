@@ -31,24 +31,52 @@ enum zoompan_var_name {
     ZOOMPAN_VARS_NB
 };
 
-typedef struct ZPcontext {
-    const AVClass *class1;
+typedef struct ZPMincontext {
+    ZPMincontext(){}
+    ZPMincontext(const char* zoom_expr, const char* x_expr
+            , const char *y_expr, int64_t mwx_s, int64_t mhy_s, int64_t mwhx_s, int64_t mhhy_s
+            , const char *ox_expr, const char *oy_expr)
+        :zoom_expr_str(zoom_expr), x_expr_str(x_expr), y_expr_str(y_expr), mwx(mwx_s),mhy(mhy_s)
+        ,mwhx(mwhx_s),mhhy(mhhy_s),ox_expr_str(ox_expr),oy_expr_str(oy_expr){}
     const char *zoom_expr_str;
     const char *x_expr_str;
     const char *y_expr_str;
-    const char *duration_expr_str;
-    int w, h; //out width, height
-    double x, y;
-    //double ox, oy;
     int64_t mwx, mhy, mwhx, mhhy;
     const char *ox_expr_str; //storm
     const char *oy_expr_str;
-    double prev_zoom;
-    int prev_nb_frames;
+}ZPMincontext;
+typedef struct ZPcontext {
+    ZPcontext(){}
+    //void initial(const char* zoom_expr, const char* x_expr
+    //        , const char *y_expr, int64_t mwx_s, int64_t mhy_s, int64_t mwhx_s, int64_t mhhy_s
+    //        , const char *ox_expr, const char *oy_expr)
+    void initial(const ZPMincontext& zpmin)
+    {
+        zoom_expr_str=zpmin.zoom_expr_str; x_expr_str=zpmin.x_expr_str; y_expr_str=zpmin.y_expr_str; mwx=zpmin.mwx;
+        mhy=zpmin.mhy; mwhx=zpmin.mwhx;mhhy=zpmin.mhhy;ox_expr_str=zpmin.ox_expr_str;
+        oy_expr_str=zpmin.oy_expr_str;
+    }
+    //const AVClass *class1;
+    //确定
+    const char *zoom_expr_str;
+    const char *x_expr_str;
+    const char *y_expr_str;
+    int64_t mwx, mhy, mwhx, mhhy;
+    const char *ox_expr_str; //storm
+    const char *oy_expr_str;
+    //运行时确定
+    const char *duration_expr_str;
+    int w, h; //out width, height
+
+    //计算出来
+    double x, y;
+    //double ox, oy;
+    //double prev_zoom;
+    //int prev_nb_frames;
     struct SwsContext *sws;
-    int64_t frame_count;
+    //int64_t frame_count;
     const AVPixFmtDescriptor *desc;
-    AVFrame *in;
+    //AVFrame *in;
     double var_values[ZOOMPAN_VARS_NB];
     int nb_frames;
     int current_frame;
@@ -56,8 +84,7 @@ typedef struct ZPcontext {
     AVRational framerate;
 } ZPContext;
 av_cold int zoompan_init(ZPcontext *s, const char* zoom, int w, int h, const char* x, const char* y, const char* duration/* , AVRational framerate*/);
-int zoompan_filter_frame(/*AVCodecContext *ctx,*/ZPContext *s, AVFrame *in, int64_t frame_count_in
-        , int64_t frame_count_out);
-int request_frame(/*AVCodecContext *ctx,*/ZPContext *s, AVFrame *in, int64_t frame_count_in, AVFrame* &out);
+int zoompan_filter_frame(/*AVCodecContext *ctx,*/ZPContext *s, int format);
+int zoompan_request_frame(/*AVCodecContext *ctx,*/ZPContext *s, AVFrame *in, int64_t frame_count_in, AVFrame* &out);
 
 #endif

@@ -47,3 +47,7 @@ ori_ffmpeg*
 soft*
 ffvcl*
 faac-1.28
+
+*.Debug
+*.Release
+*..stash

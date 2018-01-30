@@ -11,4 +11,5 @@ rm images/*;
 
 #blend
 ###./debug/console.exe /c/shareproject/jpg/loop_512.1.mp4 /c/shareproject/jpg/512img004.jpg
-./debug/console.exe /c/shareproject/jpg/IMG_1924.MP4 /c/shareproject/jpg/512img004.jpg
+#./debug/console.exe /c/shareproject/jpg/IMG_1924.MP4 /c/shareproject/jpg/512img004.jpg
+./debug/console.exe /c/shareproject/jpg/IMG_1924.MP4 /c/shareproject/jpg/4.jpg

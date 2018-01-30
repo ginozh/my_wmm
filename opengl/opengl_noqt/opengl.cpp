@@ -349,7 +349,7 @@ int opengl(unsigned char* in, unsigned char* out, int w, int h)
 #if 0
 int main(int argc, char *argv[])
 {
-    //opengl();
+    opengl();
     return 0;
 }
 #endif

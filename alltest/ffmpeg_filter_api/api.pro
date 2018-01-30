@@ -16,9 +16,11 @@ INCLUDEPATH += c:/shareproject/ffmpeg-3.3
 INCLUDEPATH += /c/shareproject/ffmpeg-3.3
 
 #LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lpostproc -lswresample -lswscale  -lavresample 
-LIBS += -lavcodec -lavdevice -lavformat -lavutil -lpostproc -lswresample -lswscale  -lavresample 
+LIBS += -lavcodec -lavformat -lavutil -lpostproc -lswresample -lswscale  -lavresample 
 #LIBS += c:/shareproject/ffmpeg-3.3/libavfilter/avfilter-6.dll
 LIBS += -lavfilter
+LIBS += -L c:/msys32/mingw32/bin -lass-9
+LIBS += -fopenmp
 
 SOURCES += main.cpp \
     filter_crop.cpp \
@@ -32,6 +34,7 @@ SOURCES += main.cpp \
     filter_rotate.cpp \
     filter_hflip.cpp \
     filter_vflip.cpp \
+    filter_subtitles.cpp \
 
 
 HEADERS  += filter_crop.h \
@@ -44,5 +47,6 @@ HEADERS  += filter_crop.h \
     filter_rotate.h \
     filter_hflip.h \
     filter_vflip.h \
+    filter_subtitles.h \
 
 

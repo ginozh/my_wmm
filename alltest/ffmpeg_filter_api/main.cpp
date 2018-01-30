@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QtGlobal>
 #include <QString>
+#include <QByteArray>
 #include <QObject> 
 #include <QFontMetrics> 
 #include <QFont> 
@@ -39,6 +40,9 @@ extern "C" {
 #include "filter_rotate.h"
 #include "filter_hflip.h"
 #include "filter_vflip.h"
+#include "filter_subtitles.h"
+#include <omp.h>
+#define OPEN_MP_NUM_PROCESSORS omp_get_num_procs()
 #define qInfo qDebug
 static AVFormatContext *fmt_ctx;
 static AVCodecContext *dec_ctx;
@@ -67,22 +71,29 @@ int testVideoFilter(int argc, char *argv[]);
 int testZoomPan(int argc, char *argv[]);
 int testPicLut(int argc, char *argv[]);
 int testColorChannelMixer(int argc, char *argv[]);
+int testSubtitles(int argc, char *argv[]);
+int testScale(int argc, char *argv[]);
 ///int testBlend(int argc, char *argv[]);
 
 int main(int argc, char *argv[])
 {
     av_log(NULL, AV_LOG_INFO, "main\n");
 
+    testScale(argc, argv);
+
     //testVideoFilter(argc, argv);
 
     //testZoomPan(argc, argv);
+
     //for(int i=0; i<1000;i++)
     {
-    testPicLut(argc, argv);
+    //testPicLut(argc, argv);
     //QThread::msleep(100);
     }
 
     //testColorChannelMixer(argc, argv);
+
+    //testSubtitles(argc, argv);
 
     ////testBlend(argc, argv);
     return 0;
@@ -144,13 +155,15 @@ AVFrame* convertFormat(AVFrame *frame, int dstW, int dstH, int format)
     memset(pFrame, 0, sizeof(AVFrame));
     //
 
-    int numBytes = avpicture_get_size((AVPixelFormat)format, dstW, dstH);
+    int numBytes = avpicture_get_size((AVPixelFormat)format, dstW, dstH); //av_image_get_buffer_size
+    //av_image_get_buffer_size(pix_fmt, width, height, 1);
 
     out_buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
     qDebug()<<"convertFormat new out_buffer: "<<out_buffer<<" size: "<<(numBytes * sizeof(uint8_t))
         <<" width: "<<dstW<<" height: "<<dstH<<" format: "<<format;
     avpicture_fill((AVPicture *) pFrame, out_buffer, (AVPixelFormat)format,
-            dstW, dstH);
+            dstW, dstH); 
+    //av_image_fill_arrays(frame->data, frame->linesize, buf, avctx->pix_fmt, avctx->width, avctx->height, 1);
     pFrame->format = format;
     pFrame->width  = dstW;
     pFrame->height = dstH;
@@ -214,9 +227,9 @@ void displayFrame(AVFrame *frame)
     //QImage tmpImg((uchar *)out_buffer,frame->width,frame->height,QImage::Format_RGB32);
     ////QImage tmpImg((uchar *)out_buffer,frame->width,frame->height,QImage::Format_RGB32);
     QImage tmpImg((uchar *)out_buffer,frame->width,frame->height,QImage::Format_RGBA8888);
-    //tmpImg.save(QString("images/%1.jpg").arg(idx));
+    tmpImg.save(QString("images/%1.jpg").arg(idx));
     //tmpImg.save(QString("/home/gino/ffmpeg-3.0.2/macjpg/%1.jpg").arg(idx));
-    tmpImg.save(QString("/c/shareproject/jpg/tmp/%1.jpg").arg(idx));
+    //tmpImg.save(QString("/c/shareproject/jpg/tmp/%1.jpg").arg(idx));
 
     qDebug()<<"displayFrame free out_buffer: "<<out_buffer;
     av_free(out_buffer); 
@@ -241,6 +254,7 @@ int testVideoFilter(int argc, char *argv[])
     //AVFormatContext *fmt_ctx = NULL;
     AVFrame *ori_frame = NULL;
     uint8_t* tmp=NULL;
+    double time;
 
 #ifdef FILTER_BLEND
     //blend
@@ -257,8 +271,8 @@ int testVideoFilter(int argc, char *argv[])
 #ifdef FILTER_CROP
     //crop
     CropContext cc, *s=&cc;
-    char w[]="256";//"640";
-    char h[]="192";//"360";
+    char w[]="512";//"640";
+    char h[]="386";//"192";//"360";
 #endif
 #ifdef FILTER_PAD
     //pad
@@ -267,7 +281,7 @@ int testVideoFilter(int argc, char *argv[])
     char h[]="786";
 #endif
     char x[]="0";
-    char y[]="0";
+    char y[]="400";
 
     if (!frame ) {
         perror("Could not allocate frame");
@@ -289,12 +303,14 @@ int testVideoFilter(int argc, char *argv[])
     }
 #ifdef FILTER_CROP
     //crop
-    crop_init(s, w, h , x, y, 1, 0);
+    //crop_init(s, w, h , x, y, 1, 0);
+    crop_init_int(s, 500, 300 , 200, 100, 1, 1);
     //crop_config_input(dec_ctx, s);
 #endif
 #ifdef FILTER_PAD
     //pad
-    pad_init(s, w, h , x, y);
+    //pad_init(s, w, h , x, y);
+    pad_init_int(s, 1024, 786 , 50, 100);
 #endif
 #ifdef FILTER_OVERLAY
     //overlay
@@ -351,7 +367,8 @@ int testVideoFilter(int argc, char *argv[])
     //pad
                     AVFrame* scale_frame=convertFormat(frame, frame->width, frame->height, AV_PIX_FMT_RGBA);
                     pad_config_input(scale_frame, s);
-                    AVFrame* out=NULL;
+                    //AVFrame* out=NULL;
+                    AVFrame* out=convertFormat(frame, s->w, s->h, AV_PIX_FMT_RGBA);
                     pad_filter_frame(s, scale_frame, out);
                     ///av_log(NULL, AV_LOG_INFO, "out: %d\n", (int)out);
                     displayFrame(out);
@@ -377,7 +394,9 @@ int testVideoFilter(int argc, char *argv[])
                     //pts = frame->pts == AV_NOPTS_VALUE ? NAN : frame->pts * av_q2d(dec_ctx->time_base);
                     pts = (double)frame_count_out/25;
 
+                    time = av_gettime_relative() / 1000.0;
                     blend_frame(s, scale_frame, pblend_frame, out, frame_count_out++, pts);
+                    av_log(NULL, AV_LOG_INFO, "testVideoFilter blend_frame waste_time: %f\n", av_gettime_relative() / 1000.0-time);
                     displayFrame(out);
                     av_frame_free(&scale_frame); //uncomplete
                     av_frame_free(&out); //uncomplete
@@ -409,11 +428,11 @@ end:
     tmp=pblend_frame->data[0];
     av_frame_free(&pblend_frame);
     av_free(tmp);
+    image_avframe_close(fmt_ctx, blend_ctx);
 #endif
     ///avfilter_graph_free(&filter_graph);
     avcodec_free_context(&dec_ctx);
     avformat_close_input(&fmt_ctx);
-    image_avframe_close(fmt_ctx, blend_ctx);
     av_frame_free(&frame);
     ///av_frame_free(&filt_frame);
 
@@ -501,6 +520,20 @@ int testPicLut(int argc, char *argv[])
     image_to_avframe(argv[2], fmt_ctx, overlay_ctx, ori_frame);
     image_avframe_close(fmt_ctx, overlay_ctx);
 
+    //crop
+    {
+        CropContext cc, *s=&cc;
+        crop_init_int(s, 512, 385 , 0, 400, 1, 1);
+        AVFrame * overlay_frame=convertFormat(ori_frame, ori_frame->width, ori_frame->height, AV_PIX_FMT_RGBA);
+        crop_config_input(overlay_frame, s);
+        crop_filter_frame(s, overlay_frame, 0, 0);
+        displayFrame(overlay_frame);
+        uint8_t* tmp=overlay_frame->data[0];
+        av_frame_free(&overlay_frame);
+        av_free(tmp);
+        goto END_TESTPIC;
+    }
+
     {
         //overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
         AVFrame * overlay_frame=convertFormat(ori_frame, ori_frame->width, ori_frame->height, AV_PIX_FMT_YUVA420P);
@@ -519,7 +552,7 @@ int testPicLut(int argc, char *argv[])
         av_log(NULL, AV_LOG_INFO, "eq_filter_frame waste_time: %f\n", av_gettime_relative() / 1000.0-time);
         displayFrame(pFrame);
         av_frame_free(&pFrame);
-        eq_uninit(s);
+        //eq_uninit(s);
         uint8_t* tmp=overlay_frame->data[0];
         av_frame_free(&overlay_frame);
         av_free(tmp);
@@ -576,6 +609,7 @@ int testPicLut(int argc, char *argv[])
         av_frame_free(&overlay_frame);
         av_free(tmp);
     }
+END_TESTPIC:
     av_frame_free(&ori_frame);
     return 0;
 }
@@ -600,7 +634,7 @@ int testColorChannelMixer(int argc, char *argv[])
     overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
     displayFrame(overlay_frame);
 
-#if 0
+#if 1
     for(int i=-100; i<frame_count; i+=10)
     {
         colorchannelmixer_init(s);
@@ -1014,11 +1048,148 @@ int testColorChannelMixer(int argc, char *argv[])
 ////    sws_freeContext(overlay_ctx);
     return 0;
 }
+
+enum MMEffectType{
+    MMET_UNKNOW=0,
+    MMET_TRANSITION_FRAG,
+    MMET_TRANSITION_FFMPEG,
+    MMET_FILTER_FRAG,
+    MMET_FILTER_FFMPEG,
+    MMET_MOTION_FRAG,
+    MMET_MOTION_FFMPEG,
+};
+#if 0
+typedef struct STZoompanVar {
+    int allframes;
+}STZoompanVar;
+typedef struct STZoompanEle {
+    STZoompanEle(){}
+    STZoompanEle(const QByteArray& des, const QVector<int>& o, const QVector<int>& t)
+        : description(des), offset(o), type(t){}
+    //QString description;
+    QByteArray description;
+    QVector<int> offset;
+    QVector<int> type;
+}STZoompanEle;
+typedef struct STEffectsInfo {
+    STEffectsInfo(){}
+    //STEffectsInfo(int t, const QString& n, const STZoompanEle& z, const STZoompanEle& x, const STZoompanEle& y)
+    //    :type(t),name(n),zoom_expr(z),x_expr(x),y_expr(y){}
+    STEffectsInfo(int t, const QString& n, const QVector<STZoompanEle>& e)
+        :type(t),name(n),elements(e){}
+    int type;
+    QString name;
+    QVector<STZoompanEle> elements;
+    //STZoompanEle x_expr;
+    //STZoompanEle y_expr;
+}STEffectsInfo;
+#define OFFSET(x) offsetof(struct STZoompanVar, x)
+
+#endif
+typedef struct STEffectsInfo {
+    STEffectsInfo(){}
+    STEffectsInfo(int t, const QString& n, const ZPMincontext& z)
+        :type(t),name(n),zoompan(z){}
+    int type;
+    QString name;
+    ZPMincontext zoompan;
+    //QByteArray duration;
+}STEffectsInfo;
 int testZoomPan(int argc, char *argv[])
 {
+#if 0
+    {
+    QMap<QString /*id*/, STEffectsInfo > allEffects;
+    //allEffects.insert("Trans013", STEffectsInfo(MMET_MOTION_FFMPEG, "CrossZoom", STZoompanEle("1.4", {-1}, {-1}),STZoompanEle("(iw-mw)/2", {-1}, {-1}),STZoompanEle("max((zoom- 1)*(1-on/%1)*ih,0", {OFFSET(allframes)}, {AV_OPT_TYPE_INT}) ));
+    allEffects.insert("Trans013", STEffectsInfo(MMET_MOTION_FFMPEG, "CrossZoom", {{"1.4", {-1}, {-1}},{"(iw-mw)/2", {-1}, {-1}},{"max((zoom- 1)*(1-on/%1)*ih,0", {OFFSET(allframes)}, {AV_OPT_TYPE_INT}}} ));
+    QString id="Trans013";
+    QMap<QString /*id*/, STEffectsInfo >::iterator iter=allEffects.find(id);
+    if (iter != allEffects.end() && iter.key() == id)
+    {
+        QVector<STZoompanEle>& elements=iter.value().elements;
+    }
+    }
+#endif
+    //global
+    QMap<QString /*id*/, STEffectsInfo > allEffects;
+    allEffects.insert("Trans050", STEffectsInfo(MMET_MOTION_FFMPEG, "panupleft"
+                , ZPMincontext("1.4","0","max((zoom-1)*(1-on/duration)*ih,0)", 0, 0, 0, 0, "0", "(zoom-1)*ih" )));
+    allEffects.insert("Trans051", STEffectsInfo(MMET_MOTION_FFMPEG, "panup"
+                , ZPMincontext("1.4","(iw-mw)/2","max((zoom- 1)*(1-on/duration)*ih,0)", 0, 0, 1, 0, "0", "(zoom-1)*ih" )));
+    allEffects.insert("Trans052", STEffectsInfo(MMET_MOTION_FFMPEG, "panupright"
+                , ZPMincontext("1.4","(zoom-1)*iw","max((zoom-1)*(1-on/duration)*ih,0)", 0, 0, 0, 0, "0", "(zoom-1)*ih" )));
+    allEffects.insert("Trans053", STEffectsInfo(MMET_MOTION_FFMPEG, "pandownleft"
+                , ZPMincontext("1.4","0","min(on*(zoom-1)*ih/duration,(zoom-1)*ih/2)", 0, 0, 0, 0, "0", "0" )));
+    allEffects.insert("Trans054", STEffectsInfo(MMET_MOTION_FFMPEG, "pandown"
+                , ZPMincontext("1.4","(iw-mw)/2","min(on*(zoom-1)*ih/duration,(zoom-1)*ih)", 0, 0, 1, 0, "0", "0" )));
+    allEffects.insert("Trans055", STEffectsInfo(MMET_MOTION_FFMPEG, "pandownright"
+                , ZPMincontext("1.4","(zoom-1)*iw","min(on*(zoom-1)*ih/duration,(zoom-1)*ih/2)", 0, 0, 0, 0, "0", "0" )));
+    allEffects.insert("Trans056", STEffectsInfo(MMET_MOTION_FFMPEG, "panrighttop"
+                , ZPMincontext("1.4","min(on*(zoom-1)*iw/duration,iw)","0", 0, 0, 0, 0, "0", "0" )));
+    allEffects.insert("Trans057", STEffectsInfo(MMET_MOTION_FFMPEG, "panright"
+                , ZPMincontext("1.4","min(on*(zoom-1)*iw/duration,(zoom-1)*iw/2)","(ih-mh)/2", 0, 0, 0, 1, "0", "0" )));
+    allEffects.insert("Trans058", STEffectsInfo(MMET_MOTION_FFMPEG, "panrightbottom"
+                , ZPMincontext("1.4","min(on*(zoom-1)*iw/duration,(zoom-1)*iw/2)","(zoom-1)*ih/2", 0, 0, 0, 0, "0", "0" )));
+    allEffects.insert("Trans059", STEffectsInfo(MMET_MOTION_FFMPEG, "panlefttop"
+                , ZPMincontext("1.4","'max(floor((zoom-1)*(1-on/duration)*iw),0)","0", 0, 0, 0, 0, "0.2*iw", "0" )));
+    allEffects.insert("Trans061", STEffectsInfo(MMET_MOTION_FFMPEG, "panleft"
+                , ZPMincontext("1.4","max(floor((zoom-1)*(1-on/duration)*iw),0)","(zoom-1)", 0, 0, 0, 0, "0.2*iw", "0" )));
+    allEffects.insert("Trans062", STEffectsInfo(MMET_MOTION_FFMPEG, "panleftbottom"
+                , ZPMincontext("1.4","max(floor((zoom-1)*(1-on/duration)*iw),0)","(zoom-1)*ih/2", 0, 0, 0, 0, "0.2*iw", "0" )));
+    allEffects.insert("Trans063", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomincenter"
+                , ZPMincontext("1+0.01*on","(iw-mw)/2","(ih-mh)/2", 0, 0, 1, 1, "0", "0" )));
+    allEffects.insert("Trans064", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomintopleft"
+                , ZPMincontext("1+0.01*on","(iw-mw)/2","0", 0, 0, 1, 0, "0", "0" )));
+    allEffects.insert("Trans065", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomintopright"
+                , ZPMincontext("1+0.01*on","iw-mw","0", 1, 0, 0, 0, "0", "0" )));
+    allEffects.insert("Trans066", STEffectsInfo(MMET_MOTION_FFMPEG, "zoominright"
+                , ZPMincontext("1+0.01*on","(iw-mw)/2","0", 0, 0, 1, 0, "0", "0" )));
+    allEffects.insert("Trans067", STEffectsInfo(MMET_MOTION_FFMPEG, "zoominbottomright"
+                , ZPMincontext("1+0.01*on","iw-mw","ih-mh", 1, 1, 0, 0, "0", "0" )));
+    allEffects.insert("Trans068", STEffectsInfo(MMET_MOTION_FFMPEG, "zoominbottom"
+                , ZPMincontext("1+0.01*on","(iw-mw)/2","ih-mh", 0, 1, 1, 0, "0", "0" )));
+    allEffects.insert("Trans069", STEffectsInfo(MMET_MOTION_FFMPEG, "zoominbottomleft"
+                , ZPMincontext("1+0.01*on","0","ih-mh", 0, 1, 0, 0, "0", "0" )));
+    allEffects.insert("Trans070", STEffectsInfo(MMET_MOTION_FFMPEG, "zoominleft"
+                , ZPMincontext("1+0.01*on","0","(ih-mh)/2", 0, 0, 0, 1, "0", "0" )));
+    allEffects.insert("Trans071", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomoutcenter"
+                , ZPMincontext("if(lte(on,1),1.4,max(1.001,1.4-0.01*on))","(iw-mw)/2","(ih-mh)/2", 0, 0, 1, 1, "0", "0" )));
+    allEffects.insert("Trans072", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomouttopleft"
+                , ZPMincontext("if(lte(on,1),1.4,max(1.001,1.4-0.01*on))","0","0", 0, 0, 0, 0, "0", "0" )));
+    allEffects.insert("Trans073", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomouttop"
+                , ZPMincontext("if(lte(on,1),1.4,max(1.001,1.4-0.01*on))","(iw-mw)/2","0", 0, 0, 1, 0, "0", "0" )));
+    allEffects.insert("Trans074", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomoutright"
+                , ZPMincontext("if(lte(on,1),1.4,max(1.001,1.4-0.01*on))","iw-mw","(ih-mh)/2", 1, 0, 0, 1, "0", "0" )));
+    allEffects.insert("Trans075", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomoutbottomright"
+                , ZPMincontext("if(lte(on,1),1.4,max(1.001,1.4-0.01*on))","iw-mw","ih-mh", 1, 1, 0, 0, "0", "0" )));
+    allEffects.insert("Trans076", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomoutbottom"
+                , ZPMincontext("if(lte(on,1),1.4,max(1.001,1.4-0.01*on))","(iw-mw)/2","ih-mh", 0, 1, 1, 0, "0", "0" )));
+    allEffects.insert("Trans077", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomoutbottomleft"
+                , ZPMincontext("if(lte(on,1),1.4,max(1.001,1.4-0.01*on))","0","ih-mh", 0, 1, 0, 0, "0", "0" )));
+    allEffects.insert("Trans078", STEffectsInfo(MMET_MOTION_FFMPEG, "zoomoutleft"
+                , ZPMincontext("if(lte(on,1),1.4,max(1.001,1.4-0.01*on))","0","(ih-mh)/2", 0, 0, 0, 1, "0", "0" )));
+
+    //class effect
+    ZPContext zc, *s=&zc;
+    ZPMincontext* zoompan=NULL;
+    QByteArray duration;
+    //构造函数
+    memset(s, 0, sizeof(ZPcontext));
+
+    //seteffectid()
+    QString id="Trans051";
+    QMap<QString /*id*/, STEffectsInfo >::iterator iter=allEffects.find(id);
+    if (iter != allEffects.end() && iter.key() == id)
+    {
+        zoompan = &iter.value().zoompan;
+        s->initial(*zoompan);
+    }
+
+    //getframe()
+    if(!zoompan)
+        return -1;
     AVFrame *overlay_frame = NULL;
     AVCodecContext *overlay_ctx=NULL;
-    ZPContext zc, *s=&zc;
     AVRational framerate;
     int64_t frame_count=10;
 
@@ -1031,19 +1202,51 @@ int testZoomPan(int argc, char *argv[])
 
     image_to_avframe(argv[2], fmt_ctx, overlay_ctx, overlay_frame);
     //overlay_frame=convertFormat(overlay_frame, AV_PIX_FMT_YUVA420P);
-    //overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUVA420P);
-    overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
+    overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUVA420P);
+    //overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
 
     framerate.num=24;
     framerate.den=1;
-    zoompan_init(s, "zoom+0.01", overlay_frame->width, overlay_frame->height, "0", "0", QString::number(frame_count).toStdString().c_str());
-    zoompan_filter_frame(s, overlay_frame, 0, 0);
+#if 0
+    //zoompan_init(s, "zoom+0.01", overlay_frame->width, overlay_frame->height, "0", "0", QString::number(frame_count).toStdString().c_str());
+    memset(s, 0, sizeof(ZPcontext));
+    s->zoom_expr_str="1.4";//"zoom+0.01";//"1.4";
+    s->x_expr_str="(iw-mw)/2";//"0";//"(iw-mw)/2";
+    //double yChangeVar=1;
+    //int allframes=25;
+    QByteArray arry;
+    //arry.append(QString("max((zoom- 1)*(1-on/%1)*ih,0)").arg(allframes));
+    arry.append(QString("max((zoom- 1)*(1-on/duration)*ih,0)"));
+    s->y_expr_str=arry.data();//"0"
+    s->mwhx=1;
+    s->ox_expr_str="0";
+    s->oy_expr_str="(zoom-1)*ih";//"0";//"(zoom-1)*ih";
+    //s->prev_zoom = 1;
 
-    for(int i=0; i<frame_count; i++)
+    QByteArray arrd;
+    arrd.append(QString::number(frame_count));
+    s->duration_expr_str=arrd.data();
+    s->w=overlay_frame->width;
+    s->h=overlay_frame->height;
+#endif
+    duration.clear();duration.append(QString::number(frame_count));
+    s->duration_expr_str=duration.data();
+    s->w=overlay_frame->width;
+    s->h=overlay_frame->height;
+    zoompan_filter_frame(s, overlay_frame->format);
+
+    for(int i=1; i<=frame_count+5; i++)
     {
-        //AVFrame* pFrame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUVA420P);
+        //AVFrame* pFrame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
+        AVFrame* pFrame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUVA420P);
+        zoompan_request_frame(s, overlay_frame, i, pFrame);
+        displayFrame(pFrame);
+        av_frame_free(&pFrame);
+    }
+    for(int i=1; i<=frame_count+5; i++)
+    {
         AVFrame* pFrame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
-        request_frame(s, overlay_frame, i, pFrame);
+        zoompan_request_frame(s, overlay_frame, i, pFrame);
         displayFrame(pFrame);
         av_frame_free(&pFrame);
     }
@@ -1134,4 +1337,108 @@ int GetAsh(BYTE** imageBuf, int x, int y)
     clr = (imageBuf[y][x*4] + imageBuf[y][x*4+1]
             +imageBuf[y][x*4+2]) / 3;
     return clr;
+}
+int testSubtitles(int argc, char *argv[])
+{
+    AVFrame *overlay_frame = NULL;
+    AVCodecContext *overlay_ctx=NULL;
+    AssContext cc, *s=&cc;
+    int64_t frame_count=100;
+
+    av_log(NULL, AV_LOG_INFO, "ColorChannelMixer\n");
+    if (argc != 3) {
+        fprintf(stderr, "Usage: %s any jpgfile\n", argv[0]);
+        exit(1);
+    }
+    av_register_all();
+
+    image_to_avframe(argv[2], fmt_ctx, overlay_ctx, overlay_frame);
+    //overlay_frame=convertFormat(overlay_frame, AV_PIX_FMT_YUVA420P);
+    overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUV420P);
+    //overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
+    displayFrame(overlay_frame);
+
+    int w=1280;
+    int h=720;
+    int ret=subtitles_init_subtitles(s, "", "subtitle.srt",0, 0);
+    subtitles_config_input(s, AV_PIX_FMT_YUV420P, w, h );
+    subtitles_filter_frame(s, overlay_frame, 1, 24, 1);
+    displayFrame(overlay_frame);
+}
+
+int testScale(int argc, char *argv[])
+{
+    AVFrame *overlay_frame = NULL;
+    AVCodecContext *overlay_ctx=NULL;
+    double time, alltime;
+
+    av_log(NULL, AV_LOG_INFO, "testScale\n");
+    if (argc != 3) {
+        fprintf(stderr, "Usage: %s any jpgfile\n", argv[0]);
+        exit(1);
+    }
+    av_register_all();
+
+    image_to_avframe(argv[2], fmt_ctx, overlay_ctx, overlay_frame);
+    //overlay_frame=convertFormat(overlay_frame, AV_PIX_FMT_YUVA420P);
+    overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUV420P);
+    //overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
+    //displayFrame(overlay_frame);
+
+    uint8_t *dst_data[4];
+    int dst_linesize[4];
+    int src_w = overlay_frame->width, src_h = overlay_frame->height;
+    //int dst_w=src_w, dst_h=src_h;
+    int dst_w=1280, dst_h=720;
+    enum AVPixelFormat src_pix_fmt = (AVPixelFormat)overlay_frame->format, dst_pix_fmt = AV_PIX_FMT_RGBA;
+    int dst_bufsize;
+    struct SwsContext *sws_ctx;
+    int ret;
+    int align=1;
+
+    alltime = av_gettime_relative() / 1000.0;
+    /* create scaling context */
+    sws_ctx = sws_getContext(src_w, src_h, src_pix_fmt,
+                             dst_w, dst_h, dst_pix_fmt,
+                             SWS_BICUBLIN, NULL, NULL, NULL);
+    if (!sws_ctx) {
+        fprintf(stderr,
+                "Impossible to create scale context for the conversion "
+                "fmt:%s s:%dx%d -> fmt:%s s:%dx%d\n",
+                av_get_pix_fmt_name(src_pix_fmt), src_w, src_h,
+                av_get_pix_fmt_name(dst_pix_fmt), dst_w, dst_h);
+        ret = AVERROR(EINVAL);
+        goto end;
+    }
+    /* buffer is going to be written to rawvideo file, no alignment */
+    if ((ret = av_image_alloc(dst_data, dst_linesize,
+                              dst_w, dst_h, dst_pix_fmt, align)) < 0) {
+        fprintf(stderr, "Could not allocate destination image\n");
+        goto end;
+    }
+    dst_bufsize = ret;
+
+    time = av_gettime_relative() / 1000.0;
+    /* convert to destination format */
+
+    //omp_set_num_threads(OPEN_MP_NUM_PROCESSORS);
+    //omp_set_nested(true);
+    //#pragma omp parallel
+    {
+    sws_scale(sws_ctx, (const uint8_t * const*)overlay_frame->data,
+            overlay_frame->linesize, 0, src_h, dst_data, dst_linesize);
+    }
+    av_log(NULL, AV_LOG_INFO, "sws_scale waste_time: %f all_waste_time: %f dst_bufsize: %d\n"
+            , av_gettime_relative() / 1000.0-time,av_gettime_relative() / 1000.0-alltime, dst_bufsize );
+
+    //buffer -> avframe 
+    //buffer -> qimage
+end:
+    //av_buffer_unref(&frame->buf[0]);
+    av_freep(&dst_data[0]);
+    sws_freeContext(sws_ctx);
+    return ret < 0;
+
+
+    //av_image_copy
 }

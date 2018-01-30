@@ -12,7 +12,6 @@ extern "C" {
 #include "libswscale/swscale.h"
 }
 #include <QDebug>
-#define qInfo qDebug
 
 static const char *const var_names[] = {
     "in_w",   "iw",
@@ -50,7 +49,7 @@ av_cold int zoompan_init(ZPcontext *s, const char* zoom, int w, int h, const cha
     s->h=h;
     //s->framerate=framerate;
     
-    s->prev_zoom = 1;
+    //s->prev_zoom = 1;
     s->ox_expr_str="0";
     s->oy_expr_str="0";
     return 0;
@@ -59,25 +58,28 @@ av_cold int zoompan_init(ZPcontext *s, const char* zoom, int w, int h, const cha
 static int output_single_frame(/*AVCodecContext *ctx,*/ZPContext *s, AVFrame *in, double *var_values, int i,
                                int64_t frame_count_in, double *zoom, double *dx, double *dy, AVFrame *&out)
 {
-    int64_t pts = s->frame_count;
+    //int64_t pts = s->frame_count;
     int k, x, y, w, h, ret = 0;
     uint8_t *input[4];
     int px[4], py[4];
-    qDebug()<<"output_single_frame i: "<<i<<" frame_count_in: "<<frame_count_in<<" s->x: "<<s->x
-        <<" s->y: "<<s->y<<" s->prev_zoom: "<<s->prev_zoom<<" s->prev_nb_frames: "<<s->prev_nb_frames;
 
     var_values[ZOOMPAN_VAR_PX]    = s->x;
     var_values[ZOOMPAN_VAR_PY]    = s->y;
-    var_values[ZOOMPAN_VAR_PZOOM] = s->prev_zoom;
-    var_values[ZOOMPAN_VAR_PDURATION] = s->prev_nb_frames;
+    //var_values[ZOOMPAN_VAR_PZOOM] = s->prev_zoom;
+    //var_values[ZOOMPAN_VAR_PDURATION] = s->prev_nb_frames;
     //var_values[ZOOMPAN_VAR_TIME] = pts;// * av_q2d(ctx->time_base);
     var_values[ZOOMPAN_VAR_FRAME] = i;
     //var_values[ZOOMPAN_VAR_ON] = outlink->frame_count_in + 1;
-    var_values[ZOOMPAN_VAR_ON] = frame_count_in + 1;
+    //var_values[ZOOMPAN_VAR_ON] = frame_count_in + 1;
+    var_values[ZOOMPAN_VAR_ON] = frame_count_in;
     if ((ret = av_expr_parse_and_eval(zoom, s->zoom_expr_str,
                                       var_names, var_values,
                                       NULL, NULL, NULL, NULL, NULL, 0, NULL)) < 0)
+    {
+        qInfo()<<"output_single_frame error av_expr_parse_and_eval ret: "<<ret<<" zoom_expr_str: "
+            <<s->zoom_expr_str;
         return ret;
+    }
 
     *zoom = av_clipd(*zoom, 1, 10);
     var_values[ZOOMPAN_VAR_ZOOM] = *zoom;
@@ -103,7 +105,10 @@ static int output_single_frame(/*AVCodecContext *ctx,*/ZPContext *s, AVFrame *in
     if ((ret = av_expr_parse_and_eval(dx, s->x_expr_str,
                                       var_names, var_values,
                                       NULL, NULL, NULL, NULL, NULL, 0, NULL)) < 0)
+    {
+        qInfo()<<"output_single_frame error av_expr_parse_and_eval ret: "<<ret;
         return ret;
+    }
     x = *dx = av_clipd(*dx, 0, FFMAX(in->width - w, 0));
     var_values[ZOOMPAN_VAR_X] = *dx;
     if(!s->mwx && !s->mwhx)
@@ -112,7 +117,10 @@ static int output_single_frame(/*AVCodecContext *ctx,*/ZPContext *s, AVFrame *in
     if ((ret = av_expr_parse_and_eval(dy, s->y_expr_str,
                                       var_names, var_values,
                                       NULL, NULL, NULL, NULL, NULL, 0, NULL)) < 0)
+    {
+        qInfo()<<"output_single_frame error av_expr_parse_and_eval ret: "<<ret;
         return ret;
+    }
     y = *dy = av_clipd(*dy, 0, FFMAX(in->height - h, 0));
     var_values[ZOOMPAN_VAR_Y] = *dy;
     if(!s->mhy && !s->mhhy)
@@ -135,12 +143,17 @@ static int output_single_frame(/*AVCodecContext *ctx,*/ZPContext *s, AVFrame *in
     s->sws = sws_alloc_context();
     if (!s->sws) {
         ret = AVERROR(ENOMEM);
+        qInfo()<<"output_single_frame error sws_alloc_context ret: "<<ret;
         goto error;
     }
 
     for (k = 0; in->data[k]; k++)
         input[k] = in->data[k] + py[k] * in->linesize[k] + px[k];
 
+    qDebug()<<"output_single_frame i: "<<i<<" frame_count_in: "<<frame_count_in<<" s->x: "<<s->x
+        <<" s->y: "<<s->y
+        <<" zoom: "<<*zoom<<" w: "<<w<<" h: "<<h<<" x: "<<x<<" y: "<<y<<" dstw: "<<out->width
+        <<" dsth: "<<out->height;
     av_opt_set_int(s->sws, "srcw", w, 0);
     av_opt_set_int(s->sws, "srch", h, 0);
     av_opt_set_int(s->sws, "src_format", in->format, 0);
@@ -150,12 +163,15 @@ static int output_single_frame(/*AVCodecContext *ctx,*/ZPContext *s, AVFrame *in
     av_opt_set_int(s->sws, "sws_flags", SWS_BICUBIC, 0);
 
     if ((ret = sws_init_context(s->sws, NULL, NULL)) < 0)
+    {
+        qInfo()<<"output_single_frame error sws_init_context ret: "<<ret;
         goto error;
+    }
 
     sws_scale(s->sws, (const uint8_t *const *)&input, in->linesize, 0, h, out->data, out->linesize);
 
-    out->pts = pts;
-    s->frame_count++;
+    //out->pts = pts;
+    //s->frame_count++;
 
     ////ret = ff_filter_frame(outlink, out);
     sws_freeContext(s->sws);
@@ -163,37 +179,35 @@ static int output_single_frame(/*AVCodecContext *ctx,*/ZPContext *s, AVFrame *in
     s->current_frame++;
     return ret;
 error:
-    av_frame_free(&out);
+    //av_frame_free(&out);
     return ret;
 }
 
 //init
-int zoompan_filter_frame(/*AVCodecContext *ctx,*/ZPContext *s, AVFrame *in, int64_t frame_count_in
-        , int64_t frame_count_out)
+int zoompan_filter_frame(ZPContext *s, int format)
 {
     double nb_frames, ox=0, oy=0; //storm
     int ret;
-    s->desc = av_pix_fmt_desc_get((AVPixelFormat)in->format);
+    s->desc = av_pix_fmt_desc_get((AVPixelFormat)format);
 
     //av_assert0(s->in == NULL);
 
     s->finished = 0;
-    s->var_values[ZOOMPAN_VAR_IN_W]  = s->var_values[ZOOMPAN_VAR_IW] = in->width;
-    s->var_values[ZOOMPAN_VAR_IN_H]  = s->var_values[ZOOMPAN_VAR_IH] = in->height;
+    s->var_values[ZOOMPAN_VAR_IN_W]  = s->var_values[ZOOMPAN_VAR_IW] = s->w;//in->width;
+    s->var_values[ZOOMPAN_VAR_IN_H]  = s->var_values[ZOOMPAN_VAR_IH] = s->h;//in->height;
     s->var_values[ZOOMPAN_VAR_OUT_W] = s->var_values[ZOOMPAN_VAR_OW] = s->w;
     s->var_values[ZOOMPAN_VAR_OUT_H] = s->var_values[ZOOMPAN_VAR_OH] = s->h;
-    s->var_values[ZOOMPAN_VAR_IN]    = frame_count_out + 1;
-    s->var_values[ZOOMPAN_VAR_ON]    = frame_count_in + 1;
+    //s->var_values[ZOOMPAN_VAR_IN]    = frame_count_out + 1;
+    //s->var_values[ZOOMPAN_VAR_ON]    = frame_count_in + 1;
     s->var_values[ZOOMPAN_VAR_PX]    = s->x;
     s->var_values[ZOOMPAN_VAR_PY]    = s->y;
     //s->var_values[ZOOMPAN_VAR_X]     = 0; //storm
     //s->var_values[ZOOMPAN_VAR_Y]     = 0; //storm
-    s->var_values[ZOOMPAN_VAR_PZOOM] = s->prev_zoom;
+    //s->var_values[ZOOMPAN_VAR_PZOOM] = s->prev_zoom;
     s->var_values[ZOOMPAN_VAR_ZOOM]  = 1;
-    s->var_values[ZOOMPAN_VAR_PDURATION] = s->prev_nb_frames;
-    s->var_values[ZOOMPAN_VAR_A]     = (double) in->width / in->height;
-    s->var_values[ZOOMPAN_VAR_SAR]   = in->sample_aspect_ratio.num ?
-        (double) in->sample_aspect_ratio.num / in->sample_aspect_ratio.den : 1;
+    //s->var_values[ZOOMPAN_VAR_PDURATION] = s->prev_nb_frames;
+    s->var_values[ZOOMPAN_VAR_A]     = (double)s->w / s->h; //(double) in->width / in->height;
+    s->var_values[ZOOMPAN_VAR_SAR]   = 1;//in->sample_aspect_ratio.num ?  (double) in->sample_aspect_ratio.num / in->sample_aspect_ratio.den : 1;
     s->var_values[ZOOMPAN_VAR_DAR]   = s->var_values[ZOOMPAN_VAR_A] * s->var_values[ZOOMPAN_VAR_SAR];
     s->var_values[ZOOMPAN_VAR_HSUB]  = 1 << s->desc->log2_chroma_w;
     s->var_values[ZOOMPAN_VAR_VSUB]  = 1 << s->desc->log2_chroma_h;
@@ -201,7 +215,9 @@ int zoompan_filter_frame(/*AVCodecContext *ctx,*/ZPContext *s, AVFrame *in, int6
     if ((ret = av_expr_parse_and_eval(&ox, s->ox_expr_str,
                                       var_names, s->var_values,
                                       NULL, NULL, NULL, NULL, NULL, 0, NULL)) < 0)
+    {
         return ret;
+    }
     if ((ret = av_expr_parse_and_eval(&oy, s->oy_expr_str,
                                       var_names, s->var_values,
                                       NULL, NULL, NULL, NULL, NULL, 0, NULL)) < 0)
@@ -212,7 +228,7 @@ int zoompan_filter_frame(/*AVCodecContext *ctx,*/ZPContext *s, AVFrame *in, int6
     if ((ret = av_expr_parse_and_eval(&nb_frames, s->duration_expr_str,
                                       var_names, s->var_values,
                                       NULL, NULL, NULL, NULL, NULL, 0, NULL)) < 0) {
-        av_frame_free(&in);
+        //av_frame_free(&in);
         return ret;
     }
 
@@ -223,7 +239,7 @@ int zoompan_filter_frame(/*AVCodecContext *ctx,*/ZPContext *s, AVFrame *in, int6
 }
 
 //poll
-int request_frame(/*AVCodecContext *ctx,*/ZPContext *s, AVFrame *in, int64_t frame_count_in, AVFrame* &out)
+int zoompan_request_frame(/*AVCodecContext *ctx,*/ZPContext *s, AVFrame *in, int64_t frame_count_in, AVFrame* &out)
 {
     //AVFrame *in = s->in;
     double zoom=-1, dx=-1, dy=-1;
@@ -241,9 +257,11 @@ int request_frame(/*AVCodecContext *ctx,*/ZPContext *s, AVFrame *in, int64_t fra
             s->x = dx;
         if (dy != -1)
             s->y = dy;
+#if 0
         if (zoom != -1)
             s->prev_zoom = zoom;
-        s->prev_nb_frames = s->nb_frames;
+#endif
+        //s->prev_nb_frames = s->nb_frames;
         s->nb_frames = 0;
         s->current_frame = 0;
         //av_frame_free(&s->in);

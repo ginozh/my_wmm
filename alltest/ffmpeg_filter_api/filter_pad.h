@@ -35,6 +35,7 @@ typedef struct PadContext {
 } PadContext;
 
 void pad_init(PadContext* s, char* w, char*h, char* x, char* y);
+void pad_init_int(PadContext* s,int w, int h, int x, int y);
 //int pad_config_input(AVCodecContext *ctx, PadContext *s);
 int pad_config_input(AVFrame* frame, PadContext *s);
 //int pad_filter_frame(AVCodecContext *ctx, PadContext* s, AVFrame * &in, AVFrame *&out);
