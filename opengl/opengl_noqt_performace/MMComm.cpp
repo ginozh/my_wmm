@@ -19,7 +19,9 @@ static const GLchar *v_shader_source =
 "  //texCoord = position;\n"
 "  //textureCoord = position;\n"
 "  texCoord = position* 0.5 + 0.5;\n"
-"  textureCoord = position* 0.5 + 0.5;\n"
+"  //textureCoord = position* 0.5 + 0.5;\n"
+"  textureCoord = gl_Position.xy * 0.5 + 0.5;\n"
+"  //textureCoord = position* 0.5 + 1.0;\n"
 "}\n";
 #ifndef __UBUNTU__
 static GLuint buildShader(const GLchar *shader_source, GLenum type) {
@@ -71,35 +73,33 @@ int MMGlobalContext::createProgram(QString effectname)
     //av_log(NULL, AV_LOG_ERROR, "Fragment 2.1\n");
     //QString filePathPre=":/fragment/";
     //QString filePathPre="../opengl_off/";
-    QString& fileName=fragInfo.fragFile; //filePathPre+effectname+".frag";
-    QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    QString fragVertex, fragSource;
     {
-        qInfo()<<"MMGlobalContext::createProgram error can't read theme file: "<<fileName;
-        return -2;
+        QString fileName="vertex.frag";
+        QFile file(fileName);
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            qInfo()<<"MMGlobalContext::createProgram error can't read theme file: "<<fileName;
+            return -2;
+        }
+        fragVertex = file.readAll();
+        file.close();
     }
-    QString fragSource = file.readAll();
-#if 0
-    QString fragSource = 
-        "vec4 INPUT(vec2 tc);\n"
-        "\n" + file.readAll()+
-        "uniform sampler2D tex;\n"
-        "varying vec2 texCoord;\n"
-        "vec4 INPUT(vec2 tc)\n"
-        "{\n"
-        "//return texture2D(tex, texCoord * 0.5 + 0.5);\n"
-        "return texture2D(tex, tc);\n"
-        "}\n"
-        "void main() {\n"
-        "//gl_FragColor = texture2D(tex, texCoord * 0.5 + 0.5);\n"
-        "gl_FragColor = FUNCNAME(texCoord * 0.5 + 0.5);\n"
-        "//gl_FragColor = FUNCNAME(texCoord);\n"
-        "}\n";
-#endif
-    file.close();
+    {
+        QString& fileName=fragInfo.fragFile; //filePathPre+effectname+".frag";
+        QFile file(fileName);
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            qInfo()<<"MMGlobalContext::createProgram error can't read theme file: "<<fileName;
+            return -2;
+        }
+        fragSource = file.readAll();
+        file.close();
+    }
     // build_program
     GLuint v_shader, f_shader;
-    v_shader = buildShader(v_shader_source, GL_VERTEX_SHADER);
+    //v_shader = buildShader(v_shader_source, GL_VERTEX_SHADER);
+    v_shader = buildShader(fragVertex.toLocal8Bit().constData(), GL_VERTEX_SHADER);
     //gs->f_shader = buildShader(f_shader_source, GL_FRAGMENT_SHADER);
     f_shader = buildShader(fragSource.toLocal8Bit().constData(), GL_FRAGMENT_SHADER);
     if (!(v_shader && f_shader )) {
@@ -295,6 +295,122 @@ GLint MMGlobalContext::load2DTexture(int w, int h, const unsigned char *pixels)
 #endif
     return textureId1;
 }
+int MMGlobalContext::fragRenderForOtherThread(const QString& effectname, 
+        const unsigned char* bits, int width, int height, float globaltime, float totaltime, 
+        const unsigned char* bits1, int width2, int height2)
+{
+    int iRtn=0;
+    GLuint        program;
+    GLint status;
+
+    //VAO
+    GLuint        pos_buf, tex_coord_buf;
+    //float spos[12] = { -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 1.0f};
+#if 1
+    // 512*384 -> 960*720
+    float spos[12] = { 
+        160.0f, 0.0f,
+        160.0f, 720.0f,
+        1120.0f, 0.0f,
+        160.0f, 720.0f,
+        1120.0f, 0.0f,
+        1120.0f, 720.0f
+    };
+#if 1
+    float coordpos[12] = { 
+        0.0f, 0.0f,
+        0.0f, 720.0f,
+        1280.0f, 0.0f,
+        0.0f, 720.0f,
+        1280.0f, 0.0f,
+        1280.0f, 720.0f
+    };
+#endif
+    //float coordpos[12] = { -1.0f, 1.0f, 1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f};
+#endif
+    //texture
+    GLuint textureId[MAX_TEXTURES_CNT];
+    GLuint textureId2[MAX_TEXTURES_CNT];
+    int cnt=0;
+    int cnt2=0;
+
+
+    if(!mapEffectProgram.contains(effectname))
+    {
+        qInfo()<<"MMGlobalContext::fragRenderForOtherThread error. no such effectname: "<<effectname;
+        return -1;
+    }
+    STFragmentInfo& fragInfo=mapEffectProgram[effectname];
+    program=fragInfo.program;
+    if (!glIsProgram(program)) {
+        qInfo()<<"MMGlobalContext::fragRenderForOtherThread error program is not program"<< " effectname:"
+            <<effectname;
+        iRtn=-2;
+        goto END_fragRenderForOtherThread;
+    }
+    glGetProgramiv(program, GL_LINK_STATUS, &status);
+    if (status != GL_TRUE) {
+        qInfo()<<"MMGlobalContext::fragRenderForOtherThread error glGetProgramiv"<< " effectname:"
+            <<effectname;
+        iRtn=-3;
+        goto END_fragRenderForOtherThread;
+    }
+
+    glUseProgram(program);
+
+    glUniform1f(glGetUniformLocation(program, "u_global_time"), globaltime);
+    glUniform1f(glGetUniformLocation(program, "u_total_time"), totaltime);
+    glUniform2f(glGetUniformLocation(program, "u_resolution"), m_gs->w, m_gs->h);
+
+    //VAO
+    {
+    glGenBuffers(1, &pos_buf);
+    glBindBuffer(GL_ARRAY_BUFFER, pos_buf);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(spos), spos, GL_STATIC_DRAW);
+
+    // Step4: 指定解析方式  并启用顶点属性
+    // 顶点位置属性
+    GLint loc = glGetAttribLocation(program, "position");
+    glEnableVertexAttribArray(loc);
+    glVertexAttribPointer(loc, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+    {
+    glGenBuffers(1, &tex_coord_buf);
+    glBindBuffer(GL_ARRAY_BUFFER, tex_coord_buf);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(coordpos), coordpos, GL_STATIC_DRAW);
+
+    // Step4: 指定解析方式  并启用顶点属性
+    // 顶点位置属性
+    GLint loc = glGetAttribLocation(program, "a_texCoord");
+    glEnableVertexAttribArray(loc);
+    glVertexAttribPointer(loc, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+
+    //texture
+    LoadUniformAllTexture(effectname, bits, width, height, bits1, width2, height2);
+
+    //parament
+    UniformAllParament(effectname);
+
+    // 清除颜色缓冲区 重置为指定颜色
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+
+    glViewport(0, 0, m_gs->w, m_gs->h);
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    glDeleteBuffers(1, &pos_buf);
+
+END_fragRenderForOtherThread:
+    return iRtn;
+}
 
 int MMGlobalContext::fragRenderForOtherThread(const QString& effectname, 
         const unsigned char* bits, float globaltime, float totaltime, 
@@ -390,7 +506,10 @@ int MMGlobalContext::fragRenderForOtherThread(const QString& effectname,
     {
         //textureId[cnt++]=MMGlobalContext::load2DTexture(m_gs->w, m_gs->h, (const unsigned char*)fragInfo.textures[idx].arrData.constData());
         //textureId[cnt++]=MMGlobalContext::load2DTexture(m_gs->w, m_gs->h, (const unsigned char*)fragInfo.textures[idx].avFrame->data[0]);
-        textureId[cnt++]=MMGlobalContext::load2DTexture(m_gs->w, m_gs->h, (const unsigned char*)fragInfo.textures[idx].image->bits());
+        //textureId[cnt++]=MMGlobalContext::load2DTexture(m_gs->w, m_gs->h, (const unsigned char*)fragInfo.textures[idx].image->bits());
+        std::shared_ptr<QImage> qimage=fragInfo.textures[idx].image;
+        textureId[cnt++]=MMGlobalContext::load2DTexture(qimage->width(), qimage->height(), (const unsigned char*)qimage->bits());
+        qDebug()<<"MMGlobalContext::fragRenderForOtherThread qimage->width: "<<qimage->width()<<" qimage->height: "<<qimage->height();
     }
 #if 0
     if(fragInfo.textures.size()>=1)
@@ -480,7 +599,9 @@ int MMGlobalContext::fragRenderForOtherThread(const QString& effectname,
     textureId2[cnt2++]=textures[ii % 2];
     for(int idx=0; idx<mapEffectProgram[m_effectName2].textures.size(); idx++)
     {
-        textureId2[cnt2++]=MMGlobalContext::load2DTexture(m_gs->w, m_gs->h, (const unsigned char*)mapEffectProgram[m_effectName2].textures[idx].image->bits());
+        //textureId2[cnt2++]=MMGlobalContext::load2DTexture(m_gs->w, m_gs->h, (const unsigned char*)mapEffectProgram[m_effectName2].textures[idx].image->bits());
+        std::shared_ptr<QImage> qimage=mapEffectProgram[m_effectName2].textures[idx].image;
+        textureId2[cnt2++]=MMGlobalContext::load2DTexture(qimage->width(), qimage->height(), (const unsigned char*)qimage->bits());
     }
     startTime = QTime::currentTime();
     for(int idx=0; idx<cnt2; idx++)
@@ -623,6 +744,7 @@ int MMGlobalContext::ParseConfCreateProgram(const QString pathpre, const QString
                 <<textInfo.filename;
             return -5;
         }
+#if 0
         if(m_gs && (image->width()!=m_gs->w || image->height()!=m_gs->h))
         {
             qDebug()<<"MMGlobalContext::ParseConfCreateProgram scale image. image_w: "
@@ -634,9 +756,14 @@ int MMGlobalContext::ParseConfCreateProgram(const QString pathpre, const QString
                 <<image->width()<<" image_h: "<<image->height()<<" to w: "<<m_gs->w
                 <<" h: "<<m_gs->h;
         }
+#endif
+        qDebug()<<"MMGlobalContext::ParseConfCreateProgram textInfo.filename :"<<textInfo.filename
+            <<" image_w: " <<image->width()<<" image_h: "<<image->height()<<" gs_w: "<<m_gs->w
+            <<" h: "<<m_gs->h;
         if(image->format()!=QImage::Format_RGBA8888)
         {
-            qDebug()<<"MMGlobalContext::ParseConfCreateProgram converFormat";
+            qDebug()<<"MMGlobalContext::ParseConfCreateProgram converFormat format: "<<image->format()
+                <<" QImage::Format_RGBA8888: "<<QImage::Format_RGBA8888;
 			image = std::shared_ptr<QImage>(new QImage(image->convertToFormat(QImage::Format_RGBA8888)));
         }
 
@@ -684,3 +811,56 @@ STTextureInfo::~STTextureInfo()
     }
 }
 #endif
+int MMGlobalContext::LoadUniformAllTexture(const QString& effectname
+        , const unsigned char* bits, int width, int height
+        , const unsigned char* bits1, int width2, int height2)
+{
+    GLuint textureId[MAX_TEXTURES_CNT];
+    int cnt=0;
+    STFragmentInfo& fragInfo=mapEffectProgram[effectname];
+    GLuint program=fragInfo.program;
+
+    textureId[cnt++]=MMGlobalContext::load2DTexture(width, height, bits);
+    if(bits1)
+    {
+        textureId[cnt++]=MMGlobalContext::load2DTexture(width2, height2, bits1);
+    }
+    for(int idx=0; idx<fragInfo.textures.size(); idx++)
+    {
+        std::shared_ptr<QImage> qimage=fragInfo.textures[idx].image;
+        textureId[cnt++]=MMGlobalContext::load2DTexture(qimage->width(), qimage->height(), (const unsigned char*)qimage->bits());
+        qDebug()<<"MMGlobalContext::LoadUniformAllTexture qimage->width: "<<qimage->width()<<" qimage->height: "<<qimage->height();
+    }
+    for(int idx=0; idx<cnt; idx++)
+    {
+        glActiveTexture(GL_TEXTURE0+idx);
+        glBindTexture(GL_TEXTURE_2D, textureId[idx]);
+        glUniform1i(glGetUniformLocation(program, arrTexturesVar[idx].constData()), idx);
+    }
+    return 0;
+}
+int MMGlobalContext::UniformAllParament(const QString& effectname)
+{
+    STFragmentInfo& fragInfo=mapEffectProgram[effectname];
+    GLuint program=fragInfo.program;
+
+    for(int idx=0; idx<fragInfo.paras.size(); idx++)
+    {
+        STParaInfo& para = fragInfo.paras[idx];
+        if(para.type.compare("float")==0)
+        {
+            qDebug()<<"MMGlobalContext::UniformAllParament type: "<<para.type<<"name: "
+                <<para.name<<" deflt: " <<para.deflt;
+            glUniform1f(glGetUniformLocation(program, para.name.constData()), para.deflt.toFloat());
+        }
+        else if(para.type.compare("int")==0)
+        {
+            glUniform1i(glGetUniformLocation(program, para.name.constData()), para.deflt.toInt());
+        }
+        else
+        {
+            qInfo()<<"MMGlobalContext::UniformAllParament error type: "<<para.type<<" effectname: "<<effectname;
+        }
+    }
+    return 0;
+}

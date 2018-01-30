@@ -27,10 +27,12 @@ int main(int argc, char *argv[])
     //qInstallMessageHandler(myMessageHandler);
 
     //test opengl
+    int glw=1280, glh=720;
     QImage image1, image2;
     {
     QImage& image=image1;
-    QString fileName="c:\\shareproject\\jpg\\4.jpg";
+    //QString fileName="c:\\shareproject\\jpg\\4.jpg";
+    QString fileName="c:\\shareproject\\jpg\\512img003.jpg";
     image.load(fileName);
     if (image.isNull()) {
         qDebug()<<"error";
@@ -48,17 +50,18 @@ int main(int argc, char *argv[])
     }
     image = image.convertToFormat(QImage::Format_RGBA8888);
     }
-    QImage mask(image1.width(), image1.height(),QImage::Format_RGBA8888);
+    QImage mask(glw, glh,QImage::Format_RGBA8888);
     unsigned char *mask_pixels = (unsigned char *) mask.bits();
     {
 
-    QString m_effectName="Cube", m_effectName2="WS_OLD_PHOTO";
+    QString m_effectName="Comm", m_effectName2="WS_OLD_PHOTO";
     int64_t curr_effect_number=15;
     int64_t total_effect_number=30;
     //GenericShaderContext* gs=MMGlobalContext::instance()->m_gs; //storm
     //glfwMakeContextCurrent( gs->threadWin );
-    MMGlobalContext::instance()->initialOpengl(image1.width(), image1.height());
-    MMGlobalContext::instance()->createBindFramebufferTexture(image1.width(), image1.height());
+    //MMGlobalContext::instance()->initialOpengl(image1.width(), image1.height());
+    MMGlobalContext::instance()->initialOpengl(glw, glh);
+    ////MMGlobalContext::instance()->createBindFramebufferTexture(image1.width(), image1.height());
 
     if(MMGlobalContext::instance()->ParseConfCreateProgram("./",m_effectName)==0
             && MMGlobalContext::instance()->ParseConfCreateProgram("./",m_effectName2)==0)
@@ -66,13 +69,17 @@ int main(int argc, char *argv[])
         QTime startTime = QTime::currentTime();
         unsigned char *pixels = (unsigned char *) image1.bits();
         unsigned char *pixels2 = (unsigned char *) image2.bits();
+        //if(!MMGlobalContext::instance()->fragRenderForOtherThread(m_effectName, pixels
+        //            , curr_effect_number, total_effect_number, pixels2))
         if(!MMGlobalContext::instance()->fragRenderForOtherThread(m_effectName, pixels
-                    , curr_effect_number, total_effect_number, pixels2))
+                    , image1.width(), image1.height()
+                    , curr_effect_number, total_effect_number))
         {
             int dt = startTime.msecsTo(QTime::currentTime());
             qDebug()<< "opengl waste: " << dt;
             glFlush();
-            glReadPixels(0, 0, image1.width(), image1.height(), GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *)mask_pixels);
+            glReadPixels(0, 0, glw, glh, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *)mask_pixels);
+            mask.save(QString("%1.jpg").arg(curr_effect_number));
         }
         else
         {

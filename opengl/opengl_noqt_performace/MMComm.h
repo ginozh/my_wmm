@@ -105,12 +105,19 @@ public:
     static GLint createAndSetupTexture();
     static GLint load2DTexture(int w, int h,const unsigned char *pixels);
     //int fragRender(const QString& effectid, const uchar* bits);
-    int fragRenderForOtherThread(const QString& effectid, 
+    int fragRenderForOtherThread(const QString& effectname, 
             const unsigned char* bits, float globaltime=0, float totaltime=0, 
             const unsigned char* bits1=NULL);
+    int fragRenderForOtherThread(const QString& effectname, 
+            const unsigned char* bits, int width, int height, float globaltime=0, float totaltime=0, 
+            const unsigned char* bits1=NULL, int width2=0, int height2=0);
     int ParseConfCreateProgram(const QString pathpre, const QString& effectname);
     int createProgram(QString effectname);
     static void createBindFramebufferTexture(int w, int h);
+    int LoadUniformAllTexture(const QString& effectname
+            , const unsigned char* bits, int width, int height
+            , const unsigned char* bits1, int width2, int height2);
+    int UniformAllParament(const QString& effectname);
 private:
 public:
     //QMap<QString/*effectname*/, GLuint/*program*/> mapEffectProgram;
