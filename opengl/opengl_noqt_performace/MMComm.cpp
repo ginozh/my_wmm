@@ -307,7 +307,7 @@ int MMGlobalContext::fragRenderForOtherThread(const QString& effectname,
     GLuint        pos_buf, tex_coord_buf;
     //float spos[12] = { -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 1.0f};
 #if 1
-    // 512*384 -> 960*720
+    // 512*384 -> 960*720 overlay 1280*720
     float spos[12] = { 
         160.0f, 0.0f,
         160.0f, 720.0f,
@@ -316,7 +316,7 @@ int MMGlobalContext::fragRenderForOtherThread(const QString& effectname,
         1120.0f, 0.0f,
         1120.0f, 720.0f
     };
-#if 1
+#if 0
     float coordpos[12] = { 
         0.0f, 0.0f,
         0.0f, 720.0f,
@@ -326,7 +326,14 @@ int MMGlobalContext::fragRenderForOtherThread(const QString& effectname,
         1280.0f, 720.0f
     };
 #endif
-    //float coordpos[12] = { -1.0f, 1.0f, 1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f};
+    float coordpos[12] = { 
+        -1.0f, 1.0f, 
+        -1.0f, -1.0f, 
+        1.0f, 1.0f, 
+        -1.0f, -1.0f, 
+        1.0f, 1.0f, 
+        1.0f, -1.0f
+    };
 #endif
     //texture
     GLuint textureId[MAX_TEXTURES_CNT];
