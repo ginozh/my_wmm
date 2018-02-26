@@ -1,0 +1,5 @@
+main.cpp
+mainwindow.h
+    layout: 
+    playerwidget: paintGL by textureid
+    GLHiddenWidget: thread create textureid
