@@ -4,6 +4,7 @@
 #include <QSurfaceFormat>
 #include <QLabel>
 #include <QPushButton>
+#include <QDockWidget>
 #include <QDebug>
 #include "mainwindow.h"
 #include "playerwidget.h"
@@ -26,9 +27,6 @@ MainWindow::MainWindow(QWidget *parent)
     fmt.setProfile(QSurfaceFormat::CoreProfile);
     QSurfaceFormat::setDefaultFormat(fmt);
 
-	//create hidden QGLWidget
-	m_hiddenGl=new GLHiddenWidget();
-	//m_hiddenGl->setVisible(false);
 
     setWindowTitle(tr("Movie Maker"));
 
@@ -44,8 +42,16 @@ MainWindow::MainWindow(QWidget *parent)
     {
         mainLayout->addWidget(playerWidget);
     }
+	//create hidden QGLWidget
+	m_hiddenGl=new GLHiddenWidget();
+	//m_hiddenGl->setVisible(false);
     {
-        mainLayout->addWidget(m_hiddenGl);
+        stackedLayout = new QDockWidget(this);
+        {
+            stackedLayout->setWidget(m_hiddenGl);
+        }
+        //stackedLayout->showMinimized();
+        addDockWidget(Qt::NoDockWidgetArea, stackedLayout);
     }
     {
         QHBoxLayout* hbox = new QHBoxLayout;
@@ -66,6 +72,7 @@ MainWindow::MainWindow(QWidget *parent)
             connect(m_pbLeftRotate, &QAbstractButton::clicked, 
                     [=]()
                     {
+                    //stackedLayout->setVisible(false);
                     //move the hidden widget to the new thread id
                     m_hiddenGl->doneCurrent();
                     const QOpenGLContext * c = m_hiddenGl->context();
@@ -126,4 +133,9 @@ void MainWindow::process()
 		playerWidget->update();
         QThread::msleep(10000*1000);
     }
+}
+void MainWindow::showEvent(QShowEvent *event)
+{
+    stackedLayout->setVisible(false);
+    QMainWindow::showEvent(event);
 }
