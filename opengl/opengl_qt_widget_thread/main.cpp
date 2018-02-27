@@ -6,9 +6,7 @@
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
-    QApplication app(argc, argv);
-
+#if 0
     QSurfaceFormat fmt;
     fmt.setDepthBufferSize(24);
     if (QCoreApplication::arguments().contains(QStringLiteral("--multisample")))
@@ -18,6 +16,9 @@ int main(int argc, char *argv[])
         fmt.setProfile(QSurfaceFormat::CoreProfile);
     }
     QSurfaceFormat::setDefaultFormat(fmt);
+#endif
+    //QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts, true);
+    QApplication app(argc, argv);
 
     MainWindow mainWindow;
     if (QCoreApplication::arguments().contains(QStringLiteral("--transparent"))) {

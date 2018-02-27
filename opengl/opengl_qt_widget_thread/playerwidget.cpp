@@ -19,11 +19,11 @@
 #include <QWindow>
 #include "playerwidget.h"
 
-int w=512;
-int h=384;
-QSize m_size(w,h);
+extern GLuint globalid;
+static int w=512;
+static int h=384;
+static QSize m_size(w,h);
 
-#define PIXEL_FORMAT GL_RGB
 static const float position[12] = {
     -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 1.0f};
 static const GLchar *v_shader_source =
@@ -33,9 +33,9 @@ static const GLchar *v_shader_source =
 "  gl_Position = vec4(position, 0, 1);\n"
 "  texCoord = position;\n"
 "}\n";
-GLuint VAOId, VBOId;
-GLuint programId;
-GenericShaderContext* gs;
+static GLuint VAOId, VBOId;
+static GLuint programId;
+static GenericShaderContext* gs;
 //QWindow * s;
 
 GLWidget* GLWidget::m_pInstance = NULL;
@@ -52,7 +52,7 @@ void PlayerPrivate::run()
     {
         GLWidget::instance()->initial();
         GLWidget::instance()->update();
-        QThread::msleep(100000);
+        QThread::msleep(1000*1000);
     }
 }
 #if 1
@@ -69,6 +69,8 @@ GLuint GLWidget::build_shader(const GLchar *shader_source, GLenum type)
     if (!shader || !glIsShader(shader)) {
         return 0;
     }
+    qDebug()<<"GLWidget::build_shader shader: "<<shader<<" glIsShader: "<<glIsShader(shader)
+        <<" 20: "<<glIsShader(20);
     glShaderSource(shader, 1, &shader_source, 0);
     glCompileShader(shader);
     GLint status;
@@ -84,11 +86,12 @@ int GLWidget::build_program(GenericShaderContext *gs, const QString& fragSource)
     //f_shader = build_shader(f_shader_source, GL_FRAGMENT_SHADER);
     f_shader = build_shader(fragSource.toLocal8Bit().constData(), GL_FRAGMENT_SHADER);
     if (!(v_shader && f_shader )) {
-        qDebug()<<"build_shader error";
+        qDebug()<<"GLWidget::build_shader error";
         return -1;
     }
 
     gs->program = glCreateProgram();
+    qDebug()<<"GLWidget::build_program gs->program: "<<gs->program;
     glAttachShader(gs->program, v_shader);
     glAttachShader(gs->program, f_shader);
     glLinkProgram(gs->program);
@@ -101,6 +104,7 @@ int GLWidget::build_program(GenericShaderContext *gs, const QString& fragSource)
 GLWidget::GLWidget(QOpenGLWidget *shareWidget, QWidget *parent)
     : QOpenGLWidget(parent)
 {
+    gs = new GenericShaderContext;
     //m_context = new QOpenGLContext;
     //m_context->create();
 #if 0
@@ -140,8 +144,9 @@ void GLWidget::cleanup()
 
 void GLWidget::initializeGL()
 {
-    QOpenGLWidget::initializeGL();
+    //QOpenGLWidget::initializeGL();
     //initializeOpenGLFunctions();
+    initial();
 }
 
 void GLWidget::initial()
@@ -158,7 +163,6 @@ void GLWidget::initial()
     makeCurrent();
     initializeOpenGLFunctions();
     //initializeOpenGLFunctions();
-    gs = new GenericShaderContext;
     gs->w=w;
     gs->h=h;
     QString filePathPre=".";
@@ -190,7 +194,7 @@ void GLWidget::initial()
     file.close();
     int ret;
     if((ret = build_program(gs, fragSource)) < 0) {
-        qDebug()<<"build_program error: "<<ret;
+        qDebug()<<"GLWidget::build_program error: "<<ret;
         return ;//-2;
     }
     bInitial=true;
@@ -258,16 +262,28 @@ void GLWidget::paintGL()
         return ;
     }
     qDebug()<<"GLWidget::paintGL start";
+    QOpenGLContext * globalcon=QOpenGLContext::globalShareContext();
+    if(globalcon && globalcon->isValid())
+    {
+        qDebug()<<"GLWidget::paintGL is valid globalcon: "<<globalcon;
+    }
+    else
+    {
+        qDebug()<<"GLWidget::paintGL isnot valid globalcon: "<<globalcon;
+    }
+    qDebug()<<"GLWidget::paintGL shareContext: "<<context()->shareContext();
     GLuint textureId0;
     glGenTextures(1, &textureId0);
     glBindTexture(GL_TEXTURE_2D, textureId0);
     qDebug()<<"GLWidget::paintGL textureId0: "<<textureId0;
+#if 0
     glGenTextures(1, &textureId0);
     glBindTexture(GL_TEXTURE_2D, textureId0);
     qDebug()<<"GLWidget::paintGL textureId0: "<<textureId0;
-    for(GLuint txtid=2; txtid<=7; txtid++)
+#endif
+    for(GLuint txtid=1; txtid<=15; txtid++)
     {
-        qDebug()<<"GLWidget::paintGL txtid: "<<txtid<<" istextureid: "<<glIsTexture(txtid);
+        //qDebug()<<"GLWidget::paintGL txtid: "<<txtid<<" glIsShader: "<<glIsShader(txtid);
     }
 
     QImage image;
@@ -304,11 +320,13 @@ void GLWidget::paintGL()
     glUseProgram(gs->program);
     // 启用多个纹理单元 绑定纹理对象
     //glActiveTexture(GL_TEXTURE0);
+#if 0
     {
         // Step1 创建并绑定纹理对象
         glGenTextures(1, &gs->frame_tex);
         //glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, gs->frame_tex);
+        qDebug()<<"GLWidget::paintGL gs->frame_tex: "<<gs->frame_tex;
         // Step2 设定wrap参数
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -322,6 +340,9 @@ void GLWidget::paintGL()
         glBindTexture(GL_TEXTURE_2D, 0);
     }
     GLint textureId1 = gs->frame_tex;
+#endif
+    GLint textureId1 = globalid;
+    qDebug()<<"GLWidget::paintGL textureId1: "<<textureId1<<" glIsTexture: "<<glIsTexture(textureId1);
     // 启用多个纹理单元 绑定纹理对象
     //glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureId1);

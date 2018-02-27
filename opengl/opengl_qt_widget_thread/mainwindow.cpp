@@ -39,7 +39,8 @@ MainWindow::MainWindow(QWidget *parent)
 #if 0
     playerWidget = new GLWidget(qglFormat, m_hiddenGl);
 #endif
-    playerWidget = new GLWidget(m_hiddenGl);
+    //playerWidget = new GLWidget(m_hiddenGl);
+    playerWidget = GLWidget::instance();//new GLWidget(m_hiddenGl);
     {
         mainLayout->addWidget(playerWidget);
     }
@@ -71,15 +72,35 @@ MainWindow::MainWindow(QWidget *parent)
                     qDebug()<<"hidden c: "<<c;
                     if(c)
                     {
+                        m_sharecontext = new QOpenGLContext;
+                        //m_sharecontext->setShareContext(playerWidget->context());
+                        //m_sharecontext->create();
+#if 0
+                        m_sharecontext->moveToThread(m_processThread);
+                        m_processThread->start();
+#endif
+#if 1
                         m_hiddenGl->context()->moveToThread(m_processThread);
+                        //m_hiddenGl->context()->shareContext()->moveToThread(m_processThread);
+                        //m_hiddenGl->test(this);
                         //m_hiddenGl->test(this);
                         m_processThread->start();
                         //QThread::msleep(10*1000);
+#endif
+#if 0
+                        m_hiddenGl->test(m_sharecontext); //create textureid;
+                        playerWidget->update();
+#endif
                     }
-                    c=playerWidget->context();
-                    qDebug()<<"player c: "<<c;
-                    playerWidget->initial();
+                    //c=playerWidget->context();
+                    //qDebug()<<"player c: "<<c;
+                    //playerWidget->initial();
                     //playerWidget->update();
+#if 0
+                    PlayerPrivate *pp = new PlayerPrivate();
+                    playerWidget->context()->moveToThread(pp);
+                    pp->start();
+#endif
 
                     });
         }
@@ -99,9 +120,7 @@ void MainWindow::process()
     {
         //make sure opengl context current
         //m_hiddenGl->makeCurrent();
-        //m_hiddenGl->test();
-        //create textureid;
-        //tmp
+        m_hiddenGl->test(m_sharecontext); //create textureid;
 
         qDebug()<<"MainWindow::process update play";
 		playerWidget->update();

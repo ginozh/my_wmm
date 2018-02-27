@@ -6,6 +6,7 @@
 class GLWidget;
 class MainWindow;
 class GLHiddenWidget;
+class QOpenGLContext;
 class TestOpenCLThread:public QThread
 {
 	Q_OBJECT
@@ -28,6 +29,7 @@ private:
 	TestOpenCLThread *m_processThread;
     GLWidget* playerWidget;
 	GLHiddenWidget *m_hiddenGl;
+    QOpenGLContext* m_sharecontext;
 };
 
 #endif

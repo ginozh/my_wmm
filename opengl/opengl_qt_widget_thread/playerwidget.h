@@ -6,7 +6,8 @@
 #include <QOpenGLBuffer>
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
-typedef struct {
+class GenericShaderContext {
+public:
     //const AVClass *class;
     GLuint        program;
     GLuint        frame_tex;
@@ -14,7 +15,7 @@ typedef struct {
     GLuint        pos_buf;
     int w;
     int h;
-} GenericShaderContext;
+};
 #include <QThread>
 class PlayerPrivate : public QThread
 {
