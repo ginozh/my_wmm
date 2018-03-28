@@ -11,6 +11,7 @@ public:
     explicit GLHiddenWidget(QWidget *parent = 0);
     ~GLHiddenWidget();
     void test(QOpenGLContext* sharecontext);
+    void main2sub(QOpenGLContext* sharecontext);
 
     void initial() ;
 private:
@@ -20,6 +21,7 @@ protected:
     //void resizeGL(int w, int h) Q_DECL_OVERRIDE;
     //void paintGL() Q_DECL_OVERRIDE;
     void initializeGL() Q_DECL_OVERRIDE;
+    void showEvent(QShowEvent *event) Q_DECL_OVERRIDE;
 private:
     QOffscreenSurface *m_surface;
     bool bInitial=false;

@@ -105,9 +105,11 @@ public:
     static GLint createAndSetupTexture();
     static GLint load2DTexture(int w, int h,const unsigned char *pixels);
     //int fragRender(const QString& effectid, const uchar* bits);
+#if 1
     int fragRenderForOtherThread(const QString& effectname, 
             const unsigned char* bits, float globaltime=0, float totaltime=0, 
             const unsigned char* bits1=NULL);
+#endif
     int fragRenderForOtherThread(const QString& effectname, 
             const unsigned char* bits, int width, int height, float globaltime=0, float totaltime=0, 
             const unsigned char* bits1=NULL, int width2=0, int height2=0);

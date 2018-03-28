@@ -262,6 +262,7 @@ void GLWidget::paintGL()
         return ;
     }
     qDebug()<<"GLWidget::paintGL start";
+    qDebug()<<"GLWidget::paintGL currentthread: "<<QThread::currentThread()<<" belongthread: "<<context()->thread();
     QOpenGLContext * globalcon=QOpenGLContext::globalShareContext();
     if(globalcon && globalcon->isValid())
     {
@@ -272,6 +273,7 @@ void GLWidget::paintGL()
         qDebug()<<"GLWidget::paintGL isnot valid globalcon: "<<globalcon;
     }
     qDebug()<<"GLWidget::paintGL shareContext: "<<context()->shareContext();
+    qDebug()<<"GLWidget::paintGL 9 glIsProgram: "<<glIsProgram(9);
     GLuint textureId0;
     glGenTextures(1, &textureId0);
     glBindTexture(GL_TEXTURE_2D, textureId0);

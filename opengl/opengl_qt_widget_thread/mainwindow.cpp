@@ -43,15 +43,18 @@ MainWindow::MainWindow(QWidget *parent)
         mainLayout->addWidget(playerWidget);
     }
 	//create hidden QGLWidget
-	m_hiddenGl=new GLHiddenWidget();
+	m_hiddenGl=new GLHiddenWidget(playerWidget);
 	//m_hiddenGl->setVisible(false);
     {
-        stackedLayout = new QDockWidget(this);
+#if 0
+        //stackedLayout = new QDockWidget(this);
+        stackedLayout = new QDockWidget(playerWidget);
         {
             stackedLayout->setWidget(m_hiddenGl);
         }
         //stackedLayout->showMinimized();
-        addDockWidget(Qt::NoDockWidgetArea, stackedLayout);
+        //addDockWidget(Qt::NoDockWidgetArea, stackedLayout);
+#endif
     }
     {
         QHBoxLayout* hbox = new QHBoxLayout;
@@ -79,10 +82,10 @@ MainWindow::MainWindow(QWidget *parent)
                     qDebug()<<"hidden c: "<<c;
                     if(c)
                     {
-                        m_sharecontext = new QOpenGLContext;
-                        //m_sharecontext->setShareContext(playerWidget->context());
-                        //m_sharecontext->create();
 #if 0
+                        m_sharecontext = new QOpenGLContext;
+                        m_sharecontext->setShareContext(playerWidget->context());
+                        m_sharecontext->create();
                         m_sharecontext->moveToThread(m_processThread);
                         m_processThread->start();
 #endif
@@ -111,6 +114,15 @@ MainWindow::MainWindow(QWidget *parent)
 
                     });
         }
+        {
+            QPushButton* m_pbLeftRotate = new QPushButton("test");
+            hbox->addWidget(m_pbLeftRotate);
+
+            connect(m_pbLeftRotate, &QAbstractButton::clicked, 
+                    [=]()
+                    {
+                    });
+        }
     }
 
     centralWidget->setLayout(mainLayout);
@@ -123,19 +135,29 @@ MainWindow::~MainWindow()
 void MainWindow::process()
 {
     qDebug()<<"MainWindow::process";
+    int cnt=1;
 	while(true)
     {
-        //make sure opengl context current
-        //m_hiddenGl->makeCurrent();
-        m_hiddenGl->test(m_sharecontext); //create textureid;
+        if(cnt==1)
+        {
+            //make sure opengl context current
+            //m_hiddenGl->makeCurrent();
+            m_hiddenGl->test(m_sharecontext); //create textureid;
 
-        qDebug()<<"MainWindow::process update play";
-		playerWidget->update();
-        QThread::msleep(10000*1000);
+            qDebug()<<"MainWindow::process update play";
+            playerWidget->update();
+        }
+        else if(cnt==2)
+        {
+            qDebug()<<"MainWindow::process main to sub thread opengl context";
+            m_hiddenGl->main2sub(m_sharecontext); //create textureid;
+        }
+        QThread::msleep(10*1000);
+        cnt++;
     }
 }
 void MainWindow::showEvent(QShowEvent *event)
 {
-    stackedLayout->setVisible(false);
+    //stackedLayout->setVisible(false);
     QMainWindow::showEvent(event);
 }

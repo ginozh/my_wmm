@@ -78,6 +78,8 @@ public:
             qInfo()<<"error can't read theme file: "<<fileName;
             return -1;
         }
+        //QString fragSource = file.readAll();
+#if 1
         QString fragSource = 
             "vec4 INPUT(vec2 tc);\n"
             "\n" + file.readAll()+
@@ -93,6 +95,7 @@ public:
             "gl_FragColor = FUNCNAME(texCoord * 0.5 + 0.5);\n"
             "//gl_FragColor = FUNCNAME(texCoord);\n"
             "}\n";
+#endif
         file.close();
         int ret;
         if((ret = build_program(gs, fragSource)) < 0) {
@@ -138,7 +141,8 @@ public:
         QTime startTime = QTime::currentTime();
 #endif
         // 清除颜色缓冲区 重置为指定颜色
-        glClearColor(0.18f, 0.04f, 0.14f, 1.0f);
+        //glClearColor(0.18f, 0.04f, 0.14f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         // 这里填写场景绘制代码
@@ -259,6 +263,7 @@ void opengl()
     m_renderFbo = new QOpenGLFramebufferObject(m_size, format);
 
     OpenGLRenderer* openGLRenderer = new OpenGLRenderer();
+    //openGLRenderer->initialize("1977", width, height);
     openGLRenderer->initialize("Aibao", width, height);
     {
         m_renderFbo->bind();

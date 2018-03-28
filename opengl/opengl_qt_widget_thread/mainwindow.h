@@ -32,7 +32,7 @@ private:
 	TestOpenCLThread *m_processThread;
     GLWidget* playerWidget;
 	GLHiddenWidget *m_hiddenGl;
-    QOpenGLContext* m_sharecontext;
+    QOpenGLContext* m_sharecontext=NULL;
     QDockWidget *stackedLayout;
 };
 

@@ -414,11 +414,12 @@ int MMGlobalContext::fragRenderForOtherThread(const QString& effectname,
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     glDeleteBuffers(1, &pos_buf);
+    glDeleteBuffers(1, &tex_coord_buf);
 
 END_fragRenderForOtherThread:
     return iRtn;
 }
-
+#if 1
 int MMGlobalContext::fragRenderForOtherThread(const QString& effectname, 
         const unsigned char* bits, float globaltime, float totaltime, 
         const unsigned char* bits1
@@ -657,6 +658,7 @@ END_fragRenderForOtherThread:
 #endif
     return iRtn;
 }
+#endif
 
 int MMGlobalContext::ParseConfCreateProgram(const QString pathpre, const QString& effectname)
 {

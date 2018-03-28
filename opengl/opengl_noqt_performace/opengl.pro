@@ -13,5 +13,9 @@ QMAKE_CXXFLAGS += -D__STDC_CONSTANT_MACROS -Wno-deprecated -Wno-unused-function 
 LIBS += -lglew32 -lglfw3 -lopengl32
 SOURCES += MMComm.cpp \
     main.cpp \
+    slider.cpp \
 
 HEADERS  += MMComm.h \
+    mainwindow.h \
+    slider.h \
+

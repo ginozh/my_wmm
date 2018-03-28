@@ -13,7 +13,8 @@
 Window::Window(MainWindow *mw)
     : mainWindow(mw)
 {
-    glWidget = new GLWidget;
+    //glWidget = new GLWidget;
+    glWidget = GLWidget::instance();
 
     xSlider = createSlider();
     ySlider = createSlider();
@@ -67,7 +68,16 @@ void Window::keyPressEvent(QKeyEvent *e)
     else
         QWidget::keyPressEvent(e);
 }
-
+void Window::dockUndock()
+{
+#if 0
+    GLWidget::instance()->initial();
+    GLWidget::instance()->update();
+#endif
+    PlayerPrivate* p = new PlayerPrivate();
+    p->start();
+}
+#if 0
 void Window::dockUndock()
 {
     if (parent()) {
@@ -91,3 +101,4 @@ void Window::dockUndock()
         }
     }
 }
+#endif

@@ -88,9 +88,20 @@ void GLHiddenWidget::test(QOpenGLContext* sharecontext)
         qDebug()<<"GLHiddenWidget::test is not valid globalcon: "<<globalcon;
     }
     qDebug()<<"GLHiddenWidget::test shareContext: "<<context()->shareContext()<<" context: "<<context();
-    makeCurrent();
-    //sharecontext->makeCurrent(m_surface);
+    if(sharecontext)
+    {
+        sharecontext->makeCurrent(m_surface);
+    }
+    else
+    {
+        makeCurrent();
+    }
     //context()->shareContext()->makeCurrent(m_surface);
+    qDebug()<<"GLHiddenWidget::test currentthread: "<<QThread::currentThread()<<" belongthread: "<<context()->thread();
+    qDebug()<<"GLHiddenWidget::test 9 glIsProgram: "<<glIsProgram(9);
+    qDebug()<<"GLHiddenWidget::test 7 glIsShader: "<<glIsShader(7);
+    qDebug()<<"GLHiddenWidget::test 2 glIsTexture: "<<glIsTexture(2);
+    qDebug()<<"GLHiddenWidget::test 8 glIsTexture: "<<glIsTexture(8);
 
 
     QImage image;
@@ -121,7 +132,18 @@ void GLHiddenWidget::test(QOpenGLContext* sharecontext)
             GL_RGB, GL_UNSIGNED_BYTE, bits);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
-    doneCurrent();
+    for(GLuint txtid=1; txtid<=15; txtid++)
+    {
+        //qDebug()<<"GLHiddenWidget::test txtid: "<<txtid<<" glIsShader: "<<glIsShader(txtid);
+    }
+    if(sharecontext)
+    {
+        sharecontext->doneCurrent();
+    }
+    else
+    {
+        doneCurrent();
+    }
     //context()->moveToThread(qApp->thread());
 #if 0
     initial();
@@ -140,6 +162,31 @@ void GLHiddenWidget::test(QOpenGLContext* sharecontext)
         qDebug()<<"GLHiddenWidget::test txtid: "<<txtid<<" glIsShader: "<<glIsShader(txtid);
     }
 #endif
+}
+void GLHiddenWidget::main2sub(QOpenGLContext* sharecontext)
+{
+    if(sharecontext)
+    {
+        sharecontext->makeCurrent(m_surface);
+    }
+    else
+    {
+        makeCurrent();
+    }
+    //context()->shareContext()->makeCurrent(m_surface);
+    qDebug()<<"GLHiddenWidget::main2sub currentthread: "<<QThread::currentThread()<<" belongthread: "<<thread();
+    qDebug()<<"GLHiddenWidget::main2sub 9 glIsProgram: "<<glIsProgram(9);
+    qDebug()<<"GLHiddenWidget::main2sub 7 glIsShader: "<<glIsShader(7);
+    qDebug()<<"GLHiddenWidget::main2sub 2 glIsTexture: "<<glIsTexture(2);
+    qDebug()<<"GLHiddenWidget::main2sub 8 glIsTexture: "<<glIsTexture(8);
+    if(sharecontext)
+    {
+        sharecontext->doneCurrent();
+    }
+    else
+    {
+        doneCurrent();
+    }
 }
 void GLHiddenWidget::initializeGL()
 {
@@ -213,4 +260,9 @@ void GLHiddenWidget::initial()
     }
     bInitial=true;
     qDebug()<<"GLHiddenWidget::initializeGL end";
+}
+void GLHiddenWidget::showEvent(QShowEvent *event)
+{
+    setVisible(false);
+    QOpenGLWidget::showEvent(event);
 }

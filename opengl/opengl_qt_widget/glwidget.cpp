@@ -17,6 +17,7 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLExtraFunctions>
 #include <QTime>
+#include <QWindow>
 
 int w=512;
 int h=384;
@@ -35,7 +36,31 @@ static const GLchar *v_shader_source =
 GLuint VAOId, VBOId;
 GLuint programId;
 GenericShaderContext* gs;
+QWindow * s;
 
+GLWidget* GLWidget::m_pInstance = NULL;
+PlayerPrivate::PlayerPrivate(QObject *parent)
+    :QThread(parent)
+{
+}
+PlayerPrivate::~PlayerPrivate()
+{
+}
+void PlayerPrivate::run()
+{
+    for (;;) 
+    {
+        GLWidget::instance()->initial();
+        GLWidget::instance()->update();
+        QThread::msleep(100000);
+    }
+}
+GLWidget* GLWidget::instance()  
+{  
+    if(m_pInstance == NULL)  //判断是否第一次调用  
+        m_pInstance = new GLWidget();  
+    return m_pInstance;  
+}  
 GLuint GLWidget::build_shader(const GLchar *shader_source, GLenum type) 
 {
     GLuint shader = glCreateShader(type);
@@ -74,6 +99,8 @@ int GLWidget::build_program(GenericShaderContext *gs, const QString& fragSource)
 GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget(parent)
 {
+    m_context = new QOpenGLContext;
+    m_context->create();
 #if 0
     // --transparent causes the clear color to be transparent. Therefore, on systems that
     // support it, the widget will become transparent apart from the logo.
@@ -111,11 +138,23 @@ void GLWidget::cleanup()
 
 void GLWidget::initializeGL()
 {
-    QString effectid = "Aibao";
-    qDebug()<<"GLWidget::initializeGL";
-    connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &GLWidget::cleanup);
+    QOpenGLWidget::initializeGL();
+    //initializeOpenGLFunctions();
+}
 
+void GLWidget::initial()
+{
+    if(bInitial)
+    {
+        return;
+    }
+    QString effectid = "Aibao";
+    qDebug()<<"GLWidget::initializeGL start";
+
+    s = new QWindow();
+    m_context->makeCurrent(s);
     initializeOpenGLFunctions();
+    //initializeOpenGLFunctions();
     gs = new GenericShaderContext;
     gs->w=w;
     gs->h=h;
@@ -151,6 +190,8 @@ void GLWidget::initializeGL()
         qDebug()<<"build_program error: "<<ret;
         return ;//-2;
     }
+    bInitial=true;
+    qDebug()<<"GLWidget::initializeGL end";
 }
 #if 0
 void GLWidget::initializeGL()
@@ -209,6 +250,11 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
+    if(!bInitial)
+    {
+        return ;
+    }
+    qDebug()<<"GLWidget::paintGL start";
     QImage image;
     QString fileName="c:\\shareproject\\jpg\\512img001.jpg";
     image.load(fileName);
@@ -270,6 +316,7 @@ void GLWidget::paintGL()
 
     //glBindVertexArray(0);
     glUseProgram(0);
+    qDebug()<<"GLWidget::paintGL end";
 }
 #if 0
 void GLWidget::paintGL()

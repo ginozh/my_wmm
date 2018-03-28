@@ -7,9 +7,11 @@ uniform float u_total_time;
 
 float progress = u_global_time / u_total_time;
 vec2 resolution = u_resolution;
+void test();
 void main() 
 {
     gl_FragColor = texture2D(mSample0, textureCoord);
+    //test();
 }
 void test()
 {

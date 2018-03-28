@@ -19,16 +19,29 @@ typedef struct {
     int w;
     int h;
 } GenericShaderContext;
+#include <QThread>
+class PlayerPrivate : public QThread
+{
+    Q_OBJECT
+public:
+    PlayerPrivate(QObject *parent = 0);
+    ~PlayerPrivate();
+protected:
+    void run();
+};
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
-
-public:
+private:
     GLWidget(QWidget *parent = 0);
+    static GLWidget *m_pInstance;
+public:
+    static GLWidget* instance();
     ~GLWidget();
 
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     QSize sizeHint() const Q_DECL_OVERRIDE;
+    void initial() ;
 
 public slots:
     void cleanup();
@@ -41,6 +54,10 @@ protected:
 private:
     GLuint build_shader(const GLchar *shader_source, GLenum type) ;
     int build_program(GenericShaderContext *gs, const QString& fragSource) ;
+
+private:
+    bool bInitial=false;
+    QOpenGLContext *m_context=NULL;
 };
 
 #endif
