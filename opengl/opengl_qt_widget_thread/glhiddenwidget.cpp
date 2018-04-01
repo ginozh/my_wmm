@@ -106,6 +106,7 @@ void GLHiddenWidget::test(QOpenGLContext* sharecontext)
 
     QImage image;
     QString fileName="c:\\shareproject\\jpg\\512img001.jpg";
+    //QString fileName="1.jpg";
     image.load(fileName);
     if (image.isNull()) {
         qDebug()<<"error";

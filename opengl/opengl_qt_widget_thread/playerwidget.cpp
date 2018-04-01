@@ -290,6 +290,7 @@ void GLWidget::paintGL()
 
     QImage image;
     QString fileName="c:\\shareproject\\jpg\\512img001.jpg";
+    //QString fileName="1.jpg";
     image.load(fileName);
     if (image.isNull()) {
         qDebug()<<"error";
@@ -297,6 +298,7 @@ void GLWidget::paintGL()
     }
     image = image.convertToFormat(QImage::Format_RGB888);
     const uchar* bits = image.bits();
+    QTime startTime = QTime::currentTime();
     //openGLRenderer->render(image.bits());
     // 清除颜色缓冲区 重置为指定颜色
     //glClearColor(0.18f, 0.04f, 0.14f, 1.0f);
@@ -352,6 +354,8 @@ void GLWidget::paintGL()
     glUniform1i(glGetUniformLocation(gs->program, "tex"), 0);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
+    int dt = startTime.msecsTo(QTime::currentTime());
+    qDebug()<< "GLWidget::paintGL waste_time createProgram. time: " << dt;
     //glBindVertexArray(0);
     glUseProgram(0);
     qDebug()<<"GLWidget::paintGL end";

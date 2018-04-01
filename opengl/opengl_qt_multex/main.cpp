@@ -260,7 +260,8 @@ void opengl()
     QOpenGLFramebufferObject *m_renderFbo=0;
     QOpenGLFramebufferObjectFormat format;
     format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
-    m_renderFbo = new QOpenGLFramebufferObject(m_size, format);
+    //m_renderFbo = new QOpenGLFramebufferObject(m_size, format);
+    m_renderFbo = new QOpenGLFramebufferObject(m_size);
 
     OpenGLRenderer* openGLRenderer = new OpenGLRenderer();
     //openGLRenderer->initialize("1977", width, height);
@@ -276,12 +277,19 @@ void opengl()
         }
         image = image.convertToFormat(QImage::Format_RGB888);
         openGLRenderer->render(image.bits());
+#if 0
         context->functions()->glFlush();
         QImage imagefrag(width,height,QImage::Format_RGB888);
         unsigned char *pixels = (unsigned char *) imagefrag.bits();
         openGLRenderer->readPixels(pixels);
         imagefrag.save("c:\\shareproject\\jpg\\512img001_frag.jpg");
+#endif
+        QImage imagefrag=m_renderFbo->toImage();
+        imagefrag.save("c:\\shareproject\\jpg\\512img001_fbofrag.jpg");
+        qDebug()<<"fbo1 texture: "<<m_renderFbo->texture();
+        //qDebug()<<"fbo1 texture: "<<m_renderFbo->takeTexture();
         m_renderFbo->bindDefault();
+        qDebug()<<"fbo2 texture: "<<m_renderFbo->texture();
     }
     {
         m_renderFbo->bind();

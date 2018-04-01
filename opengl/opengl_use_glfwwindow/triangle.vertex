@@ -1,0 +1,16 @@
+attribute vec3 position;
+attribute vec3 color;
+attribute vec2 textCoord;
+
+varying vec3 VertColor;
+varying vec2 TextCoord;
+varying vec2 textureCoord;
+
+void main()
+{
+	gl_Position = vec4(position, 1.0);
+	VertColor = color;
+    textureCoord = textCoord;
+	TextCoord = textCoord;
+    TextCoord = vec2(textCoord.x, 1.0-textCoord.y);
+}
