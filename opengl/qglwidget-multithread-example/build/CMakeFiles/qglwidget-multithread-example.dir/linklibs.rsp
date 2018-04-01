@@ -1,0 +1,1 @@
+C:/msys32/mingw32/lib/libQt5OpenGL.dll.a -lopengl32 -lglu32 C:/msys32/mingw32/lib/libQt5Widgets.dll.a C:/msys32/mingw32/lib/libQt5Gui.dll.a C:/msys32/mingw32/lib/libQt5Core.dll.a -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 

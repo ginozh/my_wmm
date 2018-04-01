@@ -1,0 +1,7 @@
+C:/qtproject/opengl/otheropengl/qglwidget-multithread-example/build/CMakeFiles/install/strip.dir
+C:/qtproject/opengl/otheropengl/qglwidget-multithread-example/build/CMakeFiles/edit_cache.dir
+C:/qtproject/opengl/otheropengl/qglwidget-multithread-example/build/CMakeFiles/rebuild_cache.dir
+C:/qtproject/opengl/otheropengl/qglwidget-multithread-example/build/CMakeFiles/list_install_components.dir
+C:/qtproject/opengl/otheropengl/qglwidget-multithread-example/build/CMakeFiles/qglwidget-multithread-example.dir
+C:/qtproject/opengl/otheropengl/qglwidget-multithread-example/build/CMakeFiles/install.dir
+C:/qtproject/opengl/otheropengl/qglwidget-multithread-example/build/CMakeFiles/install/local.dir
