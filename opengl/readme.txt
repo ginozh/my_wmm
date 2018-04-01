@@ -8,3 +8,4 @@ ok:
 
 尝试：1，qglwidget、thread、share fbo texture program、update    
         在子线程中update widget
+
