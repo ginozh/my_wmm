@@ -6,6 +6,8 @@
 #include "opengl_widget.h"
 #include "opengl_thread.h"
 #include <iostream>
+#include <QPushButton>
+#include <QMessageBox>
 #include <QtGui/QResizeEvent>
 
 namespace kuu
@@ -32,6 +34,17 @@ Widget::Widget(const QGLFormat& openglFormat)
 {
     // Disable automatic buffer swap (swap is done in rendering thread)
     setAutoBufferSwap(false);
+    QPushButton* m_pbPreFrame = new QPushButton(this);
+    m_pbPreFrame->setText("ok");
+    m_pbPreFrame->setStyleSheet("color:black;background-color:red");
+    m_pbPreFrame->move(100,100);
+    connect(m_pbPreFrame, &QAbstractButton::clicked, 
+            [=]()
+            {
+            QMessageBox msgBox;
+            msgBox.setText("The document has been modified.");
+            msgBox.exec();
+                    });
 }
 
 /* ---------------------------------------------------------------- *

@@ -7,6 +7,8 @@
 #include <chrono>
 #include <iostream>
 #include <QMutex>
+#include <QTime>
+#include <QDebug>
 #include <glm/gtx/transform.hpp>
 #include "opengl_quad.h"
 
@@ -172,6 +174,7 @@ void Thread::run()
             glm::translate(glm::mat4(1.0f),
                            glm::vec3(0.0f, 0.0f, -5.0f));
 
+        QTime startTime = QTime::currentTime();
         // Clear the color buffer
         glViewport(0, 0, w, h);
         glClearColor(0.0f, 0.0f, 0.2f, 1.0f);
@@ -186,6 +189,8 @@ void Thread::run()
         // Swap buffers and we're done.
         widget->swapBuffers();
         widget->doneCurrent();
+        int dt = startTime.msecsTo(QTime::currentTime());
+        qDebug()<<"Thread::run waste: "<<dt;
     }
 }
 
