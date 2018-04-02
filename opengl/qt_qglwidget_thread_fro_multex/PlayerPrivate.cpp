@@ -36,16 +36,19 @@ void PlayerPrivate::run()
             QString fileName;
             if(idx%2==0)
             {
-                fileName="c:\\shareproject\\jpg\\img006.jpg";
+                //fileName="c:\\shareproject\\jpg\\img006.jpg";
+                //fileName="c:\\shareproject\\jpg\\1.jpg";
+                fileName="1.jpg";
             }
             else
             {
                 //fileName="c:\\shareproject\\jpg\\img007.jpg";
-                fileName="c:\\shareproject\\jpg\\img006.jpg";
+                //fileName="c:\\shareproject\\jpg\\img006.jpg";
+                fileName="1.jpg";
             }
             image.load(fileName);
             if (image.isNull()) {
-                qDebug()<<"error";
+                qDebug()<<"error fileName: "<<fileName;
             }
             image = image.convertToFormat(QImage::Format_RGBA8888);
 
