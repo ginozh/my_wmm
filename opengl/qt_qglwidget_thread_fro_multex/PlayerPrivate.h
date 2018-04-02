@@ -12,6 +12,8 @@ public:
     void setGLWidget(GLWidget* glw);
 protected:
     void run();
+public:
+    bool m_bstart=false;
 private:
     GLWidget* glwidget=NULL;
 };

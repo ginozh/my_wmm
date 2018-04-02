@@ -18,38 +18,67 @@ void PlayerPrivate::setGLWidget(GLWidget* glw)
 }
 void PlayerPrivate::run()
 {
+    int idx=0;
     for (;;) 
     {
-        double frameTime = 1000;
-        int idxFbo=-1;
+        double frameTime = 100;
+        if(!m_bstart)
         {
-            QImage image1, image2;
+            QThread::msleep(frameTime);
+            continue;
+        }
+        ++idx;
+
+        int idxFbo=-1;
+        GLuint texture=-1;
+        {
+            QImage image;
+            QString fileName;
+            if(idx%2==0)
             {
-                QImage& image=image1;
-                QString fileName="c:\\shareproject\\jpg\\img006.jpg";
-                image.load(fileName);
-                if (image.isNull()) {
-                    qDebug()<<"error";
-                }
-                image = image.convertToFormat(QImage::Format_RGBA8888);
+                fileName="c:\\shareproject\\jpg\\img006.jpg";
             }
-            GLuint texture=0;
+            else
+            {
+                //fileName="c:\\shareproject\\jpg\\img007.jpg";
+                fileName="c:\\shareproject\\jpg\\img006.jpg";
+            }
+            image.load(fileName);
+            if (image.isNull()) {
+                qDebug()<<"error";
+            }
+            image = image.convertToFormat(QImage::Format_RGBA8888);
+
             glwidget->m_shareWidget->context()->makeCurrent();
-            texture=glwidget->load2DTexture(image1.width(), image1.height(), image1.bits());
-            idxFbo=glwidget->fragRenderForOtherThreadAgain("Basic"
+            //texture=glwidget->load2DTexture(image.width(), image.height(), image.bits());
+            texture=glwidget->m_shareWidget->load2DTexture(image.width(), image.height(), image.bits());
+            if(texture<=0)
+            {
+                qInfo()<<"load2DTexture error";
+            }
+#if 1
+            idxFbo=glwidget->m_shareWidget->fragRenderForOtherThreadAgain("Basic"
                     , NULL, 0, texture
                     , 1, 1, 0, true, true);
-            glwidget->m_shareWidget->context()->doneCurrent();
             if(idxFbo<0)
             {
                 qInfo()<<"fragRenderForOtherThread error";
             }
+#endif
+            glwidget->m_shareWidget->context()->doneCurrent();
         }
         if(idxFbo>=0)
         {
-            glwidget->m_idxFbo=idxFbo;
+            glwidget->m_texture=glwidget->m_shareWidget->GetTexture(idxFbo);
+            //glwidget->m_idxFbo=idxFbo;
             glwidget->update();
         }
+        else if(texture>0)
+        {
+            glwidget->m_texture=texture;
+            glwidget->update();
+        }
+        //m_bstart=false;
         QThread::msleep(frameTime);
     }
 }

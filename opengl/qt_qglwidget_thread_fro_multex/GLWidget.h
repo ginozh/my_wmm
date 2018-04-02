@@ -99,7 +99,8 @@ class GLWidget : public QGLWidget, protected QGLFunctions
 {
 	Q_OBJECT
 public:
-	GLWidget(QGLFormat format, const QGLWidget *shareWidget=0, QWidget *parent=0);
+	//GLWidget(bool bHidden,QGLFormat format, const QGLWidget *shareWidget=0, QWidget *parent=0);
+	GLWidget(bool bHidden,QGLFormat format, GLWidget *shareWidget=0, QWidget *parent=0);
 	~GLWidget();
 	bool initialize();
 	void initializeGLContext();
@@ -159,8 +160,12 @@ public:
     int glw=0;
     int glh=0;
     QMutex m_mutexRender;
-	const QGLWidget *m_shareWidget=NULL;
+	//const QGLWidget *m_shareWidget=NULL;
+	GLWidget *m_shareWidget=NULL;
     int m_idxFbo=-1;
+    int m_texture=-1;
+
+    bool m_bhidden;
 };
 
 #endif // _GLWidget_h_

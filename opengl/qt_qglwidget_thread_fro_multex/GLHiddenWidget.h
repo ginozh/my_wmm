@@ -6,17 +6,18 @@ class GLHiddenWidget : public QGLWidget
 {
 	Q_OBJECT
 public:
-	GLHiddenWidget(QGLFormat format);
+	GLHiddenWidget(QGLFormat format, QWidget *parent=0);
 	~GLHiddenWidget();
 protected:
-	virtual void glInit();
-	virtual void glDraw();
+	//virtual void glInit();
+	//virtual void glDraw();
 
 	virtual void initializeGL();
 	virtual void resizeGL(int width, int height);
 	virtual void paintGL();
 
     void resizeEvent(QResizeEvent *event);
+    void showEvent(QShowEvent *event);
     void paintEvent(QPaintEvent *);
 
 private:

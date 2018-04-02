@@ -4,16 +4,19 @@
 #include <QDebug>
 #include "GLWidget.h"
 
-GLWidget::GLWidget(QGLFormat format, const QGLWidget *shareWidget, QWidget *parent)
-    : QGLWidget(format, parent, shareWidget),
-    m_format(format),
-    m_shareWidget(shareWidget)
+//GLWidget::GLWidget(bool bHidden,QGLFormat format, const QGLWidget *shareWidget, QWidget *parent)
+GLWidget::GLWidget(bool bHidden,QGLFormat format, GLWidget *shareWidget, QWidget *parent)
+    : QGLWidget(format, parent, shareWidget)
+    , m_format(format)
+    , m_shareWidget(shareWidget)
+    , m_bhidden(bHidden)
 {
 	setAutoBufferSwap(false);
 
 	doneCurrent();
+
     idxFrameBuf=0;
-    maxFrameBuf=50;
+    maxFrameBuf=20;
     //usedFboCnt=10;
 
     for(int idx=0; idx<MAX_TEXTURES_CNT; idx++)
@@ -195,14 +198,25 @@ void GLWidget::glDraw()
 #endif
 void GLWidget::initializeGL()
 {
-    qDebug()<<"GLWidget::initializeGL";
-    initializeGLFunctions();
+    qDebug()<<"GLWidget::initializeGL m_bhidden: "<<m_bhidden;
     if(m_init == 0)
+    {
+        initializeGLFunctions();
         initialize();
+    }
 }
 void GLWidget::initialOpengl(int width, int height,bool bForce)
 {
     qDebug()<<"GLWidget::initialOpengl width: "<<width<<" height: "<<height<<"bInitialGL:"<<bInitialGL;
+    if(m_bhidden)
+    {
+        setVisible(false);
+        if(m_init == 0)
+        {
+            initializeGLFunctions();
+            initialize();
+        }
+    }
     if(bInitialGL)
     {
         return;
@@ -217,6 +231,7 @@ void GLWidget::initialOpengl(int width, int height,bool bForce)
         return;
     }
 #endif
+    makeCurrent();
     for (int ii=0; ii<vFboInfo.size(); ++ii)
     {
         qDebug()<<"GLWidget::releaseResource gldelete fb: "<<vFboInfo[ii].framebuffer;
@@ -254,14 +269,21 @@ void GLWidget::initialOpengl(int width, int height,bool bForce)
     glh=height;
 
     createBindFramebufferTexture(glw, glh);
+    doneCurrent();
 }
 void GLWidget::resizeGL(int width, int height)
 {
+    if(m_bhidden)
+    {
+        //return;
+    }
     qDebug()<<"GLWidget::resizeGL width: "<<width<<" height: "<<height;
     //glViewport(0, 0, (GLint)width, (GLint)height);
+#if 0
     makeCurrent();
     initialOpengl(width, height);
     doneCurrent();
+#endif
 }
 
 bool GLWidget::initialize()
@@ -291,25 +313,33 @@ void GLWidget::initializeGLContext()
 
 	//make sure new context is current
 	makeCurrent();
-
+#if 0
 	//load extensions with glew
 	///glewInit();
 
 	glClearColor(0, 0, 0, 1.0f);
 	glClearDepth(1.0f);
-
+#endif
 	doneCurrent();
 }
 
 void GLWidget::paintGL()
 {
-    qDebug()<<"GLWidget::paintGL m_idxFbo: "<<m_idxFbo;
+    if(m_bhidden)
+    {
+        //return;
+    }
+    qDebug()<<"GLWidget::paintGL m_idxFbo: "<<m_idxFbo<<" m_texture: "<<m_texture;
     QTime startTime = QTime::currentTime();
     //makeCurrent();
+#if 0
     if(m_init == 0)
         initialize();
-    if(m_idxFbo<=0)
+#endif
+    if(m_idxFbo<0 && m_texture<=0)
     {
+        qInfo()<<"GLWidget::paintGL error. m_idxFbo: "<<m_idxFbo<<" m_texture: "<<m_texture;
+        QGLWidget::paintGL();
         return;
     }
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -344,8 +374,16 @@ void GLWidget::paintGL()
     int dt = startTime.msecsTo(QTime::currentTime());
     //fbo to glwidget
     {
-        GLuint displayTexture;
-        displayTexture = GetTexture(m_idxFbo);
+        GLuint displayTexture=GetTexture(m_idxFbo);
+        if(displayTexture<=0)
+        {
+            displayTexture=m_texture;
+            //displayTexture = GetTexture(m_idxFbo);
+        }
+        if(displayTexture<=0)
+        {
+            qInfo()<<"GLWidget::paintGL error. displayTexture: "<<displayTexture;
+        }
         idxFbo=fragRenderForOtherThreadAgain("Basic"
                 , NULL, 0, displayTexture
                 , 1, 1, 0, false);
@@ -356,15 +394,28 @@ void GLWidget::paintGL()
     }
     int alldt = startTime.msecsTo(QTime::currentTime());
     qDebug()<<"GLWidget::paintGL dt: "<<dt<<" alldt: "<<alldt;
+    m_idxFbo=-1;
+    m_texture=-1;
     //doneCurrent();
 }
 void GLWidget::resizeEvent(QResizeEvent *evt)
 {
+    if(m_bhidden)
+    {
+        //return;
+    }
     qDebug()<<"GLWidget::resizeEvent evt: "<<evt;
     QGLWidget::resizeEvent(evt);
 }
 void GLWidget::showEvent(QShowEvent *event)
 {
+#if 0
+    if(m_bhidden)
+    {
+        setVisible(false);
+        return;
+    }
+#endif
     qDebug()<<"GLWidget::showEvent evt: "<<event;
     QGLWidget::showEvent(event);
 }

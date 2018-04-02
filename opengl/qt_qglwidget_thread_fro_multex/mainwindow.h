@@ -23,8 +23,13 @@ public:
 protected:
     void showEvent(QShowEvent *event) Q_DECL_OVERRIDE;
 private:
-	GLHiddenWidget *m_hiddenGl;
 	GLWidget *m_mainView;
+	//GLHiddenWidget *m_hiddenGl;
+	GLWidget *m_hiddenGl;
+    PlayerPrivate* m_playerprivate=NULL;
+
+    int glw=1280;
+    int glh=720;
 };
 
 #endif
