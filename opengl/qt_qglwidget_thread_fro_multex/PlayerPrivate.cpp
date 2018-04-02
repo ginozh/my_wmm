@@ -11,14 +11,19 @@ PlayerPrivate::~PlayerPrivate()
 }
 void PlayerPrivate::setGLWidget(GLWidget* glw)
 {
-    glwidget=glw;
     qDebug()<<"PlayerPrivate::setGLWidget moveToThread";
+    if(glwidget)
+        return;
+    glwidget=glw;
     glwidget->m_shareWidget->context()->moveToThread(this);
     qDebug()<<"PlayerPrivate::setGLWidget moveToThread 2";
 }
 void PlayerPrivate::run()
 {
     int idx=0;
+    int glw=1280;
+    int glh=720;
+    glwidget->m_shareWidget->initialOpengl(glw, glh);
     for (;;) 
     {
         double frameTime = 100;

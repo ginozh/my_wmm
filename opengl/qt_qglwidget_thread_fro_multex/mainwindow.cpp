@@ -14,6 +14,7 @@
 #include <QDebug>
 #include "mainwindow.h"
 #include "GLHiddenWidget.h"
+PlayerPrivate* m_playerprivate=NULL;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -35,17 +36,8 @@ MainWindow::MainWindow(QWidget *parent)
     setCentralWidget(centralWidget);
     QVBoxLayout* mainLayout = new QVBoxLayout;
 
+    m_playerprivate=new PlayerPrivate();
     QLabel* lbl=NULL;
-    {
-        QHBoxLayout* hbox = new QHBoxLayout;
-        mainLayout->addLayout(hbox);
-        {
-            //playerWidget = new PlayerWidget(this, false);
-            //create main view
-            m_mainView=new GLWidget(false, qglFormat, m_hiddenGl, this);
-            hbox->addWidget(m_mainView);
-        }
-    }
     {
         QHBoxLayout* hbox = new QHBoxLayout;
         mainLayout->addLayout(hbox);
@@ -72,13 +64,14 @@ MainWindow::MainWindow(QWidget *parent)
             connect(m_pbPreFrame, &QAbstractButton::clicked, 
                     [=]()
                     {
+                    if(m_playerprivate)
                         m_playerprivate->m_bstart=true;
 #if 0
                     int idxFbo=-1;
                     QImage image1, image2;
                     {
                         QImage& image=image1;
-                        QString fileName="c:\\shareproject\\jpg\\img006.jpg";
+                        QString fileName="1.jpg";
                         image.load(fileName);
                         if (image.isNull()) {
                             qDebug()<<"error";
@@ -88,24 +81,31 @@ MainWindow::MainWindow(QWidget *parent)
                     }
                     GLuint texture=0;
                     m_mainView->m_shareWidget->context()->makeCurrent();
-                    texture=m_mainView->load2DTexture(image1.width(), image1.height(), image1.bits());
-#if 0
-                    idxFbo=m_mainView->fragRenderForOtherThreadAgain("Basic"
+                    texture=m_mainView->m_shareWidget->load2DTexture(image1.width(), image1.height(), image1.bits());
+#if 1
+                    idxFbo=m_mainView->m_shareWidget->fragRenderForOtherThreadAgain("Basic"
                             , NULL, 0, texture
                             , 1, 1, 0, true, true);
-                    m_mainView->m_shareWidget->context()->doneCurrent();
                     if(idxFbo<0)
                     {
                         qInfo()<<"fragRenderForOtherThread error";
                     }
+#endif
                     if(idxFbo>=0)
                     {
-                        m_mainView->m_idxFbo=idxFbo;
+                        m_mainView->m_texture=m_mainView->m_shareWidget->GetTexture(idxFbo);
                         m_mainView->update();
                     }
-#endif
+                    else if(texture>0)
+                    {
+                        m_mainView->m_texture=texture;
+                        m_mainView->update();
+                    }
+                    m_mainView->m_shareWidget->context()->doneCurrent();
+
                     m_mainView->m_texture=texture;
                     m_mainView->update();
+
 #endif
                     });
         }
@@ -114,12 +114,13 @@ MainWindow::MainWindow(QWidget *parent)
 }
 void MainWindow::showEvent(QShowEvent *event)
 {
+    qDebug()<<"MainWindow::showEvent";
     QMainWindow::showEvent(event);
     m_mainView->initialOpengl(glw, glh);
-    m_hiddenGl->initialOpengl(glw, glh);
+    //m_hiddenGl->initialOpengl(glw, glh);
+    m_hiddenGl->setVisible(false);
 #if 1
-    m_playerprivate=new PlayerPrivate();
-    m_playerprivate->setGLWidget(m_mainView);
+    //m_playerprivate->setGLWidget(m_mainView);
     m_playerprivate->start();
 #endif
 }

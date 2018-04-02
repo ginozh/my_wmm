@@ -26,7 +26,7 @@ private:
 	GLWidget *m_mainView;
 	//GLHiddenWidget *m_hiddenGl;
 	GLWidget *m_hiddenGl;
-    PlayerPrivate* m_playerprivate=NULL;
+    //PlayerPrivate* m_playerprivate=NULL;
 
     int glw=1280;
     int glh=720;

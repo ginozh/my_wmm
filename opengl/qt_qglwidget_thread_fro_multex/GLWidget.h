@@ -166,6 +166,8 @@ public:
     int m_texture=-1;
 
     bool m_bhidden;
+    QMutex m_mutexInit;
+	QGLContext *m_glContext=NULL;
 };
 
 #endif // _GLWidget_h_

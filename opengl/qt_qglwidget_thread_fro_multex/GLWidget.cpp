@@ -3,6 +3,7 @@
 #include <QJsonObject> 
 #include <QDebug>
 #include "GLWidget.h"
+#include "PlayerPrivate.h"
 
 //GLWidget::GLWidget(bool bHidden,QGLFormat format, const QGLWidget *shareWidget, QWidget *parent)
 GLWidget::GLWidget(bool bHidden,QGLFormat format, GLWidget *shareWidget, QWidget *parent)
@@ -207,10 +208,11 @@ void GLWidget::initializeGL()
 }
 void GLWidget::initialOpengl(int width, int height,bool bForce)
 {
-    qDebug()<<"GLWidget::initialOpengl width: "<<width<<" height: "<<height<<"bInitialGL:"<<bInitialGL;
+    qDebug()<<"GLWidget::initialOpengl width: "<<width<<" height: "<<height<<"bInitialGL:"<<bInitialGL
+        <<" m_bhidden: "<<m_bhidden;
     if(m_bhidden)
     {
-        setVisible(false);
+        //setVisible(false);
         if(m_init == 0)
         {
             initializeGLFunctions();
@@ -288,7 +290,8 @@ void GLWidget::resizeGL(int width, int height)
 
 bool GLWidget::initialize()
 {
-    qDebug()<<"GLWidget::initialize";
+    QMutexLocker locker(&m_mutexInit);
+    qDebug()<<"GLWidget::initialize m_init: "<<m_init;
 	if(m_init == 0)
 	{
 		m_init=1;
@@ -297,19 +300,27 @@ bool GLWidget::initialize()
 	}
 	return true;
 }
+extern PlayerPrivate* m_playerprivate;
 void GLWidget::initializeGLContext()
 {
-    qDebug()<<"GLWidget::initializeGLContext";
+    qDebug()<<"GLWidget::initializeGLContext m_glContext: "<<m_glContext<<" m_bhidden: "<<m_bhidden;
+    if(m_glContext)
+        return;
 	//create context from inside thread
-	QGLContext *glContext=new QGLContext(m_format, this);
+	m_glContext=new QGLContext(m_format, this);
 
 	//share context with another QGLWidget
 	if(m_shareWidget != NULL)
     {
         qDebug()<<"GLWidget::initializeGLContext m_shareWidget->context: "<<m_shareWidget->context();
-		glContext->create(m_shareWidget->context());
+        if(m_playerprivate)
+            m_playerprivate->setGLWidget(this);
+
+		m_glContext->create(m_shareWidget->context());
     }
-	setContext(glContext);
+    qDebug()<<"GLWidget::initializeGLContext setContext glContext: "<<m_glContext<<" m_bhidden: "
+        <<m_bhidden;
+	setContext(m_glContext);
 
 	//make sure new context is current
 	makeCurrent();
@@ -329,7 +340,8 @@ void GLWidget::paintGL()
     {
         //return;
     }
-    qDebug()<<"GLWidget::paintGL m_idxFbo: "<<m_idxFbo<<" m_texture: "<<m_texture;
+    qDebug()<<"GLWidget::paintGL m_idxFbo: "<<m_idxFbo<<" m_texture: "<<m_texture
+        <<"m_bhidden:"<<m_bhidden;
     QTime startTime = QTime::currentTime();
     //makeCurrent();
 #if 0
@@ -374,16 +386,33 @@ void GLWidget::paintGL()
     int dt = startTime.msecsTo(QTime::currentTime());
     //fbo to glwidget
     {
-        GLuint displayTexture=GetTexture(m_idxFbo);
-        if(displayTexture<=0)
-        {
+        GLuint displayTexture;
+        if(m_texture>0)
             displayTexture=m_texture;
-            //displayTexture = GetTexture(m_idxFbo);
-        }
+        else
+            displayTexture=GetTexture(m_idxFbo);
         if(displayTexture<=0)
         {
             qInfo()<<"GLWidget::paintGL error. displayTexture: "<<displayTexture;
         }
+#if 0
+        {
+            QImage image;
+            QString fileName;
+            fileName="1.jpg";
+            image.load(fileName);
+            if (image.isNull()) {
+                qDebug()<<"error fileName: "<<fileName;
+            }
+            image = image.convertToFormat(QImage::Format_RGBA8888);
+            displayTexture=load2DTexture(image.width(), image.height(), image.bits());
+            if(displayTexture<=0)
+            {
+                qInfo()<<"load2DTexture error";
+            }
+        }
+#endif
+
         idxFbo=fragRenderForOtherThreadAgain("Basic"
                 , NULL, 0, displayTexture
                 , 1, 1, 0, false);
@@ -416,7 +445,7 @@ void GLWidget::showEvent(QShowEvent *event)
         return;
     }
 #endif
-    qDebug()<<"GLWidget::showEvent evt: "<<event;
+    qDebug()<<"GLWidget::showEvent evt: "<<event<<"m_bhidden:"<<m_bhidden;
     QGLWidget::showEvent(event);
 }
 void GLWidget::closeEvent(QCloseEvent *evt)
@@ -754,7 +783,8 @@ int GLWidget::ParseConfCreateProgram(const QString pathpre, const QString& effec
         return -1;
     }
     fragInfo.fragFile=pathpre+fragInfo.fragFile;
-    qDebug()<<"GLWidget::ParseConfCreateProgram fragFile: "<<fragInfo.fragFile;
+    qDebug()<<"GLWidget::ParseConfCreateProgram fragFile: "<<fragInfo.fragFile<<" m_bhidden: "
+        <<m_bhidden;
     //QMap<QString/*effectname*/, STFragmentInfo> m_mapEffectProgram;
     foreach (QVariant texture, result["TEXTURES"].toList()) 
     {
@@ -890,7 +920,12 @@ int GLWidget::fragRenderForOtherThreadAgain(const QString& effectname
     if(!m_mapEffectProgram.contains(effectname))
     {
         qInfo()<<"GLWidget::fragRenderForOtherThreadAgain error. no such effect: "<<effectname;
-        return -1;
+        if(ParseConfCreateProgram(":/Effects/Shader/",effectname)!=0)
+        {
+            qInfo()<<"GLWidget::initialOpengl error. createProgram wrong. effectname: "<<effectname;
+            return -1;
+        }
+        //return -1;
     }
     return fragRenderForOtherThreadAgain(effectname, m_mapEffectProgram[effectname], ori_spos
             , ori_spossize, texture, globaltime, totaltime, texture2, useFbo, oneFrameFirstgl);
