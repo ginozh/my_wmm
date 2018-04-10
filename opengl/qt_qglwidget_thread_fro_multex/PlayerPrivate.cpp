@@ -57,6 +57,11 @@ void PlayerPrivate::run()
             }
             image = image.convertToFormat(QImage::Format_RGBA8888);
 
+            {
+
+            qDebug()<<"PlayerPrivate::run start lock";
+            QMutexLocker locker(&glwidget->m_mutexRender); 
+            qDebug()<<"PlayerPrivate::run get lock";
             glwidget->m_shareWidget->context()->makeCurrent();
             //texture=glwidget->load2DTexture(image.width(), image.height(), image.bits());
             texture=glwidget->m_shareWidget->load2DTexture(image.width(), image.height(), image.bits());
@@ -74,6 +79,8 @@ void PlayerPrivate::run()
             }
 #endif
             glwidget->m_shareWidget->context()->doneCurrent();
+            qDebug()<<"PlayerPrivate::run end lock";
+            }
         }
         if(idxFbo>=0)
         {
@@ -83,8 +90,10 @@ void PlayerPrivate::run()
         }
         else if(texture>0)
         {
+#if 0
             glwidget->m_texture=texture;
             glwidget->update();
+#endif
         }
         //m_bstart=false;
         QThread::msleep(frameTime);

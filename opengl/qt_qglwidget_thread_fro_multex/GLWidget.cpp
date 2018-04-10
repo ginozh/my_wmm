@@ -17,7 +17,7 @@ GLWidget::GLWidget(bool bHidden,QGLFormat format, GLWidget *shareWidget, QWidget
 	doneCurrent();
 
     idxFrameBuf=0;
-    maxFrameBuf=20;
+    maxFrameBuf=40;
     //usedFboCnt=10;
 
     for(int idx=0; idx<MAX_TEXTURES_CNT; idx++)
@@ -351,9 +351,12 @@ void GLWidget::paintGL()
     if(m_idxFbo<0 && m_texture<=0)
     {
         qInfo()<<"GLWidget::paintGL error. m_idxFbo: "<<m_idxFbo<<" m_texture: "<<m_texture;
-        QGLWidget::paintGL();
+        //QGLWidget::paintGL();
         return;
     }
+    qDebug()<<"GLWidget::paintGL start lock";
+    QMutexLocker locker(&m_mutexRender); 
+    qDebug()<<"GLWidget::paintGL get lock";
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 
@@ -383,6 +386,7 @@ void GLWidget::paintGL()
         }
     }
 #endif
+    qDebug()<<"GLWidget::paintGL get1 lock";
     int dt = startTime.msecsTo(QTime::currentTime());
     //fbo to glwidget
     {
@@ -413,6 +417,7 @@ void GLWidget::paintGL()
         }
 #endif
 
+    qDebug()<<"GLWidget::paintGL get2 lock";
         idxFbo=fragRenderForOtherThreadAgain("Basic"
                 , NULL, 0, displayTexture
                 , 1, 1, 0, false);
@@ -425,6 +430,7 @@ void GLWidget::paintGL()
     qDebug()<<"GLWidget::paintGL dt: "<<dt<<" alldt: "<<alldt;
     m_idxFbo=-1;
     m_texture=-1;
+    qDebug()<<"GLWidget::paintGL end lock";
     //doneCurrent();
 }
 void GLWidget::resizeEvent(QResizeEvent *evt)
@@ -936,7 +942,7 @@ int GLWidget::fragRenderForOtherThreadAgain(const QString& effectname
         , float globaltime, float totaltime, GLuint texture2/*=0*/
         , bool useFbo/*=true*/, bool oneFrameFirstgl/*=false*/)
 {
-    QMutexLocker locker(&m_mutexRender); 
+    ///QMutexLocker locker(&m_mutexRender); 
     //makeCurrent();
     if(!useFbo)
     {
