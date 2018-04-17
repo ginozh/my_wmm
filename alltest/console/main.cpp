@@ -22,13 +22,15 @@ void testSharePtr();
 void testLevelDB();
 void testInt();
 void testSacle();
+void testCppVirtual();
 
 int main(int argc, char *argv[])
 {
 	cout << "programe start" << endl;
     QCoreApplication a(argc, argv);
 
-    testSacle();
+    testCppVirtual();
+    // testSacle();
 
     //testInt();
 
@@ -395,4 +397,34 @@ void testSacle()
     qDebug()<<"testSacle width: "<<source_size.width()<<" height: "<<source_size.height(); //938, 720
     source_size.scale(1280, 720, Qt::KeepAspectRatioByExpanding);
     qDebug()<<"testSacle width: "<<source_size.width()<<" height: "<<source_size.height(); //1280, 982
+}
+class ReaderBase
+{
+public:
+    virtual void setTimeline(int i){qDebug()<<"ReaderBase::setTimeline";v=i;}
+    virtual int getTimeline(){qDebug()<<"ReaderBase::getTimeline";return v;}
+    int v=1;
+};
+class MMObject
+{
+public:
+    virtual void setTimeline(int i){qDebug()<<"MMObject::setTimeline";v=i;}
+    virtual int getTimeline(){qDebug()<<"MMObject::getTimeline";return v;}
+    int v=2;
+};
+class QtImageReader : public ReaderBase, public MMObject
+{
+public:
+    virtual void setTimeline(int i){qDebug()<<"QtImageReader::setTimeline";/*v=i*/;MMObject::setTimeline(i);ReaderBase::setTimeline(i);}
+    //virtual int getTimeline(){qDebug()<<"QtImageReader::getTimeline";return v;}
+    //int v=3;
+};
+void testCppVirtual()
+{
+    QtImageReader* image = new QtImageReader();
+    ReaderBase* base=image;
+    MMObject* mmobject = image;
+    mmobject->setTimeline(100);
+    qDebug()<<"base->getTimeline v: "<<base->getTimeline();
+    qDebug()<<"base->v v: "<<base->v;
 }

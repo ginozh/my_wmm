@@ -72,6 +72,7 @@ int testZoomPan(int argc, char *argv[]);
 int testPicLut(int argc, char *argv[]);
 int testColorChannelMixer(int argc, char *argv[]);
 int testSubtitles(int argc, char *argv[]);
+int testTransparentBGSubtitles(int argc, char *argv[]);
 int testScale(int argc, char *argv[]);
 ///int testBlend(int argc, char *argv[]);
 
@@ -79,7 +80,7 @@ int main(int argc, char *argv[])
 {
     av_log(NULL, AV_LOG_INFO, "main\n");
 
-    testScale(argc, argv);
+    //testScale(argc, argv);
 
     //testVideoFilter(argc, argv);
 
@@ -94,6 +95,8 @@ int main(int argc, char *argv[])
     //testColorChannelMixer(argc, argv);
 
     //testSubtitles(argc, argv);
+
+    testTransparentBGSubtitles(argc, argv);
 
     ////testBlend(argc, argv);
     return 0;
@@ -227,7 +230,7 @@ void displayFrame(AVFrame *frame)
     //QImage tmpImg((uchar *)out_buffer,frame->width,frame->height,QImage::Format_RGB32);
     ////QImage tmpImg((uchar *)out_buffer,frame->width,frame->height,QImage::Format_RGB32);
     QImage tmpImg((uchar *)out_buffer,frame->width,frame->height,QImage::Format_RGBA8888);
-    tmpImg.save(QString("images/%1.jpg").arg(idx));
+    tmpImg.save(QString("images/%1.png").arg(idx));
     //tmpImg.save(QString("/home/gino/ffmpeg-3.0.2/macjpg/%1.jpg").arg(idx));
     //tmpImg.save(QString("/c/shareproject/jpg/tmp/%1.jpg").arg(idx));
 
@@ -1338,6 +1341,55 @@ int GetAsh(BYTE** imageBuf, int x, int y)
             +imageBuf[y][x*4+2]) / 3;
     return clr;
 }
+int testTransparentBGSubtitles(int argc, char *argv[])
+{
+    AVFrame *avframe = NULL;
+    AVCodecContext *overlay_ctx=NULL;
+    AssContext cc, *s=&cc;
+    int64_t frame_count=100;
+
+    av_log(NULL, AV_LOG_INFO, "testTransparentBGSubtitles\n");
+    av_register_all();
+
+    int neww=1280;
+    int newh=720;
+
+    QImage m_blackImage(neww, newh, QImage::Format_RGBA8888);
+	//m_blackImage->fill(QColor("#000000"));
+	//m_blackImage.fill(QColor(0, 0, 0, 20));
+	m_blackImage.fill(QColor(0, 0, 0, 0));
+    //m_blackImage.save("transparent.png");
+    //return 0;
+    avframe = av_frame_alloc();
+    if (!avframe) 
+    {
+        qInfo()<<"SubtitleReader::GetFrame error av_frame_alloc";
+        return -1;
+    }
+    memset(avframe, 0, sizeof(AVFrame));
+    avframe->format = AV_PIX_FMT_RGBA;
+    avframe->width  = neww;
+    avframe->height = newh;
+    int ret = av_frame_get_buffer(avframe, 32);
+    if (ret < 0) {
+        qInfo()<<"SubtitleReader::GetFrame error av_frame_get_buffer";
+        //goto END_GetFrame;
+        return -1;
+    }
+    //frame
+	//unsigned char* qbuffer = new unsigned char[buffer_size]();
+    //av_image_fill_arrays(avframe->data, avframe->linesize, m_qbuffer, AV_PIX_FMT_RGBA, neww, newh, 1);
+    av_image_fill_arrays(avframe->data, avframe->linesize, m_blackImage.bits(), AV_PIX_FMT_RGBA, neww, newh, 1);
+    displayFrame(avframe);
+
+    ret=subtitles_init_subtitles(s, "", "subtitle.srt",0, 0);
+    //subtitles_config_input(s, AV_PIX_FMT_YUV420P, neww, newh );
+    subtitles_config_input(s, AV_PIX_FMT_RGBA, neww, newh );
+    subtitles_filter_frame(s, avframe, 1, 24, 1);
+    displayFrame(avframe);
+
+    return 0;
+}
 int testSubtitles(int argc, char *argv[])
 {
     AVFrame *overlay_frame = NULL;
@@ -1364,6 +1416,8 @@ int testSubtitles(int argc, char *argv[])
     subtitles_config_input(s, AV_PIX_FMT_YUV420P, w, h );
     subtitles_filter_frame(s, overlay_frame, 1, 24, 1);
     displayFrame(overlay_frame);
+
+    return 0;
 }
 
 int testScale(int argc, char *argv[])
@@ -1381,8 +1435,8 @@ int testScale(int argc, char *argv[])
 
     image_to_avframe(argv[2], fmt_ctx, overlay_ctx, overlay_frame);
     //overlay_frame=convertFormat(overlay_frame, AV_PIX_FMT_YUVA420P);
-    overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUV420P);
-    //overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
+    //overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_YUV420P);
+    overlay_frame=convertFormat(overlay_frame, overlay_frame->width, overlay_frame->height, AV_PIX_FMT_RGBA);
     //displayFrame(overlay_frame);
 
     uint8_t *dst_data[4];

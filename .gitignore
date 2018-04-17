@@ -23,7 +23,7 @@ tmp1.sh
 */debug/*
 */release/*
 *.log
-*/build*
+build/
 
 */jpg/*
 */images/*
