@@ -38,6 +38,7 @@ mat4   model, view, projection;
 void add_text( vertex_buffer_t * buffer, texture_font_t * font,
                char *text, vec4 * color, vec2 * pen )
 {
+    double time;
     size_t i;
     float r = color->red, g = color->green, b = color->blue, a = color->alpha;
     for( i = 0; i < strlen(text); ++i )
@@ -71,6 +72,8 @@ void add_text( vertex_buffer_t * buffer, texture_font_t * font,
             pen->x += glyph->advance_x;
         }
     }
+    time = glfwGetTime( );
+    printf( "add_text waste_time: %.3f\n", time);
 }
 
 
@@ -80,10 +83,13 @@ void init( void )
     size_t i;
     vec2 pen = {{0,0}};
     vec4 color = {{0,0,0,1}};
+    double time;
 
     atlas  = texture_atlas_new( 512, 512, 1 );
     font = texture_font_new_from_file( atlas, 12, "fonts/VeraMono.ttf" );
     buffer = vertex_buffer_new( "vertex:3f,tex_coord:2f,color:4f" );
+    time = glfwGetTime( );
+    printf( "init 1 waste_time: %.3f \n", time);
 
     pen.y = -font->descender;
     for( i=0; i<line_count; ++i )
@@ -93,6 +99,8 @@ void init( void )
         pen.y += font->height - font->linegap;
     }
 
+    time = glfwGetTime( );
+    printf( "init 2 waste_time: %.3f line_count: %d\n", time, line_count);
     glClearColor( 1.0, 1.0, 1.0, 1.0 );
     glDisable( GL_DEPTH_TEST );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
@@ -110,6 +118,8 @@ void init( void )
 
     shader = shader_load("shaders/v3f-t2f-c4f.vert",
                          "shaders/v3f-t2f-c4f.frag");
+    time = glfwGetTime( );
+    printf( "init 3 waste_time: %.3f \n", time);
     mat4_set_identity( &projection );
     mat4_set_identity( &model );
     mat4_set_identity( &view );
@@ -266,7 +276,10 @@ int main( int argc, char **argv )
     fprintf( stderr, "Using GLEW %s\n", glewGetString(GLEW_VERSION) );
 #endif
 
+    glfwSetTime(0.0);
     init();
+    double time = glfwGetTime( );
+    printf( "init waste_time: %.3f \n", time);
 
     glfwShowWindow( window );
     reshape( window, 800, 600 );
