@@ -336,8 +336,10 @@ int main( int argc, char **argv )
 
     while(!glfwWindowShouldClose( window ))
     {
+        float start=(float)(glfwGetTime()*1000.0f);
         display( window );
         glfwPollEvents( );
+        printf("waste_time: %f\n", (float)(glfwGetTime()*1000.0f)-start);
 
         if (screenshot_path)
         {
