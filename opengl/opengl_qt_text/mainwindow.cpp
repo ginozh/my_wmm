@@ -146,11 +146,15 @@ MainWindow::MainWindow(QWidget *parent)
 #if 1
                     QFontDatabase database;
                     foreach (const QString &family, database.families()) {
-                        ////qDebug()<<" family: "<<family;
+                        //qDebug()<<"afamily: "<<family;
                     }
                     QFont f=database.font(font.family(), "", 9);
                     qDebug()<<"f family: "<<f.family();
 #endif
+
+                    //2,根据字体中文名字获取families(例如Arial) --libass 可能中文就可以了
+                    //再确定系统families,本机(Microsoft JhengHei)
+                    // 遍历所有文字信息,根据得分值获取最佳family
                     //clip, textreader
                     //textreader.init();
                     //1, init
@@ -176,7 +180,8 @@ MainWindow::MainWindow(QWidget *parent)
                     //ass_set_fonts(ass_renderer, NULL, "sans-serif",    ///directwrite
                     //        ASS_FONTPROVIDER_AUTODETECT, NULL, 1);
                     const char *default_font=NULL;
-                    const char *default_family="sans-serif";
+                    //const char *default_family="sans-serif";
+                    const char* default_family=font.family().toUtf8().data();
                     int dfp=ASS_FONTPROVIDER_AUTODETECT;
                     const char *config=NULL;
                     fontselect = ass_fontselect_init(ass_library, ft,
@@ -185,7 +190,13 @@ MainWindow::MainWindow(QWidget *parent)
                     //2, font
                     //ass_parse.c:update_font
                     Cache *font_cache=ass_font_cache_create();;
-                    char family[]="Brush Script MT";
+                    //char family[]="Brush Script MT";
+                    //char family[]="STXihei";
+                    //char family[]="华文细黑";//symbol:  27979  face_index:  0  glyph_index:  10563
+                    //iFace:  0  family_name:  Yu Gothic; iFace:  1  family_name:  Microsoft JhengHei UI
+                    //char family[]="游ゴシック";//symbol:  27979  face_index:  1  glyph_index:  15369
+                    char* family=font.family().toUtf8().data();
+                    qDebug()<<"orignal family: "<<family;
                     ASS_Font *ass_font=NULL;
                     double font_size=20.0;
                     {
@@ -193,7 +204,7 @@ MainWindow::MainWindow(QWidget *parent)
                         ASS_FontDesc desc;
                         desc.vertical = 0;
                         desc.family = strdup(family);
-                        val = 1;
+                        val = 0;
                         // 0 = normal, 1 = bold, >1 = exact weight
                         if (val == 1 || val == -1)
                             val = 700;               // bold
@@ -201,7 +212,7 @@ MainWindow::MainWindow(QWidget *parent)
                             val = 400;               // normal
                         desc.bold = val;
 
-                        val = 1;
+                        val = 0;
                         if (val == 1)
                             val = 100;              // italic
                         else if (val <= 0)
@@ -262,6 +273,8 @@ MainWindow::MainWindow(QWidget *parent)
                     for(int iFace=0; iFace<ass_font->n_faces; iFace++)
                     {
                         qDebug()<<"iFace: "<<iFace<<" family_name: "<<ass_font->faces[iFace]->family_name;
+                        family=ass_font->faces[iFace]->family_name;
+                        //break;
                     }
                     ////FT_Glyph glyph = ass_font_get_glyph(info->font, info->symbol, info->face_index, info->glyph_index, priv->settings.hinting, info->flags);//GlyphInfo *info
 
@@ -269,7 +282,7 @@ MainWindow::MainWindow(QWidget *parent)
                     ass_cache_done(font_cache);
 
                     playerWidget->makeCurrentOut();
-                    m_hiddenWidget->init();
+                    m_hiddenWidget->init(family);
                     playerWidget->doneCurrentOut();
                     playerPrivate->ready=1;
 

@@ -31,6 +31,7 @@ extern "C" {
 #include "mat4.h"
 #include "texture-font.h"
 #include "markup.h"
+#include "font-manager.h"
 
 #ifdef __cplusplus
 }
@@ -722,12 +723,20 @@ vertex_attribute_delete( vertex_attribute_t * self );
   vertex_buffer_erase( vertex_buffer_t * self,
                        const size_t index );
   //textreader
-
+#if 0
   GLuint shader;
   texture_atlas_t *atlas=NULL;
   vertex_buffer_t *buffer=NULL;
+#endif
   mat4   model, view, projection;
-  void init( void );
+  GLuint bounds_shader;
+  GLuint text_shader;
+  font_manager_t * font_manager;
+  text_buffer_t * text_buffer;
+  vertex_buffer_t *lines_buffer;
+  char * match_description( char * description );
+  ////void init( void );
+  void init(char* family);
   void add_text( vertex_buffer_t * buffer, texture_font_t * font,
           const char * text, vec4 * color, vec2 * pen );
   GLuint

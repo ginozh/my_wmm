@@ -20,7 +20,6 @@ QMAKE_CXXFLAGS += -D__STDC_CONSTANT_MACROS -Wno-deprecated -Wno-unused-function 
 RESOURCES  = effects.qrc
 
 #LIBS += -lfreetype 
-LIBS += -lfontconfig
 LIBS += c:/shareproject/MovieMakeAdvance/libffmpeg_64/lib/libavformat.a \
         c:/shareproject/MovieMakeAdvance/libffmpeg_64/lib/libavfilter.a \
         c:/shareproject/MovieMakeAdvance/libffmpeg_64/lib/libavcodec.a \
@@ -104,7 +103,6 @@ HEADERS  +=  \
     x86/cpuid.h \
     ass_directwrite.h \
     ass_fontselect.h \
-    ass_fontconfig.h \
     ass_library.h \
     ass_outline.h \
     ass_cache.h \
