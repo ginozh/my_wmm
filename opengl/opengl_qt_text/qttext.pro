@@ -39,7 +39,8 @@ LIBS += c:/shareproject/MovieMakeAdvance/libffmpeg_64/lib/libavformat.a \
         -lbluray-2 \
         -lxml2-2 -lmodplug-1 -lrtmp-1 -lgmp-10 -lgnutls-30 -lhogweed-4 -lnettle-6 \
         -lidn2-0 -lp11-kit-0 -lffi-6 -ltasn1-6 -lwsock32 -lWs2_32 -lz \
-        -lSecur32 -lfdk-aac -lxvidcore
+        -lSecur32 -lfdk-aac -lxvidcore \
+        x86/rasterizer.o x86/blend_bitmaps.o x86/blur.o x86/cpuid.o
 LIBS += -lSDL2
 
 SOURCES +=  \
@@ -58,6 +59,20 @@ SOURCES +=  \
     MMComm.cpp \
     mainwindow.cpp \
     PlayerPrivate.cpp \
+    ass_string.c \
+    ass_utils.c \
+    ass_strtod.c \
+    ass_directwrite.c \
+    ass_fontselect.c \
+    ass_library.c \
+    ass_outline.c \
+    ass_cache.c \
+    ass_font.c \
+    ass_bitmap.c \
+    ass.c \
+    ass_blur.c \
+    GraphicsScene.cpp \
+    OpenGLView.cpp \
 
 
 
@@ -73,10 +88,39 @@ HEADERS  +=  \
     markup.h \
     font-manager.h \
     mat4.h \
+    markup.h \
     GLDisplayWidget.h \
     GLHiddenWidget.h \
     MMComm.h \
     FFmpegUtilities.h \
     mainwindow.h \
     PlayerPrivate.h \
+    dwrite_c.h \
+    ass_compat.h \
+    config.h \
+    ass_types.h \
+    ass_string.h \
+    ass_utils.h \
+    x86/cpuid.h \
+    ass_directwrite.h \
+    ass_fontselect.h \
+    ass_fontconfig.h \
+    ass_library.h \
+    ass_outline.h \
+    ass_cache.h \
+    ass_font.h \
+    ass_bitmap.h \
+    ass.h \
+    GraphicsScene.h \
+    OpenGLView.h \
 
+
+DISTFILES += \
+    x86/be_blur.asm \
+    x86/blend_bitmaps.asm \
+    x86/blur.asm \
+    x86/cpuid.asm \
+    x86/gaussian.asm \
+    x86/rasterizer.asm \
+    x86/utils.asm \
+    x86/x86inc.asm

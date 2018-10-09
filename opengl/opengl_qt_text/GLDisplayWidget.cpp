@@ -3,6 +3,9 @@
 #include <QJsonObject> 
 #include <QThread> 
 #include <QPushButton>
+#include <QGraphicsScene>
+#include <QVBoxLayout>
+#include <QGraphicsView>
 #include <QDebug>
 #include "GLDisplayWidget.h"
 #include "GLHiddenWidget.h"
@@ -23,8 +26,24 @@ GLDisplayWidget::GLDisplayWidget(QGLFormat& format, GLHiddenWidget *shareWidget,
     {
         qInfo()<<"GLDisplayWidget::GLDisplayWidget shareWidget is null";
     }
-	setAutoBufferSwap(false);
-
+	/////setAutoBufferSwap(false); //storm nook? 
+#if 0
+    QBoxLayout *layout = new QVBoxLayout;
+    layout->setMargin(0);
+    {
+        QGraphicsScene* scene = new QGraphicsScene(this);
+        QGraphicsView* graphicsView = new QGraphicsView(scene);
+        layout->addWidget(graphicsView);
+        int iSceneWidth = 800/2;
+        int iSceneHeight = 600/2;
+        int iHeightIdx = 0;
+        scene->setSceneRect(0,0,iSceneWidth,iSceneHeight); //如果没有这个，可能宽度会变成764
+        graphicsView->setSceneRect(0,0,iSceneWidth,iSceneHeight);
+        //graphicsView->setGeometry(QRect(0, 0, iFrameWidth, 500*dFactorY));
+        //graphicsView->setFixedSize(iFrameWidth, 500*dFactorY);
+    }
+    setLayout(layout);
+#endif
 	doneCurrent();
 #if 0
     m_pbPreFrame = new QPushButton(this);
@@ -51,15 +70,17 @@ void GLDisplayWidget::paintGL()
 {
     qDebug()<<"GLDisplayWidget::paintGL displayTexture: "<<displayTexture<<" m_width: "
         <<m_width<<" m_height: "<<m_height;
-    glViewport(0, 0, m_width, m_height);
+    makeCurrentOut();
+    if(m_width && m_height) glViewport(0, 0, m_width, m_height);
     glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
     if(displayTexture>0)
     {
         qDebug()<<"GLDisplayWidget::paintGL display";
         m_shareWidget->display();
-        swapBuffers();
-        displayTexture=0;
+        ///swapBuffers();  //storm
+        ///displayTexture=0;
     }
+    doneCurrentOut();
 }
 #if 0
 void GLDisplayWidget::paintGL()

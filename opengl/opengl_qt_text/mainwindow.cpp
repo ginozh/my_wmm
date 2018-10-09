@@ -12,9 +12,13 @@
 #include <QDesktopWidget>
 #include <QTimer>
 #include <QFontComboBox>
+#include <QGraphicsScene>
+#include <QGraphicsView>
 #include <QDebug>
 #include "mainwindow.h"
 #include "MMComm.h"
+#include "OpenGLView.h"
+#include "GraphicsScene.h"
 #if 0
 extern "C" {
 #include "texture-atlas.h"
@@ -23,8 +27,26 @@ using namespace ftgl;
 texture_atlas_t *atlas;
 vertex_buffer_t *buffer;
 #endif
+extern "C" {
+#include "ass_types.h"
+#include "ass_library.h"
+#include "ass_fontselect.h"
+#include "ass_font.h"
+#include "ass_cache.h"
+}
+
+
 #include "PlayerPrivate.h"
 PlayerPrivate* playerPrivate=NULL;
+
+void msg_callback(int level, const char *fmt, va_list va, void *data)
+{
+    if (level > 6)
+        return;
+    printf("libass: ");
+    vprintf(fmt, va);
+    printf("\n");
+}
 
 //#define SCALEFLAGS SWS_FAST_BILINEAR
 #define SCALEFLAGS SWS_BILINEAR
@@ -60,8 +82,30 @@ MainWindow::MainWindow(QWidget *parent)
                     //playerWidget = new PlayerWidget(iw, ih, this);
                     playerWidget = new PlayerWidget(qglFormat, m_hiddenWidget, this, false);
                     qDebug()<<"playerWidget: "<<playerWidget<<" higlwidget: "<<playerWidget->m_shareWidget;
-                    vbox->addWidget(playerWidget);
+                    /////vbox->addWidget(playerWidget);
                     playerWidget->setFixedSize(iw,ih);
+#if 0
+                    QLineEdit* lineedit=new QLineEdit(playerWidget);
+                    lineedit->setAttribute(Qt::WA_TranslucentBackground);
+                    lineedit->setWindowOpacity(0.5);
+#endif
+#if 1
+                    playerWidget->makeCurrent( );
+                    //QGLWidget* pWidget = new QGLWidget( QGLFormat( QGL::SampleBuffers ), this );
+                    //pWidget->makeCurrent( );
+                    GraphicsScene* pScene = new GraphicsScene( this );
+                    //QGraphicsView* pView = new QGraphicsView(this);
+                    OpenGLView* pView = new OpenGLView(this);
+                    pView->setViewport( playerWidget );
+                    //pView->setViewport( pWidget );
+                    pView->setGlWidget(playerWidget);
+                    pView->setFixedSize(iw,ih);
+                    pView->setViewportUpdateMode( QGraphicsView::FullViewportUpdate );
+                    pView->setScene( pScene );
+                    playerWidget->doneCurrent( );
+                    vbox->addWidget(pView);
+#endif
+
                     //playerWidget->resize(iw,ih);
                     //playerWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 #if 0
@@ -102,13 +146,128 @@ MainWindow::MainWindow(QWidget *parent)
 #if 1
                     QFontDatabase database;
                     foreach (const QString &family, database.families()) {
-                        qDebug()<<" family: "<<family;
+                        ////qDebug()<<" family: "<<family;
                     }
                     QFont f=database.font(font.family(), "", 9);
                     qDebug()<<"f family: "<<f.family();
 #endif
                     //clip, textreader
                     //textreader.init();
+                    //1, init
+                    ASS_Library *ass_library;
+                    ass_library = ass_library_init();
+                    if (!ass_library) {
+                        printf("ass_library_init failed!\n");
+                        exit(1);
+                    }
+                    ass_set_message_cb(ass_library, msg_callback, NULL);
+                    FT_Library ft;
+                    {
+                        int error;
+                        int vmajor, vminor, vpatch;
+                        error = FT_Init_FreeType(&ft);
+                        if (error) {
+                            ///ass_msg(library, MSGL_FATAL, "%s failed", "FT_Init_FreeType");
+                        }
+                        FT_Library_Version(ft, &vmajor, &vminor, &vpatch);
+                        ////ass_msg(library, MSGL_V, "Raster: FreeType %d.%d.%d", vmajor, vminor, vpatch);
+                    }
+                    ASS_FontSelector *fontselect;
+                    //ass_set_fonts(ass_renderer, NULL, "sans-serif",    ///directwrite
+                    //        ASS_FONTPROVIDER_AUTODETECT, NULL, 1);
+                    const char *default_font=NULL;
+                    const char *default_family="sans-serif";
+                    int dfp=ASS_FONTPROVIDER_AUTODETECT;
+                    const char *config=NULL;
+                    fontselect = ass_fontselect_init(ass_library, ft,
+                            default_family, default_font, config, (ASS_DefaultFontProvider)dfp);
+
+                    //2, font
+                    //ass_parse.c:update_font
+                    Cache *font_cache=ass_font_cache_create();;
+                    char family[]="Brush Script MT";
+                    ASS_Font *ass_font=NULL;
+                    double font_size=20.0;
+                    {
+                        unsigned val;
+                        ASS_FontDesc desc;
+                        desc.vertical = 0;
+                        desc.family = strdup(family);
+                        val = 1;
+                        // 0 = normal, 1 = bold, >1 = exact weight
+                        if (val == 1 || val == -1)
+                            val = 700;               // bold
+                        else if (val <= 0)
+                            val = 400;               // normal
+                        desc.bold = val;
+
+                        val = 1;
+                        if (val == 1)
+                            val = 100;              // italic
+                        else if (val <= 0)
+                            val = 0;                // normal
+                        desc.italic = val;
+                        ass_cache_dec_ref(ass_font);
+                        ass_font = ass_font_new(font_cache, ass_library,
+                                    ft, fontselect, &desc);
+                    }
+                    int face_index;
+                    int glyph_index;
+
+                    //ass_font_get_index(render_priv->fontselect, info->font,
+                    //        info->symbol, &info->face_index, &info->glyph_index);//GlyphInfo *info
+                    uint32_t symbol;FT_Glyph glyph;
+                    symbol=27979;
+                    face_index=0;
+                    glyph_index=0;
+                    ass_font_get_index(fontselect, ass_font, symbol, &face_index, &glyph_index);
+                    //ass_face_set_size(info->font->faces[info->face_index], info->font_size);
+                    //render_priv->text_info->glyphs[0]->font->faces[0]->size->metrics何时赋值? 
+                    //  ass_render.c:ass_shaper_shape->shape_harfbuzz->get_hb_font
+                    //
+                    ass_face_set_size(ass_font->faces[face_index], 20.0);
+                    //ass_font_set_transform(info->font, info->scale_x,
+                    //        info->scale_y, NULL);
+                    glyph = ass_font_get_glyph(ass_font,
+                                symbol, face_index, glyph_index,
+                                ASS_HINTING_NONE, 0);
+                    //1, 15369
+                    qDebug()<<"symbol: "<<symbol<<" face_index: "<<face_index
+                        <<" glyph_index: "<<glyph_index<<" glyph_advance x: "<<glyph->advance.x
+                        <<" y: "<<glyph->advance.y;
+                    symbol=35797;
+                    face_index=0;
+                    glyph_index=0;
+                    ass_font_get_index(fontselect, ass_font, symbol, &face_index, &glyph_index);
+                    ass_face_set_size(ass_font->faces[face_index], 256.0);
+                    glyph = ass_font_get_glyph(ass_font,
+                                symbol, face_index, glyph_index,
+                                ASS_HINTING_NONE, 0);
+                    //1, 23187
+                    qDebug()<<"symbol: "<<symbol<<" face_index: "<<face_index
+                        <<" glyph_index: "<<glyph_index<<" glyph_advance x: "<<glyph->advance.x
+                        <<" y: "<<glyph->advance.y;
+                    symbol=66;
+                    face_index=0;
+                    glyph_index=0;
+                    ass_font_get_index(fontselect, ass_font, symbol, &face_index, &glyph_index);
+                    ass_face_set_size(ass_font->faces[face_index], 256.0);
+                    glyph = ass_font_get_glyph(ass_font,
+                                symbol, face_index, glyph_index,
+                                ASS_HINTING_NONE, 0);
+                    //0, 37->1, 37
+                    qDebug()<<"symbol: "<<symbol<<" face_index: "<<face_index
+                        <<" glyph_index: "<<glyph_index<<" glyph_advance x: "<<glyph->advance.x
+                        <<" y: "<<glyph->advance.y;
+                    for(int iFace=0; iFace<ass_font->n_faces; iFace++)
+                    {
+                        qDebug()<<"iFace: "<<iFace<<" family_name: "<<ass_font->faces[iFace]->family_name;
+                    }
+                    ////FT_Glyph glyph = ass_font_get_glyph(info->font, info->symbol, info->face_index, info->glyph_index, priv->settings.hinting, info->flags);//GlyphInfo *info
+
+                    //clean tmp?
+                    ass_cache_done(font_cache);
+
                     playerWidget->makeCurrentOut();
                     m_hiddenWidget->init();
                     playerWidget->doneCurrentOut();

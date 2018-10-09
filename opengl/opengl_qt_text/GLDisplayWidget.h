@@ -2,7 +2,9 @@
 #define _GLDisplayWidget_h_
 
 #include <QGLWidget>
+#include <QOpenGLWidget>
 #include <QGLFunctions>
+#include <QOpenGLFunctions>
 #include <memory>
 #include <QImage>
 #include <QMap>
@@ -17,6 +19,7 @@ class Frame;
 class FFmpegWriter;
 class ExporterPrivate;
 class GLDisplayWidget : public QGLWidget, protected QGLFunctions
+//class GLDisplayWidget : public QOpenGLWidget, protected QOpenGLFunctions
 //class GLDisplayWidget : public GLBaseWidget
 {
 	Q_OBJECT
@@ -33,7 +36,8 @@ public:
     std::shared_ptr<QImage> getCapture();
 signals:
     void sigGLPainted();
-protected:
+///protected:
+public:
 	virtual void glInit(); //overlay initializeGL
 	virtual void glDraw(); //overlay paintGL
     virtual void initializeGL();

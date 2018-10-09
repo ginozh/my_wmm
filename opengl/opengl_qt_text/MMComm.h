@@ -8,6 +8,7 @@
 #include <SDL.h>
 #include <QVariant>
 #include <QGLFunctions>
+#include <QOpenGLFunctions>
 #include <QGLFramebufferObject>
 #include <QMutex>
 #include <QMap>
@@ -102,7 +103,8 @@ typedef struct STFboInfo {
     //bool bTextureUsed;
 }STFboInfo;
 
-class MMGlobalContext : public QObject, protected QGLFunctions
+//class MMGlobalContext : public QObject, protected QGLFunctions
+class MMGlobalContext : public QObject, protected QOpenGLFunctions
 {
     Q_OBJECT
 private:
