@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QVector>
 #include <QPainter>
+#include <QFontComboBox>
 #include <memory>
 #include "GLDisplayWidget.h"
 #include "GLHiddenWidget.h"
@@ -296,6 +297,8 @@ private:
     QAbstractButton* m_pbmedia;
 
     QAbstractButton* m_pbExport;
+
+    QFontComboBox* tmpfcb;
 };
 
 #endif

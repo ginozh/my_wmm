@@ -125,7 +125,7 @@ MainWindow::MainWindow(QWidget *parent)
         QHBoxLayout* hbox = new QHBoxLayout;
         mainLayout->addLayout(hbox);
         {
-            QFontComboBox* tmpfcb = new QFontComboBox();
+            tmpfcb = new QFontComboBox();
             hbox->addWidget(tmpfcb);
             connect(tmpfcb, &QFontComboBox::currentFontChanged,
                     [=](const QFont &font)
@@ -278,14 +278,19 @@ MainWindow::MainWindow(QWidget *parent)
                     }
                     ////FT_Glyph glyph = ass_font_get_glyph(info->font, info->symbol, info->face_index, info->glyph_index, priv->settings.hinting, info->flags);//GlyphInfo *info
 
-                    //clean tmp?
-                    ass_cache_done(font_cache);
 
                     playerWidget->makeCurrentOut();
                     m_hiddenWidget->init(family);
                     playerWidget->doneCurrentOut();
                     playerPrivate->ready=1;
 
+                    //clean tmp?
+                    //ass_render.c::ass_renderer_done
+                    ass_cache_done(font_cache);
+                    ass_fontselect_free(fontselect);
+                    FT_Done_FreeType(ft);
+                    //test.c::main
+                    ass_library_done(ass_library);
 
                     });
         }
@@ -361,13 +366,22 @@ void MainWindow::initialOpengl()
 #endif
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(processFirstThing()));
-    timer->setSingleShot(true);
-    timer->start(1000);
+    ////timer->setSingleShot(true);
+    timer->start(2000);
 }
 void MainWindow::processFirstThing()
 {
     ////return;
     qDebug()<<"MainWindow::processFirstThing";
+    static int icnt=0;
+    if(icnt++%2==0)
+    {
+        tmpfcb->setCurrentIndex(tmpfcb->count()-2);
+    }
+    else
+    {
+        tmpfcb->setCurrentIndex(tmpfcb->count()-3);
+    }
 #if 0
 #ifndef EXPORT
     ///if(playerWidget) playerWidget->setFixedSize(iw,ih);

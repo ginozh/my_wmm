@@ -1,3 +1,8 @@
+零、final
+1, 初始化.
+1.1, text.vert、text.frag
+1.2, 
+
 一、千里之行始于足下
 
 1、抽出glwidget

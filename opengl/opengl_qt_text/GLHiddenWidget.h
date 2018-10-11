@@ -730,10 +730,10 @@ vertex_attribute_delete( vertex_attribute_t * self );
 #endif
   mat4   model, view, projection;
   GLuint bounds_shader;
-  GLuint text_shader;
-  font_manager_t * font_manager;
-  text_buffer_t * text_buffer;
-  vertex_buffer_t *lines_buffer;
+  GLuint text_shader=0;
+  font_manager_t * font_manager=NULL;
+  text_buffer_t * text_buffer=NULL;
+  vertex_buffer_t *lines_buffer=NULL;
   char * match_description( char * description );
   ////void init( void );
   void init(char* family);

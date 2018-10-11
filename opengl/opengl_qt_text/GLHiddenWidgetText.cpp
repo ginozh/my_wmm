@@ -947,10 +947,16 @@ GLHiddenWidget::match_description( char * description )
 }
 void GLHiddenWidget::init(char* family)
 {
-    text_shader = shader_load( "text.vert",
-                               "text.frag" );
+    if(!text_shader)
+        text_shader = shader_load( "text.vert",
+                "text.frag" );
 
-    font_manager = font_manager_new( 512, 512, LCD_FILTERING_ON );
+    if(!font_manager)
+        font_manager = font_manager_new( 512, 512, LCD_FILTERING_ON );
+    if(text_buffer)
+    {
+        text_buffer_delete(text_buffer);
+    }
     text_buffer = text_buffer_new( );
 
     vec4 black  = {{0.0, 0.0, 0.0, 1.0}};
@@ -972,7 +978,6 @@ void GLHiddenWidget::init(char* family)
     //char *f_japanese = match_description("STHupo:size=28:lang=zh\\-CN"); //ok
     //char *f_japanese = match_description("华文隶书:size=28:lang=zh\\-CN"); //no
     printf("init. f_japanese: %s\n" , f_japanese);
-    qDebug()<<"GLHiddenWidgetText::init family: "<<family<<" f_japanese: "<<f_japanese;
 
     //exit(0);
     markup_t normal = {
@@ -992,6 +997,8 @@ void GLHiddenWidget::init(char* family)
     //markup_t japanese  = normal; japanese.family = "c:/qtproject/opengl/freetype-gl/fonts/fireflysung.ttf";
                                  japanese.size = 25.0;
     japanese.font = font_manager_get_from_markup( font_manager, &japanese );
+    qDebug()<<"GLHiddenWidgetText::init family: "<<family<<" f_japanese: "<<f_japanese<<" font: "<<(void*)japanese.font;
+    free( f_japanese );
 
     vec2 pen = {{20, 200}};
 #if 0
@@ -1030,7 +1037,7 @@ void GLHiddenWidget::init(char* family)
         <<"font_manager->atlas->height:"<<font_manager->atlas->height;
 
     text_buffer_align( text_buffer, &pen, ALIGN_CENTER );
-
+#if 0
     vec4 bounds = text_buffer_get_bounds( text_buffer, &pen );
     float left = bounds.left;
     float right = bounds.left + bounds.width;
@@ -1053,12 +1060,13 @@ void GLHiddenWidget::init(char* family)
                             {     right, bottom - 10, 0, 0,0,0,1} };
     GLuint indices[] = { 0,1,2,3,4,5,6,7 };
     vertex_buffer_push_back( lines_buffer, vertices, 8, indices, 8);
-
+#endif
     mat4_set_identity( &projection );
     mat4_set_identity( &model );
     mat4_set_identity( &view );
 
     mat4_set_orthographic( &projection, 0, glw, 0, glh, -1, 1);
+
 }
 #if 0
 void GLHiddenWidget::init( void )
@@ -1137,7 +1145,7 @@ void GLHiddenWidget::display( )
         glBlendColor( 0, 0, 0, 0 );
         glUseProgram( 0 );
     }
-#if 1
+#if 0
     glBlendFunc( GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
     glBlendColor( 1.0, 1.0, 1.0, 1.0 );
     glUseProgram( bounds_shader );
