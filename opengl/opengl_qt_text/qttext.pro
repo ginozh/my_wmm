@@ -96,7 +96,7 @@ HEADERS  +=  \
     PlayerPrivate.h \
     dwrite_c.h \
     ass_compat.h \
-    config.h \
+    ass_config.h \
     ass_types.h \
     ass_string.h \
     ass_utils.h \
@@ -109,6 +109,8 @@ HEADERS  +=  \
     ass_font.h \
     ass_bitmap.h \
     ass.h \
+    ass_cache_template.h \
+    ass_func_template.h \
     GraphicsScene.h \
     OpenGLView.h \
 

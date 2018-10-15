@@ -17,7 +17,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "config.h"
+#include "ass_config.h"
 #include "ass_compat.h"
 
 #include <stdlib.h>
@@ -41,7 +41,7 @@
 #include "ass.h"
 #include "ass_library.h"
 #include "ass_fontselect.h"
-#include "ass_fontconfig.h"
+//#include "ass_fontconfig.h"
 //#include "ass_coretext.h"
 #include "ass_directwrite.h"
 #include "ass_font.h"

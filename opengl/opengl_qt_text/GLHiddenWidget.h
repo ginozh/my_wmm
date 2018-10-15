@@ -734,7 +734,7 @@ vertex_attribute_delete( vertex_attribute_t * self );
   font_manager_t * font_manager=NULL;
   text_buffer_t * text_buffer=NULL;
   vertex_buffer_t *lines_buffer=NULL;
-  char * match_description( char * description );
+  char * match_description( const char * face, bool bold=false, bool italic=false );
   ////void init( void );
   void init(char* family);
   void add_text( vertex_buffer_t * buffer, texture_font_t * font,

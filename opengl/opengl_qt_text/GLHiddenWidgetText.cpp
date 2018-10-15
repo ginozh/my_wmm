@@ -572,6 +572,7 @@ GLHiddenWidget::vertex_buffer_render ( vertex_buffer_t *self, GLenum mode )
 {
     size_t vcount = self->vertices->size;
     size_t icount = self->indices->size;
+    qDebug()<<"GLHiddenWidget::vertex_buffer_render vcount: "<<vcount<<" icount: "<<icount;
 
     vertex_buffer_render_setup( self, mode );
     if( icount )
@@ -906,7 +907,7 @@ GLHiddenWidget::shader_compile( const char* source,
     return handle;
 }
 char *
-GLHiddenWidget::match_description( char * description )
+GLHiddenWidget::match_description( const char * face, bool bold/*=false*/, bool italic/*=false*/ )
 {
 
 #if (defined(_WIN32) || defined(_WIN64)) && !defined(__MINGW32__)
@@ -917,7 +918,15 @@ GLHiddenWidget::match_description( char * description )
 
     char *filename = 0;
     FcInit();
-    FcPattern *pattern = FcNameParse((const FcChar8*)description);
+    FcPattern *pattern = FcPatternCreate();
+    if(!pattern)
+    {
+        fprintf( stderr, "fontconfig error: could not match face '%s'", face );
+        return 0;//tmp
+    }
+    FcPatternAddString(pattern, FC_FAMILY, (const FcChar8*)face);
+    FcPatternAddInteger(pattern, FC_WEIGHT, bold?FC_WEIGHT_BOLD:FC_WEIGHT_REGULAR);
+    FcPatternAddInteger(pattern, FC_SLANT, italic?FC_SLANT_ITALIC:FC_SLANT_ROMAN);
     FcConfigSubstitute( 0, pattern, FcMatchPattern );
     FcDefaultSubstitute( pattern );
     FcResult result;
@@ -926,7 +935,7 @@ GLHiddenWidget::match_description( char * description )
 
     if ( !match )
     {
-        fprintf( stderr, "fontconfig error: could not match description '%s'", description );
+        fprintf( stderr, "fontconfig error: could not match face '%s'", face );
         return 0;
     }
     else
@@ -935,7 +944,7 @@ GLHiddenWidget::match_description( char * description )
         FcResult result = FcPatternGet( match, FC_FILE, 0, &value );
         if ( result )
         {
-            fprintf( stderr, "fontconfig error: could not match description '%s'", description );
+            fprintf( stderr, "fontconfig error: could not match face '%s'", face );
         }
         else
         {
@@ -962,6 +971,9 @@ void GLHiddenWidget::init(char* family)
     vec4 black  = {{0.0, 0.0, 0.0, 1.0}};
     vec4 white  = {{1.0, 1.0, 1.0, 1.0}};
     vec4 yellow = {{1.0, 1.0, 0.0, 1.0}};
+    vec4 red = {{1.0, 0.0, 0.0, 1.0}};
+    vec4 green = {{0.0, 1.0, 0.0, 1.0}};
+    vec4 blue = {{0.0, 0.0, 1.0, 1.0}};
     vec4 grey   = {{0.5, 0.5, 0.5, 1.0}};
     vec4 none   = {{1.0, 1.0, 1.0, 0.0}};
 
@@ -974,7 +986,7 @@ void GLHiddenWidget::init(char* family)
     //char *f_japanese = match_description("jj:size=18:lang=zh\\-CN"); //ok
     //char *f_japanese = match_description("Brush Script MT:size=28:lang=zh\\-CN"); //ok
     //char *f_japanese = match_description("Microsoft JhengHei UI:size=28"); //ok
-    char *f_japanese = match_description(family);
+    char *f_japanese = match_description(family, false, true);
     //char *f_japanese = match_description("STHupo:size=28:lang=zh\\-CN"); //ok
     //char *f_japanese = match_description("华文隶书:size=28:lang=zh\\-CN"); //no
     printf("init. f_japanese: %s\n" , f_japanese);
@@ -983,24 +995,24 @@ void GLHiddenWidget::init(char* family)
     markup_t normal = {
         //.family  = f_normal,
         .family  = f_japanese,
-        .size    = 20.0, .bold    = 0,   .italic  = 0,
+        .size    = 200.0, .bold    = 0,   .italic  = 0,
         .spacing = 0.0,  .gamma   = 2.,
-        .foreground_color    = white, .background_color    = none,
-        .outline           = 0,     .outline_color     = white,
-        .underline           = 0,     .underline_color     = white,
-        .overline            = 0,     .overline_color      = white,
-        .strikethrough       = 0,     .strikethrough_color = white,
+        .foreground_color    = white, .background_color    = black,
+        .outline           = 1,     .outline_color     = yellow,
+        .underline           = 1,     .underline_color     = red,
+        .overline            = 1,     .overline_color      = green,
+        .strikethrough       = 1,     .strikethrough_color = blue,
         .font = 0,
     };
     markup_t japanese  = normal; japanese.family = f_japanese;
     //markup_t japanese  = normal; japanese.family = "C:/Windows/Fonts/simsun.ttc";
     //markup_t japanese  = normal; japanese.family = "c:/qtproject/opengl/freetype-gl/fonts/fireflysung.ttf";
-                                 japanese.size = 25.0;
+    //                             japanese.size = 25.0;
     japanese.font = font_manager_get_from_markup( font_manager, &japanese );
-    qDebug()<<"GLHiddenWidgetText::init family: "<<family<<" f_japanese: "<<f_japanese<<" font: "<<(void*)japanese.font;
+    qDebug()<<"GLHiddenWidgetText::init family: "<<family<<" fontpath: "<<f_japanese<<" font: "<<(void*)japanese.font;
     free( f_japanese );
 
-    vec2 pen = {{20, 200}};
+    vec2 pen = {{20, 300}};
 #if 0
     text_buffer_printf( text_buffer, &pen,
                         &underline, "The",
@@ -1018,8 +1030,8 @@ void GLHiddenWidget::init(char* family)
                         NULL );
 #endif
     text_buffer_printf( text_buffer, &pen,
-                        &japanese,  "Brush Script MT张私はガラスを食べられます。 それは私を傷つけません\n",
-                        //&japanese,  "test font\n",
+                        //&japanese,  "Brush Script MT张私はガラスを食べられます。 それは私を傷つけません\n",
+                        &japanese,  "test\n",
                         NULL );
 
     glGenTextures( 1, &font_manager->atlas->id );
@@ -1031,12 +1043,11 @@ void GLHiddenWidget::init(char* family)
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, font_manager->atlas->width,
                   font_manager->atlas->height, 0, GL_RGB, GL_UNSIGNED_BYTE,
                   font_manager->atlas->data );
-    printf("init font_manager->atlas->width: %d font_manager->atlas->height: %d\n"
-            , font_manager->atlas->width, font_manager->atlas->height);
     qDebug()<<"init font_manager->atlas->width:"<<font_manager->atlas->width
-        <<"font_manager->atlas->height:"<<font_manager->atlas->height;
+        <<"font_manager->atlas->height:"<<font_manager->atlas->height<<" glw: "<<glw
+        <<" glh: "<<glh;
 
-    text_buffer_align( text_buffer, &pen, ALIGN_CENTER );
+    ////text_buffer_align( text_buffer, &pen, ALIGN_CENTER ); //tmp
 #if 0
     vec4 bounds = text_buffer_get_bounds( text_buffer, &pen );
     float left = bounds.left;
@@ -1120,6 +1131,12 @@ void GLHiddenWidget::display( )
     glColor4f(1.00,1.00,1.00,1.00);
     glUseProgram( text_shader );
     {
+        qDebug()<<"GLHiddenWidget::display start text"
+            <<"model: "<<model.data[0]<<model.data[1]<<model.data[2]<<model.data[3]
+            <<"view: "<<view.data[0]<<view.data[1]<<view.data[2]<<view.data[3]
+            <<"projection: "<<projection.data[0]<<projection.data[1]<<projection.data[2]<<projection.data[3] 
+            <<" w h: "<<font_manager->atlas->width << font_manager->atlas->height <<font_manager->atlas->depth
+            ;
         glUniformMatrix4fv( glGetUniformLocation( text_shader, "model" ),
                             1, 0, model.data);
         glUniformMatrix4fv( glGetUniformLocation( text_shader, "view" ),

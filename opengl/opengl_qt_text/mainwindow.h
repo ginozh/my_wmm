@@ -96,8 +96,8 @@ private:
 private:
     PlayerWidget* playerWidget=NULL;
     GLHiddenWidget* m_hiddenWidget=NULL;
-    int iw=512;//640;//1280;
-    int ih=512;//360;//720;
+    int iw=640;//1280;
+    int ih=360;//720;
     int iw_export=640;//1920;//320;//1280;
     int ih_export=360;//1080;//180;//720;
     int id=1;

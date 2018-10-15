@@ -180,8 +180,19 @@ MainWindow::MainWindow(QWidget *parent)
                     //ass_set_fonts(ass_renderer, NULL, "sans-serif",    ///directwrite
                     //        ASS_FONTPROVIDER_AUTODETECT, NULL, 1);
                     const char *default_font=NULL;
+                    QByteArray qbaFamily="宋体";
                     //const char *default_family="sans-serif";
-                    const char* default_family=font.family().toUtf8().data();
+                    //const char* default_family=font.family().toUtf8().data();
+                    const char* default_family=qbaFamily.data();
+                    //char family[]="Brush Script MT";
+                    //char family[]="STXihei";
+                    //char family[]="华文细黑";//symbol:  27979  face_index:  0  glyph_index:  10563
+                    //iFace:  0  family_name:  Yu Gothic; iFace:  1  family_name:  Microsoft JhengHei UI
+                    //char family[]="游ゴシック";//symbol:  27979  face_index:  1  glyph_index:  15369
+                    //char* family=font.family().toUtf8().data();
+                    char* family=qbaFamily.data(); //test
+                    qDebug()<<"orignal family: "<<family;
+
                     int dfp=ASS_FONTPROVIDER_AUTODETECT;
                     const char *config=NULL;
                     fontselect = ass_fontselect_init(ass_library, ft,
@@ -190,13 +201,6 @@ MainWindow::MainWindow(QWidget *parent)
                     //2, font
                     //ass_parse.c:update_font
                     Cache *font_cache=ass_font_cache_create();;
-                    //char family[]="Brush Script MT";
-                    //char family[]="STXihei";
-                    //char family[]="华文细黑";//symbol:  27979  face_index:  0  glyph_index:  10563
-                    //iFace:  0  family_name:  Yu Gothic; iFace:  1  family_name:  Microsoft JhengHei UI
-                    //char family[]="游ゴシック";//symbol:  27979  face_index:  1  glyph_index:  15369
-                    char* family=font.family().toUtf8().data();
-                    qDebug()<<"orignal family: "<<family;
                     ASS_Font *ass_font=NULL;
                     double font_size=20.0;
                     {
@@ -204,7 +208,8 @@ MainWindow::MainWindow(QWidget *parent)
                         ASS_FontDesc desc;
                         desc.vertical = 0;
                         desc.family = strdup(family);
-                        val = 0;
+                        qDebug()<<"mainwindow desc.family: "<<desc.family;
+                        val = 1;
                         // 0 = normal, 1 = bold, >1 = exact weight
                         if (val == 1 || val == -1)
                             val = 700;               // bold
@@ -212,7 +217,7 @@ MainWindow::MainWindow(QWidget *parent)
                             val = 400;               // normal
                         desc.bold = val;
 
-                        val = 0;
+                        val = 1;
                         if (val == 1)
                             val = 100;              // italic
                         else if (val <= 0)
@@ -228,7 +233,7 @@ MainWindow::MainWindow(QWidget *parent)
                     //ass_font_get_index(render_priv->fontselect, info->font,
                     //        info->symbol, &info->face_index, &info->glyph_index);//GlyphInfo *info
                     uint32_t symbol;FT_Glyph glyph;
-                    symbol=27979;
+                    symbol=27979;//ass_utils.c::ass_utf8_get_char, utf8-utils.c::utf8_to_utf32
                     face_index=0;
                     glyph_index=0;
                     ass_font_get_index(fontselect, ass_font, symbol, &face_index, &glyph_index);
@@ -274,7 +279,7 @@ MainWindow::MainWindow(QWidget *parent)
                     {
                         qDebug()<<"iFace: "<<iFace<<" family_name: "<<ass_font->faces[iFace]->family_name;
                         family=ass_font->faces[iFace]->family_name;
-                        //break;
+                        break;
                     }
                     ////FT_Glyph glyph = ass_font_get_glyph(info->font, info->symbol, info->face_index, info->glyph_index, priv->settings.hinting, info->flags);//GlyphInfo *info
 
@@ -286,7 +291,7 @@ MainWindow::MainWindow(QWidget *parent)
 
                     //clean tmp?
                     //ass_render.c::ass_renderer_done
-                    ass_cache_done(font_cache);
+                    ass_cache_done(font_cache);//// ass_font_clear(ass_font);
                     ass_fontselect_free(fontselect);
                     FT_Done_FreeType(ft);
                     //test.c::main
@@ -366,12 +371,13 @@ void MainWindow::initialOpengl()
 #endif
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(processFirstThing()));
-    ////timer->setSingleShot(true);
+    timer->setSingleShot(true);
     timer->start(2000);
 }
 void MainWindow::processFirstThing()
 {
-    ////return;
+    tmpfcb->setCurrentIndex(tmpfcb->count()-2);
+    return;
     qDebug()<<"MainWindow::processFirstThing";
     static int icnt=0;
     if(icnt++%2==0)

@@ -13,7 +13,7 @@
  *
  */
 
-#include "config.h"
+#include "ass_config.h"
 #include "ass_compat.h"
 
 #include <stdlib.h>
