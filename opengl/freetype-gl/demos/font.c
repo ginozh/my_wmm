@@ -76,13 +76,14 @@ void init( void )
     const char * filename = "fonts/Vera.ttf";
     char * text = "A Quick Brown Fox Jumps Over The Lazy Dog 0123456789";
     buffer = vertex_buffer_new( "vertex:3f,tex_coord:2f,color:4f" );
-    vec2 pen = {{5,400}};
+    vec2 pen = {{5,500}};
     vec4 black = {{0,0,0,1}};
     for( i=7; i < 27; ++i)
     {
         font = texture_font_new_from_file( atlas, i, filename );
         pen.x = 5;
         pen.y -= font->height;
+        printf("pen x: %f y: %f font->height: %f\n", pen.x, pen.y, font->height);
         texture_font_load_glyphs( font, text );
         add_text( buffer, font, text, &black, &pen );
         texture_font_delete( font );
@@ -108,7 +109,8 @@ void init( void )
 // ---------------------------------------------------------------- display ---
 void display( GLFWwindow* window )
 {
-    glClearColor( 1, 1, 1, 1 );
+    //glClearColor( 1, 1, 1, 1 );
+    glClearColor( 1, 1, 0, 1 );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     glEnable( GL_BLEND );

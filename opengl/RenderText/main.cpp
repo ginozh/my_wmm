@@ -16,6 +16,8 @@
 #include FT_FREETYPE_H
 // GL includes
 #include "Shader.h"
+#include <QTime>
+#include <QDebug>
 
 // Properties
 const GLuint WIDTH = 800, HEIGHT = 600;
@@ -144,6 +146,7 @@ int main()
     // Game loop
     while (!glfwWindowShouldClose(window))
     {
+        QTime startTime = QTime::currentTime();
         // Check and call events
         glfwPollEvents();
 
@@ -153,9 +156,12 @@ int main()
 
         RenderText(shader, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
         RenderText(shader, "(C) LearnOpenGL.com", 540.0f, 570.0f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
+        //RenderText(shader, "(C) LearnOpenGL.com", 540.0f, 0.0f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
        
         // Swap the buffers
         glfwSwapBuffers(window);
+        int64_t wasteTime = startTime.msecsTo(QTime::currentTime());
+        qInfo()<< "waste: " << wasteTime;
     }
 
     glfwTerminate();

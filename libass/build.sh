@@ -7,4 +7,4 @@
 COMMENT
 
 ./configure --enable-test --disable-fontconfig CFLAGS="-O0 -g" CPPFLAGS="-O0 -g"
-make V=1
+make V=1 -j10

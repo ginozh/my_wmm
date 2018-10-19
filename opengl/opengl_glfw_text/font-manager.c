@@ -160,6 +160,7 @@ font_manager_get_from_description( font_manager_t *self,
             return 0;
         }
     }
+    printf("font_manager_get_from_description. filename: %s\n" , filename);
     font = font_manager_get_from_filename( self, filename, size );
 
     free( filename );

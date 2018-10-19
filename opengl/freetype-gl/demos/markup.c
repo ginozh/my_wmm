@@ -98,15 +98,27 @@ void init()
     vec4 grey   = {{0.5, 0.5, 0.5, 1.0}};
     vec4 none   = {{1.0, 1.0, 1.0, 0.0}};
 
-    char *f_normal   = match_description("Droid Serif:size=24");
-    char *f_bold     = match_description("Droid Serif:size=24:weight=bold");
-    char *f_italic   = match_description("Droid Serif:size=24:slant=italic");
-    char *f_japanese = match_description("Droid Sans:size=18:lang=ja");
+    //char *f_normal   = match_description("Vera:size=50");
+    char *f_normal   = match_description("sans\\-serif:size=50");
+    //char *f_bold     = match_description("Droid Serif:size=24:weight=bold"); //core?
+    char *f_bold     = match_description("sans\\-serif:size=24:bold");
+    char *f_italic   = match_description("sans\\-serif:size=24:slant=italic");
+    //char *f_japanese = match_description("Droid Sans:size=18:lang=ja");
+    //char *f_japanese = match_description("sans-serif:size=18:lang=zh");
+    //char *f_japanese = match_description("sans\\-serif:size=18:lang=zh\\-CN");
+    //char *f_japanese = match_description("FZLanTingHeiS\\-UL\\-GB:size=18:lang=zh\\-CN"); //ok
+    //char *f_japanese = match_description("FZLanTingHeiS\\-UL\\-GB"); //ok
+    //char *f_japanese = match_description("Yu Gothic UI Semibold"); //ok
+    //char *f_japanese = match_description("jj:size=18:lang=zh\\-CN"); //ok
+    char *f_japanese = match_description("Brush Script MT:size=18:lang=zh\\-CN"); //ok
     char *f_math     = match_description("DejaVu Sans:size=24");
+    printf("init. f_normal: %s f_bold: %s f_italic: %s f_japanese: %s f_math: %s\n"
+            , f_normal, f_bold, f_italic, f_japanese, f_math);
 
+    //exit(0);
     markup_t normal = {
         .family  = f_normal,
-        .size    = 24.0, .bold    = 0,   .italic  = 0,
+        .size    = 20.0, .bold    = 0,   .italic  = 0,
         .spacing = 0.0,  .gamma   = 2.,
         .foreground_color    = white, .background_color    = none,
         .underline           = 0,     .underline_color     = white,
@@ -127,7 +139,9 @@ void init()
     markup_t bold      = normal; bold.bold = 1; bold.family = f_bold;
     markup_t italic    = normal; italic.italic = 1; italic.family = f_italic;
     markup_t japanese  = normal; japanese.family = f_japanese;
-                                 japanese.size = 18.0;
+    //markup_t japanese  = normal; japanese.family = "C:/Windows/Fonts/simsun.ttc";
+    //markup_t japanese  = normal; japanese.family = "c:/qtproject/opengl/freetype-gl/fonts/fireflysung.ttf";
+                                 japanese.size = 25.0;
     markup_t math      = normal; math.family = f_math;
 
     normal.font = font_manager_get_from_markup( font_manager, &normal );
@@ -154,7 +168,7 @@ void init()
                         &small,     "Now is the time for all good men "
                                     "to come to the aid of the party.\n",
                         &italic,    "Ég get etið gler án þess að meiða mig.\n",
-                        &japanese,  "私はガラスを食べられます。 それは私を傷つけません\n",
+                        &japanese,  "aaa张私はガラスを食べられます。 それは私を傷つけません\n",
                         &math,      "ℕ ⊆ ℤ ⊂ ℚ ⊂ ℝ ⊂ ℂ",
                         NULL );
 
@@ -303,7 +317,7 @@ int main( int argc, char **argv )
     glfwWindowHint( GLFW_VISIBLE, GL_FALSE );
     glfwWindowHint( GLFW_RESIZABLE, GL_FALSE );
 
-    window = glfwCreateWindow( 500, 220, argv[0], NULL, NULL );
+    window = glfwCreateWindow( 1000, 500, argv[0], NULL, NULL );
 
     if (!window)
     {
@@ -332,14 +346,14 @@ int main( int argc, char **argv )
     init();
 
     glfwShowWindow( window );
-    reshape( window, 500, 220 );
+    reshape( window, 1000, 500 );
 
     while(!glfwWindowShouldClose( window ))
     {
         float start=(float)(glfwGetTime()*1000.0f);
         display( window );
         glfwPollEvents( );
-        printf("waste_time: %f\n", (float)(glfwGetTime()*1000.0f)-start);
+        ///printf("waste_time: %f\n", (float)(glfwGetTime()*1000.0f)-start);
 
         if (screenshot_path)
         {

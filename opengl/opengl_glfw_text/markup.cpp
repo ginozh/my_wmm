@@ -44,7 +44,8 @@ GLuint text_shader;
 
 // ------------------------------------------------------ match_description ---
 char *
-match_description( char * description )
+//match_description( char * description )
+match_description( const char * face, bool bold=false, bool italic=false )
 {
 
 #if (defined(_WIN32) || defined(_WIN64)) && !defined(__MINGW32__)
@@ -55,7 +56,16 @@ match_description( char * description )
 
     char *filename = 0;
     FcInit();
-    FcPattern *pattern = FcNameParse((const FcChar8*)description);
+    //FcPattern *pattern = FcNameParse((const FcChar8*)description);
+    FcPattern *pattern = FcPatternCreate();
+    if(!pattern)
+    {
+        fprintf( stderr, "fontconfig error: could not match face '%s'", face );
+        return 0;
+    }
+    FcPatternAddString(pattern, FC_FAMILY, (const FcChar8*)face);
+    FcPatternAddInteger(pattern, FC_WEIGHT, bold?FC_WEIGHT_BOLD:FC_WEIGHT_REGULAR);
+    FcPatternAddInteger(pattern, FC_SLANT, italic?FC_SLANT_ITALIC:FC_SLANT_ROMAN);
     FcConfigSubstitute( 0, pattern, FcMatchPattern );
     FcDefaultSubstitute( pattern );
     FcResult result;
@@ -64,7 +74,7 @@ match_description( char * description )
 
     if ( !match )
     {
-        fprintf( stderr, "fontconfig error: could not match description '%s'", description );
+        fprintf( stderr, "fontconfig error: could not match face '%s'", face );
         return 0;
     }
     else
@@ -73,7 +83,7 @@ match_description( char * description )
         FcResult result = FcPatternGet( match, FC_FILE, 0, &value );
         if ( result )
         {
-            fprintf( stderr, "fontconfig error: could not match description '%s'", description );
+            fprintf( stderr, "fontconfig error: could not match face '%s'", face );
         }
         else
         {
@@ -99,20 +109,24 @@ void init()
     vec4 none   = {{1.0, 1.0, 1.0, 0.0}};
 
     //char *f_normal   = match_description("Vera:size=50");
-    char *f_normal   = match_description("sans\\-serif:size=50");
-    //char *f_bold     = match_description("Droid Serif:size=24:weight=bold"); //core?
-    char *f_bold     = match_description("sans\\-serif:size=24");
-    char *f_italic   = match_description("sans\\-serif:size=24:slant=italic");
+    char *f_normal   = match_description("Arial");
+    char *f_bold     = match_description("Arial", true);
+    //char *f_bold     = match_description("sans\\-serif:size=24");
+    char *f_italic   = match_description("sans\\-serif", false, true);
+    //char *f_italic   = match_description("SimSun", false, true);
     //char *f_japanese = match_description("Droid Sans:size=18:lang=ja");
     //char *f_japanese = match_description("sans-serif:size=18:lang=zh");
     //char *f_japanese = match_description("sans\\-serif:size=18:lang=zh\\-CN");
     //char *f_japanese = match_description("FZLanTingHeiS\\-UL\\-GB:size=18:lang=zh\\-CN"); //ok
     //char *f_japanese = match_description("FZLanTingHeiS\\-UL\\-GB"); //ok
     //char *f_japanese = match_description("Yu Gothic UI Semibold"); //ok
-    char *f_japanese = match_description("jj:size=18:lang=zh\\-CN"); //ok
-    char *f_math     = match_description("DejaVu Sans:size=24");
-    printf("init. f_normal: %s f_bold: %s f_italic: %s f_japanese: %s f_math: %s\n"
-            , f_normal, f_bold, f_italic, f_japanese, f_math);
+    //char *f_japanese = match_description("jj:size=18"); //ok
+    //char *f_japanese = match_description("Brush Script MT"); //ok
+    char *f_japanese = match_description("Microsoft JhengHei UI"); //ok
+    //char *f_japanese = match_description("华文隶书:size=28:lang=zh\\-CN"); //no
+    char *f_math     = match_description("DejaVu Sans");
+    printf("init. f_normal: %s f_bold: %s f_italic: %s f_japanese: %s f_math: %s\n" , f_normal, f_bold, f_italic, f_japanese, f_math);
+    //printf("init. f_japanese: %s\n" , f_japanese);
 
     //exit(0);
     markup_t normal = {
@@ -143,7 +157,7 @@ void init()
     //markup_t japanese  = normal; japanese.family = "c:/qtproject/opengl/freetype-gl/fonts/fireflysung.ttf";
                                  japanese.size = 25.0;
     markup_t math      = normal; math.family = f_math;
-
+#if 1
     normal.font = font_manager_get_from_markup( font_manager, &normal );
     highlight.font = font_manager_get_from_markup( font_manager, &highlight );
     reverse.font = font_manager_get_from_markup( font_manager, &reverse );
@@ -155,8 +169,12 @@ void init()
     italic.font = font_manager_get_from_markup( font_manager, &italic );
     japanese.font = font_manager_get_from_markup( font_manager, &japanese );
     math.font = font_manager_get_from_markup( font_manager, &math );
+#else
+    japanese.font = font_manager_get_from_markup( font_manager, &japanese );
+#endif
 
     vec2 pen = {{20, 200}};
+#if 1
     text_buffer_printf( buffer, &pen,
                         &underline, "The",
                         &normal,    " Quick",
@@ -171,6 +189,11 @@ void init()
                         &japanese,  "aaa张私はガラスを食べられます。 それは私を傷つけません\n",
                         &math,      "ℕ ⊆ ℤ ⊂ ℚ ⊂ ℝ ⊂ ℂ",
                         NULL );
+#else
+    text_buffer_printf( buffer, &pen,
+                        &japanese,  "Brush Script MT张私はガラスを食べられます。 それは私を傷つけません\n",
+                        NULL );
+#endif
 
     glGenTextures( 1, &font_manager->atlas->id );
     glBindTexture( GL_TEXTURE_2D, font_manager->atlas->id );
@@ -181,6 +204,8 @@ void init()
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, font_manager->atlas->width,
                   font_manager->atlas->height, 0, GL_RGB, GL_UNSIGNED_BYTE,
                   font_manager->atlas->data );
+    printf("init font_manager->atlas->width: %d font_manager->atlas->height: %d\n"
+            , font_manager->atlas->width, font_manager->atlas->height);
 
     text_buffer_align( buffer, &pen, ALIGN_CENTER );
 
@@ -343,17 +368,19 @@ int main( int argc, char **argv )
     fprintf( stderr, "Using GLEW %s\n", glewGetString(GLEW_VERSION) );
 #endif
 
+    float start=(float)(glfwGetTime()*1000.0f);
     init();
+    ////printf("init waste_time: %f\n", (float)(glfwGetTime()*1000.0f)-start);
 
     glfwShowWindow( window );
     reshape( window, 1000, 500 );
 
     while(!glfwWindowShouldClose( window ))
     {
-        float start=(float)(glfwGetTime()*1000.0f);
+        start=(float)(glfwGetTime()*1000.0f);
         display( window );
         glfwPollEvents( );
-        printf("waste_time: %f\n", (float)(glfwGetTime()*1000.0f)-start);
+        ///printf("waste_time: %f\n", (float)(glfwGetTime()*1000.0f)-start);
 
         if (screenshot_path)
         {

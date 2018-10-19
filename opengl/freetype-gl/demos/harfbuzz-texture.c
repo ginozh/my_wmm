@@ -24,7 +24,7 @@
 const char *texts[NUM_EXAMPLES] = {
     "Ленивый рыжий кот",
     "كسول الزنجبيل القط",
-    "懶惰的姜貓",
+    "aa懶惰的姜貓",
 };
 
 const hb_direction_t text_directions[NUM_EXAMPLES] = {
@@ -51,6 +51,7 @@ const char *fonts[NUM_EXAMPLES] = {
     "fonts/Liberastika-Regular.ttf",
     "fonts/amiri-regular.ttf",
     "fonts/fireflysung.ttf",
+    //"c:/Windows/Fonts/arial.ttf",
 };
 
 enum {
@@ -124,18 +125,20 @@ void init( void )
     FT_Face ft_face[NUM_EXAMPLES];
     assert(!FT_New_Face( ft_library, fonts[ENGLISH], 0, &ft_face[ENGLISH]) );
     assert(!FT_Set_Char_Size( ft_face[ENGLISH], 0, ptSize, device_hdpi, device_vdpi ) );
-    // ftfdump( ft_face[ENGLISH] );            // wonderful world of encodings ...
+    ftfdump( ft_face[ENGLISH] );            // wonderful world of encodings ...
     force_ucs2_charmap( ft_face[ENGLISH] ); // which we ignore.
 
     assert( !FT_New_Face(ft_library, fonts[ARABIC], 0, &ft_face[ARABIC]) );
     assert( !FT_Set_Char_Size(ft_face[ARABIC], 0, ptSize, device_hdpi, device_vdpi ) );
-    // ftfdump( ft_face[ARABIC] );
+    ftfdump( ft_face[ARABIC] );
     force_ucs2_charmap( ft_face[ARABIC] );
 
+    float start=(float)(glfwGetTime()*1000.0f);
     assert(!FT_New_Face( ft_library, fonts[CHINESE], 0, &ft_face[CHINESE]) );
     assert(!FT_Set_Char_Size( ft_face[CHINESE], 0, ptSize, device_hdpi, device_vdpi ) );
-    // ftfdump( ft_face[CHINESE] );
     force_ucs2_charmap( ft_face[CHINESE] );
+    printf("waste_time: %f\n", (float)(glfwGetTime()*1000.0f)-start);
+    ftfdump( ft_face[CHINESE] );
 
     /* Get our harfbuzz font structs */
     hb_font_t *hb_ft_font[NUM_EXAMPLES];
@@ -148,6 +151,7 @@ void init( void )
 
     for (i=0; i < NUM_EXAMPLES; ++i)
     {
+        float start=(float)(glfwGetTime()*1000.0f);
         hb_buffer_set_direction( buf, text_directions[i] ); /* or LTR */
         hb_buffer_set_script( buf, scripts[i] ); /* see hb-unicode.h */
         hb_buffer_set_language( buf,
@@ -230,6 +234,7 @@ void init( void )
 
         /* clean up the buffer, but don't kill it just yet */
         hb_buffer_reset(buf);
+        printf("init waste_time: %f\n", (float)(glfwGetTime()*1000.0f)-start);
     }
 
 

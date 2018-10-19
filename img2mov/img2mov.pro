@@ -10,9 +10,9 @@ CONFIG += c++11
 
 INCLUDEPATH += C:\qtproject\ffmpeg-3.0.2
 #QMAKE_CFLAGS += -D__STDC_CONSTANT_MACROS -static-libgcc -static-libstdc++ -ggdb
-QMAKE_CFLAGS += -D__STDC_CONSTANT_MACROS
+QMAKE_CFLAGS += -D__STDC_CONSTANT_MACROS -fpermissive
 #QMAKE_CXXFLAGS += -D__STDC_CONSTANT_MACROS -static-libgcc -static-libstdc++ -ggdb
-QMAKE_CXXFLAGS += -D__STDC_CONSTANT_MACROS
+QMAKE_CXXFLAGS += -D__STDC_CONSTANT_MACROS -fpermissive
 DEFINES += __STDC_FORMAT_MACROS
 #LIBS += -L C:\qtproject\ffmpeg-3.0.2
 LIBS += -lavcodec

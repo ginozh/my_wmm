@@ -480,6 +480,7 @@ texture_font_load_glyph( texture_font_t * self,
         FT_Done_FreeType( library );
         return 0;
     }
+    FT_GlyphSlot_Oblique(face->glyph);
 
     if( self->rendermode == RENDER_NORMAL || self->rendermode == RENDER_SIGNED_DISTANCE_FIELD )
     {
@@ -629,6 +630,7 @@ cleanup_stroker:
 
     // Discard hinting to get advance
     FT_Load_Glyph( face, glyph_index, FT_LOAD_RENDER | FT_LOAD_NO_HINTING);
+    FT_GlyphSlot_Oblique(face->glyph);
     slot = face->glyph;
     glyph->advance_x = slot->advance.x / HRESf;
     glyph->advance_y = slot->advance.y / HRESf;

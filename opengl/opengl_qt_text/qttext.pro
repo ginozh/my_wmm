@@ -39,7 +39,9 @@ LIBS += c:/shareproject/MovieMakeAdvance/libffmpeg_64/lib/libavformat.a \
         -lxml2-2 -lmodplug-1 -lrtmp-1 -lgmp-10 -lgnutls-30 -lhogweed-4 -lnettle-6 \
         -lidn2-0 -lp11-kit-0 -lffi-6 -ltasn1-6 -lwsock32 -lWs2_32 -lz \
         -lSecur32 -lfdk-aac -lxvidcore \
-        x86/rasterizer.o x86/blend_bitmaps.o x86/blur.o x86/cpuid.o
+
+
+#        x86/rasterizer.o x86/blend_bitmaps.o x86/blur.o x86/cpuid.o
 LIBS += -lSDL2
 
 SOURCES +=  \
@@ -114,8 +116,13 @@ HEADERS  +=  \
     GraphicsScene.h \
     OpenGLView.h \
 
-
-DISTFILES += \
+QMAKE_EXTRA_COMPILERS += nasm
+NASMEXTRAFLAGS = -DARCH_X86_64=1 -DPIC -f win64 -DHAVE_ALIGNED_STACK=1 -DHAVE_CPUNOP=0 -Dprivate_prefix=ass
+OTHER_FILES += $$NASM_SOURCES
+nasm.output = x86/${QMAKE_FILE_BASE}.o
+nasm.commands = nasm $$NASMEXTRAFLAGS -o x86/${QMAKE_FILE_BASE}.o ${QMAKE_FILE_NAME}
+nasm.input = NASM_SOURCES
+NASM_SOURCES += \
     x86/be_blur.asm \
     x86/blend_bitmaps.asm \
     x86/blur.asm \

@@ -19,17 +19,18 @@ void testArg();
 void testMemoryLeak();
 void testDouble();
 void testSharePtr();
-void testLevelDB();
+////void testLevelDB();
 void testInt();
 void testSacle();
 void testCppVirtual();
+void testGetSamplesPerFrame();
 
 int main(int argc, char *argv[])
 {
 	cout << "programe start" << endl;
     QCoreApplication a(argc, argv);
 
-    testCppVirtual();
+    //testCppVirtual();
     // testSacle();
 
     //testInt();
@@ -50,11 +51,14 @@ int main(int argc, char *argv[])
 
     // createASpeed();
 
+    testGetSamplesPerFrame();
+
     //qDebug()<<"qLn: "<<qLn(10)<<" qPow: "<<qPow(3.3,2);
 
 	cout << "programe end" << endl;
     return 0;//a.exec();
 }
+#if 0
 #include "leveldb/db.h"
 #include "leveldb/write_batch.h"
 #include "leveldb/slice.h"
@@ -80,7 +84,7 @@ void testLevelDB()
         cout << "testLevelDB error status is not ok" << endl;
     }
 }
-
+#endif
 class A {
 public:
 	A() {
@@ -427,4 +431,43 @@ void testCppVirtual()
     mmobject->setTimeline(100);
     qDebug()<<"base->getTimeline v: "<<base->getTimeline();
     qDebug()<<"base->v v: "<<base->v;
+}
+int GetSamplesPerFrame(int64_t number, float fps, int sample_rate, int m)
+{
+	double fps_rate = (double)1/(double)fps;
+
+	double previous_samples = ((double)sample_rate * fps_rate) * ((double)number - 1);
+	double previous_samples_remainder = fmod(previous_samples, (double)m); // subtract the remainder to the total (to make it evenly divisible)
+	previous_samples -= previous_samples_remainder;
+
+	// Determine the current samples total, and make sure it's evenly divisible by the # of m(16)
+	double total_samples = ((double)sample_rate * fps_rate) * (double)number;
+	double total_samples_remainder = fmod(total_samples, (double)m); // subtract the remainder to the total (to make it evenly divisible)
+	total_samples -= total_samples_remainder;
+
+	// Subtract the previous frame's total samples with this frame's total samples.  Not all sample rates can
+	// be evenly divided into frames, so each frame can have have different # of samples.
+	int samples_per_frame = round(total_samples - previous_samples);
+	return samples_per_frame;
+}
+void testGetSamplesPerFrame()
+{
+	cout <<endl;
+    int64_t total=3013;
+    int64_t totalsamples=0;
+    float fps=29.97f;
+    int sample_rate=44100;
+    int channels=16;
+    for(int64_t number=1; number<=total; number++)
+    {
+        int samples_per_frame=GetSamplesPerFrame(number, fps, sample_rate, channels);
+        totalsamples+=samples_per_frame;
+        cout <<samples_per_frame<<" ";
+    }
+	cout <<endl;
+    cout <<"samples_per_frame: "<<(float)totalsamples/total<<" totalsamples: "<<totalsamples
+        <<" totalframes: "<<total
+        <<" sample_rate/fps: "<<(float)sample_rate/fps
+        <<" sample_rate: "<<sample_rate
+        <<" fps: "<<fps<<endl;
 }

@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <math.h>
-#include "opengl.h"
+//#include "opengl.h"
 #include "text-buffer.h"
 #include "utf8-utils.h"
 
