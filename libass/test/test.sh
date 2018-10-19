@@ -6,4 +6,4 @@
 @description: 
 COMMENT
 
-./test.exe a.jpg test.ass 1
+./test.exe a.png test.ass 1
