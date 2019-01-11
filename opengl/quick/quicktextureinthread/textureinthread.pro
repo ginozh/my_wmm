@@ -1,10 +1,15 @@
-QT += quick
+QT += widgets quick
 
 # To make threaded gl check...
 QT += core-private gui-private
 
-HEADERS += threadrenderer.h
-SOURCES += threadrenderer.cpp main.cpp
+HEADERS += threadrenderer.h \
+    mainwindow.h\
+
+
+SOURCES += threadrenderer.cpp main.cpp \
+    mainwindow.cpp \
+
 
 INCLUDEPATH += ../shared
 HEADERS += ../shared/logorenderer.h

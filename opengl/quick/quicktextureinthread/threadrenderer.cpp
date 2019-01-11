@@ -11,9 +11,10 @@
 
 #include <QtQuick/QQuickWindow>
 #include <qsgsimpletexturenode.h>
+#include <QDebug>
 
 QList<QThread *> ThreadRenderer::threads;
-//#define USE_LOGO
+#define USE_LOGO
 /*
  * The render thread shares a context with the scene graph and will
  * render into two separate FBOs, one to use for display and one
@@ -56,6 +57,7 @@ public slots:
 #endif
         }
 
+        qDebug()<<"RenderThread::renderNext m_displayFbo->texture(): "<<m_displayFbo->texture();
         m_renderFbo->bind();
         context->functions()->glViewport(0, 0, m_size.width(), m_size.height());
 
