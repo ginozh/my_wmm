@@ -9,6 +9,7 @@
 MainWindow::MainWindow()
 {
     setWindowTitle("qtquick test");
+    qDebug()<<"MainWindow::MainWindow";
     qmlRegisterType<ThreadRenderer>("SceneGraphRendering", 1, 0, "Renderer");
     m_quickView=new QQuickView;
     m_quickView->setPersistentOpenGLContext(true);

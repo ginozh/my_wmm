@@ -14,7 +14,7 @@
 #include <QDebug>
 
 QList<QThread *> ThreadRenderer::threads;
-#define USE_LOGO
+//#define USE_LOGO
 /*
  * The render thread shares a context with the scene graph and will
  * render into two separate FBOs, one to use for display and one
@@ -34,6 +34,7 @@ public:
 #endif
         , m_size(size)
     {
+        qDebug()<<"RenderThread::RenderThread";
         ThreadRenderer::threads << this;
     }
 
@@ -43,6 +44,7 @@ public:
 public slots:
     void renderNext()
     {
+        qDebug()<<"RenderThread::renderNext";
         context->makeCurrent(surface);
 
         if (!m_renderFbo) {
@@ -78,6 +80,7 @@ public slots:
 
     void shutDown()
     {
+        qDebug()<<"RenderThread::shutDown";
         context->makeCurrent(surface);
         delete m_renderFbo;
         delete m_displayFbo;
@@ -121,6 +124,9 @@ public:
         , m_texture(0)
         , m_window(window)
     {
+        qDebug()<<"TextureNode::TextureNode";
+        connect(window, &QQuickWindow::beforeRendering, this, &TextureNode::maybeRotate);
+        connect(window, &QQuickWindow::frameSwapped, this, &TextureNode::maybeUpdate);
         // Our texture node must have a texture, so use the default 0 texture.
         m_texture = m_window->createTextureFromId(0, QSize(1, 1));
         setTexture(m_texture);
@@ -141,6 +147,7 @@ public slots:
     // This function gets called on the FBO rendering thread and will store the
     // texture id and size and schedule an update on the window.
     void newTexture(int id, const QSize &size) {
+        qDebug()<<"TextureNode::newTexture id: "<<id;
         m_mutex.lock();
         m_id = id;
         m_size = size;
@@ -154,6 +161,7 @@ public slots:
 
     // Before the scene graph starts to render, we update to the pending texture
     void prepareNode() {
+        qDebug()<<"TextureNode::prepareNode m_id: "<<m_id;
         m_mutex.lock();
         int newId = m_id;
         QSize size = m_size;
@@ -173,6 +181,12 @@ public slots:
             emit textureInUse();
         }
     }
+    void maybeRotate() {
+        qDebug()<<"TextureNode::maybeRotate beforeRendering";
+    }
+    void maybeUpdate() {
+        qDebug()<<"TextureNode::maybeUpdate frameSwapped";
+    }
 
 private:
 
@@ -188,13 +202,15 @@ private:
 ThreadRenderer::ThreadRenderer()
     : m_renderThread(0)
 {
+    qDebug()<<"ThreadRenderer::ThreadRenderer";
     setFlag(ItemHasContents, true);
     m_renderThread = new RenderThread(QSize(512, 512));
 }
 
 void ThreadRenderer::ready()
 {
-    m_renderThread->surface = new QOffscreenSurface();
+    qDebug()<<"ThreadRenderer::ready";
+    m_renderThread->surface = new QOffscreenSurface(); //new by gui-thread 
     m_renderThread->surface->setFormat(m_renderThread->context->format());
     m_renderThread->surface->create();
 
@@ -204,10 +220,12 @@ void ThreadRenderer::ready()
 
     m_renderThread->start();
     update();
+    qDebug()<<"ThreadRenderer::ready update";
 }
 
 QSGNode *ThreadRenderer::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
+    qDebug()<<"ThreadRenderer::updatePaintNode";
     TextureNode *node = static_cast<TextureNode *>(oldNode);
 
     if (!m_renderThread->context) {
@@ -222,15 +240,20 @@ QSGNode *ThreadRenderer::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *
         m_renderThread->context->setShareContext(current);
         m_renderThread->context->create();
         m_renderThread->context->moveToThread(m_renderThread);
+        qDebug()<<"ThreadRenderer::updatePaintNode new openglcontext";
 
         current->makeCurrent(window());
 
-        QMetaObject::invokeMethod(this, "ready");
+        QMetaObject::invokeMethod(this, "ready"); //=> guithread
+        //QMetaObject::invokeMethod(this, "ready", Qt::AutoConnection);
+        //QMetaObject::invokeMethod(this, "ready", Qt::QueuedConnection);
+        //ready();
         return 0;
     }
 
     if (!node) {
         node = new TextureNode(window());
+        qDebug()<<"ThreadRenderer::updatePaintNode new TextureNode";
 
         /* Set up connections to get the production of FBO textures in sync with vsync on the
          * rendering thread.
