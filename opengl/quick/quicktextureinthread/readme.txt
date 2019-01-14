@@ -48,6 +48,7 @@ mythread:
         context->makeCurrent(surface);
         if (!m_renderFbo) {new QOpenGLFramebufferObject;}
         m_renderFbo->bind();
+        m_logoRenderer->render();
         context->functions()->glFlush();
         qSwap(m_renderFbo, m_displayFbo);
         emit textureReady(m_displayFbo->texture(), m_size); 

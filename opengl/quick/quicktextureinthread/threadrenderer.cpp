@@ -14,7 +14,7 @@
 #include <QDebug>
 
 QList<QThread *> ThreadRenderer::threads;
-//#define USE_LOGO
+#define USE_LOGO
 /*
  * The render thread shares a context with the scene graph and will
  * render into two separate FBOs, one to use for display and one
@@ -44,6 +44,7 @@ public:
 public slots:
     void renderNext()
     {
+        ////QThread::msleep(5000);
         qDebug()<<"RenderThread::renderNext";
         context->makeCurrent(surface);
 
@@ -59,7 +60,7 @@ public slots:
 #endif
         }
 
-        qDebug()<<"RenderThread::renderNext m_displayFbo->texture(): "<<m_displayFbo->texture();
+        qDebug()<<"RenderThread::renderNext m_renderFbo->texture(): "<<m_renderFbo->texture();
         m_renderFbo->bind();
         context->functions()->glViewport(0, 0, m_size.width(), m_size.height());
 
