@@ -1,6 +1,7 @@
 #include "threadrenderer.h"
 
 #include <QDebug>
+#define USE_LOGO
 
 QList<QThread *> ThreadRenderer::threads;
 /*
@@ -79,13 +80,21 @@ QSGNode *ThreadRenderer::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *
          *
          * This FBO rendering pipeline is throttled by vsync on the scene graph rendering thread.
          */
-        connect(m_renderThread, &RenderThread::textureReady, node, &TextureNode::newTexture, Qt::DirectConnection);
-        connect(node, &TextureNode::pendingNewTexture, window(), &QQuickWindow::update, Qt::QueuedConnection);
-        connect(window(), &QQuickWindow::beforeRendering, node, &TextureNode::prepareNode, Qt::DirectConnection);
-        connect(node, &TextureNode::textureInUse, m_renderThread, &RenderThread::renderNext, Qt::QueuedConnection);
+        //connect(m_renderThread, &RenderThread::textureReady, node, &TextureNode::newTexture, Qt::DirectConnection);
+        m_renderThread->node=node;
+        //connect(node, &TextureNode::pendingNewTexture, window(), &QQuickWindow::update, Qt::QueuedConnection);
+        connect(m_renderThread, &RenderThread::pendingNewTexture, window(), &QQuickWindow::update, Qt::QueuedConnection);
+        //connect(window(), &QQuickWindow::beforeRendering, node, &TextureNode::prepareNode, Qt::DirectConnection);
+        connect(window(), &QQuickWindow::beforeRendering, m_renderThread, &RenderThread::beforeRenderingSlot, Qt::DirectConnection);
+        //connect(node, &TextureNode::textureInUse, m_renderThread, &RenderThread::renderNext, Qt::QueuedConnection);
+        //=>run for
+        connect(window(), &QQuickWindow::frameSwapped, m_renderThread, &RenderThread::frameSwappedSlot, Qt::DirectConnection);
 
         // Get the production of FBO textures started..
-        QMetaObject::invokeMethod(m_renderThread, "renderNext", Qt::QueuedConnection);
+        //QMetaObject::invokeMethod(m_renderThread, "renderNext", Qt::QueuedConnection);
+        //=>run for 
+        //m_renderThread->conditionAsynPause.wakeOne();
+        m_renderThread->m_allready=true;
     }
 
     node->setRect(boundingRect());
@@ -96,10 +105,8 @@ RenderThread::RenderThread(const QSize &size)
     : surface(0)
     , context(0)
     , m_renderFbo(0)
-      , m_displayFbo(0)
-#ifdef USE_LOGO
-      , m_logoRenderer(0)
-#endif
+    , m_displayFbo(0)
+    , m_logoRenderer(0)
 , m_size(size)
 {
     qDebug()<<"RenderThread::RenderThread";
@@ -127,9 +134,7 @@ void RenderThread::renderNext()
     m_renderFbo->bind();
     context->functions()->glViewport(0, 0, m_size.width(), m_size.height());
 
-#ifdef USE_LOGO
-    m_logoRenderer->render();
-#endif
+    if(m_logoRenderer) m_logoRenderer->render();
 
     // We need to flush the contents to the FBO before posting
     // the texture to the other thread, otherwise, we might
@@ -139,18 +144,63 @@ void RenderThread::renderNext()
     m_renderFbo->bindDefault();
     qSwap(m_renderFbo, m_displayFbo);
 
-    emit textureReady(m_displayFbo->texture(), m_size);
+    //emit textureReady(m_displayFbo->texture(), m_size);
+    if(node)
+    {
+        node->newTexture(m_displayFbo->texture(), m_size);
+
+        // We cannot call QQuickWindow::update directly here, as this is only allowed
+        // from the rendering thread or GUI thread.
+        emit pendingNewTexture();
+        qDebug()<<"RenderThread::renderNext all texture is ready. update QQuickWindow";
+    }
+    else
+        qInfo()<<"RenderThread::renderNext error. node is null";
+}
+void RenderThread::beforeRenderingSlot() 
+{
+    if(node){
+        bool bNodeTextureInUse=node->prepareNode(); //是否可以被renderthread显示在gpu上了?
+        qDebug()<<"RenderThread::beforeRenderingSlot bNodeTextureInUse: "<<bNodeTextureInUse;
+    }
+}
+
+void RenderThread::frameSwappedSlot() 
+{
+    qDebug()<<"RenderThread::frameSwappedSlot";
 }
 
 void RenderThread::shutDown()
 {
     qDebug()<<"RenderThread::shutDown";
+    abort=true;
+}
+
+#if 1
+void RenderThread::run()
+{
+    qDebug()<<"RenderThread::run";
+    //wait
+    while(!m_allready)
+    {
+        QThread::msleep(100);
+    }
+#if 0
+    mutexAsynPause.lock();
+    conditionAsynPause.wait(&(mutexAsynPause));
+    mutexAsynPause.unlock();
+#endif
+    qDebug()<<"RenderThread::run wait after";
+    while(!abort)
+    {
+        renderNext();
+        QThread::msleep(10);
+    }
+
     context->makeCurrent(surface);
     delete m_renderFbo;
     delete m_displayFbo;
-#ifdef USE_LOGO
-    delete m_logoRenderer;
-#endif
+    if(m_logoRenderer) delete m_logoRenderer;
     context->doneCurrent();
     delete context;
 
@@ -161,6 +211,7 @@ void RenderThread::shutDown()
     exit();
     moveToThread(QGuiApplication::instance()->thread());
 }
+#endif
 
 TextureNode::TextureNode(QQuickWindow *window)
     : m_id(0)
@@ -169,8 +220,8 @@ TextureNode::TextureNode(QQuickWindow *window)
       , m_window(window)
 {
     qDebug()<<"TextureNode::TextureNode";
-    connect(window, &QQuickWindow::beforeRendering, this, &TextureNode::maybeRotate);
-    connect(window, &QQuickWindow::frameSwapped, this, &TextureNode::maybeUpdate);
+    ///connect(window, &QQuickWindow::beforeRendering, this, &TextureNode::maybeRotate);
+    //connect(window, &QQuickWindow::frameSwapped, this, &TextureNode::maybeUpdate);
     // Our texture node must have a texture, so use the default 0 texture.
     m_texture = m_window->createTextureFromId(0, QSize(1, 1));
     setTexture(m_texture);
@@ -188,15 +239,11 @@ void TextureNode::newTexture(int id, const QSize &size)
     m_id = id;
     m_size = size;
     m_mutex.unlock();
-
-    // We cannot call QQuickWindow::update directly here, as this is only allowed
-    // from the rendering thread or GUI thread.
-    emit pendingNewTexture();
 }
 
 
 // Before the scene graph starts to render, we update to the pending texture
-void TextureNode::prepareNode() 
+bool TextureNode::prepareNode() 
 {
     qDebug()<<"TextureNode::prepareNode m_id: "<<m_id;
     m_mutex.lock();
@@ -215,17 +262,19 @@ void TextureNode::prepareNode()
 
         // This will notify the rendering thread that the texture is now being rendered
         // and it can start rendering to the other one.
-        emit textureInUse();
+        ///emit textureInUse();
+        return true;
     }
+    return false;
 }
-
+#if 0
 void TextureNode::maybeRotate() 
 {
     qDebug()<<"TextureNode::maybeRotate beforeRendering";
 }
-
 void TextureNode::maybeUpdate() 
 {
     qDebug()<<"TextureNode::maybeUpdate frameSwapped";
 }
+#endif
 
