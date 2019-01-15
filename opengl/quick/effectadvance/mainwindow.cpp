@@ -5,12 +5,14 @@
 #include <QApplication>
 #include "mainwindow.h"
 #include "threadrenderer.h"
+#include "textbox.h"
 
 MainWindow::MainWindow()
 {
     setWindowTitle("qtquick test");
     qDebug()<<"MainWindow::MainWindow";
     qmlRegisterType<ThreadRenderer>("SceneGraphRendering", 1, 0, "Renderer");
+    qmlRegisterType<TextBox>("TextBoxPlugin", 1, 0, "TextBox");
     m_quickView=new QQuickView;
     m_quickView->setPersistentOpenGLContext(true);
     m_quickView->setPersistentSceneGraph(true);
@@ -23,7 +25,7 @@ MainWindow::MainWindow()
             this, &MainWindow::quickViewStatusChanged);
     connect(m_quickView, &QQuickWindow::sceneGraphError,
             this, &MainWindow::sceneGraphError);
-    m_quickView->setSource(QUrl(QStringLiteral("qrc:///scenegraph/textureinthread/main.qml")));
+    m_quickView->setSource(QUrl(QStringLiteral("qrc:///main.qml")));
 
     QWidget *container = QWidget::createWindowContainer(m_quickView);
     container->setMinimumSize(m_quickView->size());

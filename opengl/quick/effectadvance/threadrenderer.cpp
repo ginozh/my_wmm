@@ -118,18 +118,6 @@ void RenderThread::renderNext()
     qDebug()<<"RenderThread::renderNext";
     context->makeCurrent(surface);
 
-    if (!m_renderFbo) {
-        // Initialize the buffers and renderer
-        QOpenGLFramebufferObjectFormat format;
-        format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
-        m_renderFbo = new QOpenGLFramebufferObject(m_size, format);
-        m_displayFbo = new QOpenGLFramebufferObject(m_size, format);
-#ifdef USE_LOGO
-        m_logoRenderer = new LogoRenderer();
-        m_logoRenderer->initialize();
-#endif
-    }
-
     qDebug()<<"RenderThread::renderNext m_renderFbo->texture(): "<<m_renderFbo->texture();
     m_renderFbo->bind();
     context->functions()->glViewport(0, 0, m_size.width(), m_size.height());
@@ -191,6 +179,19 @@ void RenderThread::run()
     mutexAsynPause.unlock();
 #endif
     qDebug()<<"RenderThread::run wait after";
+    if (!m_renderFbo) {
+        context->makeCurrent(surface);
+        // Initialize the buffers and renderer
+        QOpenGLFramebufferObjectFormat format;
+        format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+        m_renderFbo = new QOpenGLFramebufferObject(m_size, format);
+        m_displayFbo = new QOpenGLFramebufferObject(m_size, format);
+#ifdef USE_LOGO
+        m_logoRenderer = new LogoRenderer();
+        m_logoRenderer->initialize();
+#endif
+        context->doneCurrent();
+    }
     while(!abort)
     {
         renderNext();

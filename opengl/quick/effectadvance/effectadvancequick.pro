@@ -4,11 +4,13 @@ QT += widgets quick
 QT += core-private gui-private
 
 HEADERS += threadrenderer.h \
-    mainwindow.h\
+    mainwindow.h \
+    textbox.h \
 
 
 SOURCES += threadrenderer.cpp main.cpp \
     mainwindow.cpp \
+    textbox.cpp \
 
 
 INCLUDEPATH += ../shared

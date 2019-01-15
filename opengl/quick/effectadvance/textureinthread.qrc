@@ -1,6 +1,7 @@
 <RCC>
-    <qresource prefix="/scenegraph/textureinthread">
+    <qresource>
         <file>main.qml</file>
         <file>error.qml</file>
+        <file>lineedit-bg.png</file>
     </qresource>
 </RCC>

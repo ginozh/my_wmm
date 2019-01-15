@@ -39,7 +39,7 @@ int main(int argc, char **argv)
 
     if (!QGuiApplicationPrivate::platform_integration->hasCapability(QPlatformIntegration::ThreadedOpenGL)) {
         QQuickView view;
-        view.setSource(QUrl("qrc:///scenegraph/textureinthread/error.qml"));
+        view.setSource(QUrl("qrc:///error.qml"));
         view.show();
         return app.exec();
     }
