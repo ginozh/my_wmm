@@ -37,7 +37,15 @@ MainWindow::MainWindow()
 
     layout->addWidget(new QLineEdit(QStringLiteral("A QLineEdit")));
     layout->addWidget(container);
-    layout->addWidget(new QLineEdit(QStringLiteral("A QLineEdit")));
+    m_lineEdit=new QLineEdit(QStringLiteral("red"));
+    layout->addWidget(m_lineEdit);
+    m_pbAdd = new QPushButton("add color");
+    layout->addWidget(m_pbAdd);
+    connect(m_pbAdd, &QAbstractButton::clicked, [=]() {
+            //QMetaObject::invokeMethod(m_currentRootObject, "performLayerBasedGrab",Q_ARG(QVariant, fd.selectedFiles().first()));
+            //quickwidgets/quickwidget/main.cpp
+            QMetaObject::invokeMethod(m_currentRootObject, "addNewText",Q_ARG(QVariant, m_lineEdit->text().trimmed()));
+            });
     setCentralWidget(centralWidget);
 
     QMenu *fileMenu = menuBar()->addMenu(tr("File"));

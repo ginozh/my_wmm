@@ -3,6 +3,7 @@
 #include <QMainWindow>
 #include <QVBoxLayout>
 #include <QLineEdit>
+#include <QPushButton>
 #include <QQmlError>
 #include <QQuickView>
 class MainWindow : public QMainWindow
@@ -17,6 +18,8 @@ private slots:
 private:
     QQuickView *m_quickView;
     QObject *m_currentRootObject;
+    QLineEdit *m_lineEdit;
+    QAbstractButton* m_pbAdd;
 };
 
 #endif
