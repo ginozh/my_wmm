@@ -16,6 +16,7 @@ private slots:
 
 private:
     QQuickView *m_quickView;
+    QObject *m_currentRootObject;
 };
 
 #endif

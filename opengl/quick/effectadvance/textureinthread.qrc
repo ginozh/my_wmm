@@ -1,7 +1,10 @@
 <RCC>
     <qresource>
         <file>main.qml</file>
+        <file>ListDelegate.qml</file>
+        <file>TextEntry.qml</file>
         <file>error.qml</file>
         <file>lineedit-bg.png</file>
+        <file>remove.png</file>
     </qresource>
 </RCC>

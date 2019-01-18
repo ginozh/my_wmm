@@ -6,11 +6,13 @@ QT += core-private gui-private
 HEADERS += threadrenderer.h \
     mainwindow.h \
     textbox.h \
+    dynamicentrymodel.h \
 
 
 SOURCES += threadrenderer.cpp main.cpp \
     mainwindow.cpp \
     textbox.cpp \
+    dynamicentrymodel.cpp \
 
 
 INCLUDEPATH += ../shared

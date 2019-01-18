@@ -6,6 +6,7 @@
 #include "mainwindow.h"
 #include "threadrenderer.h"
 #include "textbox.h"
+#include "dynamicentrymodel.h"
 
 MainWindow::MainWindow()
 {
@@ -13,6 +14,7 @@ MainWindow::MainWindow()
     qDebug()<<"MainWindow::MainWindow";
     qmlRegisterType<ThreadRenderer>("SceneGraphRendering", 1, 0, "Renderer");
     qmlRegisterType<TextBox>("TextBoxPlugin", 1, 0, "TextBox");
+    qmlRegisterType<DynamicEntryModel>("org.example", 1, 0, "DynamicEntryModel");
     m_quickView=new QQuickView;
     m_quickView->setPersistentOpenGLContext(true);
     m_quickView->setPersistentSceneGraph(true);
@@ -26,6 +28,8 @@ MainWindow::MainWindow()
     connect(m_quickView, &QQuickWindow::sceneGraphError,
             this, &MainWindow::sceneGraphError);
     m_quickView->setSource(QUrl(QStringLiteral("qrc:///main.qml")));
+
+    m_currentRootObject = m_quickView->rootObject();
 
     QWidget *container = QWidget::createWindowContainer(m_quickView);
     container->setMinimumSize(m_quickView->size());
