@@ -14,9 +14,12 @@
                    d)fbo->texture设置到TextureNode
 3, 文字帧
     c++控制(quick\quickwidgets\qquickviewcomparison):
-    3.1 新建、显示、不可见、销毁，
+    3.1 新建、销毁，
+        c++调用qml函数: quick/quickwidgets/quickwidget
         /c/qtproject/opengl/qmlbook/docs/ch16-qtcpp/src/modelview
-    3.2 动态修改文字属性
+    3.2 显示、不可见
+        quickcontrols/controls/tableview
+    3.3 动态修改文字属性
         动态属性: quick/quickwidgets/qquickviewcomparison
 
         阴影: DropShadow

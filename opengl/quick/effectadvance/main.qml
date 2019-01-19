@@ -4,6 +4,7 @@ import QtQuick.Controls 1.4
 import SceneGraphRendering 1.0
 // our module
 import org.example 1.0
+import org.qtproject.example 1.0
 
 Item {
     id: box
@@ -38,6 +39,7 @@ Item {
         model: dynamic
         delegate: ListDelegate 
         {
+            visible:model.name!="#ff0000"?true:false
             x:200
             width: 200;//ListView.view.width
             // construct a string based on the models proeprties
@@ -59,5 +61,9 @@ Item {
     function addNewText(txt) {
         print('new text: ' + txt);
         dynamic.append(txt);
+    }
+    function modify(color) {
+        print('modify color: ' + color);
+        dynamic.modify(color);
     }
 }

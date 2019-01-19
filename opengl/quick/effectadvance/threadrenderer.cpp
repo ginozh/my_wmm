@@ -115,10 +115,10 @@ RenderThread::RenderThread(const QSize &size)
 void RenderThread::renderNext()
 {
     ////QThread::msleep(5000);
-    qDebug()<<"RenderThread::renderNext";
+    ////qDebug()<<"RenderThread::renderNext";
     context->makeCurrent(surface);
 
-    qDebug()<<"RenderThread::renderNext m_renderFbo->texture(): "<<m_renderFbo->texture();
+    ////qDebug()<<"RenderThread::renderNext m_renderFbo->texture(): "<<m_renderFbo->texture();
     m_renderFbo->bind();
     context->functions()->glViewport(0, 0, m_size.width(), m_size.height());
 
@@ -140,7 +140,7 @@ void RenderThread::renderNext()
         // We cannot call QQuickWindow::update directly here, as this is only allowed
         // from the rendering thread or GUI thread.
         emit pendingNewTexture();
-        qDebug()<<"RenderThread::renderNext all texture is ready. update QQuickWindow";
+        ////qDebug()<<"RenderThread::renderNext all texture is ready. update QQuickWindow";
     }
     else
         qInfo()<<"RenderThread::renderNext error. node is null";
@@ -149,13 +149,13 @@ void RenderThread::beforeRenderingSlot()
 {
     if(node){
         bool bNodeTextureInUse=node->prepareNode(); //是否可以被renderthread显示在gpu上了?
-        qDebug()<<"RenderThread::beforeRenderingSlot bNodeTextureInUse: "<<bNodeTextureInUse;
+        ////qDebug()<<"RenderThread::beforeRenderingSlot bNodeTextureInUse: "<<bNodeTextureInUse;
     }
 }
 
 void RenderThread::frameSwappedSlot() 
 {
-    qDebug()<<"RenderThread::frameSwappedSlot";
+    ////qDebug()<<"RenderThread::frameSwappedSlot";
 }
 
 void RenderThread::shutDown()
@@ -235,7 +235,7 @@ TextureNode::~TextureNode()
 }
 void TextureNode::newTexture(int id, const QSize &size) 
 {
-    qDebug()<<"TextureNode::newTexture id: "<<id;
+    ////qDebug()<<"TextureNode::newTexture id: "<<id;
     m_mutex.lock();
     m_id = id;
     m_size = size;
@@ -246,7 +246,7 @@ void TextureNode::newTexture(int id, const QSize &size)
 // Before the scene graph starts to render, we update to the pending texture
 bool TextureNode::prepareNode() 
 {
-    qDebug()<<"TextureNode::prepareNode m_id: "<<m_id;
+    ////qDebug()<<"TextureNode::prepareNode m_id: "<<m_id;
     m_mutex.lock();
     int newId = m_id;
     QSize size = m_size;

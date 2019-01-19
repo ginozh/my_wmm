@@ -7,6 +7,7 @@
 #include "threadrenderer.h"
 #include "textbox.h"
 #include "dynamicentrymodel.h"
+#include "sortfilterproxymodel.h"
 
 MainWindow::MainWindow()
 {
@@ -15,6 +16,7 @@ MainWindow::MainWindow()
     qmlRegisterType<ThreadRenderer>("SceneGraphRendering", 1, 0, "Renderer");
     qmlRegisterType<TextBox>("TextBoxPlugin", 1, 0, "TextBox");
     qmlRegisterType<DynamicEntryModel>("org.example", 1, 0, "DynamicEntryModel");
+    qmlRegisterType<SortFilterProxyModel>("org.qtproject.example", 1, 0, "SortFilterProxyModel");
     m_quickView=new QQuickView;
     m_quickView->setPersistentOpenGLContext(true);
     m_quickView->setPersistentSceneGraph(true);
@@ -45,6 +47,15 @@ MainWindow::MainWindow()
             //QMetaObject::invokeMethod(m_currentRootObject, "performLayerBasedGrab",Q_ARG(QVariant, fd.selectedFiles().first()));
             //quickwidgets/quickwidget/main.cpp
             QMetaObject::invokeMethod(m_currentRootObject, "addNewText",Q_ARG(QVariant, m_lineEdit->text().trimmed()));
+            });
+    m_lineEditM=new QLineEdit(QStringLiteral("red"));
+    layout->addWidget(m_lineEditM);
+    m_pbM = new QPushButton("modify color");
+    layout->addWidget(m_pbM);
+    connect(m_pbM, &QAbstractButton::clicked, [=]() {
+            //QMetaObject::invokeMethod(m_currentRootObject, "performLayerBasedGrab",Q_ARG(QVariant, fd.selectedFiles().first()));
+            //quickwidgets/quickwidget/main.cpp
+            QMetaObject::invokeMethod(m_currentRootObject, "modify",Q_ARG(QVariant, m_lineEditM->text().trimmed()));
             });
     setCentralWidget(centralWidget);
 

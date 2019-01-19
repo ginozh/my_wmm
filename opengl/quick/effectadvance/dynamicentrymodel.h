@@ -24,6 +24,7 @@ public:
     Q_INVOKABLE void remove(int index);
     Q_INVOKABLE void clear();
     Q_INVOKABLE QColor get(int index);
+    Q_INVOKABLE void modify(const QString& colorValue);
 public: // interface QAbstractListModel
     virtual int rowCount(const QModelIndex &parent) const;
     virtual QVariant data(const QModelIndex &index, int role) const;

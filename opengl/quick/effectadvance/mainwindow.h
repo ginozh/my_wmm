@@ -20,6 +20,8 @@ private:
     QObject *m_currentRootObject;
     QLineEdit *m_lineEdit;
     QAbstractButton* m_pbAdd;
+    QLineEdit *m_lineEditM;
+    QAbstractButton* m_pbM;
 };
 
 #endif

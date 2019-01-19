@@ -1,4 +1,5 @@
 #include "dynamicentrymodel.h"
+#include<QDebug>
 
 DynamicEntryModel::DynamicEntryModel(QObject *parent)
     : QAbstractListModel(parent)
@@ -26,6 +27,22 @@ void DynamicEntryModel::insert(int index, const QString &colorValue)
     m_data.insert(index, color);
     emit endInsertRows();
     emit countChanged(m_data.count());
+}
+
+void DynamicEntryModel::modify(const QString &colorValue)
+{
+    int index=0;
+    if(index < 0 || index > m_data.count()) {
+        return;
+    }
+    QColor color(colorValue);
+    if(!color.isValid()) {
+        return;
+    }
+    m_data[index]=color;
+    qDebug()<<"DynamicEntryModel::modify index: "<<index<<" color: "<<color;
+    QModelIndex topLeft = createIndex(0,0);
+    emit QAbstractListModel::dataChanged(topLeft, topLeft);
 }
 
 void DynamicEntryModel::append(const QString &colorValue)
@@ -68,7 +85,8 @@ int DynamicEntryModel::rowCount(const QModelIndex &parent) const
 QVariant DynamicEntryModel::data(const QModelIndex &index, int role) const
 {
     int row = index.row();
-    if(row < 0 || row >= m_data.count()) {
+    if(row < 0 || row >= m_data.count()) 
+    {
         return QVariant();
     }
     const QColor& color = m_data.at(row);
