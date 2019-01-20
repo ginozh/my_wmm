@@ -18,8 +18,11 @@
         c++调用qml函数: quick/quickwidgets/quickwidget
         /c/qtproject/opengl/qmlbook/docs/ch16-qtcpp/src/modelview
     3.2 显示、不可见
-        quickcontrols/controls/tableview
+        view visible:model.name!="#ff0000"?true:false
+        emit QAbstractListModel::dataChanged(topLeft, topLeft);
+        //quickcontrols/controls/tableview
     3.3 动态修改文字属性
+        font众多属性: quickcontrols/controls/texteditor
         动态属性: quick/quickwidgets/qquickviewcomparison
 
         阴影: DropShadow

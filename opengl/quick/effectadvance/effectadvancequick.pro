@@ -7,14 +7,14 @@ HEADERS += threadrenderer.h \
     mainwindow.h \
     textbox.h \
     dynamicentrymodel.h \
-    sortfilterproxymodel.h \
+    documenthandler.h \
 
 
 SOURCES += threadrenderer.cpp main.cpp \
     mainwindow.cpp \
     textbox.cpp \
     dynamicentrymodel.cpp \
-    sortfilterproxymodel.cpp \
+    documenthandler.cpp \
 
 
 INCLUDEPATH += ../shared

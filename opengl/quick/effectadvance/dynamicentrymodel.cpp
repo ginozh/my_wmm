@@ -1,53 +1,124 @@
-#include "dynamicentrymodel.h"
 #include<QDebug>
+#include<QJsonObject>
+#include<QJsonDocument>
+#include "dynamicentrymodel.h"
+
+ST_TextInfo::ST_TextInfo()
+{
+    visible=true;
+    posx=posy=0;
+}
 
 DynamicEntryModel::DynamicEntryModel(QObject *parent)
     : QAbstractListModel(parent)
 {
-    m_roleNames[NameRole] = "name";
-    m_roleNames[HueRole] = "hue";
-    m_roleNames[SaturationRole] = "saturation";
-    m_roleNames[BrightnessRole] = "brightness";
+    m_roleNames[VisibleRole] = "visible";
+    m_roleNames[PosXRole] = "posx";
+    m_roleNames[PosYRole] = "posy";
+    m_roleNames[TextRole] = "text";
+    m_roleNames[ColorRole] = "color";
 }
 
 DynamicEntryModel::~DynamicEntryModel()
 {
 }
 
-void DynamicEntryModel::insert(int index, const QString &colorValue)
+void DynamicEntryModel::insert(int index, const QString &textInfo)
 {
     if(index < 0 || index > m_data.count()) {
+        qInfo()<<"DynamicEntryModel::insert error index: "<<index<<" m_data.count: "<<m_data.count();
         return;
     }
-    QColor color(colorValue);
+    QJsonObject jsonObj;
+    QJsonDocument doc = QJsonDocument::fromJson(textInfo.toUtf8());
+    if(doc.isNull())
+    {
+        qInfo()<<"DynamicEntryModel::insert error. doc is null. data: "<<textInfo;
+        return;
+    }
+    if(!doc.isObject())
+    {
+        qInfo()<<"DynamicEntryModel::insert error. doc is not object . data: "<<textInfo;
+        return;
+    }
+    jsonObj = doc.object(); 
+    if(!jsonObj.contains("posx") || !jsonObj["posx"].isDouble() 
+            || !jsonObj.contains("posy") ||!jsonObj["posy"].isDouble()
+            || !jsonObj.contains("text") ||!jsonObj["text"].isString() || jsonObj["text"].toString().isEmpty()
+            || !jsonObj.contains("color") ||!jsonObj["color"].isString() || jsonObj["color"].toString().isEmpty()
+      )
+    {
+        qInfo()<<"DynamicEntryModel::insert error no posx or posy or text or color. index: "<<index
+            <<" textInfo: "<<textInfo;
+        return;
+    }
+#define ASSIGN_PROPERTY(name, totype, type) do{ \
+    if(jsonObj.contains(#name) && jsonObj[#name].is##totype()) \
+    { \
+        stTextInfo.name=(type)jsonObj[#name].to##totype(); \
+    } \
+}while(0);
+    ST_TextInfo stTextInfo;
+    ASSIGN_PROPERTY(posx, Double, int);
+    ASSIGN_PROPERTY(posy, Double, int);
+    ASSIGN_PROPERTY(text, String, QString);
+    ASSIGN_PROPERTY(color, String, QString);
+
+    QColor color(stTextInfo.color);
     if(!color.isValid()) {
+        qInfo()<<"DynamicEntryModel::insert error. color is isvalid. stTextInfo.color: "<<stTextInfo.color
+            <<" textInfo: "<<textInfo;
         return;
     }
+    stTextInfo.qcolor=color;
     emit beginInsertRows(QModelIndex(), index, index);
-    m_data.insert(index, color);
+    m_data.insert(index, stTextInfo);
     emit endInsertRows();
     emit countChanged(m_data.count());
 }
 
-void DynamicEntryModel::modify(const QString &colorValue)
+void DynamicEntryModel::modify(int index, const QString &textInfo)
 {
-    int index=0;
     if(index < 0 || index > m_data.count()) {
+        qInfo()<<"DynamicEntryModel::modify error. index: "<<index<<" m_data.count: "<<m_data.count();
         return;
     }
-    QColor color(colorValue);
+    QJsonObject jsonObj;
+    QJsonDocument doc = QJsonDocument::fromJson(textInfo.toUtf8());
+    if(doc.isNull())
+    {
+        qInfo()<<"DynamicEntryModel::modify error. doc is null. data: "<<textInfo;
+        return;
+    }
+    if(!doc.isObject())
+    {
+        qInfo()<<"DynamicEntryModel::modify error. doc is not object . data: "<<textInfo;
+        return;
+    }
+    jsonObj = doc.object(); 
+    ST_TextInfo stTextInfo=m_data[index];
+    ASSIGN_PROPERTY(posx, Double, int);
+    ASSIGN_PROPERTY(posy, Double, int);
+    ASSIGN_PROPERTY(text, String, QString);
+    ASSIGN_PROPERTY(color, String, QString);
+
+    QColor color(stTextInfo.color);
     if(!color.isValid()) {
+        qInfo()<<"DynamicEntryModel::modify error. color is isvalid. stTextInfo.color: "<<stTextInfo.color
+            <<" textInfo: "<<textInfo;
         return;
     }
-    m_data[index]=color;
+    stTextInfo.qcolor=color;
+
+    m_data[index]=stTextInfo;
     qDebug()<<"DynamicEntryModel::modify index: "<<index<<" color: "<<color;
-    QModelIndex topLeft = createIndex(0,0);
+    QModelIndex topLeft = createIndex(index,index);
     emit QAbstractListModel::dataChanged(topLeft, topLeft);
 }
 
-void DynamicEntryModel::append(const QString &colorValue)
+void DynamicEntryModel::append(const QString &textInfo)
 {
-    insert(count(), colorValue);
+    insert(count(), textInfo);
 }
 
 void DynamicEntryModel::remove(int index)
@@ -67,7 +138,7 @@ void DynamicEntryModel::clear()
     m_data.clear();
     emit endResetModel();
 }
-
+#if 0
 QColor DynamicEntryModel::get(int index)
 {
     if(index < 0 || index >= m_data.count()) {
@@ -75,6 +146,7 @@ QColor DynamicEntryModel::get(int index)
     }
     return m_data.at(index);
 }
+#endif
 
 int DynamicEntryModel::rowCount(const QModelIndex &parent) const
 {
@@ -89,20 +161,18 @@ QVariant DynamicEntryModel::data(const QModelIndex &index, int role) const
     {
         return QVariant();
     }
-    const QColor& color = m_data.at(row);
+    const ST_TextInfo& stTextInfo = m_data.at(row);
     switch(role) {
-    case NameRole:
-        // return the color name as hex string (model.name)
-        return color.name();
-    case HueRole:
-        // return the hue of the color (model.hue)
-        return color.hueF();
-    case SaturationRole:
-        // return the saturation of the color (model.saturation)
-        return color.saturationF();
-    case BrightnessRole:
-        // return the brightness of the color (model.brightness)
-        return color.lightnessF();
+    case VisibleRole:
+        return stTextInfo.visible;
+    case PosXRole:
+        return stTextInfo.posx;
+    case PosYRole:
+        return stTextInfo.posy;
+    case TextRole:
+        return stTextInfo.text;
+    case ColorRole:
+        return stTextInfo.qcolor;
     }
     return QVariant();
 }

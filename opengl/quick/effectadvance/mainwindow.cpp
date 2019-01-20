@@ -7,7 +7,7 @@
 #include "threadrenderer.h"
 #include "textbox.h"
 #include "dynamicentrymodel.h"
-#include "sortfilterproxymodel.h"
+#include "documenthandler.h"
 
 MainWindow::MainWindow()
 {
@@ -16,7 +16,8 @@ MainWindow::MainWindow()
     qmlRegisterType<ThreadRenderer>("SceneGraphRendering", 1, 0, "Renderer");
     qmlRegisterType<TextBox>("TextBoxPlugin", 1, 0, "TextBox");
     qmlRegisterType<DynamicEntryModel>("org.example", 1, 0, "DynamicEntryModel");
-    qmlRegisterType<SortFilterProxyModel>("org.qtproject.example", 1, 0, "SortFilterProxyModel");
+    //qmlRegisterType<SortFilterProxyModel>("org.qtproject.example", 1, 0, "SortFilterProxyModel");
+    qmlRegisterType<DocumentHandler>("org.qtproject.example", 1, 0, "DocumentHandler");
     m_quickView=new QQuickView;
     m_quickView->setPersistentOpenGLContext(true);
     m_quickView->setPersistentSceneGraph(true);
@@ -39,23 +40,33 @@ MainWindow::MainWindow()
 
     layout->addWidget(new QLineEdit(QStringLiteral("A QLineEdit")));
     layout->addWidget(container);
-    m_lineEdit=new QLineEdit(QStringLiteral("red"));
+    m_lineEdit=new QLineEdit(QStringLiteral("{\"posx\":200, \"posy\":0, \"text\":\"hello,world\",\"color\":\"red\"}"));
     layout->addWidget(m_lineEdit);
     m_pbAdd = new QPushButton("add color");
     layout->addWidget(m_pbAdd);
     connect(m_pbAdd, &QAbstractButton::clicked, [=]() {
             //QMetaObject::invokeMethod(m_currentRootObject, "performLayerBasedGrab",Q_ARG(QVariant, fd.selectedFiles().first()));
             //quickwidgets/quickwidget/main.cpp
-            QMetaObject::invokeMethod(m_currentRootObject, "addNewText",Q_ARG(QVariant, m_lineEdit->text().trimmed()));
+            QVariant retVal;
+            QMetaObject::invokeMethod(m_currentRootObject, "addNewText"
+                    ,Q_RETURN_ARG(QVariant, retVal)
+                    ,Q_ARG(QVariant, m_lineEdit->text().trimmed())
+                    //,Q_ARG(QVariant, QString("{\"posx\":200, \"posy\":0, \"text\":\"hello,world\",\"color\":\"red\"}"))
+                    );
+            qDebug()<<"addNewText retVal: "<<retVal.toInt();
             });
-    m_lineEditM=new QLineEdit(QStringLiteral("red"));
+    m_lineEditI=new QLineEdit(QStringLiteral("0"));
+    layout->addWidget(m_lineEditI);
+    m_lineEditM=new QLineEdit(QStringLiteral("{\"posx\":200, \"posy\":0, \"text\":\"hello,world\",\"color\":\"red\"}"));
     layout->addWidget(m_lineEditM);
-    m_pbM = new QPushButton("modify color");
+    m_pbM = new QPushButton("modify index color. red means disappear");
     layout->addWidget(m_pbM);
     connect(m_pbM, &QAbstractButton::clicked, [=]() {
             //QMetaObject::invokeMethod(m_currentRootObject, "performLayerBasedGrab",Q_ARG(QVariant, fd.selectedFiles().first()));
             //quickwidgets/quickwidget/main.cpp
-            QMetaObject::invokeMethod(m_currentRootObject, "modify",Q_ARG(QVariant, m_lineEditM->text().trimmed()));
+            QMetaObject::invokeMethod(m_currentRootObject, "modify"
+                    ,Q_ARG(QVariant, m_lineEditI->text().trimmed())
+                    ,Q_ARG(QVariant, m_lineEditM->text().trimmed()));
             });
     setCentralWidget(centralWidget);
 

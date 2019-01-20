@@ -28,7 +28,7 @@ Item {
         onCountChanged: {
             // we print out count and the last entry when count is changing
             print('new count: ' + count);
-            print('last entry: ' + get(count-1));
+            ///print('last entry: ' + get(count-1));
         }
     }
     //view
@@ -39,31 +39,49 @@ Item {
         model: dynamic
         delegate: ListDelegate 
         {
-            visible:model.name!="#ff0000"?true:false
-            x:200
-            width: 200;//ListView.view.width
+            visible:model.visible
+            x:model.posx
+            y:model.posy
+            //width: 200;//ListView.view.width
             // construct a string based on the models proeprties
-            text: model.name
+            text: model.text
             // sets the font color of our custom delegates
-            color: model.name
+            color: model.color
+            horizontalAlignment: TextEdit.AlignHCenter
+            font.family: "宋体"
+            font.pointSize: 20
+            font.letterSpacing: 0.9
+            font.bold: true
+            font.underline: true
+            font.strikeout : true
+            font.italic : true
 
-            onClicked: {
+            onClicked: { //<=> ListDelegate signal clicked()
                 // make this delegate the current item
+                print('Repeater onClicked');
                 view.currentIndex = index
                 view.focus = true
             }
+/*
             onRemove: {
                 // remove the current entry from the model
                 dynamic.remove(index)
             }
+*/
         }
     }
-    function addNewText(txt) {
+    function addNewText(txt) { //json
         print('new text: ' + txt);
         dynamic.append(txt);
+        return dynamic.count-1;
     }
-    function modify(color) {
-        print('modify color: ' + color);
-        dynamic.modify(color);
+    function modify(idx, txt) { //json
+        print('modify txt: ' + txt);
+        dynamic.modify(idx, txt);
+    }
+    function disappear(txt) { //json: [idx, idx]
+    }
+    function remove(index) {
+        dynamic.remove(index);
     }
 }
