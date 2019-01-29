@@ -11,6 +11,7 @@ Item {
     ///property alias currentText: textlabel.text
     width: 400
     height: 400
+    signal textChanged(string msg)
 
     Renderer {
         id: renderer
@@ -58,7 +59,7 @@ Item {
 
             onClicked: { //<=> ListDelegate signal clicked()
                 // make this delegate the current item
-                print('Repeater onClicked');
+                print('Repeater onClicked index: '+index);
                 view.currentIndex = index
                 view.focus = true
             }

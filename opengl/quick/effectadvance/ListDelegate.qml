@@ -1,4 +1,5 @@
-import QtQuick 2.5
+import QtQuick 2.7
+import QtQuick.Controls 2.1
 import QtQuick.Layouts 1.2
 import TextBoxPlugin 1.0
 import QtGraphicalEffects 1.0
@@ -24,6 +25,7 @@ Item {
         Component.onCompleted: forceActiveFocus()
 		TextBox {
 			//customitems/painteditem/textballoons.qml
+            id: textbox
             anchors.fill: parent
 			width: parent.width
 			height: parent.height
@@ -35,9 +37,15 @@ Item {
             //onClicked: { parent.focus = true }
             onClicked: { 
                 parent.forceActiveFocus(); 
+                textbox.visible=true;
+                parent.clicked();
                 //view.clicked();
                 print('TextEdit onClicked');
             }
+        }
+        onEditingFinished:  {
+            box.textChanged(textlabel.text); 
+            textbox.visible=false;
         }
     }
 }

@@ -1,4 +1,4 @@
-QT += widgets quick
+QT += widgets quick opengl
 
 # To make threaded gl check...
 QT += core-private gui-private
@@ -16,6 +16,8 @@ SOURCES += threadrenderer.cpp main.cpp \
     dynamicentrymodel.cpp \
     documenthandler.cpp \
 
+
+LIBS += -lopengl32
 
 INCLUDEPATH += ../shared
 HEADERS += ../shared/logorenderer.h

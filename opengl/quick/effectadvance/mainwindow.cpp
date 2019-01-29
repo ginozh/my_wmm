@@ -44,6 +44,7 @@ MainWindow::MainWindow()
     layout->addWidget(m_lineEdit);
     m_pbAdd = new QPushButton("add color");
     layout->addWidget(m_pbAdd);
+    connect((QObject *)m_currentRootObject, SIGNAL(textChanged(QString)), this, SLOT(textChanged(QString)));
     connect(m_pbAdd, &QAbstractButton::clicked, [=]() {
             //QMetaObject::invokeMethod(m_currentRootObject, "performLayerBasedGrab",Q_ARG(QVariant, fd.selectedFiles().first()));
             //quickwidgets/quickwidget/main.cpp
@@ -82,10 +83,17 @@ void MainWindow::quickViewStatusChanged(QQuickView::Status status)
         for (const QQmlError &error : viewErrors)
             errors.append(error.toString());
         statusBar()->showMessage(errors.join(QStringLiteral(", ")));
+        qInfo()<<"MainWindow::quickViewStatusChanged error. errors: "<<errors.join(QStringLiteral(", "));
     }
 }
 
 void MainWindow::sceneGraphError(QQuickWindow::SceneGraphError, const QString &message)
 {
     statusBar()->showMessage(message);
+    qInfo()<<"MainWindow::sceneGraphError error. message: "<<message;
+}
+
+void MainWindow::textChanged(QString text)
+{
+    qDebug()<<"MainWindow::textChanged text: "<<text;
 }

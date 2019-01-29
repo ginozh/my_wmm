@@ -23,6 +23,10 @@ QFile outFile(LOG_FILE);
 void myMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString & str);
 int main(int argc, char **argv)
 {
+    qputenv("QT_LOGGING_RULES", "qt.qpa.gl=true");
+    //qputenv("QT_OPENGL", "angle");
+    ///qputenv("QT_ANGLE_PLATFORM", "d3d9");
+    ///QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
     ///QGuiApplication app(argc, argv); //error
     QApplication app(argc, argv);
 
@@ -36,14 +40,14 @@ int main(int argc, char **argv)
     qInstallMessageHandler(myMessageHandler);
 
     qSetMessagePattern("[%{time yyyyMMdd h:mm:ss.zzz} %{if-debug}D%{endif}%{if-info}I%{endif}%{if-warning}W%{endif}%{if-critical}C%{endif}%{if-fatal}F%{endif}] %{file}:%{line} - %{message}");
-
+#if 1
     if (!QGuiApplicationPrivate::platform_integration->hasCapability(QPlatformIntegration::ThreadedOpenGL)) {
         QQuickView view;
         view.setSource(QUrl("qrc:///error.qml"));
         view.show();
         return app.exec();
     }
-
+#endif
     MainWindow mainWindow;
     //const QRect availableGeometry = QApplication::desktop()->availableGeometry(&mainWindow);
     //mainWindow.resize(availableGeometry.width() , availableGeometry.height() );
