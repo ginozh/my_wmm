@@ -145,6 +145,7 @@ Item {
                 //sourceItem: textlabelItem
                 //sourceItem: sourceRed
                 sourceItem: textlabel
+                //sourceItem: image
                 //hideSource: true
                 //live: true
             }
@@ -235,5 +236,16 @@ Item {
 		id: textrecttheSource
 		//sourceItem: textrect
 		sourceItem: textlabel
-	}
+    }
+    Image {
+        id: image
+        //anchors.fill: mask
+        //source: "qrc:rotate.jpg"
+        source: "qrc:rotate1.jpg"
+    }
+    ShaderEffectSource {
+        id: sourceImage
+        hideSource: true
+        sourceItem: image
+    }
 }

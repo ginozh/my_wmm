@@ -4,5 +4,7 @@
         <file>ListDelegate.qml</file>
         <file>error.qml</file>
         <file>qmlMotionEffect.frag</file>
+        <file>rotate.jpg</file>
+        <file>rotate1.jpg</file>
     </qresource>
 </RCC>
