@@ -105,3 +105,9 @@ render_thread:
     emit QQuickWindow::frameSwapped()
     Frame is complete and on screen
     Advance Animations Even Processing etc.
+
+三、移动、旋转、缩放、透明
+vec2 curPos = u_curPos;// current position [(0.0,0.0),(1.0,1.0)]
+float CurRotate = u_CurRotate;//degree
+vec2 curScale = u_curScale ; //range [0,1]
+float alpha = u_alpha;//range [0,100]

@@ -48,4 +48,54 @@ Item {
             textbox.visible=false;
         }
     }
+	ShaderEffectSource {
+		id: textrecttheSource
+		sourceItem: textlabel
+    }
+	ShaderEffectSource {
+		id: sourceBlackSource
+		sourceItem: sourceBlack
+	}
+	Rectangle {
+		visible:false 
+		width: parent.width; height: parent.height
+        id: sourceBlack
+        color: "transparent"
+		//color: '#000000'
+	}
+	ShaderEffect {
+		//visible:false 
+		visible: true
+		id: effect2
+		width: parent.width; height: parent.height
+		// default vertex shader code
+		vertexShader: "
+		uniform highp mat4 qt_Matrix;
+		attribute highp vec4 qt_Vertex;
+		attribute highp vec2 qt_MultiTexCoord0;
+		varying highp vec2 qt_TexCoord0;
+		void main() {
+			qt_TexCoord0 = qt_MultiTexCoord0;
+			gl_Position = qt_Matrix * qt_Vertex;
+		}"
+        //property variant mSample0: theSource
+        property variant mSample0: sourceBlackSource;
+        property variant mSample1: textrecttheSource; //sourceImage;// textrecttheSource;// sourceBlack;// textrect;// textrect;// textlabel;// sourceImage
+        //property color tint: root.sliderToColor(colorizeSlider.value)
+        property real u_global_time: colorizeSlider.value
+        property real u_total_time: 100
+        fragmentShader: "qrc:qmlMotionEffect.frag"
+        //fragmentShader: "qrc:shadereffects/content/shaders/colorize1.frag"
+		// default fragment shader code
+        Slider {
+            id: colorizeSlider
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+			from: 1
+			value: 25
+			to: 100
+            height: 40
+        }
+	}
 }

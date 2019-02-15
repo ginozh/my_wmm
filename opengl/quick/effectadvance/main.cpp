@@ -51,10 +51,10 @@ int main(int argc, char **argv)
     MainWindow mainWindow;
     //const QRect availableGeometry = QApplication::desktop()->availableGeometry(&mainWindow);
     //mainWindow.resize(availableGeometry.width() , availableGeometry.height() );
-    mainWindow.resize(640, 360);
+    //mainWindow.resize(640, 360);
     //mainWindow.playerWidget->resize(6*availableGeometry.width() / 8, 6*availableGeometry.height() / 8);
-    //mainWindow.showMaximized();
-    mainWindow.show();
+    mainWindow.showMaximized();
+    //mainWindow.show();
 
     return app.exec();
 #if 0

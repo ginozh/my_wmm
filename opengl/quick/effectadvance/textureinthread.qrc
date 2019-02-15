@@ -3,5 +3,6 @@
         <file>main.qml</file>
         <file>ListDelegate.qml</file>
         <file>error.qml</file>
+        <file>qmlMotionEffect.frag</file>
     </qresource>
 </RCC>

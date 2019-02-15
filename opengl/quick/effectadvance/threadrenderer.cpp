@@ -1,7 +1,7 @@
 #include "threadrenderer.h"
 
 #include <QDebug>
-#define USE_LOGO
+//#define USE_LOGO
 
 QList<QThread *> ThreadRenderer::threads;
 /*

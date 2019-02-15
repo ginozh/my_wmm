@@ -15,6 +15,7 @@ private slots:
     void quickViewStatusChanged(QQuickView::Status);
     void sceneGraphError(QQuickWindow::SceneGraphError error, const QString &message);
     void textChanged(QString);
+    void processFirstThing();
 
 
 private:

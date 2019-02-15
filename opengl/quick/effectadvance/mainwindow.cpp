@@ -3,6 +3,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QApplication>
+#include <QTimer>
 #include "mainwindow.h"
 #include "threadrenderer.h"
 #include "textbox.h"
@@ -36,11 +37,12 @@ MainWindow::MainWindow()
 
     QWidget *container = QWidget::createWindowContainer(m_quickView);
     container->setMinimumSize(m_quickView->size());
+    container->setFixedSize(m_quickView->size());
     container->setFocusPolicy(Qt::TabFocus);
 
     layout->addWidget(new QLineEdit(QStringLiteral("A QLineEdit")));
     layout->addWidget(container);
-    m_lineEdit=new QLineEdit(QStringLiteral("{\"posx\":200, \"posy\":0, \"text\":\"hello,world\",\"color\":\"red\"}"));
+    m_lineEdit=new QLineEdit(QStringLiteral("{\"posx\":0, \"posy\":0, \"text\":\"hello,world\",\"color\":\"white\"}"));
     layout->addWidget(m_lineEdit);
     m_pbAdd = new QPushButton("add color");
     layout->addWidget(m_pbAdd);
@@ -73,6 +75,17 @@ MainWindow::MainWindow()
 
     QMenu *fileMenu = menuBar()->addMenu(tr("File"));
     fileMenu->addAction(tr("Quit"), qApp, &QCoreApplication::quit);
+
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(processFirstThing()));
+    timer->setSingleShot(true);
+    timer->start(1000);
+}
+
+void MainWindow::processFirstThing()
+{
+    qDebug()<<"MainWindow::processFirstThing";
+    m_pbAdd->click();
 }
 
 void MainWindow::quickViewStatusChanged(QQuickView::Status status)
