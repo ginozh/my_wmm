@@ -19,6 +19,8 @@
 class Project;
 class EffectControls;
 class Viewer;
+class ViewerWidget;
+class ViewerContainer;
 class Timeline;
 
 class MainWindow : public QMainWindow
@@ -35,6 +37,8 @@ protected:
 private slots:
 private:
     Viewer* m_Viewer;
+    ViewerWidget* m_viewer_widget;
+    ViewerContainer* viewer_container;
 };
 extern MainWindow* mainWindow;
 

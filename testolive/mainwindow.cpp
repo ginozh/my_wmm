@@ -16,6 +16,7 @@
 #include "ui/viewerwidget.h"
 #include "ui/sourceiconview.h"
 #include "ui/timelineheader.h"
+#include "ui/viewercontainer.h"
 
 #include "panels/panels.h"
 #include "panels/project.h"
@@ -82,9 +83,20 @@ MainWindow::MainWindow(QWidget *parent)
                 vbox->addWidget(lbl);
 
                 {
+#if 0
                     m_Viewer = new Viewer(this);
                     vbox->addWidget(m_Viewer);
-                    sequence_viewer = m_Viewer;
+                    viewer_widget = m_Viewer->viewer_widget;
+#elif 0
+                    m_viewer_widget = new ViewerWidget(NULL);
+                    vbox->addWidget(m_viewer_widget);
+                    viewer_widget = m_viewer_widget;
+#else
+                    viewer_container = new ViewerContainer(NULL);
+                    viewer_container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+                    vbox->addWidget(viewer_container);
+                    viewer_widget = viewer_container->child;
+#endif
                 }
                 {
                     QPushButton* m_pbmedia = new QPushButton("load");
@@ -92,7 +104,7 @@ MainWindow::MainWindow(QWidget *parent)
                     connect(m_pbmedia, &QAbstractButton::clicked, [=]() {
                             QString autorecovery="C:/Users/user/AppData/Roaming/olive-editor/autorecovery.ove";
                             init_effects();
-                            LoadThread* lt = new LoadThread(NULL, true);
+                            LoadThread* lt = new LoadThread(NULL, true); 
                             //QObject::connect(lt, SIGNAL(success()), this, SLOT(thread_done()));
                             //QObject::connect(lt, SIGNAL(error()), this, SLOT(die()));
                             //QObject::connect(lt, SIGNAL(report_progress(int)), bar, SLOT(setValue(int)));
@@ -103,8 +115,17 @@ MainWindow::MainWindow(QWidget *parent)
                     QPushButton* m_pbmedia = new QPushButton("update");
                     vbox->addWidget(m_pbmedia);
                     connect(m_pbmedia, &QAbstractButton::clicked, [=]() {
+#if 0
                             m_Viewer->set_main_sequence();
                             m_Viewer->update_viewer();
+#elif 0
+                            //loadthread=>success_func()=> set_sequence(open_seq);
+                            ///set_sequence(true, sequence); //project\sequence.cpp
+                            viewer_widget->frame_update();
+#else
+                            viewer_container->adjust();
+                            viewer_widget->frame_update();
+#endif
                             });
                 }
             }

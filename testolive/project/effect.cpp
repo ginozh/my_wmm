@@ -45,15 +45,19 @@
 #include <QtMath>
 #include <QMenu>
 #include <QApplication>
-Viewer* sequence_viewer = 0; //storm
+#include <QDebug>
+///Viewer* sequence_viewer = 0; //storm
+ViewerWidget* viewer_widget = 0; //storm
 bool shaders_are_enabled = true;
 QVector<EffectMeta> effects;
 
 Effect* create_effect(Clip* c, const EffectMeta* em) {
 	if (em->internal >= 0 && em->internal < EFFECT_INTERNAL_COUNT) {
+        qDebug()<<"effect.cpp::create_effect em->internal: "<<em->internal;
 		// must be an internal effect
 		switch (em->internal) {
 		case EFFECT_INTERNAL_TRANSFORM: return new TransformEffect(c, em);
+#if 0
 		case EFFECT_INTERNAL_TEXT: return new TextEffect(c, em);
 		case EFFECT_INTERNAL_TIMECODE: return new TimecodeEffect(c, em);
 		case EFFECT_INTERNAL_SOLID: return new SolidEffect(c, em);
@@ -69,6 +73,10 @@ Effect* create_effect(Clip* c, const EffectMeta* em) {
 #endif
 #ifndef NOFREI0R
 		case EFFECT_INTERNAL_FREI0R: return new Frei0rEffect(c, em);
+#endif
+#else
+		case EFFECT_INTERNAL_VOLUME: return new VolumeEffect(c, em);
+		case EFFECT_INTERNAL_PAN: return new PanEffect(c, em);
 #endif
 		}
 	} else if (!em->filename.isEmpty()) {
@@ -367,11 +375,13 @@ int Effect::gizmo_count() {
 void Effect::refresh() {}
 
 void Effect::field_changed() {
-	sequence_viewer->viewer_widget->frame_update();
+	//sequence_viewer->viewer_widget->frame_update();
+	viewer_widget->frame_update();
 	////panel_graph_editor->update_panel();
 }
 
 void Effect::show_context_menu(const QPoint& pos) {
+#if 0
 	if (meta->type == EFFECT_TYPE_EFFECT) {
 		QMenu menu(mainWindow);
 
@@ -394,27 +404,34 @@ void Effect::show_context_menu(const QPoint& pos) {
 
 		menu.exec(container->title_bar->mapToGlobal(pos));
 	}
+#endif
 }
 
 void Effect::delete_self() {
+#if 0
 	EffectDeleteCommand* command = new EffectDeleteCommand();
 	command->clips.append(parent_clip);
 	command->fx.append(get_index_in_clip());
 	undo_stack.push(command);
 	update_ui(true);
+#endif
 }
 
 void Effect::move_up() {
+#if 0
 	MoveEffectCommand* command = new MoveEffectCommand();
 	command->clip = parent_clip;
 	command->from = get_index_in_clip();
 	command->to = command->from - 1;
 	undo_stack.push(command);
 	panel_effect_controls->reload_clips();
-	sequence_viewer->viewer_widget->frame_update();
+	//sequence_viewer->viewer_widget->frame_update();
+#endif
+	viewer_widget->frame_update();
 }
 
 void Effect::move_down() {
+#if 0
 	MoveEffectCommand* command = new MoveEffectCommand();
 	command->clip = parent_clip;
 	command->from = get_index_in_clip();
@@ -422,6 +439,8 @@ void Effect::move_down() {
 	undo_stack.push(command);
 	panel_effect_controls->reload_clips();
 	panel_sequence_viewer->viewer_widget->frame_update();
+#endif
+	viewer_widget->frame_update();
 }
 
 int Effect::get_index_in_clip() {

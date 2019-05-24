@@ -53,8 +53,8 @@ int main(int argc, char *argv[]) {
 	//MainWindow w(nullptr, appName);
 	MainWindow w(nullptr);
 
-		w.showFullScreen();
-	//	w.showMaximized();
+		//w.showFullScreen();
+		w.showMaximized();
     //storm
     //av_log_set_level(AV_LOG_ERROR);
     //av_log_set_callback(my_log_callback);

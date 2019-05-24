@@ -34,7 +34,8 @@ struct EffectMeta {
 	int type;
 	int subtype;
 };
-class Viewer;extern Viewer* sequence_viewer; //storm
+///class Viewer;extern Viewer* sequence_viewer; //storm
+class ViewerWidget;extern ViewerWidget* viewer_widget; //storm
 extern bool shaders_are_enabled;
 extern QVector<EffectMeta> effects;
 
