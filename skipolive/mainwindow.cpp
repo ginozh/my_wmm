@@ -53,6 +53,7 @@ MainWindow::MainWindow(QWidget *parent)
                     m_viewer_widget = new OpenGLWidget(NULL);
                     vbox->addWidget(m_viewer_widget);
                     m_viewer_widget->setFixedSize(1280,720);
+                    //m_viewer_widget->setFixedSize(640,360);
                 }
                 {
                     QPushButton* m_pbmedia = new QPushButton("load");

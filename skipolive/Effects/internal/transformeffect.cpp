@@ -126,11 +126,11 @@ TransformEffect::TransformEffect(Clip* c, const EffectMeta* em) : Effect(c, em) 
 }
 
 void adjust_field(EffectField* field, double old_offset, double new_offset) {
-	if (field->keyframes.size() > 0) {
+	/*if (field->keyframes.size() > 0) {
 		for (int i=0;i<field->keyframes.size();i++) {
 			field->keyframes[i].data = field->keyframes.at(i).data.toDouble() - old_offset + new_offset;
 		}
-	} else {
+	} else*/ {
 		field->set_current_data(field->get_current_data().toDouble() - old_offset + new_offset);
 	}
 }

@@ -17,11 +17,11 @@
 //#include "ui/keyframenavigator.h"
 //#include "ui/clickablelabel.h"
 
-EffectRow::EffectRow(Effect *parent, bool save, QGridLayout *uilayout, const QString &n, int row, bool keyframable) :
+EffectRow::EffectRow(Effect *parent, bool save, void *uilayout, const QString &n, int row, bool keyframable) :
 	parent_effect(parent),
 	savable(save),
 	keyframing(false),
-	ui(uilayout),
+	//ui(uilayout),
 	name(n),
 	ui_row(row),
 	just_made_unsafe_keyframe(false)
@@ -162,24 +162,26 @@ EffectField* EffectRow::add_field(int type, const QString& id, int colspan) {
 	EffectField* field = new EffectField(this, type, id);
 	if (parent_effect->meta->type != EFFECT_TYPE_TRANSITION) connect(field, SIGNAL(clicked()), this, SLOT(focus_row()));
 	fields.append(field);
+#if 0
 	QWidget* element = field->get_ui_element();
 	ui->addWidget(element, ui_row, column_count, 1, colspan);
+#endif
 	column_count++;
 	connect(field, SIGNAL(changed()), parent_effect, SLOT(field_changed()));
 	return field;
 }
-
+#if 0
 void EffectRow::add_widget(QWidget* w) {
-	ui->addWidget(w, ui_row, column_count);
+	///ui->addWidget(w, ui_row, column_count);
 	column_count++;
 }
-
+#endif
 EffectRow::~EffectRow() {
 	for (int i=0;i<fields.size();i++) {
 		delete fields.at(i);
 	}
 }
-
+#if 0
 void EffectRow::set_keyframe_now(ComboAction* ca) {
 #if 0
 	long time = sequence->playhead-parent_effect->parent_clip->timeline_in+parent_effect->parent_clip->clip_in;
@@ -275,8 +277,9 @@ void EffectRow::set_keyframe_now(ComboAction* ca) {
 	panel_effect_controls->update_keyframes();*/
 #endif
 }
-
-void EffectRow::delete_keyframe_at_time(ComboAction* ca, long time) {
+#endif
+void EffectRow::delete_keyframe_at_time(void* ca, long time) {
+#if 0
 	for (int j=0;j<fieldCount();j++) {
 		EffectField* f = field(j);
 		for (int i=0;i<f->keyframes.size();i++) {
@@ -286,6 +289,7 @@ void EffectRow::delete_keyframe_at_time(ComboAction* ca, long time) {
 			}
 		}
 	}
+#endif
 }
 
 const QString &EffectRow::get_name() {

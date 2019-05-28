@@ -1,6 +1,5 @@
 #include "effectgizmo.h"
 
-#include "ui/labelslider.h"
 #include "effectfield.h"
 #include <QDebug>
 
@@ -24,10 +23,10 @@ EffectGizmo::EffectGizmo(int type) :
 }
 
 void EffectGizmo::set_previous_value() {
-    if (x_field1 != nullptr) static_cast<LabelSlider*>(x_field1->ui_element)->set_previous_value();
-    if (y_field1 != nullptr) static_cast<LabelSlider*>(y_field1->ui_element)->set_previous_value();
-    if (x_field2 != nullptr) static_cast<LabelSlider*>(x_field2->ui_element)->set_previous_value();
-    if (y_field2 != nullptr) static_cast<LabelSlider*>(y_field2->ui_element)->set_previous_value();
+    if (x_field1 != nullptr) (x_field1->ui_element)->set_previous_value();
+    if (y_field1 != nullptr) (y_field1->ui_element)->set_previous_value();
+    if (x_field2 != nullptr) (x_field2->ui_element)->set_previous_value();
+    if (y_field2 != nullptr) (y_field2->ui_element)->set_previous_value();
 }
 
 int EffectGizmo::get_point_count() {

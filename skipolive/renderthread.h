@@ -8,6 +8,7 @@
 #include <QOpenGLContext>
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLTexture>
+#include <QOpenGLShaderProgram>
 
 class Clip;
 class Effect;
@@ -43,8 +44,8 @@ private:
 	QOpenGLContext* share_ctx;
 	QOpenGLContext* ctx;
 	int divider;
-	int tex_width;
-	int tex_height;
+	//int tex_width;
+	//int tex_height;
 	bool queued;
 	bool texture_failed;
 	bool running;
@@ -53,20 +54,14 @@ private:
 signals:
 	void start_create_effect_ui(Clip* c);
 public:
-    GLuint compose_sequencet(void* viewer,
-            QOpenGLContext* ctx,
-            void* seq,
-            QVector<Clip*>& nests,
-            bool video,
-            bool render_audio,
-            Effect** gizmos,
-            bool& texture_failed,
-            bool rendering) ;
+    GLuint compose_sequencet() ;
     void setGLWidget(OpenGLWidget*);
     OpenGLWidget* m_glwidget=NULL;
     QOpenGLTexture* texture=nullptr;
     QOpenGLFramebufferObject** fbo=nullptr;
     Clip* clip=nullptr;
+    QOpenGLShaderProgram* glslProgram=nullptr;
+    bool isOpen = false;
 };
 
 #endif // RENDERTHREAD_H

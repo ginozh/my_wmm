@@ -13,11 +13,45 @@
 #include <QVariant>
 #include <QVector>
 
-#include "glkeyframe.h"
-
 class EffectRow;
-class ComboAction;
+class Element : public QObject
+{
+	Q_OBJECT
+public:
+    Element();
+	double getPreviousValue();
+    void set_previous_value() ;
+    int getPreviousIndex();
+    int currentIndex() ;
+    bool isChecked();
+    double value();
+    void set_value(double v, bool userSet);
+    void setChecked(bool checked);
+    void setCurrentIndexEx(int idx);
 
+    void set_default_value(double v);
+    void set_minimum_value(double v);
+    void set_maximum_value(double v);
+
+    bool isEnabled();
+    void setEnabled(bool e);
+private:
+	int index;
+	int previousIndex;
+    bool ischecked;
+    bool isenabled=true;
+
+    double default_value;
+    double previous_value;
+    double internal_value=-1;
+    bool set=false;
+
+    bool min_enabled = false;
+    double min_value;
+    bool max_enabled=false;
+    double max_value;
+
+};
 class EffectField : public QObject {
 	Q_OBJECT
 public:
@@ -26,15 +60,11 @@ public:
 	int type;
 	QString id;
 
-    double get_validated_keyframe_handle(int key, bool post);
-
 	QVariant get_previous_data();
 	QVariant get_current_data();
 	double frameToTimecode(long frame);
 	long timecodeToFrame(double timecode);
 	void set_current_data(const QVariant&);
-	void get_keyframe_data(double timecode, int& before, int& after, double& d);
-	QVariant validate_keyframe_data(double timecode, bool async = false);
 
 	double get_double_value(double timecode, bool async = false);
 	void set_double_value(double v);
@@ -64,17 +94,12 @@ public:
 	QString get_filename(double timecode, bool async = false);
 	void set_filename(const QString& s);
 
-	QWidget* get_ui_element();
 	bool is_enabled();
 	void set_enabled(bool e);
-	QVector<EffectKeyframe> keyframes;
-	QWidget* ui_element;
+	Element* ui_element;
 
-	void make_key_from_change(ComboAction* ca);
 public slots:
 	void ui_element_change();
-private:
-	bool hasKeyframes();
 signals:
 	void changed();
 	void toggled(bool);

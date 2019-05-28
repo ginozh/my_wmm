@@ -1,11 +1,6 @@
 #include "effectloaders.h"
 
 #include "project/effect.h"
-//#include "project/transition.h"
-//#include "io/path.h"
-//#include "panels/panels.h"
-//#include "panels/effectcontrols.h"
-//#include "io/crossplatformlib.h"
 
 #include <QDir>
 #include <QXmlStreamReader>
@@ -13,7 +8,7 @@
 #include <QDebug>
 
 
-	QMutex effects_loaded;
+QMutex effects_loaded;
 void load_internal_effects() {
 	if (!shaders_are_enabled) qWarning() << "Shaders are disabled, some effects may be nonfunctional";
 
@@ -80,28 +75,6 @@ void load_internal_effects() {
 	em.name = "Solid";
 	em.internal = EFFECT_INTERNAL_SOLID;
 	effects.append(em);
-/*
-	// internal transitions
-	em.type = EFFECT_TYPE_TRANSITION;
-	em.category = "";
-
-	em.name = "Cross Dissolve";
-	em.internal = TRANSITION_INTERNAL_CROSSDISSOLVE;
-	effects.append(em);
-
-	em.subtype = EFFECT_TYPE_AUDIO;
-
-	em.name = "Linear Fade";
-	em.internal = TRANSITION_INTERNAL_LINEARFADE;
-	effects.append(em);
-
-	em.name = "Exponential Fade";
-	em.internal = TRANSITION_INTERNAL_EXPONENTIALFADE;
-	effects.append(em);
-
-	em.name = "Logarithmic Fade";
-	em.internal = TRANSITION_INTERNAL_LOGARITHMICFADE;
-	effects.append(em);*/
 }
 
 void load_shader_effects() {
@@ -159,10 +132,12 @@ void load_shader_effects() {
 void init_effects() {
 	load_internal_effects();
 	load_shader_effects();
+#if 0
     return;
 	EffectInit* init_thread = new EffectInit();
 	QObject::connect(init_thread, SIGNAL(finished()), init_thread, SLOT(deleteLater()));
 	init_thread->start();
+#endif
 }
 
 EffectInit::EffectInit() {

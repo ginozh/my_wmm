@@ -176,3 +176,9 @@ void LabelSlider::mouseReleaseEvent(QMouseEvent*) {
 		}
     }
 }
+#if 0
+void Element::setCurrentTextEx(const QString &text) {
+	setCurrentText(text);
+	index = currentIndex();
+}
+#endif

@@ -20,16 +20,11 @@ SOURCES += main.cpp \
     renderthread.cpp \
     Clip.cpp \
     $$SRC_PREFIX/io/math.cpp \
-    $$SRC_PREFIX/ui/collapsiblewidget.cpp \
-    $$SRC_PREFIX/ui/checkboxex.cpp \
-    $$SRC_PREFIX/ui/comboboxex.cpp \
-    $$SRC_PREFIX/ui/labelslider.cpp \
     $$SRC_PREFIX/project/effect.cpp \
     $$SRC_PREFIX/project/effectloaders.cpp \
     $$SRC_PREFIX/project/effectfield.cpp \
     $$SRC_PREFIX/project/effectrow.cpp \
     $$SRC_PREFIX/project/effectgizmo.cpp \
-    $$SRC_PREFIX/project/glkeyframe.cpp \
     $$SRC_PREFIX/Effects/internal/transformeffect.cpp \
 
 
@@ -39,14 +34,9 @@ HEADERS  += \
     renderthread.h \
     Clip.h \
     $$SRC_PREFIX/io/math.h \
-    $$SRC_PREFIX/ui/collapsiblewidget.h \
-    $$SRC_PREFIX/ui/checkboxex.h \
-    $$SRC_PREFIX/ui/comboboxex.h \
-    $$SRC_PREFIX/ui/labelslider.h \
     $$SRC_PREFIX/project/effect.h \
     $$SRC_PREFIX/project/effectloaders.h \
     $$SRC_PREFIX/project/effectfield.h \
     $$SRC_PREFIX/project/effectrow.h \
     $$SRC_PREFIX/project/effectgizmo.h \
-    $$SRC_PREFIX/project/glkeyframe.h \
     $$SRC_PREFIX/Effects/internal/transformeffect.h \

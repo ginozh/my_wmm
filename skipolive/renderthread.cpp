@@ -36,7 +36,7 @@ GLuint draw_clipt(QOpenGLContext* ctx, QOpenGLFramebufferObject* fbo, GLuint tex
 	glGetIntegerv(GL_BLEND_DST_RGB, &dst_rgb);
 	glGetIntegerv(GL_BLEND_DST_ALPHA, &dst_alpha);
 
-	ctx->functions()->GL_DEFAULT_BLENDt;
+	ctx->functions()->glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ONE, GL_ONE);
 
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBegin(GL_QUADS);
@@ -104,8 +104,6 @@ RenderThread::RenderThread() :
 	gizmos(nullptr),
 	share_ctx(nullptr),
 	ctx(nullptr),
-	tex_width(1280),
-	tex_height(720),
 	queued(false),
 	texture_failed(false),
 	running(true)
@@ -117,27 +115,35 @@ RenderThread::~RenderThread() {
 	surface.destroy();
 }
 
-void RenderThread::run() {
+void RenderThread::run() 
+{
 	mutex.lock();
 
-	while (running) {
-		if (!queued) {
+	while (running) 
+    {
+		if (!queued) 
+        {
 			waitCond.wait(&mutex);
 		}
-		if (!running) {
+		if (!running) 
+        {
 			break;
 		}
-        emit start_create_effect_ui(clip);
+        ///emit start_create_effect_ui(clip);
+        if(clip->effects.size()<=0) clip->createEffect();
 		queued = false;
 
 
-		if (share_ctx != nullptr) {
-			if (ctx != nullptr) {
+		if (share_ctx != nullptr) 
+        {
+			if (ctx != nullptr) 
+            {
                 qDebug()<<"RenderThread::run";
 				ctx->makeCurrent(&surface);
 
 				// gen fbo
-				if (frameBuffer == 0) {
+				if (frameBuffer == 0) 
+                {
 					delete_fbo();
 					ctx->functions()->glGenFramebuffers(1, &frameBuffer);
 				}
@@ -146,13 +152,14 @@ void RenderThread::run() {
 				ctx->functions()->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frameBuffer);
 
 				// gen texture
-				if (texColorBuffer == 0 ) {
+				if (texColorBuffer == 0 ) 
+                {
 					delete_texture();
 					glGenTextures(1, &texColorBuffer);
                     qDebug()<<"RenderThread::run glGenTextures texColorBuffer: "<<texColorBuffer<<" frameBuffer: "<<frameBuffer;
 					glBindTexture(GL_TEXTURE_2D, texColorBuffer);
 					glTexImage2D(
-						GL_TEXTURE_2D, 0, GL_RGB, tex_width, tex_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr
+						GL_TEXTURE_2D, 0, GL_RGB, m_glwidget->glw, m_glwidget->glh, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr
 					);
 					//tex_width = seq->width;
 					//tex_height = seq->height;
@@ -183,160 +190,182 @@ void RenderThread::run() {
 
 	mutex.unlock();
 }
-GLuint RenderThread::compose_sequencet(void* viewer,
-						QOpenGLContext* ctx,
-						void* seq,
-						QVector<Clip*>& nests,
-						bool video,
-						bool render_audio,
-						Effect** gizmos,
-						bool& texture_failed,
-						bool rendering) 
+GLuint RenderThread::compose_sequencet() 
 {
-	GLint current_fbo = 0;
-	if (video) {
-		glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &current_fbo);
-	}
+    GLint current_fbo = 0;
+    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &current_fbo);
+    qDebug()<<"RenderThread::compose_sequencet current_fbo: "<<current_fbo;
 
-	////Sequence* s = seq;
-	long playhead = 0;//s->playhead;
-	int audio_track_count = 0;
+    int half_width = m_glwidget->glw/2;//s->width/2;
+    int half_height = m_glwidget->glh/2;//s->height/2;
 
-	QVector<Clip*> current_clips;
-	int half_width = 1280/2;//s->width/2;
-	int half_height = 720/2;//s->height/2;
+    glPushMatrix();
+    glLoadIdentity();
+    glOrtho(-half_width, half_width, -half_height, half_height, -1, 10);
+    ctx->functions()->glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ONE, GL_ONE);
+    glColor4f(1.0, 1.0, 1.0, 1.0);
 
-	if (video) {
-		glPushMatrix();
-		glLoadIdentity();
-		glOrtho(-half_width, half_width, -half_height, half_height, -1, 10);
-	}
-				ctx->functions()->GL_DEFAULT_BLENDt;
-				glColor4f(1.0, 1.0, 1.0, 1.0);
-
-				GLuint textureID = 0;
-				int video_width = 1280;//c->getWidth();
-				int video_height = 720;//c->getHeight();
-						// set up opengl texture
-						if (texture == nullptr) {
-                            texture = new QOpenGLTexture(QOpenGLTexture::Target2D);
-                            texture->setSize(video_width, video_height);
-                            texture->setFormat(QOpenGLTexture::RGBA8_UNorm);
-                            texture->setMipLevels(texture->maximumMipLevels());
-                            texture->setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
-                            texture->allocateStorage(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8);
-                            qDebug()<<"texture new QOpenGLTexture. width: "<<video_width<<" height: "<<video_height
-                                <<" format: "<<QOpenGLTexture::RGBA8_UNorm<<" fixfmt: "<<QOpenGLTexture::RGBA;
-						}
+    GLuint textureID = 0;
+    int video_width = 1024;//1280;//c->getWidth();
+    int video_height = 768;//720;//c->getHeight();
+    // set up opengl texture
+    if (texture == nullptr) 
+    {
+        texture = new QOpenGLTexture(QOpenGLTexture::Target2D);
+        texture->setSize(video_width, video_height);
+        texture->setFormat(QOpenGLTexture::RGBA8_UNorm);
+        texture->setMipLevels(texture->maximumMipLevels());
+        texture->setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
+        texture->allocateStorage(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8);
+        qDebug()<<"texture new QOpenGLTexture. width: "<<video_width<<" height: "<<video_height
+            <<" format: "<<QOpenGLTexture::RGBA8_UNorm<<" fixfmt: "<<QOpenGLTexture::RGBA;
+    }
 #if 0
-						get_clip_frame(c, qMax(playhead, c->timeline_in), texture_failed);
+    get_clip_frame(c, qMax(playhead, c->timeline_in), texture_failed);
 #else
-                        {
-                            static QImage* image=nullptr;
-                            if(image==nullptr)
-                            {
-                                //image=new QImage("\\\\Mac\\Home\\Desktop\\upan\\jpg\\1_ori_scale.jpg");
-                                image=new QImage("\\\\Mac\\Home\\Desktop\\upan\\jpg\\5.jpg");
-                                image=new QImage(image->convertToFormat(QImage::Format_RGBA8888));
-                            }
-                            texture->setData(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,image->bits());
-                        }
+    {
+        static QImage* image=nullptr;
+        if(image==nullptr)
+        {
+            image=new QImage("\\\\Mac\\Home\\Desktop\\upan\\jpg\\1_ori_scale.jpg");
+            //image=new QImage("\\\\Mac\\Home\\Desktop\\upan\\jpg\\5.jpg");
+            image=new QImage(image->convertToFormat(QImage::Format_RGBA8888));
+        }
+        texture->setData(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,image->bits());
+    }
 #endif
-						textureID = texture->textureId();
-					glPushMatrix();
+    textureID = texture->textureId();
+    glPushMatrix();
 
-					// start preparing cache
-					if (fbo == nullptr) {
-						fbo = new QOpenGLFramebufferObject* [2];
-						fbo[0] = new QOpenGLFramebufferObject(video_width, video_height);
-						fbo[1] = new QOpenGLFramebufferObject(video_width, video_height);
-						ctx->functions()->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, current_fbo);
-					}
+    // start preparing cache
+    if (fbo == nullptr) 
+    {
+        fbo = new QOpenGLFramebufferObject* [2];
+        fbo[0] = new QOpenGLFramebufferObject(video_width, video_height);
+        fbo[1] = new QOpenGLFramebufferObject(video_width, video_height);
+        ctx->functions()->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, current_fbo);
+    }
 
-					// clear fbos
-					/*c->fbo[0]->bind();
-					glClear(GL_COLOR_BUFFER_BIT);
-					c->fbo[0]->release();
-					c->fbo[1]->bind();
-					glClear(GL_COLOR_BUFFER_BIT);
-					c->fbo[1]->release();*/
+    // clear fbos
+    /*c->fbo[0]->bind();
+      glClear(GL_COLOR_BUFFER_BIT);
+      c->fbo[0]->release();
+      c->fbo[1]->bind();
+      glClear(GL_COLOR_BUFFER_BIT);
+      c->fbo[1]->release();*/
 
 
-					bool fbo_switcher = false;
+    bool fbo_switcher = false;
 
-					glViewport(0, 0, video_width, video_height);
+    glViewport(0, 0, video_width, video_height);
 
-					GLuint composite_texture;
-						//composite_texture = draw_clipt(ctx, c->fbo[fbo_switcher], textureID, true);
-						composite_texture = draw_clipt(ctx, fbo[fbo_switcher], textureID, true);
+    GLuint composite_texture;
+    //composite_texture = draw_clipt(ctx, c->fbo[fbo_switcher], textureID, true);
+    composite_texture = draw_clipt(ctx, fbo[fbo_switcher], textureID, true);
 
-					fbo_switcher = !fbo_switcher;
+    fbo_switcher = !fbo_switcher;
 
-					// set up default coords
-					GLTextureCoords coords;
-					coords.grid_size = 1;
-					coords.vertexTopLeftX = coords.vertexBottomLeftX = -video_width/2;
-					coords.vertexTopLeftY = coords.vertexTopRightY = -video_height/2;
-					coords.vertexTopRightX = coords.vertexBottomRightX = video_width/2;
-					coords.vertexBottomLeftY = coords.vertexBottomRightY = video_height/2;
-					coords.vertexBottomLeftZ = coords.vertexBottomRightZ = coords.vertexTopLeftZ = coords.vertexTopRightZ = 1;
-					coords.textureTopLeftY = coords.textureTopRightY = coords.textureTopLeftX = coords.textureBottomLeftX = 0.0;
-					coords.textureBottomLeftY = coords.textureBottomRightY = coords.textureTopRightX = coords.textureBottomRightX = 1.0;
-					coords.textureTopLeftQ = coords.textureTopRightQ = coords.textureTopLeftQ = coords.textureBottomLeftQ = 1;
-					// EFFECT CODE START
-					double timecode = 0;//get_timecode(c, playhead);
+    // set up default coords
+    GLTextureCoords coords;
+    memset(&coords, 0, sizeof(coords));
+    coords.grid_size = 1;
+    coords.vertexTopLeftX = coords.vertexBottomLeftX = -video_width/2;
+    coords.vertexTopLeftY = coords.vertexTopRightY = -video_height/2;
+    coords.vertexTopRightX = coords.vertexBottomRightX = video_width/2;
+    coords.vertexBottomLeftY = coords.vertexBottomRightY = video_height/2;
+    coords.vertexBottomLeftZ = coords.vertexBottomRightZ = coords.vertexTopLeftZ = coords.vertexTopRightZ = 1;
+    coords.textureTopLeftY = coords.textureTopRightY = coords.textureTopLeftX = coords.textureBottomLeftX = 0.0;
+    coords.textureBottomLeftY = coords.textureBottomRightY = coords.textureTopRightX = coords.textureBottomRightX = 1.0;
+    coords.textureTopLeftQ = coords.textureTopRightQ = coords.textureTopLeftQ = coords.textureBottomLeftQ = 1;
+    // EFFECT CODE START
+    double timecode = 0;//get_timecode(c, playhead);
 
-					Effect* first_gizmo_effect = nullptr;
-					Effect* selected_effect = nullptr;
-                    qDebug()<<"clip: "<<clip;
-                    if(clip && clip->effects.size()>0)
-                    {
-                        Effect* e = clip->effects.at(0);
-                        //process_effect(ctx, c, e, timecode, coords, composite_texture, fbo_switcher, texture_failed, TA_NO_TRANSITION);
-                        e->process_coords(timecode, coords, 0);
-                        (*gizmos) = e;
-                    }
-					glViewport(0, 0, 1280, 720);
+    //Effect* first_gizmo_effect = nullptr;
+    //Effect* selected_effect = nullptr;
+    qDebug()<<"clip: "<<clip;
+    if(clip && clip->effects.size()>0)
+    {
+        Effect* e = clip->effects.at(0);
+        //process_effectt(ctx, c, e, timecode, coords, composite_texture, fbo_switcher, texture_failed, TA_NO_TRANSITION);
+        e->process_coords(timecode, coords, 0);
+        gizmos = e;
+        //crop
+        {
+			if(!glslProgram) glslProgram = new QOpenGLShaderProgram();
+            if(!isOpen)
+            {
+                if (glslProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, "./Effects/common.vert")
+                        && glslProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, "./Effects/crop.frag")
+                   ) 
+                {
+                    qInfo() << "Vertex Fragment shader added successfully";
+                    isOpen = true;
+                }
+                else
+                {
+                    qInfo()<<"Fragment add error";
+                }
+            }
+            if (isOpen &&glslProgram->link()) 
+            {
+                qInfo() << "Shader program linked successfully";
+                bool bound = glslProgram->bind();
+                glslProgram->setUniformValue("resolution", m_glwidget->glw, m_glwidget->glh);
+                glslProgram->setUniformValue("time", GLfloat(timecode));
+                glslProgram->setUniformValue("left", GLfloat(50));
+                glslProgram->setUniformValue("top", GLfloat(0));
+                glslProgram->setUniformValue("right", GLfloat(0));
+                glslProgram->setUniformValue("bottom", GLfloat(0));
+                glslProgram->setUniformValue("feather", GLfloat(0));
+                composite_texture = draw_clipt(ctx, fbo[fbo_switcher], composite_texture, true);
+                fbo_switcher = !fbo_switcher;
+                if (bound) glslProgram->release();
+            }
+            else
+            {
+                qInfo()<<"link error";
+            }
+        }
+    }
+    glViewport(0, 0, m_glwidget->glw, m_glwidget->glh);
 
-					glBindTexture(GL_TEXTURE_2D, composite_texture);
+    glBindTexture(GL_TEXTURE_2D, composite_texture);
 
-					glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-					glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-					glBegin(GL_QUADS);
+    glBegin(GL_QUADS);
 
-					GLint current_fbo1 = 0;
-					glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &current_fbo1);
+    ////GLint current_fbo1 = 0;
+    ////glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &current_fbo1);
 
-					if (coords.grid_size <= 1) {
-						float z = 0.0f;
+    if (coords.grid_size <= 1) {
+        float z = 0.0f;
 
-						glTexCoord2f(coords.textureTopLeftX, coords.textureTopLeftY); // top left
-						glVertex3f(coords.vertexTopLeftX, coords.vertexTopLeftY, z); // top left
-						glTexCoord2f(coords.textureTopRightX, coords.textureTopRightY); // top right
-						glVertex3f(coords.vertexTopRightX, coords.vertexTopRightY, z); // top right
-						glTexCoord2f(coords.textureBottomRightX, coords.textureBottomRightY); // bottom right
-						glVertex3f(coords.vertexBottomRightX, coords.vertexBottomRightY, z); // bottom right
-						glTexCoord2f(coords.textureBottomLeftX, coords.textureBottomLeftY); // bottom left
-						glVertex3f(coords.vertexBottomLeftX, coords.vertexBottomLeftY, z); // bottom left
-					} 
-					glEnd();
-					glBindTexture(GL_TEXTURE_2D, 0); // unbind texture
-                    /////saveOpenglBuffer("renderfunctions_compose_sequence"); //storm
+        glTexCoord2f(coords.textureTopLeftX, coords.textureTopLeftY); // top left
+        glVertex3f(coords.vertexTopLeftX, coords.vertexTopLeftY, z); // top left
+        glTexCoord2f(coords.textureTopRightX, coords.textureTopRightY); // top right
+        glVertex3f(coords.vertexTopRightX, coords.vertexTopRightY, z); // top right
+        glTexCoord2f(coords.textureBottomRightX, coords.textureBottomRightY); // bottom right
+        glVertex3f(coords.vertexBottomRightX, coords.vertexBottomRightY, z); // bottom right
+        glTexCoord2f(coords.textureBottomLeftX, coords.textureBottomLeftY); // bottom left
+        glVertex3f(coords.vertexBottomLeftX, coords.vertexBottomLeftY, z); // bottom left
+    } 
+    glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0); // unbind texture
+    /////saveOpenglBuffer("renderfunctions_compose_sequence"); //storm
 
-					// prepare gizmos
-					if ((*gizmos) != nullptr
-							/*&& nests.isEmpty()
-							&& ((*gizmos) == first_gizmo_effect
-							|| (*gizmos) == selected_effect)*/) {
-						(*gizmos)->gizmo_draw(timecode, coords); // set correct gizmo coords
-						(*gizmos)->gizmo_world_to_screen(); // convert gizmo coords to screen coords
-					}
-					glPopMatrix();
-	if (video) {
-		glPopMatrix();
-	}
-	return 0;
+    // prepare gizmos
+    if (gizmos != nullptr
+            /*&& nests.isEmpty()
+              && (gizmos == first_gizmo_effect
+              || (gizmos == selected_effect)*/) {
+        gizmos->gizmo_draw(timecode, coords); // set correct gizmo coords
+        gizmos->gizmo_world_to_screen(); // convert gizmo coords to screen coords
+    }
+    glPopMatrix();
+    glPopMatrix();
+    return 0;
 }
 
 void RenderThread::paint() 
@@ -357,7 +386,7 @@ void RenderThread::paint()
 
 	gizmos = nullptr;
 	QVector<Clip*> nests;
-	compose_sequencet(nullptr, ctx, nullptr, nests, true, false, &gizmos, texture_failed, false);
+	compose_sequencet();
     qDebug()<<"RenderThread::paint gizmos: "<<gizmos;
     ////static int idx=0;save_fn=QString("paint_after_compose_%1.png").arg(++idx);
 	if (!save_fn.isEmpty()) {
@@ -366,8 +395,8 @@ void RenderThread::paint()
 			queued = true;
 		} else {
 			ctx->functions()->glBindFramebuffer(GL_READ_FRAMEBUFFER, frameBuffer);
-			QImage img(tex_width, tex_height, QImage::Format_RGBA8888);
-			glReadPixels(0, 0, tex_width, tex_height, GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
+			QImage img(m_glwidget->glw, m_glwidget->glh, QImage::Format_RGBA8888);
+			glReadPixels(0, 0, m_glwidget->glw, m_glwidget->glh, GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
 			img.save(save_fn);
 			ctx->functions()->glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 			save_fn = "";
@@ -376,7 +405,7 @@ void RenderThread::paint()
 
 	if (pixel_buffer != nullptr) {
 		ctx->functions()->glBindFramebuffer(GL_READ_FRAMEBUFFER, frameBuffer);
-		glReadPixels(0, 0, tex_width, tex_height, GL_RGBA, GL_UNSIGNED_BYTE, pixel_buffer);
+		glReadPixels(0, 0, m_glwidget->glw, m_glwidget->glh, GL_RGBA, GL_UNSIGNED_BYTE, pixel_buffer);
 		ctx->functions()->glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 		pixel_buffer = nullptr;
 	}

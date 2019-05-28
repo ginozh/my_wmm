@@ -10,20 +10,11 @@
 #include <QOpenGLTexture>
 #include <QMutex>
 #include <QThread>
-class QLabel;
-class QWidget;
-class CollapsibleWidget;
-class QGridLayout;
-class QPushButton;
-class QMouseEvent;
-
-//struct Clip;
 class Clip;
 class QXmlStreamReader;
 class QXmlStreamWriter;
 class Effect;
 class EffectRow;
-//class CheckboxEx;
 
 struct EffectMeta {
 	QString name;
@@ -35,8 +26,6 @@ struct EffectMeta {
 	int type;
 	int subtype;
 };
-///class Viewer;extern Viewer* sequence_viewer; //storm
-//class OpenGLWidget;extern OpenGLWidget* viewer_widget; //storm
 extern bool shaders_are_enabled;
 extern QVector<EffectMeta> effects;
 
@@ -121,7 +110,6 @@ public:
 	const EffectMeta* meta;
 	int id;
 	QString name;
-	CollapsibleWidget* container;
 
 	EffectRow* add_row(const QString &name, bool savable = true, bool keyframable = true);
 	EffectRow* row(int i);
@@ -164,8 +152,6 @@ public:
     virtual void process_image(double timecode, uint8_t* input, uint8_t* output, int size);
 	virtual void process_shader(double timecode, GLTextureCoords&);
 	virtual void process_coords(double timecode, GLTextureCoords& coords, int data);
-	virtual GLuint process_superimpose(double timecode);
-	virtual void process_audio(double timecode_start, double timecode_end, quint8* samples, int nb_bytes, int channel_count);
 
 	virtual void gizmo_draw(double timecode, GLTextureCoords& coords);
 	void gizmo_move(EffectGizmo* sender, int x_movement, int y_movement, double timecode, bool done);
@@ -197,8 +183,6 @@ private:
 	bool isOpen;
 	QVector<EffectRow*> rows;
 	QVector<EffectGizmo*> gizmos;
-	QGridLayout* ui_layout;
-	QWidget* ui;
 	bool bound;
 
 	// superimpose functions

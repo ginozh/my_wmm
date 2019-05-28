@@ -5,27 +5,27 @@
 #include <QVector>
 
 class Effect;
-class QGridLayout;
+//class QGridLayout;
 class EffectField;
-class QLabel;
-class QPushButton;
-class ComboAction;
-class QHBoxLayout;
+//class QLabel;
+//class QPushButton;
+//class ComboAction;
+//class QHBoxLayout;
 class KeyframeNavigator;
-class ClickableLabel;
+//class ClickableLabel;
 
 class EffectRow : public QObject {
 	Q_OBJECT
 public:
-	EffectRow(Effect* parent, bool save, QGridLayout* uilayout, const QString& n, int row, bool keyframable = true);
+	EffectRow(Effect* parent, bool save, void* uilayout, const QString& n, int row, bool keyframable = true);
 	~EffectRow();
 	EffectField* add_field(int type, const QString &id, int colspan = 1);
-	void add_widget(QWidget *w);
+	///void add_widget(QWidget *w);
 	EffectField* field(int i);
 	int fieldCount();
-	void set_keyframe_now(ComboAction *ca);
-	void delete_keyframe_at_time(ComboAction *ca, long time);
-	ClickableLabel* label;
+	//void set_keyframe_now(ComboAction *ca);
+	void delete_keyframe_at_time(void *ca, long time);
+	//ClickableLabel* label;
 	Effect* parent_effect;
 	bool savable;
 	const QString& get_name();
@@ -41,7 +41,7 @@ private slots:
 	void set_keyframe_enabled(bool);
 private:
 	bool keyframing;
-	QGridLayout* ui;
+	//QGridLayout* ui;
 	QString name;
 	int ui_row;
 	QVector<EffectField*> fields;
