@@ -1,5 +1,7 @@
 #include <QtMath>
 #include "Clip.h"
+#include "OpenGLWidget.h"
+#include "Effects/internal/transformeffect.h"
 #include <QXmlStreamReader>
 Clip::Clip()
 {
@@ -23,6 +25,31 @@ const EffectMeta* get_meta_from_name(const QString& input)
 	return nullptr;
 }
 
+void Clip::createEffect()
+{
+    const EffectMeta* meta = nullptr;
+
+    meta = get_meta_from_name("Distort/Transform");
+    //Effect* e = create_effect(this, meta);
+    Effect* e = new TransformEffect(this, meta);
+    e->set_enabled(true);
+    e->setValue("posx", QString::number(m_glwidget->glw/2));
+    e->setValue("posy", QString::number(m_glwidget->glh/2));
+    //e->setValue("scalex", QString::number(53.2813));
+    e->setValue("scalex", QString::number(100));
+    e->setValue("scaley", QString::number(100));
+    e->setValue("uniformscale", QString::number(1));
+    //e->setValue("rotation", QString::number(28.9063));
+    e->setValue("rotation", QString::number(0));
+    e->setValue("anchorx", QString::number(0));
+    e->setValue("anchory", QString::number(0));
+    e->setValue("opacity", QString::number(100));
+    e->setValue("blendmode", QString::number(0));
+    //e->load(stream);
+
+    this->effects.append(e);
+}
+#if 0
 void Clip::createEffect()
 {
     //QString xmlcontent="<effect name=\"Distort/Transform\" enabled=\"1\"> <row> <field id=\"posx\" value=\"849\"/> <field id=\"posy\" value=\"551\"/> </row> <row> <field id=\"scalex\" value=\"100\"/> <field id=\"scaley\" value=\"100\"/> </row> <row> <field id=\"uniformscale\" value=\"1\"/> </row> <row> <field id=\"rotation\" value=\"15.625\"/> </row> <row> <field id=\"anchorx\" value=\"0\"/> <field id=\"anchory\" value=\"0\"/> </row> <row> <field id=\"opacity\" value=\"100\"/> </row> <row> <field id=\"blendmode\" value=\"0\"/> </row> </effect>";
@@ -85,3 +112,4 @@ void Clip::createEffect()
         }
     }
 }
+#endif

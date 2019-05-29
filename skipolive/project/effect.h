@@ -130,6 +130,7 @@ public:
 	virtual void load(QXmlStreamReader& stream);
 	virtual void custom_load(QXmlStreamReader& stream);
 	virtual void save(QXmlStreamWriter& stream);
+    virtual void setValue(QString sid, QString svalue);
 
 	// glsl handling
 	bool is_open();

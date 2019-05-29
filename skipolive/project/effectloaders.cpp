@@ -13,7 +13,7 @@ void load_internal_effects() {
 	if (!shaders_are_enabled) qWarning() << "Shaders are disabled, some effects may be nonfunctional";
 
 	EffectMeta em;
-
+#if 0
 	// internal effects
 	em.type = EFFECT_TYPE_EFFECT;
 	em.subtype = EFFECT_TYPE_AUDIO;
@@ -43,14 +43,14 @@ void load_internal_effects() {
 	em.name = "Fill Left/Right";
 	em.internal = EFFECT_INTERNAL_FILLLEFTRIGHT;
 	effects.append(em);
-
+#endif
 	em.subtype = EFFECT_TYPE_VIDEO;
 
 	em.name = "Transform";
 	em.category = "Distort";
 	em.internal = EFFECT_INTERNAL_TRANSFORM;
 	effects.append(em);
-
+#if 0
 	em.name = "Corner Pin";
 	em.internal = EFFECT_INTERNAL_CORNERPIN;
 	effects.append(em);
@@ -75,6 +75,7 @@ void load_internal_effects() {
 	em.name = "Solid";
 	em.internal = EFFECT_INTERNAL_SOLID;
 	effects.append(em);
+#endif
 }
 
 void load_shader_effects() {

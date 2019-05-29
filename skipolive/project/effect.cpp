@@ -222,6 +222,29 @@ QString save_data_to_string(int type, const QVariant& data) {
 	}
 	return QString();
 }
+void Effect::setValue(QString sid, QString svalue)
+{
+    bool bFound=false;
+    for(int irow=0; irow<rows.size() && !bFound; irow++)
+    {
+        EffectRow* row = rows.at(irow);
+        for(int ifield=0; ifield<row->fieldCount() && !bFound; ifield++)
+        {
+            EffectField* field=row->field(ifield);
+            if(field->id == sid)
+            {
+                field->set_current_data(load_data_from_string(field->type, svalue));
+                qDebug()<<"Effect::setValue found. id: "<<sid<<" value: "<<svalue<<" type: "<<field->type;
+                bFound=true;
+                break;
+            }
+        }
+    }
+    if(!bFound)
+    {
+        qInfo()<<"Effect::setValue error. no found. id: "<<sid<<" value: "<<svalue;
+    }
+}
 
 void Effect::load(QXmlStreamReader& stream) {
 	int row_count = 0;
