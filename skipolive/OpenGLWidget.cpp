@@ -141,6 +141,7 @@ EffectGizmo* OpenGLWidget::get_gizmo_from_mouse(int x, int y) {
 						&& mouse_pos.y() > g->screen_pos[0].y() - dot_size
 						&& mouse_pos.x() < g->screen_pos[0].x() + dot_size
 						&& mouse_pos.y() < g->screen_pos[0].y() + dot_size) {
+                    qDebug()<<"OpenGLWidget::get_gizmo_from_mouse type: "<<GIZMO_TYPE_DOT<<" index: "<<i;
 					return g;
 				}
 				break;

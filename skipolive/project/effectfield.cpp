@@ -76,6 +76,7 @@ void EffectField::set_enabled(bool e) {
 }
 
 double EffectField::get_double_value(double timecode, bool async) {
+    qDebug()<<"EffectField::get_double_value value: "<<(ui_element)->value();
 	return (ui_element)->value();
 }
 
@@ -181,6 +182,7 @@ void Element::set_previous_value() {
     previous_value = internal_value;
 }
 double Element::value() {
+    qDebug()<<"Element::value  internal_value: "<<internal_value;
     return internal_value;
 }
 void Element::set_value(double v, bool userSet) {
@@ -197,6 +199,7 @@ void Element::set_value(double v, bool userSet) {
 		///setText(valueToString(internal_value));
         ///if (userSet) emit valueChanged();
     }
+    qDebug()<<"Element::set_value  internal_value: "<<internal_value<<" v: "<<v;
 }
 void Element::set_default_value(double v) {
     default_value = v;

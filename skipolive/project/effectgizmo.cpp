@@ -49,3 +49,12 @@ void EffectGizmo::set_cursor(int c) {
     qDebug()<<"EffectGizmo::set_cursor type: "<<type<<" cursor: "<<c;
     cursor = c;
 }
+
+bool EffectGizmo::isUniformScale() 
+{
+    return uniformscale;
+}
+
+void EffectGizmo::setUniformScale(bool u) {
+    uniformscale=u;
+}

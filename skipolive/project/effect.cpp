@@ -493,18 +493,34 @@ void Effect::gizmo_move(EffectGizmo* gizmo, int x_movement, int y_movement, doub
 			//ComboAction* ca = nullptr;
 			//if (done) ca = new ComboAction();
 			if (gizmo->x_field1 != nullptr) {
+                qDebug()<<"Effect::gizmo_move gizmo: "<<gizmo<<" gizmo->x_field1: "<<gizmo->x_field1;
 				gizmo->x_field1->set_double_value(gizmo->x_field1->get_double_value(timecode) + x_movement*gizmo->x_field_multi1);
 				//gizmo->x_field1->make_key_from_change(ca);
 			}
-			if (gizmo->y_field1 != nullptr) {
-				gizmo->y_field1->set_double_value(gizmo->y_field1->get_double_value(timecode) + y_movement*gizmo->y_field_multi1);
-				//gizmo->y_field1->make_key_from_change(ca);
-			}
+			if (gizmo->y_field1 != nullptr) 
+            {
+#if 0
+                if(gizmo->isUniformScale() && gizmo->x_field1 != nullptr)
+                {
+                    qDebug()<<"Effect::gizmo_move gizmo: "<<gizmo<<" gizmo->y_field1: "<<gizmo->y_field1;
+                    //gizmo->y_field1->set_double_value(gizmo->x_field1->get_double_value(timecode));
+                    gizmo->y_field1->set_double_value(gizmo->y_field1->get_double_value(timecode) + x_movement*gizmo->x_field_multi1);
+                }
+                else
+#endif
+                {
+                    qDebug()<<"Effect::gizmo_move gizmo: "<<gizmo<<" gizmo->y_field1: "<<gizmo->y_field1;
+                    gizmo->y_field1->set_double_value(gizmo->y_field1->get_double_value(timecode) + y_movement*gizmo->y_field_multi1);
+                    //gizmo->y_field1->make_key_from_change(ca);
+                }
+            }
 			if (gizmo->x_field2 != nullptr) {
+                qDebug()<<"Effect::gizmo_move gizmo: "<<gizmo<<" gizmo->x_field2: "<<gizmo->x_field2;
 				gizmo->x_field2->set_double_value(gizmo->x_field2->get_double_value(timecode) + x_movement*gizmo->x_field_multi2);
 				//gizmo->x_field2->make_key_from_change(ca);
 			}
 			if (gizmo->y_field2 != nullptr) {
+                qDebug()<<"Effect::gizmo_move gizmo: "<<gizmo<<" gizmo->y_field2: "<<gizmo->y_field2;
 				gizmo->y_field2->set_double_value(gizmo->y_field2->get_double_value(timecode) + y_movement*gizmo->y_field_multi2);
 				//gizmo->y_field2->make_key_from_change(ca);
 			}

@@ -42,8 +42,11 @@ public:
 
 	int get_cursor();
 	void set_cursor(int c);
+    void setUniformScale(bool u); 
+    bool isUniformScale();
 private:
 	int type;
+	bool uniformscale=false;
 	int cursor;
 };
 

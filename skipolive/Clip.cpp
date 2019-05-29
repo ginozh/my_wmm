@@ -36,9 +36,11 @@ void Clip::createEffect()
     e->setValue("posx", QString::number(m_glwidget->glw/2));
     e->setValue("posy", QString::number(m_glwidget->glh/2));
     //e->setValue("scalex", QString::number(53.2813));
-    e->setValue("scalex", QString::number(100));
-    e->setValue("scaley", QString::number(100));
-    e->setValue("uniformscale", QString::number(1));
+    e->setValue("scalex", QString::number(50));
+    e->setValue("scaley", QString::number(80));
+    int uniformscale=0;//1: true 0: false
+    e->setValue("uniformscale", QString::number(uniformscale));
+    ((TransformEffect*)e)->toggle_uniform_scale(uniformscale);
     //e->setValue("rotation", QString::number(28.9063));
     e->setValue("rotation", QString::number(0));
     e->setValue("anchorx", QString::number(0));

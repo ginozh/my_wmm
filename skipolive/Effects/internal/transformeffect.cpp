@@ -8,6 +8,7 @@
 #include <QOpenGLFunctions>
 #include <QComboBox>
 #include <QMouseEvent>
+#include <QDebug>
 
 #include "ui/collapsiblewidget.h"
 //#include "project/clip.h"
@@ -106,6 +107,11 @@ TransformEffect::TransformEffect(Clip* c, const EffectMeta* em) : Effect(c, em) 
 	anchor_gizmo->y_field1 = anchor_y_box;
 	anchor_gizmo->x_field2 = position_x;
 	anchor_gizmo->y_field2 = position_y;
+    qDebug()<<"TransformEffect::TransformEffect scale_x: "<<scale_x<<" top_left_gizmo x_field1: "<<top_left_gizmo
+        <<" top_center_gizmo y_field1: "<<top_center_gizmo<<" top_right_gizmo x_field1: "<<top_right_gizmo
+        <<" bottom_left_gizmo x_field1: "<<bottom_left_gizmo<<" bottom_center_gizmo y_field1: "<<bottom_center_gizmo
+        <<" bottom_right_gizmo x_field1: "<<bottom_right_gizmo<<" left_center_gizmo x_field1: "<<left_center_gizmo
+        <<" right_center_gizmo x_field1: "<<right_center_gizmo;
 
 	rotate_gizmo = add_gizmo(GIZMO_TYPE_DOT);
 	rotate_gizmo->color = Qt::green;
@@ -182,10 +188,22 @@ void TransformEffect::toggle_uniform_scale(bool enabled) {
 
 	top_center_gizmo->y_field1 = enabled ? scale_x : scale_y;
 	bottom_center_gizmo->y_field1 = enabled ? scale_x : scale_y;
+#if 0
+    //四个角永远是scale uniform, y值跟scale_x一致
+	top_left_gizmo->y_field1 = scale_y;
+    top_left_gizmo->setUniformScale(true);
+	top_right_gizmo->y_field1 = scale_y;
+    top_right_gizmo->setUniformScale(true);
+	bottom_left_gizmo->y_field1 = scale_y;
+    bottom_left_gizmo->setUniformScale(true);
+	bottom_right_gizmo->y_field1 = scale_y;
+    bottom_right_gizmo->setUniformScale(true);
+#else
 	top_left_gizmo->y_field1 = enabled ? nullptr : scale_y;
 	top_right_gizmo->y_field1 = enabled ? nullptr : scale_y;
 	bottom_left_gizmo->y_field1 = enabled ? nullptr : scale_y;
 	bottom_right_gizmo->y_field1 = enabled ? nullptr : scale_y;
+#endif
 }
 
 void TransformEffect::process_coords(double timecode, GLTextureCoords& coords, int) {
