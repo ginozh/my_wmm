@@ -41,8 +41,8 @@ void Clip::createEffect()
     int uniformscale=0;//1: true 0: false
     e->setValue("uniformscale", QString::number(uniformscale));
     ((TransformEffect*)e)->toggle_uniform_scale(uniformscale);
-    //e->setValue("rotation", QString::number(28.9063));
-    e->setValue("rotation", QString::number(0));
+    e->setValue("rotation", QString::number(28.9063));
+    //e->setValue("rotation", QString::number(0));
     e->setValue("anchorx", QString::number(0));
     e->setValue("anchory", QString::number(0));
     e->setValue("opacity", QString::number(100));

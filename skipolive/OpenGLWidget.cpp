@@ -391,21 +391,35 @@ void OpenGLWidget::paintGL() {
 		// clear to solid black
 
         qDebug()<<"OpenGLWidget::paintGL width: "<<width()<<" height: "<<height();
-		glClearColor(0.0, 0.0, 0.0, 1.0);
+		glClearColor(0.0, 0.0, 0.0, 0.0); //第四个参数alpha必须为0,否则显示不出图像
 		glClear(GL_COLOR_BUFFER_BIT);
+        glViewport(0, 0, glw, glh);
 
 		// set color multipler to straight white
-		glColor4f(1.0, 1.0, 1.0, 1.0);
+		///glColor4f(0.0, 0.0, 0.0, 0.0);
 
 		glEnable(GL_TEXTURE_2D);
 
 		// set screen coords to widget size
+        glPushMatrix();
 		glLoadIdentity();
 		glOrtho(0, 1, 0, 1, -1, 1);
 
 		// draw texture from render thread
 
-		glBindTexture(GL_TEXTURE_2D, renderer->texColorBuffer);
+		if(renderer->fboOverlay) 
+        {
+            glBindTexture(GL_TEXTURE_2D, renderer->fboOverlay->texture());
+#if 0
+            QImage imgOverlay=renderer->fboOverlay->toImage();
+            imgOverlay.save(QString("openglwidget.png"));
+#endif
+            qDebug()<<"OpenGLWidget fboOverlay->texture: "<<renderer->fboOverlay->texture();
+        }
+        else
+        {
+            glBindTexture(GL_TEXTURE_2D, renderer->texColorBuffer);
+        }
 
 		glBegin(GL_QUADS);
 
@@ -433,6 +447,7 @@ void OpenGLWidget::paintGL() {
 		}
 
 		glDisable(GL_TEXTURE_2D);
+        glPopMatrix();
 
 		renderer->mutex.unlock();
 

@@ -58,10 +58,21 @@ public:
     void setGLWidget(OpenGLWidget*);
     OpenGLWidget* m_glwidget=NULL;
     QOpenGLTexture* texture=nullptr;
+    QOpenGLTexture* texture2=nullptr;
     QOpenGLFramebufferObject** fbo=nullptr;
+    QOpenGLFramebufferObject** fbo2=nullptr;
+    QOpenGLFramebufferObject* fbotest=nullptr;
+    QOpenGLFramebufferObject* fbotest1=nullptr;
+    QOpenGLFramebufferObject* fbotest2=nullptr;
     Clip* clip=nullptr;
+
     QOpenGLShaderProgram* glslProgram=nullptr;
     bool isOpen = false;
+    QOpenGLShaderProgram* glslProgram2=nullptr;
+    bool isOpen2 = false;
+    QOpenGLShaderProgram* glslProgramOverlay=nullptr;
+    bool isOpenOverlay = false;
+    QOpenGLFramebufferObject* fboOverlay=nullptr;
 };
 
 #endif // RENDERTHREAD_H
