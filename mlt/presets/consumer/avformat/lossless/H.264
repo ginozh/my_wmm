@@ -1,0 +1,14 @@
+f=mp4
+acodec=aac
+ab=384k
+vcodec=libx264
+intra=1
+vb=0
+g=1
+bf=0
+preset=medium
+crf=0
+coder=ac
+
+meta.preset.extension=mp4
+meta.preset.note=Intra-frame only, lossless compressed MPEG-4 AVC with AAC audio

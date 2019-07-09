@@ -1,0 +1,15 @@
+consumer_rtaudio.o: consumer_rtaudio.cpp ../../framework/mlt.h \
+ ../../framework/mlt_animation.h ../../framework/mlt_types.h \
+ ../../framework/mlt_pool.h ../../framework/mlt_property.h \
+ ../../framework/mlt_factory.h ../../framework/mlt_profile.h \
+ ../../framework/mlt_repository.h ../../framework/mlt_frame.h \
+ ../../framework/mlt_properties.h ../../framework/mlt_events.h \
+ ../../framework/mlt_deque.h ../../framework/mlt_service.h \
+ ../../framework/mlt_multitrack.h ../../framework/mlt_producer.h \
+ ../../framework/mlt_filter.h ../../framework/mlt_transition.h \
+ ../../framework/mlt_consumer.h ../../framework/mlt_playlist.h \
+ ../../framework/mlt_field.h ../../framework/mlt_tractor.h \
+ ../../framework/mlt_tokeniser.h ../../framework/mlt_parser.h \
+ ../../framework/mlt_geometry.h ../../framework/mlt_log.h \
+ ../../framework/mlt_cache.h ../../framework/mlt_version.h \
+ ../../framework/mlt_slices.h RtAudio.h

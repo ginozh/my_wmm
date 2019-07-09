@@ -1,0 +1,4 @@
+framework	-I/usr/include -I/usr/include/mlt -D_REENTRANT	-L/usr/lib -lmlt
+mlt++	-I/usr/include -I/usr/include/mlt++ -D_REENTRANT	-L/usr/lib -lmlt++
+framework	-I/usr/local/include -I/usr/local/include/mlt -D_REENTRANT	-L/usr/local/lib -lmlt
+mlt++	-I/usr/local/include -I/usr/local/include/mlt++ -D_REENTRANT	-L/usr/local/lib -lmlt++

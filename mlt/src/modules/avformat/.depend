@@ -1,0 +1,126 @@
+common.o: common.c common.h ../../framework/mlt.h \
+ ../../framework/mlt_animation.h ../../framework/mlt_types.h \
+ ../../framework/mlt_pool.h ../../framework/mlt_property.h \
+ ../../framework/mlt_factory.h ../../framework/mlt_profile.h \
+ ../../framework/mlt_repository.h ../../framework/mlt_frame.h \
+ ../../framework/mlt_properties.h ../../framework/mlt_events.h \
+ ../../framework/mlt_deque.h ../../framework/mlt_service.h \
+ ../../framework/mlt_multitrack.h ../../framework/mlt_producer.h \
+ ../../framework/mlt_filter.h ../../framework/mlt_transition.h \
+ ../../framework/mlt_consumer.h ../../framework/mlt_playlist.h \
+ ../../framework/mlt_field.h ../../framework/mlt_tractor.h \
+ ../../framework/mlt_tokeniser.h ../../framework/mlt_parser.h \
+ ../../framework/mlt_geometry.h ../../framework/mlt_log.h \
+ ../../framework/mlt_cache.h ../../framework/mlt_version.h \
+ ../../framework/mlt_slices.h
+factory.o: factory.c ../../framework/mlt.h \
+ ../../framework/mlt_animation.h ../../framework/mlt_types.h \
+ ../../framework/mlt_pool.h ../../framework/mlt_property.h \
+ ../../framework/mlt_factory.h ../../framework/mlt_profile.h \
+ ../../framework/mlt_repository.h ../../framework/mlt_frame.h \
+ ../../framework/mlt_properties.h ../../framework/mlt_events.h \
+ ../../framework/mlt_deque.h ../../framework/mlt_service.h \
+ ../../framework/mlt_multitrack.h ../../framework/mlt_producer.h \
+ ../../framework/mlt_filter.h ../../framework/mlt_transition.h \
+ ../../framework/mlt_consumer.h ../../framework/mlt_playlist.h \
+ ../../framework/mlt_field.h ../../framework/mlt_tractor.h \
+ ../../framework/mlt_tokeniser.h ../../framework/mlt_parser.h \
+ ../../framework/mlt_geometry.h ../../framework/mlt_log.h \
+ ../../framework/mlt_cache.h ../../framework/mlt_version.h \
+ ../../framework/mlt_slices.h
+filter_avcolour_space.o: filter_avcolour_space.c common.h \
+ ../../framework/mlt.h ../../framework/mlt_animation.h \
+ ../../framework/mlt_types.h ../../framework/mlt_pool.h \
+ ../../framework/mlt_property.h ../../framework/mlt_factory.h \
+ ../../framework/mlt_profile.h ../../framework/mlt_repository.h \
+ ../../framework/mlt_frame.h ../../framework/mlt_properties.h \
+ ../../framework/mlt_events.h ../../framework/mlt_deque.h \
+ ../../framework/mlt_service.h ../../framework/mlt_multitrack.h \
+ ../../framework/mlt_producer.h ../../framework/mlt_filter.h \
+ ../../framework/mlt_transition.h ../../framework/mlt_consumer.h \
+ ../../framework/mlt_playlist.h ../../framework/mlt_field.h \
+ ../../framework/mlt_tractor.h ../../framework/mlt_tokeniser.h \
+ ../../framework/mlt_parser.h ../../framework/mlt_geometry.h \
+ ../../framework/mlt_log.h ../../framework/mlt_cache.h \
+ ../../framework/mlt_version.h ../../framework/mlt_slices.h \
+ ../../framework/mlt_filter.h ../../framework/mlt_frame.h \
+ ../../framework/mlt_log.h ../../framework/mlt_profile.h \
+ ../../framework/mlt_producer.h
+filter_avdeinterlace.o: filter_avdeinterlace.c \
+ ../../framework/mlt_filter.h ../../framework/mlt_service.h \
+ ../../framework/mlt_properties.h ../../framework/mlt_types.h \
+ ../../framework/mlt_pool.h ../../framework/mlt_events.h \
+ ../../framework/mlt_frame.h ../../framework/mlt_deque.h \
+ ../../framework/mlt_log.h mmx.h
+filter_swscale.o: filter_swscale.c ../../framework/mlt_filter.h \
+ ../../framework/mlt_service.h ../../framework/mlt_properties.h \
+ ../../framework/mlt_types.h ../../framework/mlt_pool.h \
+ ../../framework/mlt_events.h ../../framework/mlt_frame.h \
+ ../../framework/mlt_deque.h ../../framework/mlt_factory.h \
+ ../../framework/mlt_profile.h ../../framework/mlt_repository.h
+producer_avformat.o: producer_avformat.c common.h ../../framework/mlt.h \
+ ../../framework/mlt_animation.h ../../framework/mlt_types.h \
+ ../../framework/mlt_pool.h ../../framework/mlt_property.h \
+ ../../framework/mlt_factory.h ../../framework/mlt_profile.h \
+ ../../framework/mlt_repository.h ../../framework/mlt_frame.h \
+ ../../framework/mlt_properties.h ../../framework/mlt_events.h \
+ ../../framework/mlt_deque.h ../../framework/mlt_service.h \
+ ../../framework/mlt_multitrack.h ../../framework/mlt_producer.h \
+ ../../framework/mlt_filter.h ../../framework/mlt_transition.h \
+ ../../framework/mlt_consumer.h ../../framework/mlt_playlist.h \
+ ../../framework/mlt_field.h ../../framework/mlt_tractor.h \
+ ../../framework/mlt_tokeniser.h ../../framework/mlt_parser.h \
+ ../../framework/mlt_geometry.h ../../framework/mlt_log.h \
+ ../../framework/mlt_cache.h ../../framework/mlt_version.h \
+ ../../framework/mlt_slices.h ../../framework/mlt_producer.h \
+ ../../framework/mlt_frame.h ../../framework/mlt_profile.h \
+ ../../framework/mlt_log.h ../../framework/mlt_deque.h \
+ ../../framework/mlt_factory.h ../../framework/mlt_cache.h \
+ ../../framework/mlt_slices.h
+consumer_avformat.o: consumer_avformat.c common.h ../../framework/mlt.h \
+ ../../framework/mlt_animation.h ../../framework/mlt_types.h \
+ ../../framework/mlt_pool.h ../../framework/mlt_property.h \
+ ../../framework/mlt_factory.h ../../framework/mlt_profile.h \
+ ../../framework/mlt_repository.h ../../framework/mlt_frame.h \
+ ../../framework/mlt_properties.h ../../framework/mlt_events.h \
+ ../../framework/mlt_deque.h ../../framework/mlt_service.h \
+ ../../framework/mlt_multitrack.h ../../framework/mlt_producer.h \
+ ../../framework/mlt_filter.h ../../framework/mlt_transition.h \
+ ../../framework/mlt_consumer.h ../../framework/mlt_playlist.h \
+ ../../framework/mlt_field.h ../../framework/mlt_tractor.h \
+ ../../framework/mlt_tokeniser.h ../../framework/mlt_parser.h \
+ ../../framework/mlt_geometry.h ../../framework/mlt_log.h \
+ ../../framework/mlt_cache.h ../../framework/mlt_version.h \
+ ../../framework/mlt_slices.h ../../framework/mlt_consumer.h \
+ ../../framework/mlt_frame.h ../../framework/mlt_profile.h \
+ ../../framework/mlt_log.h ../../framework/mlt_events.h
+filter_avfilter.o: filter_avfilter.c common.h ../../framework/mlt.h \
+ ../../framework/mlt_animation.h ../../framework/mlt_types.h \
+ ../../framework/mlt_pool.h ../../framework/mlt_property.h \
+ ../../framework/mlt_factory.h ../../framework/mlt_profile.h \
+ ../../framework/mlt_repository.h ../../framework/mlt_frame.h \
+ ../../framework/mlt_properties.h ../../framework/mlt_events.h \
+ ../../framework/mlt_deque.h ../../framework/mlt_service.h \
+ ../../framework/mlt_multitrack.h ../../framework/mlt_producer.h \
+ ../../framework/mlt_filter.h ../../framework/mlt_transition.h \
+ ../../framework/mlt_consumer.h ../../framework/mlt_playlist.h \
+ ../../framework/mlt_field.h ../../framework/mlt_tractor.h \
+ ../../framework/mlt_tokeniser.h ../../framework/mlt_parser.h \
+ ../../framework/mlt_geometry.h ../../framework/mlt_log.h \
+ ../../framework/mlt_cache.h ../../framework/mlt_version.h \
+ ../../framework/mlt_slices.h
+filter_swresample.o: filter_swresample.c common.h ../../framework/mlt.h \
+ ../../framework/mlt_animation.h ../../framework/mlt_types.h \
+ ../../framework/mlt_pool.h ../../framework/mlt_property.h \
+ ../../framework/mlt_factory.h ../../framework/mlt_profile.h \
+ ../../framework/mlt_repository.h ../../framework/mlt_frame.h \
+ ../../framework/mlt_properties.h ../../framework/mlt_events.h \
+ ../../framework/mlt_deque.h ../../framework/mlt_service.h \
+ ../../framework/mlt_multitrack.h ../../framework/mlt_producer.h \
+ ../../framework/mlt_filter.h ../../framework/mlt_transition.h \
+ ../../framework/mlt_consumer.h ../../framework/mlt_playlist.h \
+ ../../framework/mlt_field.h ../../framework/mlt_tractor.h \
+ ../../framework/mlt_tokeniser.h ../../framework/mlt_parser.h \
+ ../../framework/mlt_geometry.h ../../framework/mlt_log.h \
+ ../../framework/mlt_cache.h ../../framework/mlt_version.h \
+ ../../framework/mlt_slices.h

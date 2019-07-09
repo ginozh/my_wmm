@@ -1,0 +1,262 @@
+1, ready
+1.1 build ffmpeg. enable shared, disable static
+
+2, run
+L: seek after a miniute.
+gdb --args
+melt upan/jpg/WeChatSight2266.mp4 -consumer avformat:output.mp4 acodec=aac ab=256k vcodec=libx264 s=1280x720 r=20
+
+mlt_repository repo = mlt_factory_init( NULL );
+   {parent = {child = 0x5555557643e0, local = 0x555555764430, close = 0x0, close_object = 0x0},
+  consumers = 0x5555557647b0, filters = 0x555555764b60, producers = 0x555555764f10, transitions = 0x5555557652c0}
+profile = mlt_profile_init( NULL );
+    {description = 0x5555557f9d50 "DV/DVD PAL", frame_rate_num = 25, frame_rate_den = 1, width = 720, height = 576,
+  progressive = 0, sample_aspect_num = 16, sample_aspect_den = 15, display_aspect_num = 4, display_aspect_den = 3,
+  colorspace = 601, is_explicit = 0}
+backup_profile = mlt_profile_clone( profile );
+
+// Look for the consumer option to load profile settings from consumer properties
+load_consumer( &consumer, profile, argc, argv );
+    mlt_profile profile
+    {description = 0x5555557f9d50 "DV/DVD PAL", frame_rate_num = 20, frame_rate_den = 1, width = 1280, height = 720,
+  progressive = 0, sample_aspect_num = 0, sample_aspect_den = 1, display_aspect_num = 0, display_aspect_den = 1,
+  colorspace = 601, is_explicit = 0}
+mlt_profile_close( backup_profile );
+melt = mlt_factory_producer( profile, "melt", &argv[ 1 ] );
+    {parent = {parent = {child = 0x555555898c30, local = 0x555555898d10, close = 0x7ffff7bb4a16 <mlt_service_close>,
+      close_object = 0x555555898c30}, get_frame = 0x7ffff7bb5b03 <producer_get_frame>,
+    close = 0x7ffff7bb6f1a <mlt_producer_close>, close_object = 0x555555898c30, local = 0x555555898cb0,
+    child = 0x555555898c30}, get_frame = 0x7ffff7bc3635 <producer_get_frame>,
+  close = 0x7ffff7bc418c <mlt_tractor_close>, close_object = 0x555555898c30, local = 0x0, child = 0x555555898c30}
+if ( ! profile->is_explicit )
+    mlt_profile_from_producer( profile, melt );
+    //create 4 threads: src/framework/mlt_consumer.c: mlt_slices_worker -> r->proc
+        ./src/modules/avformat/producer_avformat.c: sliced_h_pix_fmt_conv_proc
+    //create 15 threads
+
+melt = mlt_factory_producer( profile, "melt", &argv[ 1 ] );
+load_consumer( &consumer, profile, argc, argv );
+    consumer
+    {parent = {parent = {child = 0x5555558f1cc0, local = 0x555555892490, close = 0x7ffff7bb4a16 <mlt_service_close>,
+      close_object = 0x5555558f1cc0}, get_frame = 0x7ffff7bb3e35 <service_get_frame>, close = 0x0, close_object = 0x0,
+    local = 0x5555557d9610, child = 0x5555558f1cc0}, start = 0x7fffe7ea28b2 <consumer_start>,
+  stop = 0x7fffe7ea2e68 <consumer_stop>, is_stopped = 0x7fffe7ea2f1b <consumer_is_stopped>, purge = 0x0,
+  close = 0x7fffe7ea8d71 <consumer_close>, local = 0x55555576e2c0, child = 0x0}
+
+mlt_properties_set_data( MLT_CONSUMER_PROPERTIES( consumer ), "transport_producer", melt, 0, NULL, NULL );
+mlt_properties_set_data( MLT_PRODUCER_PROPERTIES( melt ), "transport_consumer", consumer, 0, NULL, NULL );
+
+// Get melt's properties
+mlt_properties melt_props = MLT_PRODUCER_PROPERTIES( melt );
+mlt_properties group = mlt_properties_get_data( melt_props, "group", 0 );
+mlt_properties properties = MLT_CONSUMER_PROPERTIES( consumer );
+
+// Connect consumer to melt
+mlt_consumer_connect( consumer, MLT_PRODUCER_SERVICE( melt ) );
+
+// Start the consumer
+mlt_events_listen( properties, consumer, "consumer-fatal-error", ( mlt_listener )on_fatal_error );
+// src/framework/mlt_consumer.c
+mlt_consumer_start( consumer )
+    mlt_consumer self;
+    consumer_read_ahead_start( self );
+        mlt_thread_create( self, (thread_function_t) consumer_read_ahead_thread );
+
+4, 获取帧thread
+src/framework/mlt_consumer.c
+static void *consumer_read_ahead_thread( void *arg )
+	mlt_consumer self = arg;
+	// Get the properties of the consumer
+	mlt_properties properties = MLT_CONSUMER_PROPERTIES( self );
+
+	// Get the width and height
+	int width = mlt_properties_get_int( properties, "width" );
+	int height = mlt_properties_get_int( properties, "height" );
+
+	// Get the first frame
+	mlt_frame frame = NULL;
+	frame = mlt_consumer_get_frame( self );
+    =>mlt_frame mlt_consumer_get_frame( mlt_consumer self )
+        mlt_service service = MLT_CONSUMER_SERVICE( self );
+        if ( mlt_service_producer( service ) != NULL )
+            mlt_service_get_frame( service, &frame, 0 );
+            // src/framework/mlt_service.c
+            =>int mlt_service_get_frame( mlt_service self, mlt_frame_ptr frame, int index )
+                int result = 0;
+                result = self->get_frame( self, frame, index );
+                =>static int service_get_frame( mlt_service self, mlt_frame_ptr frame, int index )
+                    mlt_service_base *base = self->local;
+                    mlt_service producer = base->in[ index ];
+                    return mlt_service_get_frame( producer, frame, index );
+                    =>int mlt_service_get_frame( mlt_service self, mlt_frame_ptr frame, int index )
+                        result = self->get_frame( self, frame, index );
+                        =>static int producer_get_frame( mlt_service service, mlt_frame_ptr frame, int index )
+                            mlt_producer self = service != NULL ? service->child : NULL;
+                            result = self->get_frame( clone, frame, index );
+                            // ./src/framework/mlt_tractor.c
+                            =>static int producer_get_frame( mlt_producer parent, mlt_frame_ptr frame, int track )
+                                mlt_tractor self = parent->child;
+                                mlt_deque data_queue = mlt_deque_init( );
+                                mlt_producer_seek( target, mlt_producer_frame( parent ) );
+                                // src/framework/mlt_producer.c
+                                => int mlt_producer_seek( mlt_producer self, mlt_position position )
+                                    // Set the position
+                                    mlt_properties_set_position( MLT_PRODUCER_PROPERTIES( self ), "_position", position );
+                                    // Calculate the absolute frame
+                                    mlt_properties_set_position( MLT_PRODUCER_PROPERTIES( self ), "_frame", use_points * mlt_producer_get_in( self ) + position );
+                                *frame = mlt_frame_init( MLT_PRODUCER_SERVICE( parent ) );
+                                mlt_frame temp = NULL;
+                                for ( i = 0; !done; i ++ )
+                                    // Get a frame from the producer
+                                    mlt_service_get_frame( self->producer, &temp, i );
+                                mlt_frame_push_audio( *frame, audio );
+                                mlt_frame_push_service( *frame, video );
+                                mlt_frame_push_service( *frame, producer_get_image );
+                                mlt_properties_set_int( frame_properties, "width", mlt_properties_get_int( video_properties, "width" ) );
+                                mlt_properties_set_double( frame_properties, "aspect_ratio", mlt_properties_get_double( video_properties, "aspect_ratio" ) );
+                                ...;
+                                // Prepare the next frame
+                                mlt_producer_prepare_next( parent );
+
+	priv->speed = mlt_properties_get_int( MLT_FRAME_PROPERTIES( frame ), "_speed" );
+
+    // Get the audio of the first frame
+    mlt_frame_get_audio( frame, &audio, &priv->audio_format, &priv->frequency, &priv->channels, &samples );
+
+    // Get the image of the first frame
+	uint8_t *image = NULL;
+    mlt_frame_get_image( frame, &image, &priv->image_format, &width, &height, 0 );
+    // src/framework/mlt_frame.c
+    => int mlt_frame_get_image( mlt_frame self, uint8_t **buffer, mlt_image_format *format, int *width, int *height, int writable )
+        mlt_get_image get_image = mlt_frame_pop_get_image( self );
+		error = get_image( self, buffer, format, width, height, writable );
+        // ./src/framework/mlt_tractor.c
+        =>static int producer_get_image( mlt_frame self, uint8_t **buffer, mlt_image_format *format, int *width, int *height, int writable )
+            mlt_frame frame = mlt_frame_pop_service( self );
+            mlt_properties frame_properties = MLT_FRAME_PROPERTIES( frame );
+            mlt_properties_set( frame_properties, "rescale.interp", mlt_properties_get( properties, "rescale.interp" ) );
+            mlt_properties_set_int( frame_properties, "resize_alpha", mlt_properties_get_int( properties, "resize_alpha" ) );
+            mlt_properties_set_int( frame_properties, "distort", mlt_properties_get_int( properties, "distort" ) );
+            ...;
+            mlt_frame_get_image( frame, buffer, format, width, height, writable );
+            // src/framework/mlt_frame.c
+            => int mlt_frame_get_image( mlt_frame self, uint8_t **buffer, mlt_image_format *format, int *width, int *height, int writable )
+                mlt_get_image get_image = mlt_frame_pop_get_image( self );
+                error = get_image( self, buffer, format, width, height, writable );
+            => ./src/modules/core/filter_resize.c 
+            => src/framework/mlt_frame.c
+            => ./src/modules/core/filter_rescale.c
+            => src/framework/mlt_frame.c
+            => ./src/modules/core/filter_crop.c
+            ...;
+            => src/framework/mlt_frame.c
+            => ./src/modules/avformat/producer_avformat.c
+            static int producer_get_image( mlt_frame frame, uint8_t **buffer, mlt_image_format *format, int *width, int *height, int writable )
+                // Get the producer
+                producer_avformat self = mlt_frame_pop_service( frame );
+                mlt_producer producer = self->parent;
+                // Obtain the frame number of this frame
+                mlt_position position = mlt_frame_original_position( frame );
+
+                // Get the image cache
+                // Cache miss
+                // We may want to use the source fps if available
+                double source_fps = mlt_properties_get_double( properties, "meta.media.frame_rate_num" ) /
+                    mlt_properties_get_double( properties, "meta.media.frame_rate_den" );
+
+                // This is the physical frame position in the source
+                int64_t req_position = ( int64_t )( position / mlt_producer_get_fps( producer ) * source_fps + 0.5 );
+
+                // Determines if we have to decode all frames in a sequence - when there temporal compression is used.
+                const AVCodecDescriptor *descriptor = codec_context->codec? avcodec_descriptor_get( codec_context->codec->id ) : NULL;
+                int must_decode = descriptor && !( descriptor->props & AV_CODEC_PROP_INTRA_ONLY );
+
+                double delay = mlt_properties_get_double( properties, "video_delay" );
+
+                // Seek if necessary
+                int preseek = must_decode && codec_context->has_b_frames;
+            #if defined(FFUDIV)
+                const char *interp = mlt_properties_get( frame_properties, "rescale.interp" );
+                preseek = preseek && interp && strcmp( interp, "nearest" );
+            #endif
+                int paused = seek_video( self, position, req_position, preseek );
+                => static int seek_video( producer_avformat self, mlt_position position,
+                        int64_t req_position, int preseek )
+                    int seek_threshold = mlt_properties_get_int( properties, "seek_threshold" );
+                    if ( seek_threshold <= 0 ) seek_threshold = 12;
+                    // 第一次position=0, self->video_expected=1, self->last_position=-2
+                    if ( self->video_seekable && ( position != self->video_expected || self->last_position < 0 ) )
+                    {
+                        // Fetch the video format context
+                        AVFormatContext *context = self->video_format;
+                        // Get the video stream
+                        AVStream *stream = context->streams[ self->video_index ];
+                        // Get codec context
+                        AVCodecContext *codec_context = stream->codec;
+                        //原始视频fps. We may want to use the source fps if available
+                        double source_fps = mlt_properties_get_double( properties, "meta.media.frame_rate_num" ) /
+                            mlt_properties_get_double( properties, "meta.media.frame_rate_den" );
+                        if ( self->first_pts == AV_NOPTS_VALUE && self->last_position == POSITION_INITIAL )
+                            find_first_pts( self, self->video_index );
+                        if ( self->video_frame && position + 1 == self->video_expected )
+                        {
+                            // We're paused - use last image
+                            paused = 1;
+                        }
+                        else if ( position < self->video_expected || position - self->video_expected >= seek_threshold || self->last_position < 0 )
+                        {
+                            // Calculate the timestamp for the requested frame
+                            int64_t timestamp = req_position / ( av_q2d( self->video_time_base ) * source_fps );
+                            if ( req_position <= 0 )
+                                timestamp = 0;
+                            else if ( self->first_pts != AV_NOPTS_VALUE )
+                                timestamp += self->first_pts;
+                            else if ( context->start_time != AV_NOPTS_VALUE )
+                                timestamp += context->start_time;
+                            if ( preseek && av_q2d( self->video_time_base ) != 0 )
+                                timestamp -= 2 / av_q2d( self->video_time_base );
+                            if ( timestamp < 0 )
+                                timestamp = 0;
+                            // Seek to the timestamp
+                            codec_context->skip_loop_filter = AVDISCARD_NONREF;
+                            av_seek_frame( context, self->video_index, timestamp, AVSEEK_FLAG_BACKWARD );
+                            // flush any pictures still in decode buffer
+                            avcodec_flush_buffers( codec_context );
+                            // Remove the cached info relating to the previous position
+                            self->current_position = POSITION_INVALID;
+                            self->last_position = POSITION_INVALID;
+                            av_freep( &self->video_frame );
+                        }
+                    }
+
+	// Continue to read ahead
+	while ( priv->ahead )
+		// Get the next frame
+		frame = mlt_consumer_get_frame( self );
+
+//Get an image from a frame
+./src/modules/avformat/producer_avformat.c
+#0  producer_get_image (frame=0x7fffbc001590, buffer=0x7fffb3308d58, format=0x61a38c, width=0x7fffb3308a18,
+    height=0x7fffb3308a1c, writable=1) at producer_avformat.c:1523
+#14 0x00007ffff7bc1195 in consumer_read_ahead_thread (arg=0x730be0) at mlt_consumer.c:820
+
+// Transport functionality
+transport( melt, consumer );
+    while( mlt_properties_get_int( properties, "done" ) == 0 && !mlt_consumer_is_stopped( consumer ) )
+        //print: Current Position:        281
+        fprintf( stderr, "Current Position: %10d\r", (int)mlt_consumer_position( consumer ) );
+    
+thread 12|13
+    #0  0x00007fffe70824e8 in ?? () from /usr/lib/x86_64-linux-gnu/libswscale-ffmpeg.so.3
+    #1  0x00007fffe7059343 in ?? () from /usr/lib/x86_64-linux-gnu/libswscale-ffmpeg.so.3
+    #2  0x00007fffe705a734 in sws_scale () from /usr/lib/x86_64-linux-gnu/libswscale-ffmpeg.so.3
+    #3  0x00007fffe8d50e35 in sliced_h_pix_fmt_conv_proc (id=0, idx=2, jobs=3, cookie=0x7fffb3308420)
+        at producer_avformat.c:1309 //编解码
+    #4  0x00007ffff7bcc9c6 in mlt_slices_worker (p=0x788940) at mlt_slices.c:117
+    #5  0x00007ffff79866ba in start_thread (arg=0x7fffd378c700) at pthread_create.c:333
+    #6  0x00007ffff73a941d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:109
+
+    
+
+// Stop the consumer
+mlt_consumer_stop( consumer );

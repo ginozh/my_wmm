@@ -1,0 +1,1 @@
+SUBDIRS = rtaudio kdenlive decklink linsys kino qt jackrack sdl2 opengl core feeds frei0r xml opencv xine ndi vid.stab motion_est avformat sdl videostab vorbis resample oldfilm plus normalize gtk2 lumas swfdec sox vmfx dv plusgpl
