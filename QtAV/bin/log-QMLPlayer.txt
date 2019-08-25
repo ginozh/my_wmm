@@ -1,0 +1,62 @@
+Debug: arguments=======  ("E:\\qtproject\\QtAV\\bin\\QMLPlayer.exe")
+Debug: current dir:  "E:/qtproject/QtAV/bin"
+Debug: ("E:/qtproject/QtAV/bin", "qrc:/qt-project.org/imports", "C:/msys64/mingw64/share/qt5/qml")
+Debug: >>>>>>>>devicePixelRatio: 1.000000
+Debug: dpi phy:  125.152 , logical:  96 , dpr:  1 ; vis rect: QRect(0,0 1366x768)
+Debug: touch devices:  (QTouchDevice("", type=TouchScreen, capabilities=Position|Area|NormalizedPosition|MouseEmulation, maximumTouchPoints=2))
+Debug: QtAV 1.13.0(Aug 17 2019, 06:19:13)
+Multimedia framework base on Qt and FFmpeg.
+Distributed under the terms of LGPLv2.1 or later.
+Shanghai, China Copyright (C) 2012-2019 Wang Bin (aka. Lucas Wang) wbsecg1@gmail.com
+Donate: http://qtav.org/donate.html
+Source: https://github.com/wang-bin/QtAV
+Home page: http://qtav.org
+Debug: "Build with Qt-5.10.0"
+Debug: "FFmpeg/Libav configuration: --prefix=/mingw64 --target-os=mingw32 --arch=x86_64 --disable-debug --disable-static --enable-avresample --enable-dxva2 --enable-d3d11va --enable-fontconfig --enable-gnutls --enable-gpl --enable-libass --enable-libbluray --enable-libcaca --enable-libcelt --enable-libfreetype --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore_amrnb --enable-libopencore_amrwb --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libxvid --enable-libvpx --enable-libwebp --enable-openal --enable-libwavpack --enable-pic --enable-postproc --enable-runtime-cpudetect --enable-shared --enable-static --enable-swresample --enable-version3 --enable-zlib --disable-doc"
+Debug: "Build with avutil-55.78.100"
+Debug: "Build with avcodec-57.107.100"
+Debug: "Build with avformat-57.83.100"
+Debug: "Build with avfilter-6.107.100"
+Debug: "Build with avdevice-57.10.100"
+Debug: "Build with avresample-3.7.0"
+Debug: "Build with swresample-2.9.100"
+Debug: "Build with swscale-4.8.100"
+Debug: Registered audio backends:  ("XAudio2", "DirectSound", "null")
+Debug: "XAudio2_9"
+Debug: "Build with XAudio2 from DXSDK"
+Debug: "Try symbol 'XAudio2Create' from WinSDK dll"
+Debug: "xaudio2: 0x560c0090"
+Debug: engine: "LibASS"
+Debug: engine: "FFmpeg"
+Debug: engine: "FFmpeg"
+Debug: engine: "LibASS"
+Debug: "OpenGL version: 4.0  hasGLSL: 1"
+Debug: "GL_VERSION: 4.0.0 - Build 10.18.10.4252"
+Debug: "GL_VENDOR: Intel"
+Debug: "GL_RENDERER: Intel(R) HD Graphics 4000"
+Debug: "GL_SHADING_LANGUAGE_VERSION: 4.00 - Build 10.18.10.4252"
+Debug: "Is OpenGLES: 0"
+Debug: "Is EGL: 0"
+Debug: "GLSL version: 400"
+Debug: "Has PBO: 1"
+Debug: resolving WGL_NV_DX_interop...
+Debug: "16 bit texture depth: 16.\n"
+Debug: "using gl_param_3r16"
+Debug: "Has 16bit texture: 1"
+Debug: "check gl3 rg: 0x822B"
+Debug: "Has RG texture: 1"
+Debug: QSurfaceFormat(version 4.0, options QFlags<QSurfaceFormat::FormatOption>(DeprecatedFunctions), depthBufferSize 24, redBufferSize 8, greenBufferSize 8, blueBufferSize 8, alphaBufferSize 8, stencilBufferSize 8, samples 0, swapBehavior QSurfaceFormat::SwapBehavior(DoubleBuffer), swapInterval 1, colorSpace QSurfaceFormat::ColorSpace(DefaultColorSpace), profile  QSurfaceFormat::OpenGLContextProfile(CompatibilityProfile))
+Debug: init>>>>>screen density logical: 3.7795275590551185 pixel: 4.927242432657595
+Debug: file:  ""
+Debug: ScreenSaver::retrieveState
+Debug: Succeed to enable screen saver (0)
+Debug: sync config to  "C:/Users/user/AppData/Roaming/QMLPlayer/QMLPlayer.ini"
+Debug: sync end
+Debug: "Not playing~"
+Warning: "No gl context"
+Debug: "(repeat 2)No gl context\nNot playing~"
+Debug: "source_voice: 0x0, master: 0x0"
+Debug: 
+Debug: "(repeat 1)source_voice: 0x0, master: 0x0\nExtractThread exiting..."
+Warning: "No gl context"
+Warning: ScreenSaver::restoreState: no data, doing nothing
