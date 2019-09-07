@@ -564,7 +564,7 @@ SDK_PRIVATE_HEADERS *= \
     QtAV/private/QPainterRenderer_p.h
 
 # QtAV/private/* may be used by developers to extend QtAV features without changing QtAV library
-# headers not in QtAV/ and it's subdirs are used only by QtAV internally
+# headers not in QtAV/ and its subdirs are used only by QtAV internally
 HEADERS *= \
     $$SDK_HEADERS \
     $$SDK_PRIVATE_HEADERS \

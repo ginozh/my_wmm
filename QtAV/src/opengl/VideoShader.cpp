@@ -31,7 +31,7 @@
 #include "utils/Logger.h"
 
 #define YUVA_DONE 0
-//#define QTAV_DEBUG_GLSL
+#define QTAV_DEBUG_GLSL
 
 namespace QtAV {
 extern QVector<Uniform> ParseUniforms(const QByteArray& text, GLuint programId = 0);

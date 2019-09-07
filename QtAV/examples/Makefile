@@ -27,19 +27,8 @@ DEL_DIR       = rmdir
 MOVE          = mv -f
 SUBTARGETS    =  \
 		sub-common \
-		sub-audiopipeline \
-		sub-sharedoutput \
-		sub-simpletranscode \
-		sub-simpleplayer \
 		sub-player \
-		sub-filters \
 		sub-framereader \
-		sub-videocapture \
-		sub-videographicsitem \
-		sub-videogroup \
-		sub-videowall \
-		sub-shader \
-		sub-glslfilter \
 		sub-window \
 		sub-QMLPlayer
 
@@ -69,106 +58,6 @@ sub-common-install_subtargets: FORCE
 sub-common-uninstall_subtargets: FORCE
 	@test -d common/ || mkdir -p common/
 	cd common/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/common/common.pro ) && $(MAKE) -f Makefile uninstall
-sub-audiopipeline-qmake_all:  FORCE
-	@test -d audiopipeline/ || mkdir -p audiopipeline/
-	cd audiopipeline/ && $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/audiopipeline/audiopipeline.pro
-	cd audiopipeline/ && $(MAKE) -f Makefile qmake_all
-sub-audiopipeline: FORCE
-	@test -d audiopipeline/ || mkdir -p audiopipeline/
-	cd audiopipeline/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/audiopipeline/audiopipeline.pro ) && $(MAKE) -f Makefile
-sub-audiopipeline-make_first: FORCE
-	@test -d audiopipeline/ || mkdir -p audiopipeline/
-	cd audiopipeline/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/audiopipeline/audiopipeline.pro ) && $(MAKE) -f Makefile 
-sub-audiopipeline-all: FORCE
-	@test -d audiopipeline/ || mkdir -p audiopipeline/
-	cd audiopipeline/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/audiopipeline/audiopipeline.pro ) && $(MAKE) -f Makefile all
-sub-audiopipeline-clean: FORCE
-	@test -d audiopipeline/ || mkdir -p audiopipeline/
-	cd audiopipeline/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/audiopipeline/audiopipeline.pro ) && $(MAKE) -f Makefile clean
-sub-audiopipeline-distclean: FORCE
-	@test -d audiopipeline/ || mkdir -p audiopipeline/
-	cd audiopipeline/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/audiopipeline/audiopipeline.pro ) && $(MAKE) -f Makefile distclean
-sub-audiopipeline-install_subtargets: FORCE
-	@test -d audiopipeline/ || mkdir -p audiopipeline/
-	cd audiopipeline/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/audiopipeline/audiopipeline.pro ) && $(MAKE) -f Makefile install
-sub-audiopipeline-uninstall_subtargets: FORCE
-	@test -d audiopipeline/ || mkdir -p audiopipeline/
-	cd audiopipeline/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/audiopipeline/audiopipeline.pro ) && $(MAKE) -f Makefile uninstall
-sub-sharedoutput-qmake_all:  FORCE
-	@test -d sharedoutput/ || mkdir -p sharedoutput/
-	cd sharedoutput/ && $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/sharedoutput/sharedoutput.pro
-	cd sharedoutput/ && $(MAKE) -f Makefile qmake_all
-sub-sharedoutput: FORCE
-	@test -d sharedoutput/ || mkdir -p sharedoutput/
-	cd sharedoutput/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/sharedoutput/sharedoutput.pro ) && $(MAKE) -f Makefile
-sub-sharedoutput-make_first: FORCE
-	@test -d sharedoutput/ || mkdir -p sharedoutput/
-	cd sharedoutput/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/sharedoutput/sharedoutput.pro ) && $(MAKE) -f Makefile 
-sub-sharedoutput-all: FORCE
-	@test -d sharedoutput/ || mkdir -p sharedoutput/
-	cd sharedoutput/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/sharedoutput/sharedoutput.pro ) && $(MAKE) -f Makefile all
-sub-sharedoutput-clean: FORCE
-	@test -d sharedoutput/ || mkdir -p sharedoutput/
-	cd sharedoutput/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/sharedoutput/sharedoutput.pro ) && $(MAKE) -f Makefile clean
-sub-sharedoutput-distclean: FORCE
-	@test -d sharedoutput/ || mkdir -p sharedoutput/
-	cd sharedoutput/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/sharedoutput/sharedoutput.pro ) && $(MAKE) -f Makefile distclean
-sub-sharedoutput-install_subtargets: FORCE
-	@test -d sharedoutput/ || mkdir -p sharedoutput/
-	cd sharedoutput/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/sharedoutput/sharedoutput.pro ) && $(MAKE) -f Makefile install
-sub-sharedoutput-uninstall_subtargets: FORCE
-	@test -d sharedoutput/ || mkdir -p sharedoutput/
-	cd sharedoutput/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/sharedoutput/sharedoutput.pro ) && $(MAKE) -f Makefile uninstall
-sub-simpletranscode-qmake_all:  FORCE
-	@test -d simpletranscode/ || mkdir -p simpletranscode/
-	cd simpletranscode/ && $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpletranscode/simpletranscode.pro
-	cd simpletranscode/ && $(MAKE) -f Makefile qmake_all
-sub-simpletranscode: FORCE
-	@test -d simpletranscode/ || mkdir -p simpletranscode/
-	cd simpletranscode/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpletranscode/simpletranscode.pro ) && $(MAKE) -f Makefile
-sub-simpletranscode-make_first: FORCE
-	@test -d simpletranscode/ || mkdir -p simpletranscode/
-	cd simpletranscode/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpletranscode/simpletranscode.pro ) && $(MAKE) -f Makefile 
-sub-simpletranscode-all: FORCE
-	@test -d simpletranscode/ || mkdir -p simpletranscode/
-	cd simpletranscode/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpletranscode/simpletranscode.pro ) && $(MAKE) -f Makefile all
-sub-simpletranscode-clean: FORCE
-	@test -d simpletranscode/ || mkdir -p simpletranscode/
-	cd simpletranscode/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpletranscode/simpletranscode.pro ) && $(MAKE) -f Makefile clean
-sub-simpletranscode-distclean: FORCE
-	@test -d simpletranscode/ || mkdir -p simpletranscode/
-	cd simpletranscode/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpletranscode/simpletranscode.pro ) && $(MAKE) -f Makefile distclean
-sub-simpletranscode-install_subtargets: FORCE
-	@test -d simpletranscode/ || mkdir -p simpletranscode/
-	cd simpletranscode/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpletranscode/simpletranscode.pro ) && $(MAKE) -f Makefile install
-sub-simpletranscode-uninstall_subtargets: FORCE
-	@test -d simpletranscode/ || mkdir -p simpletranscode/
-	cd simpletranscode/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpletranscode/simpletranscode.pro ) && $(MAKE) -f Makefile uninstall
-sub-simpleplayer-qmake_all:  FORCE
-	@test -d simpleplayer/ || mkdir -p simpleplayer/
-	cd simpleplayer/ && $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpleplayer/simpleplayer.pro
-	cd simpleplayer/ && $(MAKE) -f Makefile qmake_all
-sub-simpleplayer: FORCE
-	@test -d simpleplayer/ || mkdir -p simpleplayer/
-	cd simpleplayer/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpleplayer/simpleplayer.pro ) && $(MAKE) -f Makefile
-sub-simpleplayer-make_first: FORCE
-	@test -d simpleplayer/ || mkdir -p simpleplayer/
-	cd simpleplayer/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpleplayer/simpleplayer.pro ) && $(MAKE) -f Makefile 
-sub-simpleplayer-all: FORCE
-	@test -d simpleplayer/ || mkdir -p simpleplayer/
-	cd simpleplayer/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpleplayer/simpleplayer.pro ) && $(MAKE) -f Makefile all
-sub-simpleplayer-clean: FORCE
-	@test -d simpleplayer/ || mkdir -p simpleplayer/
-	cd simpleplayer/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpleplayer/simpleplayer.pro ) && $(MAKE) -f Makefile clean
-sub-simpleplayer-distclean: FORCE
-	@test -d simpleplayer/ || mkdir -p simpleplayer/
-	cd simpleplayer/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpleplayer/simpleplayer.pro ) && $(MAKE) -f Makefile distclean
-sub-simpleplayer-install_subtargets: FORCE
-	@test -d simpleplayer/ || mkdir -p simpleplayer/
-	cd simpleplayer/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpleplayer/simpleplayer.pro ) && $(MAKE) -f Makefile install
-sub-simpleplayer-uninstall_subtargets: FORCE
-	@test -d simpleplayer/ || mkdir -p simpleplayer/
-	cd simpleplayer/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpleplayer/simpleplayer.pro ) && $(MAKE) -f Makefile uninstall
 sub-player-qmake_all: sub-common-qmake_all FORCE
 	@test -d player/ || mkdir -p player/
 	cd player/ && $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/player/player.pro
@@ -194,31 +83,6 @@ sub-player-install_subtargets: sub-common-install_subtargets FORCE
 sub-player-uninstall_subtargets: sub-common-uninstall_subtargets FORCE
 	@test -d player/ || mkdir -p player/
 	cd player/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/player/player.pro ) && $(MAKE) -f Makefile uninstall
-sub-filters-qmake_all:  FORCE
-	@test -d filters/ || mkdir -p filters/
-	cd filters/ && $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/filters/filters.pro
-	cd filters/ && $(MAKE) -f Makefile qmake_all
-sub-filters: FORCE
-	@test -d filters/ || mkdir -p filters/
-	cd filters/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/filters/filters.pro ) && $(MAKE) -f Makefile
-sub-filters-make_first: FORCE
-	@test -d filters/ || mkdir -p filters/
-	cd filters/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/filters/filters.pro ) && $(MAKE) -f Makefile 
-sub-filters-all: FORCE
-	@test -d filters/ || mkdir -p filters/
-	cd filters/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/filters/filters.pro ) && $(MAKE) -f Makefile all
-sub-filters-clean: FORCE
-	@test -d filters/ || mkdir -p filters/
-	cd filters/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/filters/filters.pro ) && $(MAKE) -f Makefile clean
-sub-filters-distclean: FORCE
-	@test -d filters/ || mkdir -p filters/
-	cd filters/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/filters/filters.pro ) && $(MAKE) -f Makefile distclean
-sub-filters-install_subtargets: FORCE
-	@test -d filters/ || mkdir -p filters/
-	cd filters/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/filters/filters.pro ) && $(MAKE) -f Makefile install
-sub-filters-uninstall_subtargets: FORCE
-	@test -d filters/ || mkdir -p filters/
-	cd filters/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/filters/filters.pro ) && $(MAKE) -f Makefile uninstall
 sub-framereader-qmake_all:  FORCE
 	@test -d framereader/ || mkdir -p framereader/
 	cd framereader/ && $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/framereader/framereader.pro
@@ -244,156 +108,6 @@ sub-framereader-install_subtargets: FORCE
 sub-framereader-uninstall_subtargets: FORCE
 	@test -d framereader/ || mkdir -p framereader/
 	cd framereader/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/framereader/framereader.pro ) && $(MAKE) -f Makefile uninstall
-sub-videocapture-qmake_all:  FORCE
-	@test -d videocapture/ || mkdir -p videocapture/
-	cd videocapture/ && $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videocapture/videocapture.pro
-	cd videocapture/ && $(MAKE) -f Makefile qmake_all
-sub-videocapture: FORCE
-	@test -d videocapture/ || mkdir -p videocapture/
-	cd videocapture/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videocapture/videocapture.pro ) && $(MAKE) -f Makefile
-sub-videocapture-make_first: FORCE
-	@test -d videocapture/ || mkdir -p videocapture/
-	cd videocapture/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videocapture/videocapture.pro ) && $(MAKE) -f Makefile 
-sub-videocapture-all: FORCE
-	@test -d videocapture/ || mkdir -p videocapture/
-	cd videocapture/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videocapture/videocapture.pro ) && $(MAKE) -f Makefile all
-sub-videocapture-clean: FORCE
-	@test -d videocapture/ || mkdir -p videocapture/
-	cd videocapture/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videocapture/videocapture.pro ) && $(MAKE) -f Makefile clean
-sub-videocapture-distclean: FORCE
-	@test -d videocapture/ || mkdir -p videocapture/
-	cd videocapture/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videocapture/videocapture.pro ) && $(MAKE) -f Makefile distclean
-sub-videocapture-install_subtargets: FORCE
-	@test -d videocapture/ || mkdir -p videocapture/
-	cd videocapture/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videocapture/videocapture.pro ) && $(MAKE) -f Makefile install
-sub-videocapture-uninstall_subtargets: FORCE
-	@test -d videocapture/ || mkdir -p videocapture/
-	cd videocapture/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videocapture/videocapture.pro ) && $(MAKE) -f Makefile uninstall
-sub-videographicsitem-qmake_all:  FORCE
-	@test -d videographicsitem/ || mkdir -p videographicsitem/
-	cd videographicsitem/ && $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videographicsitem/videographicsitem.pro
-	cd videographicsitem/ && $(MAKE) -f Makefile qmake_all
-sub-videographicsitem: FORCE
-	@test -d videographicsitem/ || mkdir -p videographicsitem/
-	cd videographicsitem/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videographicsitem/videographicsitem.pro ) && $(MAKE) -f Makefile
-sub-videographicsitem-make_first: FORCE
-	@test -d videographicsitem/ || mkdir -p videographicsitem/
-	cd videographicsitem/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videographicsitem/videographicsitem.pro ) && $(MAKE) -f Makefile 
-sub-videographicsitem-all: FORCE
-	@test -d videographicsitem/ || mkdir -p videographicsitem/
-	cd videographicsitem/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videographicsitem/videographicsitem.pro ) && $(MAKE) -f Makefile all
-sub-videographicsitem-clean: FORCE
-	@test -d videographicsitem/ || mkdir -p videographicsitem/
-	cd videographicsitem/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videographicsitem/videographicsitem.pro ) && $(MAKE) -f Makefile clean
-sub-videographicsitem-distclean: FORCE
-	@test -d videographicsitem/ || mkdir -p videographicsitem/
-	cd videographicsitem/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videographicsitem/videographicsitem.pro ) && $(MAKE) -f Makefile distclean
-sub-videographicsitem-install_subtargets: FORCE
-	@test -d videographicsitem/ || mkdir -p videographicsitem/
-	cd videographicsitem/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videographicsitem/videographicsitem.pro ) && $(MAKE) -f Makefile install
-sub-videographicsitem-uninstall_subtargets: FORCE
-	@test -d videographicsitem/ || mkdir -p videographicsitem/
-	cd videographicsitem/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videographicsitem/videographicsitem.pro ) && $(MAKE) -f Makefile uninstall
-sub-videogroup-qmake_all:  FORCE
-	@test -d videogroup/ || mkdir -p videogroup/
-	cd videogroup/ && $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videogroup/videogroup.pro
-	cd videogroup/ && $(MAKE) -f Makefile qmake_all
-sub-videogroup: FORCE
-	@test -d videogroup/ || mkdir -p videogroup/
-	cd videogroup/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videogroup/videogroup.pro ) && $(MAKE) -f Makefile
-sub-videogroup-make_first: FORCE
-	@test -d videogroup/ || mkdir -p videogroup/
-	cd videogroup/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videogroup/videogroup.pro ) && $(MAKE) -f Makefile 
-sub-videogroup-all: FORCE
-	@test -d videogroup/ || mkdir -p videogroup/
-	cd videogroup/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videogroup/videogroup.pro ) && $(MAKE) -f Makefile all
-sub-videogroup-clean: FORCE
-	@test -d videogroup/ || mkdir -p videogroup/
-	cd videogroup/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videogroup/videogroup.pro ) && $(MAKE) -f Makefile clean
-sub-videogroup-distclean: FORCE
-	@test -d videogroup/ || mkdir -p videogroup/
-	cd videogroup/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videogroup/videogroup.pro ) && $(MAKE) -f Makefile distclean
-sub-videogroup-install_subtargets: FORCE
-	@test -d videogroup/ || mkdir -p videogroup/
-	cd videogroup/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videogroup/videogroup.pro ) && $(MAKE) -f Makefile install
-sub-videogroup-uninstall_subtargets: FORCE
-	@test -d videogroup/ || mkdir -p videogroup/
-	cd videogroup/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videogroup/videogroup.pro ) && $(MAKE) -f Makefile uninstall
-sub-videowall-qmake_all:  FORCE
-	@test -d videowall/ || mkdir -p videowall/
-	cd videowall/ && $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videowall/videowall.pro
-	cd videowall/ && $(MAKE) -f Makefile qmake_all
-sub-videowall: FORCE
-	@test -d videowall/ || mkdir -p videowall/
-	cd videowall/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videowall/videowall.pro ) && $(MAKE) -f Makefile
-sub-videowall-make_first: FORCE
-	@test -d videowall/ || mkdir -p videowall/
-	cd videowall/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videowall/videowall.pro ) && $(MAKE) -f Makefile 
-sub-videowall-all: FORCE
-	@test -d videowall/ || mkdir -p videowall/
-	cd videowall/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videowall/videowall.pro ) && $(MAKE) -f Makefile all
-sub-videowall-clean: FORCE
-	@test -d videowall/ || mkdir -p videowall/
-	cd videowall/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videowall/videowall.pro ) && $(MAKE) -f Makefile clean
-sub-videowall-distclean: FORCE
-	@test -d videowall/ || mkdir -p videowall/
-	cd videowall/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videowall/videowall.pro ) && $(MAKE) -f Makefile distclean
-sub-videowall-install_subtargets: FORCE
-	@test -d videowall/ || mkdir -p videowall/
-	cd videowall/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videowall/videowall.pro ) && $(MAKE) -f Makefile install
-sub-videowall-uninstall_subtargets: FORCE
-	@test -d videowall/ || mkdir -p videowall/
-	cd videowall/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videowall/videowall.pro ) && $(MAKE) -f Makefile uninstall
-sub-shader-qmake_all:  FORCE
-	@test -d shader/ || mkdir -p shader/
-	cd shader/ && $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/shader/shader.pro
-	cd shader/ && $(MAKE) -f Makefile qmake_all
-sub-shader: FORCE
-	@test -d shader/ || mkdir -p shader/
-	cd shader/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/shader/shader.pro ) && $(MAKE) -f Makefile
-sub-shader-make_first: FORCE
-	@test -d shader/ || mkdir -p shader/
-	cd shader/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/shader/shader.pro ) && $(MAKE) -f Makefile 
-sub-shader-all: FORCE
-	@test -d shader/ || mkdir -p shader/
-	cd shader/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/shader/shader.pro ) && $(MAKE) -f Makefile all
-sub-shader-clean: FORCE
-	@test -d shader/ || mkdir -p shader/
-	cd shader/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/shader/shader.pro ) && $(MAKE) -f Makefile clean
-sub-shader-distclean: FORCE
-	@test -d shader/ || mkdir -p shader/
-	cd shader/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/shader/shader.pro ) && $(MAKE) -f Makefile distclean
-sub-shader-install_subtargets: FORCE
-	@test -d shader/ || mkdir -p shader/
-	cd shader/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/shader/shader.pro ) && $(MAKE) -f Makefile install
-sub-shader-uninstall_subtargets: FORCE
-	@test -d shader/ || mkdir -p shader/
-	cd shader/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/shader/shader.pro ) && $(MAKE) -f Makefile uninstall
-sub-glslfilter-qmake_all:  FORCE
-	@test -d glslfilter/ || mkdir -p glslfilter/
-	cd glslfilter/ && $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/glslfilter/glslfilter.pro
-	cd glslfilter/ && $(MAKE) -f Makefile qmake_all
-sub-glslfilter: FORCE
-	@test -d glslfilter/ || mkdir -p glslfilter/
-	cd glslfilter/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/glslfilter/glslfilter.pro ) && $(MAKE) -f Makefile
-sub-glslfilter-make_first: FORCE
-	@test -d glslfilter/ || mkdir -p glslfilter/
-	cd glslfilter/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/glslfilter/glslfilter.pro ) && $(MAKE) -f Makefile 
-sub-glslfilter-all: FORCE
-	@test -d glslfilter/ || mkdir -p glslfilter/
-	cd glslfilter/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/glslfilter/glslfilter.pro ) && $(MAKE) -f Makefile all
-sub-glslfilter-clean: FORCE
-	@test -d glslfilter/ || mkdir -p glslfilter/
-	cd glslfilter/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/glslfilter/glslfilter.pro ) && $(MAKE) -f Makefile clean
-sub-glslfilter-distclean: FORCE
-	@test -d glslfilter/ || mkdir -p glslfilter/
-	cd glslfilter/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/glslfilter/glslfilter.pro ) && $(MAKE) -f Makefile distclean
-sub-glslfilter-install_subtargets: FORCE
-	@test -d glslfilter/ || mkdir -p glslfilter/
-	cd glslfilter/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/glslfilter/glslfilter.pro ) && $(MAKE) -f Makefile install
-sub-glslfilter-uninstall_subtargets: FORCE
-	@test -d glslfilter/ || mkdir -p glslfilter/
-	cd glslfilter/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/glslfilter/glslfilter.pro ) && $(MAKE) -f Makefile uninstall
 sub-window-qmake_all:  FORCE
 	@test -d window/ || mkdir -p window/
 	cd window/ && $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/window/window.pro
@@ -785,215 +499,83 @@ examples.pro:
 qmake: FORCE
 	@$(QMAKE) -o Makefile examples.pro
 
-qmake_all: sub-common-qmake_all sub-audiopipeline-qmake_all sub-sharedoutput-qmake_all sub-simpletranscode-qmake_all sub-simpleplayer-qmake_all sub-player-qmake_all sub-filters-qmake_all sub-framereader-qmake_all sub-videocapture-qmake_all sub-videographicsitem-qmake_all sub-videogroup-qmake_all sub-videowall-qmake_all sub-shader-qmake_all sub-glslfilter-qmake_all sub-window-qmake_all sub-QMLPlayer-qmake_all FORCE
+qmake_all: sub-common-qmake_all sub-player-qmake_all sub-framereader-qmake_all sub-window-qmake_all sub-QMLPlayer-qmake_all FORCE
 
-make_first: sub-common-make_first sub-audiopipeline-make_first sub-sharedoutput-make_first sub-simpletranscode-make_first sub-simpleplayer-make_first sub-player-make_first sub-filters-make_first sub-framereader-make_first sub-videocapture-make_first sub-videographicsitem-make_first sub-videogroup-make_first sub-videowall-make_first sub-shader-make_first sub-glslfilter-make_first sub-window-make_first sub-QMLPlayer-make_first  FORCE
-all: sub-common-all sub-audiopipeline-all sub-sharedoutput-all sub-simpletranscode-all sub-simpleplayer-all sub-player-all sub-filters-all sub-framereader-all sub-videocapture-all sub-videographicsitem-all sub-videogroup-all sub-videowall-all sub-shader-all sub-glslfilter-all sub-window-all sub-QMLPlayer-all  FORCE
-clean: sub-common-clean sub-audiopipeline-clean sub-sharedoutput-clean sub-simpletranscode-clean sub-simpleplayer-clean sub-player-clean sub-filters-clean sub-framereader-clean sub-videocapture-clean sub-videographicsitem-clean sub-videogroup-clean sub-videowall-clean sub-shader-clean sub-glslfilter-clean sub-window-clean sub-QMLPlayer-clean  FORCE
-distclean: sub-common-distclean sub-audiopipeline-distclean sub-sharedoutput-distclean sub-simpletranscode-distclean sub-simpleplayer-distclean sub-player-distclean sub-filters-distclean sub-framereader-distclean sub-videocapture-distclean sub-videographicsitem-distclean sub-videogroup-distclean sub-videowall-distclean sub-shader-distclean sub-glslfilter-distclean sub-window-distclean sub-QMLPlayer-distclean  FORCE
+make_first: sub-common-make_first sub-player-make_first sub-framereader-make_first sub-window-make_first sub-QMLPlayer-make_first  FORCE
+all: sub-common-all sub-player-all sub-framereader-all sub-window-all sub-QMLPlayer-all  FORCE
+clean: sub-common-clean sub-player-clean sub-framereader-clean sub-window-clean sub-QMLPlayer-clean  FORCE
+distclean: sub-common-distclean sub-player-distclean sub-framereader-distclean sub-window-distclean sub-QMLPlayer-distclean  FORCE
 	-$(DEL_FILE) Makefile
-install_subtargets: sub-common-install_subtargets sub-audiopipeline-install_subtargets sub-sharedoutput-install_subtargets sub-simpletranscode-install_subtargets sub-simpleplayer-install_subtargets sub-player-install_subtargets sub-filters-install_subtargets sub-framereader-install_subtargets sub-videocapture-install_subtargets sub-videographicsitem-install_subtargets sub-videogroup-install_subtargets sub-videowall-install_subtargets sub-shader-install_subtargets sub-glslfilter-install_subtargets sub-window-install_subtargets sub-QMLPlayer-install_subtargets FORCE
-uninstall_subtargets: sub-common-uninstall_subtargets sub-audiopipeline-uninstall_subtargets sub-sharedoutput-uninstall_subtargets sub-simpletranscode-uninstall_subtargets sub-simpleplayer-uninstall_subtargets sub-player-uninstall_subtargets sub-filters-uninstall_subtargets sub-framereader-uninstall_subtargets sub-videocapture-uninstall_subtargets sub-videographicsitem-uninstall_subtargets sub-videogroup-uninstall_subtargets sub-videowall-uninstall_subtargets sub-shader-uninstall_subtargets sub-glslfilter-uninstall_subtargets sub-window-uninstall_subtargets sub-QMLPlayer-uninstall_subtargets FORCE
+install_subtargets: sub-common-install_subtargets sub-player-install_subtargets sub-framereader-install_subtargets sub-window-install_subtargets sub-QMLPlayer-install_subtargets FORCE
+uninstall_subtargets: sub-common-uninstall_subtargets sub-player-uninstall_subtargets sub-framereader-uninstall_subtargets sub-window-uninstall_subtargets sub-QMLPlayer-uninstall_subtargets FORCE
 
 sub-common-debug:
 	@test -d common/ || mkdir -p common/
 	cd common/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/common/common.pro ) && $(MAKE) -f Makefile debug
-sub-audiopipeline-debug:
-	@test -d audiopipeline/ || mkdir -p audiopipeline/
-	cd audiopipeline/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/audiopipeline/audiopipeline.pro ) && $(MAKE) -f Makefile debug
-sub-sharedoutput-debug:
-	@test -d sharedoutput/ || mkdir -p sharedoutput/
-	cd sharedoutput/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/sharedoutput/sharedoutput.pro ) && $(MAKE) -f Makefile debug
-sub-simpletranscode-debug:
-	@test -d simpletranscode/ || mkdir -p simpletranscode/
-	cd simpletranscode/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpletranscode/simpletranscode.pro ) && $(MAKE) -f Makefile debug
-sub-simpleplayer-debug:
-	@test -d simpleplayer/ || mkdir -p simpleplayer/
-	cd simpleplayer/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpleplayer/simpleplayer.pro ) && $(MAKE) -f Makefile debug
 sub-player-debug: sub-common-debug
 	@test -d player/ || mkdir -p player/
 	cd player/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/player/player.pro ) && $(MAKE) -f Makefile debug
-sub-filters-debug:
-	@test -d filters/ || mkdir -p filters/
-	cd filters/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/filters/filters.pro ) && $(MAKE) -f Makefile debug
 sub-framereader-debug:
 	@test -d framereader/ || mkdir -p framereader/
 	cd framereader/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/framereader/framereader.pro ) && $(MAKE) -f Makefile debug
-sub-videocapture-debug:
-	@test -d videocapture/ || mkdir -p videocapture/
-	cd videocapture/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videocapture/videocapture.pro ) && $(MAKE) -f Makefile debug
-sub-videographicsitem-debug:
-	@test -d videographicsitem/ || mkdir -p videographicsitem/
-	cd videographicsitem/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videographicsitem/videographicsitem.pro ) && $(MAKE) -f Makefile debug
-sub-videogroup-debug:
-	@test -d videogroup/ || mkdir -p videogroup/
-	cd videogroup/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videogroup/videogroup.pro ) && $(MAKE) -f Makefile debug
-sub-videowall-debug:
-	@test -d videowall/ || mkdir -p videowall/
-	cd videowall/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videowall/videowall.pro ) && $(MAKE) -f Makefile debug
-sub-shader-debug:
-	@test -d shader/ || mkdir -p shader/
-	cd shader/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/shader/shader.pro ) && $(MAKE) -f Makefile debug
-sub-glslfilter-debug:
-	@test -d glslfilter/ || mkdir -p glslfilter/
-	cd glslfilter/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/glslfilter/glslfilter.pro ) && $(MAKE) -f Makefile debug
 sub-window-debug:
 	@test -d window/ || mkdir -p window/
 	cd window/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/window/window.pro ) && $(MAKE) -f Makefile debug
 sub-QMLPlayer-debug: sub-common-debug
 	@test -d QMLPlayer/ || mkdir -p QMLPlayer/
 	cd QMLPlayer/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/QMLPlayer/QMLPlayer.pro ) && $(MAKE) -f Makefile debug
-debug: sub-common-debug sub-audiopipeline-debug sub-sharedoutput-debug sub-simpletranscode-debug sub-simpleplayer-debug sub-player-debug sub-filters-debug sub-framereader-debug sub-videocapture-debug sub-videographicsitem-debug sub-videogroup-debug sub-videowall-debug sub-shader-debug sub-glslfilter-debug sub-window-debug sub-QMLPlayer-debug
+debug: sub-common-debug sub-player-debug sub-framereader-debug sub-window-debug sub-QMLPlayer-debug
 
 sub-common-release:
 	@test -d common/ || mkdir -p common/
 	cd common/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/common/common.pro ) && $(MAKE) -f Makefile release
-sub-audiopipeline-release:
-	@test -d audiopipeline/ || mkdir -p audiopipeline/
-	cd audiopipeline/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/audiopipeline/audiopipeline.pro ) && $(MAKE) -f Makefile release
-sub-sharedoutput-release:
-	@test -d sharedoutput/ || mkdir -p sharedoutput/
-	cd sharedoutput/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/sharedoutput/sharedoutput.pro ) && $(MAKE) -f Makefile release
-sub-simpletranscode-release:
-	@test -d simpletranscode/ || mkdir -p simpletranscode/
-	cd simpletranscode/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpletranscode/simpletranscode.pro ) && $(MAKE) -f Makefile release
-sub-simpleplayer-release:
-	@test -d simpleplayer/ || mkdir -p simpleplayer/
-	cd simpleplayer/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpleplayer/simpleplayer.pro ) && $(MAKE) -f Makefile release
 sub-player-release: sub-common-release
 	@test -d player/ || mkdir -p player/
 	cd player/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/player/player.pro ) && $(MAKE) -f Makefile release
-sub-filters-release:
-	@test -d filters/ || mkdir -p filters/
-	cd filters/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/filters/filters.pro ) && $(MAKE) -f Makefile release
 sub-framereader-release:
 	@test -d framereader/ || mkdir -p framereader/
 	cd framereader/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/framereader/framereader.pro ) && $(MAKE) -f Makefile release
-sub-videocapture-release:
-	@test -d videocapture/ || mkdir -p videocapture/
-	cd videocapture/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videocapture/videocapture.pro ) && $(MAKE) -f Makefile release
-sub-videographicsitem-release:
-	@test -d videographicsitem/ || mkdir -p videographicsitem/
-	cd videographicsitem/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videographicsitem/videographicsitem.pro ) && $(MAKE) -f Makefile release
-sub-videogroup-release:
-	@test -d videogroup/ || mkdir -p videogroup/
-	cd videogroup/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videogroup/videogroup.pro ) && $(MAKE) -f Makefile release
-sub-videowall-release:
-	@test -d videowall/ || mkdir -p videowall/
-	cd videowall/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videowall/videowall.pro ) && $(MAKE) -f Makefile release
-sub-shader-release:
-	@test -d shader/ || mkdir -p shader/
-	cd shader/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/shader/shader.pro ) && $(MAKE) -f Makefile release
-sub-glslfilter-release:
-	@test -d glslfilter/ || mkdir -p glslfilter/
-	cd glslfilter/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/glslfilter/glslfilter.pro ) && $(MAKE) -f Makefile release
 sub-window-release:
 	@test -d window/ || mkdir -p window/
 	cd window/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/window/window.pro ) && $(MAKE) -f Makefile release
 sub-QMLPlayer-release: sub-common-release
 	@test -d QMLPlayer/ || mkdir -p QMLPlayer/
 	cd QMLPlayer/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/QMLPlayer/QMLPlayer.pro ) && $(MAKE) -f Makefile release
-release: sub-common-release sub-audiopipeline-release sub-sharedoutput-release sub-simpletranscode-release sub-simpleplayer-release sub-player-release sub-filters-release sub-framereader-release sub-videocapture-release sub-videographicsitem-release sub-videogroup-release sub-videowall-release sub-shader-release sub-glslfilter-release sub-window-release sub-QMLPlayer-release
+release: sub-common-release sub-player-release sub-framereader-release sub-window-release sub-QMLPlayer-release
 
 sub-common-check:
 	@test -d common/ || mkdir -p common/
 	cd common/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/common/common.pro ) && $(MAKE) -f Makefile check
-sub-audiopipeline-check:
-	@test -d audiopipeline/ || mkdir -p audiopipeline/
-	cd audiopipeline/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/audiopipeline/audiopipeline.pro ) && $(MAKE) -f Makefile check
-sub-sharedoutput-check:
-	@test -d sharedoutput/ || mkdir -p sharedoutput/
-	cd sharedoutput/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/sharedoutput/sharedoutput.pro ) && $(MAKE) -f Makefile check
-sub-simpletranscode-check:
-	@test -d simpletranscode/ || mkdir -p simpletranscode/
-	cd simpletranscode/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpletranscode/simpletranscode.pro ) && $(MAKE) -f Makefile check
-sub-simpleplayer-check:
-	@test -d simpleplayer/ || mkdir -p simpleplayer/
-	cd simpleplayer/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpleplayer/simpleplayer.pro ) && $(MAKE) -f Makefile check
 sub-player-check: sub-common-check
 	@test -d player/ || mkdir -p player/
 	cd player/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/player/player.pro ) && $(MAKE) -f Makefile check
-sub-filters-check:
-	@test -d filters/ || mkdir -p filters/
-	cd filters/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/filters/filters.pro ) && $(MAKE) -f Makefile check
 sub-framereader-check:
 	@test -d framereader/ || mkdir -p framereader/
 	cd framereader/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/framereader/framereader.pro ) && $(MAKE) -f Makefile check
-sub-videocapture-check:
-	@test -d videocapture/ || mkdir -p videocapture/
-	cd videocapture/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videocapture/videocapture.pro ) && $(MAKE) -f Makefile check
-sub-videographicsitem-check:
-	@test -d videographicsitem/ || mkdir -p videographicsitem/
-	cd videographicsitem/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videographicsitem/videographicsitem.pro ) && $(MAKE) -f Makefile check
-sub-videogroup-check:
-	@test -d videogroup/ || mkdir -p videogroup/
-	cd videogroup/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videogroup/videogroup.pro ) && $(MAKE) -f Makefile check
-sub-videowall-check:
-	@test -d videowall/ || mkdir -p videowall/
-	cd videowall/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videowall/videowall.pro ) && $(MAKE) -f Makefile check
-sub-shader-check:
-	@test -d shader/ || mkdir -p shader/
-	cd shader/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/shader/shader.pro ) && $(MAKE) -f Makefile check
-sub-glslfilter-check:
-	@test -d glslfilter/ || mkdir -p glslfilter/
-	cd glslfilter/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/glslfilter/glslfilter.pro ) && $(MAKE) -f Makefile check
 sub-window-check:
 	@test -d window/ || mkdir -p window/
 	cd window/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/window/window.pro ) && $(MAKE) -f Makefile check
 sub-QMLPlayer-check: sub-common-check
 	@test -d QMLPlayer/ || mkdir -p QMLPlayer/
 	cd QMLPlayer/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/QMLPlayer/QMLPlayer.pro ) && $(MAKE) -f Makefile check
-check: sub-common-check sub-audiopipeline-check sub-sharedoutput-check sub-simpletranscode-check sub-simpleplayer-check sub-player-check sub-filters-check sub-framereader-check sub-videocapture-check sub-videographicsitem-check sub-videogroup-check sub-videowall-check sub-shader-check sub-glslfilter-check sub-window-check sub-QMLPlayer-check
+check: sub-common-check sub-player-check sub-framereader-check sub-window-check sub-QMLPlayer-check
 
 sub-common-benchmark:
 	@test -d common/ || mkdir -p common/
 	cd common/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/common/common.pro ) && $(MAKE) -f Makefile benchmark
-sub-audiopipeline-benchmark:
-	@test -d audiopipeline/ || mkdir -p audiopipeline/
-	cd audiopipeline/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/audiopipeline/audiopipeline.pro ) && $(MAKE) -f Makefile benchmark
-sub-sharedoutput-benchmark:
-	@test -d sharedoutput/ || mkdir -p sharedoutput/
-	cd sharedoutput/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/sharedoutput/sharedoutput.pro ) && $(MAKE) -f Makefile benchmark
-sub-simpletranscode-benchmark:
-	@test -d simpletranscode/ || mkdir -p simpletranscode/
-	cd simpletranscode/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpletranscode/simpletranscode.pro ) && $(MAKE) -f Makefile benchmark
-sub-simpleplayer-benchmark:
-	@test -d simpleplayer/ || mkdir -p simpleplayer/
-	cd simpleplayer/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/simpleplayer/simpleplayer.pro ) && $(MAKE) -f Makefile benchmark
 sub-player-benchmark: sub-common-benchmark
 	@test -d player/ || mkdir -p player/
 	cd player/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/player/player.pro ) && $(MAKE) -f Makefile benchmark
-sub-filters-benchmark:
-	@test -d filters/ || mkdir -p filters/
-	cd filters/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/filters/filters.pro ) && $(MAKE) -f Makefile benchmark
 sub-framereader-benchmark:
 	@test -d framereader/ || mkdir -p framereader/
 	cd framereader/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/framereader/framereader.pro ) && $(MAKE) -f Makefile benchmark
-sub-videocapture-benchmark:
-	@test -d videocapture/ || mkdir -p videocapture/
-	cd videocapture/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videocapture/videocapture.pro ) && $(MAKE) -f Makefile benchmark
-sub-videographicsitem-benchmark:
-	@test -d videographicsitem/ || mkdir -p videographicsitem/
-	cd videographicsitem/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videographicsitem/videographicsitem.pro ) && $(MAKE) -f Makefile benchmark
-sub-videogroup-benchmark:
-	@test -d videogroup/ || mkdir -p videogroup/
-	cd videogroup/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videogroup/videogroup.pro ) && $(MAKE) -f Makefile benchmark
-sub-videowall-benchmark:
-	@test -d videowall/ || mkdir -p videowall/
-	cd videowall/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/videowall/videowall.pro ) && $(MAKE) -f Makefile benchmark
-sub-shader-benchmark:
-	@test -d shader/ || mkdir -p shader/
-	cd shader/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/shader/shader.pro ) && $(MAKE) -f Makefile benchmark
-sub-glslfilter-benchmark:
-	@test -d glslfilter/ || mkdir -p glslfilter/
-	cd glslfilter/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/glslfilter/glslfilter.pro ) && $(MAKE) -f Makefile benchmark
 sub-window-benchmark:
 	@test -d window/ || mkdir -p window/
 	cd window/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/window/window.pro ) && $(MAKE) -f Makefile benchmark
 sub-QMLPlayer-benchmark: sub-common-benchmark
 	@test -d QMLPlayer/ || mkdir -p QMLPlayer/
 	cd QMLPlayer/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV/examples/QMLPlayer/QMLPlayer.pro ) && $(MAKE) -f Makefile benchmark
-benchmark: sub-common-benchmark sub-audiopipeline-benchmark sub-sharedoutput-benchmark sub-simpletranscode-benchmark sub-simpleplayer-benchmark sub-player-benchmark sub-filters-benchmark sub-framereader-benchmark sub-videocapture-benchmark sub-videographicsitem-benchmark sub-videogroup-benchmark sub-videowall-benchmark sub-shader-benchmark sub-glslfilter-benchmark sub-window-benchmark sub-QMLPlayer-benchmark
+benchmark: sub-common-benchmark sub-player-benchmark sub-framereader-benchmark sub-window-benchmark sub-QMLPlayer-benchmark
 install:install_subtargets  FORCE
 
 uninstall: uninstall_subtargets FORCE

@@ -1,3 +1,4 @@
+一, 代码分析
 1, load file
 // src/AVPlayer.cpp  1123
 bool AVPlayer::load()
@@ -5,6 +6,7 @@ bool AVPlayer::load()
     =>LoadWorker::run()
         m_player->loadInternal();
         =>void AVPlayer::loadInternal()
+            d->demuxer.setMedia(d->current_source.toString());
             d->loaded = d->demuxer.load();
             // src/AVDemuxer.cpp 746
             =>bool AVDemuxer::load()
@@ -175,7 +177,7 @@ void VideoThread::run()
                 setInSize(frame.width(), frame.height());
                 QMutexLocker locker(&d.img_mutex);
                 return receiveFrame(frame);
-                // src/output/video/OpenGLRendererBase.cpp  77
+                // src/output/video/OpenGLRendererBase.cpp  77 // class Q_AV_EXPORT OpenGLRendererBase : public VideoRenderer
                 => bool OpenGLRendererBase::receiveFrame(const VideoFrame& frame)
                     d.video_frame = frame;
                     d.frame_changed = true;
@@ -218,7 +220,8 @@ void AVDemuxThread::run()
         last_vpts = pkt.pts;
 
 5, display
-./widgets/OpenGLWidgetRenderer.cpp
+./widgets/OpenGLWidgetRenderer.cpp : public QOpenGLWidget, public OpenGLRendererBase(=>public VideoRenderer=>public AVOutput )
+#include <QtGui/QOpenGLFunctions>
 void OpenGLWidgetRenderer::paintGL()
     onPaintGL();
     // ./src/output/video/OpenGLRendererBase.cpp 115
@@ -230,6 +233,105 @@ void OpenGLWidgetRenderer::paintGL()
             foreach(Filter* filter, d.filters) {
                 VideoFilter *vf = static_cast<VideoFilter*>(filter);
                 vf->apply(d.statistics, &d.video_frame); //painter and paint device are ready, pass video frame is ok.
+                // ./src/filter/Filter.cpp 180
+                void VideoFilter::apply(Statistics *statistics, VideoFrame *frame)
+                    process(statistics, frame);
+                    // src/filter/GLSLFilter.cpp 84
+                    => void GLSLFilter::process(Statistics *statistics, VideoFrame *frame)
+                        GLint currentFbo = 0;
+                        DYGL(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFbo));
+                        d.fbo = new QOpenGLFramebufferObject(outputSize().isEmpty() ? frame->size() : outputSize(), GL_TEXTURE_2D); //TODO: prefer 16bit rgb
+                        QOpenGLContext *ctx = const_cast<QOpenGLContext*>(QOpenGLContext::currentContext()); //qt4 returns const
+                        d.glv.setOpenGLContext(ctx);
+                        d.glv.setProjectionMatrixToRect(QRectF(0, 0, d.fbo->width(), d.fbo->height()));
+                        d.fbo->bind();
+                        DYGL(glViewport(0, 0, d.fbo->width(), d.fbo->height()));
+                        d.glv.setCurrentFrame(*frame);
+                        //  src/opengl/OpenGLVideo.cpp  259
+                        =>void OpenGLVideo::setCurrentFrame(const VideoFrame &frame)
+                            d_func().material->setCurrentFrame(frame);
+                            //  src/opengl/VideoShader.cpp  478
+                            => void VideoMaterial::setCurrentFrame(const VideoFrame &frame)
+                                d.frame = frame; // VideoMaterialPrivate &d
+                        QMatrix4x4 mat; // flip vertical
+                        mat.scale(1, -1);
+                        d.glv.render(QRectF(), QRectF(), mat);
+                        // src/opengl/OpenGLVideo.cpp  344 // 如下
+                        =>void OpenGLVideo::render(const QRectF &target, const QRectF& roi, const QMatrix4x4& transform)
+                            d.material->bind() // bind first because texture parameters(target) mapped from native buffer is unknown before it
+                            // src/opengl/VideoShader.cpp 592
+                            // bool VideoMaterial::bind() //bind texture
+                                d.ensureResources()
+                                =>bool VideoMaterialPrivate::ensureResources()
+                                d.ensureTextures();
+                                => bool VideoMaterialPrivate::ensureTextures()
+                                    const int nb_planes = video_format.planeCount();
+                                    for (int p = 0; p < nb_planes; ++p) 
+                                    GLuint &tex = textures[p];
+                                    GLuint* handle = (GLuint*)frame.createInteropHandle(&tex, GLTextureSurface, p); // take the ownership
+                                    // src/VideoFrame.cpp  446
+                                    =>void* VideoFrame::createInteropHandle(void* handle, SurfaceType type, int plane)
+                                        const QVariant v = d->metadata.value(QStringLiteral("surface_interop"));
+                                        d->surface_interop = v.value<VideoSurfaceInteropPtr>();
+                                        return d->surface_interop->createHandle(handle, type, format(), plane, planeWidth(plane), planeHeight(plane));
+                                        // src/QtAV/SurfaceInterop.h:69
+                                            return 0;
+                                    DYGL(glGenTextures(1, &tex));
+                                    owns_texture[tex] = true;
+                                    initTexture(tex, internal_format[p], data_format[p], data_type[p], texture_size[p].width(), texture_size[p].height());
+                                d.uploadPlane(p, d.update_texure);
+                                =>void VideoMaterialPrivate::uploadPlane(int p, bool updateTexture)
+                                    GLuint &tex = textures[p];
+                                    if (frame.map(GLTextureSurface, &tex, p)) 
+                                    // src/VideoFrame.cpp  424
+                                    void *VideoFrame::map(SurfaceType type, void *handle, const VideoFormat& fmt, int plane)
+                                        return d->surface_interop->map(type, fmt, handle, plane);
+                                        // src/directx/SurfaceInteropD3D9.cpp  129
+                                        =>void* SurfaceInterop::map(SurfaceType type, const VideoFormat &fmt, void *handle, int plane)
+                                            if (type == GLTextureSurface)
+                                            if (m_resource->map(m_surface, *((GLuint*)handle), frame_width, frame_height, plane))
+                                            // src/directx/SurfaceInteropD3D9GL.cpp  61
+                                            =>bool GLInteropResource::map(IDirect3DSurface9 *surface, GLuint tex, int w, int h, int)
+                                                WGL_ENSURE((interop_dev = gl().DXOpenDeviceNV(d3ddev)) != NULL, false);
+                                                WGL_ENSURE((interop_obj = gl().DXRegisterObjectNV(interop_dev, dx_surface, tex, GL_TEXTURE_2D, WGL_ACCESS_READ_ONLY_NV)) != NULL, false);
+                                                DX_ENSURE_OK(d3ddev->StretchRect(surface, &src, dx_surface, NULL, D3DTEXF_NONE), false);
+                                                WGL_ENSURE(gl().DXLockObjectsNV(interop_dev, 1, &interop_obj), false);
+                                                WGL_ENSURE(gl().DXObjectAccessNV(interop_obj, WGL_ACCESS_READ_ONLY_NV), false);
+                                                DYGL(glBindTexture(GL_TEXTURE_2D, tex));
+                            // end d.material->bind()
+                            DYGL(glViewport(d.rect.x(), d.rect.y(), d.rect.width(), d.rect.height())); // viewport was used in gpu filters is wrong, qt quick fbo item's is right(so must ensure setProjectionMatrixToRect was called correctly)
+                            shader->update(d.material);
+                            shader->program()->setUniformValue(shader->matrixLocation(), transform*d.matrix);
+                            // uniform end. attribute begin
+                            d.updateGeometry(shader, target, roi);
+                            const bool blending = d.has_a;
+                            d.gr->render();
+                            // src/opengl/GeometryRenderer.cpp  264
+                            => void GeometryRenderer::render()
+                                bindBuffers();
+                                DYGL(glDrawElements(g->primitive(), g->indexCount(), g->indexType(), ibo.isCreated() ? NULL : g->indexData())); // null: data in vao or ibo. not null: data in memory
+                            // d.shader->program()->release(); //glUseProgram(0)
+                            d.material->unbind(); // => GLInteropResource::unmap
+                        // d.glv.render
+                        d.uploadPlane(p, d.update_texure);
+                        gl().BindFramebuffer(GL_FRAMEBUFFER, (GLuint)currentFbo);
+                        VideoFormat fmt(VideoFormat::Format_RGB32);
+                        VideoFrame f(d.fbo->width(), d.fbo->height(), fmt); //
+                        f.setBytesPerLine(d.fbo->width()*fmt.bytesPerPixel(), 0);
+                        // set interop;
+                        class GLTextureInterop : public VideoSurfaceInterop{
+                            void* map(SurfaceType, const VideoFormat &, void *handle, int plane) {
+                                Q_UNUSED(plane);
+                                GLuint* t = reinterpret_cast<GLuint*>(handle);
+                                *t = tex;
+                                return t;
+                            }
+                        }
+                        GLTextureInterop *interop = new GLTextureInterop(d.fbo->texture());
+                        f.setMetaData(QStringLiteral("surface_interop"), QVariant::fromValue(VideoSurfaceInteropPtr((interop))));
+                        *frame = f;
+                    // GLSLFilter::process
+            // end videofilter->apply
             drawBackground();
             if (d.video_frame.isValid()) 
             drawFrame();
@@ -252,7 +354,7 @@ void OpenGLWidgetRenderer::paintGL()
                 =>void OpenGLVideo::render(const QRectF &target, const QRectF& roi, const QMatrix4x4& transform)
                     d.material->bind() // bind first because texture parameters(target) mapped from native buffer is unknown before it
                     // src/opengl/VideoShader.cpp 592
-                    // bool VideoMaterial::bind()
+                    // bool VideoMaterial::bind() //bind texture
                         d.ensureResources()
                         =>bool VideoMaterialPrivate::ensureResources()
                         d.ensureTextures();
@@ -278,7 +380,7 @@ void OpenGLWidgetRenderer::paintGL()
                                             return t;
                                 DYGL(glBindTexture(target, tex)); // glActiveTexture was called, but maybe bind to 0 in map
                                 return; //zerocopy
-
+                            // zerocopy不会执行到这里
                             DYGL(glBindTexture(target, tex));
                             DYGL(glTexSubImage2D(target, 0, 0, 0, texture_size[p].width(), texture_size[p].height(), data_format[p], data_type[p], try_pbo ? 0 : frame.constBits(p)));
                             // const uchar* Frame::constBits(int plane) const
@@ -286,14 +388,29 @@ void OpenGLWidgetRenderer::paintGL()
                     // end bind
                     DYGL(glViewport(d.rect.x(), d.rect.y(), d.rect.width(), d.rect.height())); // viewport was used in gpu filters is wrong, qt quick fbo item's is right(so must ensure setProjectionMatrixToRect was called correctly)
                     shader->update(d.material);
-                    // src/opengl/VideoShader.cpp  349
+                    // src/opengl/VideoShader.cpp  349 glsl
                     =>bool VideoShader::update(VideoMaterial *material)
+                        initialize();
+                        =>void VideoShader::initialize(QOpenGLShaderProgram *shaderProgram)
+                            shaderProgram = program();
+                            build(shaderProgram);
+                            => bool VideoShader::build(QOpenGLShaderProgram *shaderProgram)
+                                shaderProgram->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShader());
+                                shaderProgram->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShader());
+                                haderProgram->link();
                         program()->bind(); //glUseProgram(id). for glUniform
                         program()->setUniformValue(textureLocation(i), (GLint)i);
                         program()->setUniformValue(colorMatrixLocation(), material->colorMatrix());
                         program()->setUniformValue(opacityLocation(), (GLfloat)1.0);
+                    // end update. compile shader, link program ..
                     shader->program()->setUniformValue(shader->matrixLocation(), transform*d.matrix);
                     d.gr->render();
+                    // ./src/opengl/GeometryRenderer.cpp  264
+                    =>void GeometryRenderer::render()
+                        bindBuffers();
+                        =>void GeometryRenderer::bindBuffers()
+                            vao.bind(); // vbo, ibo is ok now
+                        DYGL(glDrawArrays(g->primitive(), 0, g->vertexCount()));
     
 6, capture
 // src/VideoCapture.cpp  51
@@ -334,3 +451,15 @@ virtual void CaptureTask::run()
         QImage image(f.frameDataPtr(), f.width(), f.height(), f.bytesPerLine(0), fmt);
         return image.copy();
 
+二, 提取dxva
+采用减法方案
+样本: Thousand...mp4 时间耗时: display: 4ms, copyframe: 0ms, cpu: 7%
+1, 增加avdemuxer.cpp文件
+load()
+get_packet
+add_frame
+共享frame
+2, openglwidget.cpp
+显示frame
+
+frameread.cpp + openglwidget.cpp

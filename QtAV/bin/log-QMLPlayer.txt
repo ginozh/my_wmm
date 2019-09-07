@@ -1,10 +1,10 @@
-Debug: arguments=======  ("E:\\qtproject\\QtAV\\bin\\QMLPlayer.exe")
-Debug: current dir:  "E:/qtproject/QtAV/bin"
-Debug: ("E:/qtproject/QtAV/bin", "qrc:/qt-project.org/imports", "C:/msys64/mingw64/share/qt5/qml")
+Debug: arguments=======  ("C:\\qtproject\\QtAV\\bin\\QMLPlayer.exe")
+Debug: current dir:  "C:/qtproject/QtAV/bin"
+Debug: ("C:/qtproject/QtAV/bin", "qrc:/qt-project.org/imports", "C:/msys64/mingw64/share/qt5/qml")
 Debug: >>>>>>>>devicePixelRatio: 1.000000
-Debug: dpi phy:  125.152 , logical:  96 , dpr:  1 ; vis rect: QRect(0,0 1366x768)
-Debug: touch devices:  (QTouchDevice("", type=TouchScreen, capabilities=Position|Area|NormalizedPosition|MouseEmulation, maximumTouchPoints=2))
-Debug: QtAV 1.13.0(Aug 17 2019, 06:19:13)
+Debug: dpi phy:  227.198 , logical:  144 , dpr:  1 ; vis rect: QRect(0,0 2560x1600)
+Debug: touch devices:  ()
+Debug: QtAV 1.13.0(Aug 25 2019, 16:54:47)
 Multimedia framework base on Qt and FFmpeg.
 Distributed under the terms of LGPLv2.1 or later.
 Shanghai, China Copyright (C) 2012-2019 Wang Bin (aka. Lucas Wang) wbsecg1@gmail.com
@@ -25,19 +25,23 @@ Debug: Registered audio backends:  ("XAudio2", "DirectSound", "null")
 Debug: "XAudio2_9"
 Debug: "Build with XAudio2 from DXSDK"
 Debug: "Try symbol 'XAudio2Create' from WinSDK dll"
-Debug: "xaudio2: 0x560c0090"
+Debug: "xaudio2: 0x5a2b0090"
 Debug: engine: "LibASS"
 Debug: engine: "FFmpeg"
 Debug: engine: "FFmpeg"
 Debug: engine: "LibASS"
-Debug: "OpenGL version: 4.0  hasGLSL: 1"
-Debug: "GL_VERSION: 4.0.0 - Build 10.18.10.4252"
+Debug: init>>>>>screen density logical: 5.669291338582678 pixel: 8.944798218541235
+Debug: file:  ""
+Debug: ScreenSaver::retrieveState
+Debug: Succeed to enable screen saver (0)
+Debug: "OpenGL version: 4.3  hasGLSL: 1"
+Debug: "GL_VERSION: 4.3.0 - Build 20.19.15.4531"
 Debug: "GL_VENDOR: Intel"
-Debug: "GL_RENDERER: Intel(R) HD Graphics 4000"
-Debug: "GL_SHADING_LANGUAGE_VERSION: 4.00 - Build 10.18.10.4252"
+Debug: "GL_RENDERER: Intel(R) Iris(TM) Graphics 5100"
+Debug: "GL_SHADING_LANGUAGE_VERSION: 4.30 - Build 20.19.15.4531"
 Debug: "Is OpenGLES: 0"
 Debug: "Is EGL: 0"
-Debug: "GLSL version: 400"
+Debug: "GLSL version: 430"
 Debug: "Has PBO: 1"
 Debug: resolving WGL_NV_DX_interop...
 Debug: "16 bit texture depth: 16.\n"
@@ -45,18 +49,1786 @@ Debug: "using gl_param_3r16"
 Debug: "Has 16bit texture: 1"
 Debug: "check gl3 rg: 0x822B"
 Debug: "Has RG texture: 1"
-Debug: QSurfaceFormat(version 4.0, options QFlags<QSurfaceFormat::FormatOption>(DeprecatedFunctions), depthBufferSize 24, redBufferSize 8, greenBufferSize 8, blueBufferSize 8, alphaBufferSize 8, stencilBufferSize 8, samples 0, swapBehavior QSurfaceFormat::SwapBehavior(DoubleBuffer), swapInterval 1, colorSpace QSurfaceFormat::ColorSpace(DefaultColorSpace), profile  QSurfaceFormat::OpenGLContextProfile(CompatibilityProfile))
-Debug: init>>>>>screen density logical: 3.7795275590551185 pixel: 4.927242432657595
-Debug: file:  ""
-Debug: ScreenSaver::retrieveState
-Debug: Succeed to enable screen saver (0)
+Debug: QSurfaceFormat(version 4.3, options QFlags<QSurfaceFormat::FormatOption>(DeprecatedFunctions), depthBufferSize 24, redBufferSize 8, greenBufferSize 8, blueBufferSize 8, alphaBufferSize 8, stencilBufferSize 8, samples 0, swapBehavior QSurfaceFormat::SwapBehavior(DoubleBuffer), swapInterval 1, colorSpace QSurfaceFormat::ColorSpace(DefaultColorSpace), profile  QSurfaceFormat::OpenGLContextProfile(CompatibilityProfile))
+Debug: zero copy waste: 0
+Debug: zero copy waste: 1001
+Debug: sync config to  "C:/Users/user/AppData/Roaming/QMLPlayer/QMLPlayer.ini"
+Debug: sync end
+Debug: sync config to  "C:/Users/user/AppData/Roaming/QMLPlayer/QMLPlayer.ini"
+Debug: sync end
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onSaturationChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onHueChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onContrastChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onBrightnessChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onSubtitleTrackChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onAudioTrackChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onExternalAudioChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onChannelChanged"
+Debug: sync config to  "C:/Users/user/AppData/Roaming/QMLPlayer/QMLPlayer.ini"
+Debug: sync end
+Debug: sync config to  "C:/Users/user/AppData/Roaming/QMLPlayer/QMLPlayer.ini"
+Debug: sync end
+Debug: sync config to  "C:/Users/user/AppData/Roaming/QMLPlayer/QMLPlayer.ini"
+Debug: sync end
+Debug: sync config to  "C:/Users/user/AppData/Roaming/QMLPlayer/QMLPlayer.ini"
+Debug: sync end
+Debug: check changed true
+Debug: d3d: Auto
+Debug: d3d: D3D9
+Debug: d3d: D3D11
+Debug: d3d: WARP
+Debug: gl: Auto
+Debug: gl: Desktop
+Debug: gl: OpenGLES
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onSaturationChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onHueChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onContrastChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onBrightnessChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onSubtitleTrackChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onAudioTrackChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onExternalAudioChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onChannelChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onSaturationChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onHueChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onContrastChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onBrightnessChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onSubtitleTrackChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onAudioTrackChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onExternalAudioChanged"
+Warning: qrc:///qml/QMLPlayer/main.qml:458:9: QML Connections: Cannot assign to non-existent property "onChannelChanged"
+Debug: onSelectionChange () 0
+Debug: onSelectionChange () 0
+Debug: onSelectionChange (QUrl("file:///D:/movies")) 1
+Debug: onSelectionChange () 0
+Debug: onSelectionChange (QUrl("file:///D:/movies/Thousand.Planets.mp4")) 1
+Debug: "source_voice: 0x0, master: 0x0"
+Debug: 
+Debug: "XAudio2_9.dll"
+Debug: "Build with XAudio2 from DXSDK"
+Debug: "Try symbol 'XAudio2Create' from WinSDK dll"
+Debug: "xaudio2: 0x5a2b0090"
+Debug: sync config to  "C:/Users/user/AppData/Roaming/QMLPlayer/QMLPlayer.ini"
+Debug: sync end
+Debug: Loading  QVariant(QString, "D:/movies/Thousand.Planets.mp4")  ...
+Debug: "all closed and reseted"
+Debug: "avformat_open_input: d->format_ctx:'0x5e5528c0', url:'D:/movies/Thousand.Planets.mp4'..."
+Debug: zero copy waste: 0
+Debug: "avformat_open_input: url:'D:/movies/Thousand.Planets.mp4' ret:0"
+Debug: "avfmtctx.flags: 2097153, iformat.flags"
+Warning: "invalid index 0 (valid is 0~0) for stream type 2."
+Debug: "notify_interval: 500"
+Debug: "stream: 1, duration=395347968 (8236415 ms), time_base=0.000021"
+Debug: "codec: ac3(ATSC A/52A (AC-3))"
+Debug: "stream: 0, duration=329453533333 (8236338 ms), time_base=0.000000"
+Debug: "codec: h264(H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10)"
+Debug: "has audio"
+Debug: "QtAV::AudioDecoderFFmpeg thread type: Single, count: 1"
+Debug: "source_voice: 0x0, master: 0x0"
+Debug: AudioOutput format:  QtAV::AudioFormat(48000Hz, 4Bytes, channelCount:2, channelLayout: "stereo", sampleFormat: "flt") ; requested:  QtAV::AudioFormat(48000Hz, 4Bytes, channelCount:6, channelLayout: "5.1(side)", sampleFormat: "fltp")
+Debug: "source_voice:0x5ff14fe0"
+Warning: "src audio parameters 'channel layout(or channels), sample rate and sample format must be set before initialize resampler"
+Debug: "new audio thread"
+Debug: "demux thread setAudioThread"
+Debug: "output not changed: 0x592feb00"
+Debug: "set AVThread output"
+Debug: "stream: 1, duration=395347968 (8236415 ms), time_base=0.000021"
+Debug: "codec: ac3(ATSC A/52A (AC-3))"
+Debug: "**********trying video decoder: DXVA..."
+Debug: "set QtAV::VideoDecoderD3D() meta properties:"
+Debug: "copyMode=>OptimizedCopy"
+Debug: "creating d3d9 device ex... dll: 0x7ff8dbdc0000"
+Debug: "IDirect3DDevice9Ex created"
+Debug: "DXVA2 description:  DXVA2 (Intel(R) Iris(TM) Graphics 5100, vendor 32902(Intel), device 2606, revision 9)"
+Debug: "OurDirect3DCreateDeviceManager9 Success!"
+Debug: "obtained IDirect3DDeviceManager9"
+Debug: - 'MPEG-2 variable-length decoder' is supported by hardware
+Debug: - 'MPEG-2 inverse discrete cosine transform' is supported by hardware
+Debug: - 'VC-1 variable-length decoder 2 (Intel)' is supported by hardware
+Debug: - 'VC-1 variable-length decoder (Intel)' is supported by hardware
+Debug: - 'VC-1 variable-length decoder' is supported by hardware
+Debug: - 'H.264 variable-length decoder, no film grain technology' is supported by hardware
+Debug: - 'H.264 stereo high profile, mbs flag set' is supported by hardware
+Debug: - 'H.264 stereo high profile' is supported by hardware
+Debug: - 'H.264 multiview high profile' is supported by hardware
+Debug: - 'H.264 scalable video coding, Scalable Constrained Baseline Profile' is supported by hardware
+Debug: - 'H.264 scalable video coding, Scalable Constrained High Profile' is supported by hardware
+Debug: - Unknown GUID = 91CD2D6E-897b-4fa1-b0-d7-51-dc-88-01-0e-0a
+Debug: - Unknown GUID = 8C56EB1E-2b47-466f-8d-33-7d-bc-d6-3f-3d-f2
+Debug: - 'HEVC Main profile' is supported by hardware
+Debug: - Unknown GUID = A74CCAE2-f466-45ae-86-f5-ab-8b-e8-af-84-83
+Debug: - 'Windows Media Video 9 IDCT' is supported by hardware
+Debug: - 'VC-1 inverse discrete cosine transform' is supported by hardware
+Debug: - Unknown GUID = 49761BEC-4b63-4349-a5-ff-87-ff-df-08-84-66
+Debug: codec does not match to h264: none
+Debug: codec does not match to h264: none
+Debug: codec does not match to h264: none
+Debug: codec does not match to h264: none
+Debug: codec does not match to h264: none
+Debug: codec does not match to h264: mpeg2video
+Debug: codec does not match to h264: mpeg2video
+Debug: codec does not match to h264: mpeg1video
+Debug: codec does not match to h264: none
+Debug: codec does not match to h264: none
+Debug: codec does not match to h264: none
+Debug: D3D found codec: H.264 variable-length decoder, film grain technology. Check runtime support for the codec.
+Debug: D3D found codec: H.264 variable-length decoder, no film grain technology (Intel ClearVideo). Check runtime support for the codec.
+Debug: D3D found codec: H.264 variable-length decoder, no film grain technology. Check runtime support for the codec.
+Debug: Check profile support: High
+Debug: NV12 is supported for output
+Debug: "QtAV::VideoDecoderD3D thread type: Single, count: 1"
+Debug: "**************Video decoder found:0x5e41c660"
+Debug: "setCapture 0x593298d0"
+Debug: "stream: 0, duration=329453533333 (8236338 ms), time_base=0.000000"
+Debug: "codec: h264(H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10)"
+Debug: "auto select clock: audio > external"
+Debug: "Using AudioClock"
+Debug: "Clock initial value: 0.000000"
+Debug: "Starting audio thread..."
+Debug: "Starting video thread..."
+Debug: "get av queue a/v thread = 0x5e41c500 0x3e404c90"
+Warning: qrc:///qml/QMLPlayer/main.qml:141: TypeError: Type error
+Warning: qrc:///qml/QMLPlayer/main.qml:133: TypeError: Type error
+Debug: "available hardware decoder output format 61 (dxva2_vld)"
+Debug: "available hardware decoder output format 128 (d3d11va_vld)"
+Debug: "available hardware decoder output format 348 (d3d11)"
+Debug: "available software decoder output format 0 (yuv420p)"
+Debug: >>>>>>>>>>>>>>>>>>>>>surfaces: 20, active_thread_type: 0, threads: 1, refs: 4
+Debug: "IDirectXVideoDecoderService=0x5e2436e8 nb_surfaces=20 surface 1920x1088"
+Debug: "swr speed=1.00"
+Debug: "IDirectXVideoAccelerationService_CreateSurface succeed with 20 surfaces (1920x1088)"
+Debug: "out: {cl: 3, fmt: flt, freq: 48000}"
+Debug: "in {cl: 1551, fmt: fltp, freq: 48000}"
+Debug: Decoder configurations: 4
+Debug: configuration[0] ConfigBitstreamRaw 2
+Debug: configuration[1] ConfigBitstreamRaw 1
+Debug: configuration[2] ConfigBitstreamRaw 2
+Debug: configuration[3] ConfigBitstreamRaw 1
+Debug: duration changed: file:///D:/movies/Thousand.Planets.mp4
+Debug: add history: file:///D:/movies/Thousand.Planets.mp4
+Debug: "IDirectXVideoDecoderService.CreateVideoDecoder succeed. decoder=0x5e2f4868"
+Debug: "Using DXVA2 (Intel(R) Iris(TM) Graphics 5100, vendor 32902(Intel), device 2606, revision 9) for hardware decoding."
+Warning: "no frame could be decompressed: Error number 448 occurred 0/448"
+Warning: "invalid video frame from decoder. undecoded data size: 0"
+Debug: "AVClock started!!!!!!!!"
+Warning: "no frame could be decompressed: Error number 71 occurred 0/71"
+Warning: "invalid video frame from decoder. undecoded data size: 0"
+Debug: copy frame waste:  3  pts:  0
+Debug: "setInSize => calculating aspect ratio from converted input data(1.777778)"
+Debug: QtAV::VideoFormat(pixelFormat: 23 "nv12" alpha: false, channels: 3, planes: 2, bpc: 8, bpp: 12/12 -8-16)
+Debug: "pixel format changed:  => nv12 23"
+Debug: material changed:  "gl material 16to8bit: 0, planar: 0, has alpha: 0, 2d texture: 0, 2nd plane rg: 0, xyz: 0"  =>  "gl material 16to8bit: 0, planar: 1, has alpha: 0, 2d texture: 1, 2nd plane rg: 1, xyz: 0"
+Debug: "plane linesize 0: padded = 1920, effective = 1920. theoretical plane size: 1920x1080"
+Debug: "plane linesize 1: padded = 1920, effective = 1920. theoretical plane size: 960x540"
+Debug: "effective_tex_width_ratio=1.000000"
+Debug: texture internal format:  QVector(33321, 33323)
+Debug: texture data format:  QVector(6403, 33319)
+Debug: texture data type:  QVector(5121, 5121)
+Debug: "///////////bpp 2, bpc: 8"
+Debug: "texture width: 1920 - 1920 = pad: 0. bpp(gl): 1"
+Debug: "texture width: 960 - 960 = pad: 0. bpp(gl): 2"
+Debug: "creating texture for plane 0"
+Debug: "texture for plane 0 is created (id=4)"
+Debug: "creating texture for plane 1"
+Debug: "texture for plane 1 is created (id=11)"
+Debug: "[ShaderManager] cache a new shader material type(26): gl material 16to8bit: 0, planar: 1, has alpha: 0, 2d texture: 1, 2nd plane rg: 1, xyz: 0"
+Debug: "bind attribute: a_Position => 0"
+Debug: "bind attribute: a_TexCoords0 => 1"
+Debug: "uniform locations:"
+Debug: "u_Texture0: 2"
+Debug: "u_Texture1: 3"
+Debug: "u_Texture2: 4"
+Debug: "u_Matrix: 0"
+Debug: "u_colorMatrix: 1"
+Debug: "u_opacity: 5"
+Debug: input yuv limited range
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: creating VBO...
+Debug: creating VAO...
+Debug: vao updated
+Debug: geometry attributes changed, rebind vao...
+Debug: geometry updated
+Debug: zero copy waste: 12011
+Debug: copy frame waste:  3  pts:  41
+Debug: zero copy waste: 2497
+Debug: copy frame waste:  3  pts:  83
+Debug: zero copy waste: 2500
+Debug: copy frame waste:  2  pts:  125
+Debug: zero copy waste: 2998
+Debug: copy frame waste:  3  pts:  166
+Debug: zero copy waste: 1000
+Debug: copy frame waste:  3  pts:  208
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  3  pts:  250
+Debug: zero copy waste: 1503
+Debug: copy frame waste:  3  pts:  291
+Debug: zero copy waste: 1499
+Debug: copy frame waste:  3  pts:  333
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  375
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  416
+Debug: zero copy waste: 503
+Debug: copy frame waste:  4  pts:  458
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  4  pts:  500
+Debug: zero copy waste: 501
+Debug: copy frame waste:  6  pts:  541
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  583
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  625
+Debug: zero copy waste: 500
+Debug: copy frame waste:  4  pts:  666
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  708
+Debug: zero copy waste: 1497
+Debug: copy frame waste:  3  pts:  750
+Debug: zero copy waste: 999
+Debug: copy frame waste:  3  pts:  791
+Debug: zero copy waste: 2504
+Debug: copy frame waste:  3  pts:  833
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  875
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  916
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  958
+Debug: zero copy waste: 998
+Debug: copy frame waste:  6  pts:  1000
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  1041
+Debug: zero copy waste: 5005
+Debug: copy frame waste:  5  pts:  1083
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  1125
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  3  pts:  1166
+Debug: zero copy waste: 503
+Debug: copy frame waste:  3  pts:  1208
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  3  pts:  1250
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  1291
+Debug: zero copy waste: 2002
+Debug: copy frame waste:  4  pts:  1333
+Debug: zero copy waste: 501
+Debug: copy frame waste:  2  pts:  1375
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  3  pts:  1416
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  1458
+Debug: zero copy waste: 998
+Debug: copy frame waste:  3  pts:  1500
+Debug: zero copy waste: 448
+Debug: copy frame waste:  3  pts:  1541
+Debug: zero copy waste: 448
+Debug: copy frame waste:  4  pts:  1583
+Debug: zero copy waste: 450
+Debug: copy frame waste:  3  pts:  1625
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  3  pts:  1666
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  1708
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  1750
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  1791
+Debug: zero copy waste: 1000
+Debug: copy frame waste:  3  pts:  1833
+Debug: zero copy waste: 500
+Debug: copy frame waste:  3  pts:  1875
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  1916
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  1958
+Debug: zero copy waste: 501
+Debug: copy frame waste:  16  pts:  2000
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  3  pts:  2041
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  2083
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  2125
+Debug: zero copy waste: 502
+Debug: copy frame waste:  2  pts:  2166
+Debug: zero copy waste: 503
+Debug: copy frame waste:  3  pts:  2208
+Debug: zero copy waste: 1500
+Debug: copy frame waste:  2  pts:  2250
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  3  pts:  2291
+Debug: zero copy waste: 1496
+Debug: copy frame waste:  4  pts:  2333
+Debug: zero copy waste: 1000
+Debug: copy frame waste:  3  pts:  2375
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  2416
+Debug: zero copy waste: 1500
+Debug: copy frame waste:  3  pts:  2458
+Debug: zero copy waste: 994
+Debug: copy frame waste:  3  pts:  2500
+Debug: zero copy waste: 996
+Debug: copy frame waste:  3  pts:  2541
+Debug: zero copy waste: 957
+Debug: copy frame waste:  3  pts:  2583
+Debug: zero copy waste: 503
+Debug: copy frame waste:  3  pts:  2625
+Debug: zero copy waste: 503
+Debug: copy frame waste:  3  pts:  2666
+Debug: zero copy waste: 1501
+Debug: copy frame waste:  3  pts:  2708
+Debug: zero copy waste: 1500
+Debug: copy frame waste:  10  pts:  2750
+Debug: zero copy waste: 1504
+Debug: copy frame waste:  3  pts:  2791
+Debug: zero copy waste: 2497
+Debug: copy frame waste:  3  pts:  2833
+Debug: zero copy waste: 2500
+Debug: copy frame waste:  3  pts:  2875
+Debug: zero copy waste: 2500
+Debug: copy frame waste:  3  pts:  2916
+Debug: zero copy waste: 2499
+Debug: copy frame waste:  4  pts:  2958
+Debug: zero copy waste: 1999
+Debug: copy frame waste:  3  pts:  3000
+Debug: zero copy waste: 2499
+Debug: copy frame waste:  3  pts:  3041
+Debug: zero copy waste: 2499
+Debug: copy frame waste:  3  pts:  3083
+Debug: zero copy waste: 1498
+Debug: copy frame waste:  3  pts:  3125
+Debug: zero copy waste: 2502
+Debug: copy frame waste:  3  pts:  3166
+Debug: zero copy waste: 2494
+Debug: copy frame waste:  3  pts:  3208
+Debug: zero copy waste: 2505
+Debug: copy frame waste:  3  pts:  3250
+Debug: zero copy waste: 2499
+Debug: copy frame waste:  3  pts:  3291
+Debug: zero copy waste: 2500
+Debug: copy frame waste:  3  pts:  3333
+Debug: zero copy waste: 10638
+Debug: copy frame waste:  3  pts:  3375
+Debug: zero copy waste: 2500
+Debug: copy frame waste:  5  pts:  3416
+Debug: zero copy waste: 1497
+Debug: copy frame waste:  2  pts:  3458
+Debug: zero copy waste: 9085
+Debug: copy frame waste:  3  pts:  3500
+Debug: zero copy waste: 1016
+Debug: copy frame waste:  3  pts:  3541
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  5  pts:  3583
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  3625
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  3666
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  3708
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  3750
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  3791
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  3833
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  4  pts:  3875
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  3916
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  3958
+Debug: zero copy waste: 998
+Debug: copy frame waste:  5  pts:  4000
+Debug: zero copy waste: 500
+Debug: copy frame waste:  3  pts:  4041
+Debug: zero copy waste: 2506
+Debug: copy frame waste:  4  pts:  4083
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  4125
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  3  pts:  4166
+Debug: zero copy waste: 500
+Debug: copy frame waste:  3  pts:  4208
+Debug: zero copy waste: 500
+Debug: copy frame waste:  3  pts:  4250
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  5  pts:  4291
+Debug: zero copy waste: 1516
+Debug: copy frame waste:  3  pts:  4333
+Debug: zero copy waste: 505
+Debug: copy frame waste:  2  pts:  4375
+Debug: zero copy waste: 503
+Debug: copy frame waste:  3  pts:  4416
+Debug: zero copy waste: 518
+Debug: copy frame waste:  3  pts:  4458
+Debug: zero copy waste: 1011
+Debug: copy frame waste:  1  pts:  4500
+Debug: zero copy waste: 504
+Debug: copy frame waste:  3  pts:  4541
+Debug: zero copy waste: 506
+Debug: copy frame waste:  5  pts:  4583
+Debug: zero copy waste: 1005
+Debug: copy frame waste:  3  pts:  4625
+Debug: zero copy waste: 998
+Debug: copy frame waste:  3  pts:  4666
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  4708
+Debug: zero copy waste: 1006
+Debug: copy frame waste:  3  pts:  4750
+Debug: zero copy waste: 1006
+Debug: copy frame waste:  3  pts:  4791
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  4833
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  3  pts:  4875
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  4916
+Debug: zero copy waste: 500
+Debug: copy frame waste:  5  pts:  4958
+Debug: zero copy waste: 464
+Debug: copy frame waste:  2  pts:  5000
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  5041
+Debug: zero copy waste: 998
+Debug: copy frame waste:  4  pts:  5083
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  5125
+Debug: zero copy waste: 500
+Debug: copy frame waste:  6  pts:  5166
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  5208
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  5250
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  3  pts:  5291
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  5333
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  5375
+Debug: zero copy waste: 518
+Debug: copy frame waste:  4  pts:  5416
+Debug: zero copy waste: 518
+Debug: copy frame waste:  2  pts:  5458
+Debug: zero copy waste: 504
+Debug: copy frame waste:  2  pts:  5500
+Debug: zero copy waste: 2510
+Debug: copy frame waste:  4  pts:  5541
+Debug: zero copy waste: 498
+Debug: copy frame waste:  3  pts:  5583
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  5625
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  5666
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  4  pts:  5708
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  5750
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  5791
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  5833
+Debug: zero copy waste: 500
+Debug: copy frame waste:  3  pts:  5875
+Debug: zero copy waste: 9009
+Debug: copy frame waste:  3  pts:  5916
+Debug: zero copy waste: 508
+Debug: copy frame waste:  3  pts:  5958
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  6000
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  6041
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  6083
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  6125
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  6166
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  3  pts:  6208
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  6250
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  6291
+Debug: zero copy waste: 3003
+Debug: copy frame waste:  3  pts:  6333
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  3  pts:  6375
+Debug: zero copy waste: 517
+Debug: copy frame waste:  4  pts:  6416
+Debug: zero copy waste: 516
+Debug: copy frame waste:  3  pts:  6458
+Debug: zero copy waste: 1017
+Debug: copy frame waste:  4  pts:  6500
+Debug: zero copy waste: 1518
+Debug: copy frame waste:  4  pts:  6541
+Debug: zero copy waste: 1000
+Debug: copy frame waste:  3  pts:  6583
+Debug: zero copy waste: 456
+Debug: copy frame waste:  3  pts:  6625
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  3  pts:  6666
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  6708
+Debug: zero copy waste: 1501
+Debug: copy frame waste:  6  pts:  6750
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  6791
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  6833
+Debug: zero copy waste: 503
+Debug: copy frame waste:  4  pts:  6875
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  6916
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  6958
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  7000
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  3  pts:  7041
+Debug: zero copy waste: 501
+Debug: copy frame waste:  6  pts:  7083
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  5  pts:  7125
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  6  pts:  7166
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  7208
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  7250
+Debug: zero copy waste: 1999
+Debug: copy frame waste:  4  pts:  7291
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  7333
+Debug: zero copy waste: 2002
+Debug: copy frame waste:  3  pts:  7375
+Debug: zero copy waste: 500
+Debug: copy frame waste:  4  pts:  7416
+Debug: zero copy waste: 1016
+Debug: copy frame waste:  4  pts:  7458
+Debug: zero copy waste: 1507
+Debug: copy frame waste:  5  pts:  7500
+Debug: zero copy waste: 1004
+Debug: copy frame waste:  2  pts:  7541
+Debug: zero copy waste: 520
+Debug: copy frame waste:  3  pts:  7583
+Debug: zero copy waste: 946
+Debug: copy frame waste:  2  pts:  7625
+Debug: zero copy waste: 1004
+Debug: copy frame waste:  2  pts:  7666
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  4  pts:  7708
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  7750
+Debug: zero copy waste: 1004
+Debug: copy frame waste:  5  pts:  7791
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  7833
+Debug: zero copy waste: 1000
+Debug: copy frame waste:  11  pts:  7875
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  7916
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  7958
+Debug: zero copy waste: 763
+Debug: copy frame waste:  4  pts:  8000
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  8041
+Debug: zero copy waste: 502
+Debug: copy frame waste:  10  pts:  8083
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  3  pts:  8125
+Debug: zero copy waste: 502
+Debug: copy frame waste:  7  pts:  8166
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  7  pts:  8208
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  3  pts:  8250
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  4  pts:  8291
+Debug: zero copy waste: 997
+Debug: copy frame waste:  5  pts:  8333
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  3  pts:  8375
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  6  pts:  8416
+Debug: zero copy waste: 1502
+Debug: copy frame waste:  11  pts:  8458
+Debug: zero copy waste: 2004
+Debug: copy frame waste:  4  pts:  8500
+Debug: zero copy waste: 2015
+Debug: copy frame waste:  2  pts:  8541
+Debug: zero copy waste: 1504
+Debug: copy frame waste:  4  pts:  8583
+Debug: zero copy waste: 505
+Debug: copy frame waste:  3  pts:  8625
+Debug: zero copy waste: 2005
+Debug: copy frame waste:  4  pts:  8666
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  8708
+Debug: zero copy waste: 501
+Debug: copy frame waste:  9  pts:  8750
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  8791
+Debug: zero copy waste: 1998
+Debug: copy frame waste:  5  pts:  8833
+Debug: zero copy waste: 3501
+Debug: copy frame waste:  8  pts:  8875
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  8916
+Debug: zero copy waste: 500
+Debug: copy frame waste:  3  pts:  8958
+Debug: zero copy waste: 1000
+Debug: copy frame waste:  3  pts:  9000
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  5  pts:  9041
+Debug: zero copy waste: 1000
+Debug: copy frame waste:  7  pts:  9083
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  7  pts:  9125
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  9166
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  9208
+Debug: zero copy waste: 2000
+Debug: copy frame waste:  14  pts:  9250
+Debug: copy frame waste:  4  pts:  9291
+Debug: zero copy waste: 486
+Debug: zero copy waste: 504
+Debug: copy frame waste:  4  pts:  9333
+Debug: zero copy waste: 3001
+Debug: copy frame waste:  7  pts:  9375
+Debug: zero copy waste: 2502
+Debug: copy frame waste:  4  pts:  9416
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  9458
+Debug: zero copy waste: 506
+Debug: copy frame waste:  3  pts:  9500
+Debug: copy frame waste:  3  pts:  9541
+Debug: zero copy waste: 501
+Debug: zero copy waste: 0
+Debug: copy frame waste:  4  pts:  9583
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  9625
+Debug: zero copy waste: 4003
+Debug: copy frame waste:  7  pts:  9666
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  9708
+Debug: zero copy waste: 2003
+Debug: copy frame waste:  3  pts:  9750
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  3  pts:  9791
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  5  pts:  9833
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  9875
+Debug: zero copy waste: 500
+Debug: copy frame waste:  3  pts:  9916
+Debug: zero copy waste: 1501
+Debug: copy frame waste:  6  pts:  9958
+Debug: zero copy waste: 1501
+Debug: copy frame waste:  7  pts:  10000
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  10041
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  10083
+Debug: zero copy waste: 502
+Debug: copy frame waste:  6  pts:  10125
+Debug: zero copy waste: 501
+Debug: copy frame waste:  6  pts:  10166
+Debug: zero copy waste: 1000
+Debug: copy frame waste:  4  pts:  10208
+Debug: zero copy waste: 500
+Debug: copy frame waste:  4  pts:  10250
+Debug: zero copy waste: 2500
+Debug: copy frame waste:  4  pts:  10291
+Debug: zero copy waste: 1013
+Debug: copy frame waste:  2  pts:  10333
+Debug: zero copy waste: 505
+Debug: copy frame waste:  3  pts:  10375
+Debug: zero copy waste: 1010
+Debug: copy frame waste:  2  pts:  10416
+Debug: zero copy waste: 503
+Debug: copy frame waste:  3  pts:  10458
+Debug: zero copy waste: 1000
+Debug: copy frame waste:  3  pts:  10500
+Debug: zero copy waste: 517
+Debug: copy frame waste:  1  pts:  10541
+Debug: zero copy waste: 1005
+Debug: copy frame waste:  2  pts:  10583
+Debug: zero copy waste: 998
+Debug: copy frame waste:  2  pts:  10625
+Debug: zero copy waste: 506
+Debug: copy frame waste:  2  pts:  10666
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  4  pts:  10708
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  10750
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  10791
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  10833
+Debug: zero copy waste: 501
+Debug: copy frame waste:  6  pts:  10875
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  10916
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  4  pts:  10958
+Debug: zero copy waste: 998
+Debug: copy frame waste:  4  pts:  11000
+Debug: zero copy waste: 503
+Debug: copy frame waste:  5  pts:  11041
+Debug: zero copy waste: 502
+Debug: copy frame waste:  6  pts:  11083
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  4  pts:  11125
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  4  pts:  11166
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  11208
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  6  pts:  11250
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  11291
+Debug: zero copy waste: 1506
+Debug: copy frame waste:  3  pts:  11333
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  11375
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  6  pts:  11416
+Debug: zero copy waste: 2018
+Debug: copy frame waste:  5  pts:  11458
+Debug: zero copy waste: 1000
+Debug: copy frame waste:  2  pts:  11500
+Debug: zero copy waste: 516
+Debug: copy frame waste:  2  pts:  11541
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  5  pts:  11583
+Debug: zero copy waste: 1502
+Debug: copy frame waste:  5  pts:  11625
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  15  pts:  11666
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  11708
+Debug: zero copy waste: 501
+Debug: copy frame waste:  9  pts:  11750
+Debug: zero copy waste: 501
+Debug: copy frame waste:  2  pts:  11791
+Debug: zero copy waste: 503
+Debug: copy frame waste:  4  pts:  11833
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  11875
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  11916
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  3  pts:  11958
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  12000
+Debug: zero copy waste: 2006
+Debug: copy frame waste:  5  pts:  12041
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  12083
+Debug: zero copy waste: 2000
+Debug: copy frame waste:  3  pts:  12125
+Debug: zero copy waste: 502
+Debug: copy frame waste:  6  pts:  12166
+Debug: zero copy waste: 500
+Debug: copy frame waste:  3  pts:  12208
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  3  pts:  12250
+Debug: zero copy waste: 3001
+Debug: copy frame waste:  3  pts:  12291
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  12333
+Debug: zero copy waste: 516
+Debug: copy frame waste:  3  pts:  12375
+Debug: zero copy waste: 503
+Debug: copy frame waste:  4  pts:  12416
+Debug: copy frame waste:  2  pts:  12458
+Debug: zero copy waste: 1502
+Debug: zero copy waste: 220
+Debug: copy frame waste:  2  pts:  12500
+Debug: zero copy waste: 505
+Debug: copy frame waste:  5  pts:  12541
+Debug: zero copy waste: 521
+Debug: copy frame waste:  3  pts:  12583
+Debug: zero copy waste: 2008
+Debug: copy frame waste:  3  pts:  12625
+Debug: zero copy waste: 1514
+Debug: copy frame waste:  2  pts:  12666
+Debug: zero copy waste: 1004
+Debug: copy frame waste:  3  pts:  12708
+Debug: zero copy waste: 502
+Debug: copy frame waste:  2  pts:  12750
+Debug: zero copy waste: 501
+Debug: copy frame waste:  13  pts:  12791
+Debug: zero copy waste: 501
+Debug: copy frame waste:  9  pts:  12833
+Debug: zero copy waste: 501
+Debug: copy frame waste:  6  pts:  12875
+Debug: zero copy waste: 2502
+Debug: copy frame waste:  3  pts:  12916
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  12958
+Debug: zero copy waste: 3000
+Debug: copy frame waste:  4  pts:  13000
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  13041
+Debug: zero copy waste: 501
+Debug: copy frame waste:  7  pts:  13083
+Debug: zero copy waste: 3000
+Debug: copy frame waste:  3  pts:  13125
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  13166
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  4  pts:  13208
+Debug: zero copy waste: 2502
+Debug: copy frame waste:  4  pts:  13250
+Debug: zero copy waste: 3005
+Debug: copy frame waste:  8  pts:  13291
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  7  pts:  13333
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  13375
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  8  pts:  13416
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  6  pts:  13458
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  13500
+Debug: zero copy waste: 504
+Debug: copy frame waste:  3  pts:  13541
+Debug: zero copy waste: 1016
+Debug: copy frame waste:  5  pts:  13583
+Debug: zero copy waste: 500
+Debug: copy frame waste:  4  pts:  13625
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  13666
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  13708
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  13750
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  13791
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  13833
+Debug: zero copy waste: 500
+Debug: copy frame waste:  3  pts:  13875
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  3  pts:  13916
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  4  pts:  13958
+Debug: zero copy waste: 926
+Debug: copy frame waste:  4  pts:  14000
+Debug: copy frame waste:  4  pts:  14041
+Debug: zero copy waste: 1002
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  10  pts:  14083
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  4  pts:  14125
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  13  pts:  14166
+Debug: zero copy waste: 3503
+Debug: copy frame waste:  7  pts:  14208
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  6  pts:  14250
+Debug: zero copy waste: 2500
+Debug: copy frame waste:  6  pts:  14291
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  4  pts:  14333
+Debug: zero copy waste: 500
+Debug: copy frame waste:  4  pts:  14375
+Debug: copy frame waste:  3  pts:  14416
+Debug: zero copy waste: 500
+Debug: copy frame waste:  3  pts:  14458
+Debug: copy frame waste:  2  pts:  14500
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  14541
+Debug: zero copy waste: 515
+Debug: copy frame waste:  2  pts:  14583
+Debug: zero copy waste: 486
+Debug: copy frame waste:  2  pts:  14625
+Debug: zero copy waste: 1006
+Debug: copy frame waste:  4  pts:  14666
+Debug: zero copy waste: 505
+Debug: copy frame waste:  5  pts:  14708
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  5  pts:  14750
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  3  pts:  14791
+Debug: zero copy waste: 501
+Debug: copy frame waste:  6  pts:  14833
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  3  pts:  14875
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  14916
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  14958
+Debug: zero copy waste: 499
+Debug: copy frame waste:  5  pts:  15000
+Debug: zero copy waste: 500
+Debug: copy frame waste:  3  pts:  15041
+Debug: zero copy waste: 500
+Debug: copy frame waste:  5  pts:  15083
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  4  pts:  15125
+Debug: zero copy waste: 999
+Debug: copy frame waste:  3  pts:  15166
+Debug: zero copy waste: 2505
+Debug: copy frame waste:  5  pts:  15208
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  15250
+Debug: zero copy waste: 501
+Debug: copy frame waste:  7  pts:  15291
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  15333
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  3  pts:  15375
+Debug: zero copy waste: 1500
+Debug: copy frame waste:  3  pts:  15416
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  15458
+Debug: zero copy waste: 3505
+Debug: copy frame waste:  4  pts:  15500
+Debug: zero copy waste: 515
+Debug: copy frame waste:  3  pts:  15541
+Debug: copy frame waste:  2  pts:  15583
+Debug: zero copy waste: 988
+Debug: zero copy waste: 0
+Debug: copy frame waste:  4  pts:  15625
+Debug: copy frame waste:  4  pts:  15666
+Debug: zero copy waste: 1002
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  4  pts:  15708
+Debug: zero copy waste: 505
+Debug: copy frame waste:  5  pts:  15750
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  15791
+Debug: copy frame waste:  2  pts:  15833
+Debug: zero copy waste: 501
+Debug: zero copy waste: 0
+Debug: copy frame waste:  15  pts:  15875
+Debug: zero copy waste: 2000
+Debug: copy frame waste:  6  pts:  15916
+Debug: zero copy waste: 501
+Debug: copy frame waste:  7  pts:  15958
+Debug: zero copy waste: 500
+Debug: copy frame waste:  4  pts:  16000
+Debug: zero copy waste: 500
+Debug: copy frame waste:  3  pts:  16041
+Debug: zero copy waste: 500
+Debug: copy frame waste:  5  pts:  16083
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  16125
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  3  pts:  16166
+Debug: zero copy waste: 1998
+Debug: copy frame waste:  3  pts:  16208
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  4  pts:  16250
+Debug: zero copy waste: 3005
+Debug: copy frame waste:  8  pts:  16291
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  6  pts:  16333
+Debug: zero copy waste: 500
+Debug: copy frame waste:  5  pts:  16375
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  16416
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  16458
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  7  pts:  16500
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  16541
+Debug: copy frame waste:  4  pts:  16583
+Debug: zero copy waste: 1503
+Debug: zero copy waste: 0
+Debug: copy frame waste:  3  pts:  16625
+Debug: zero copy waste: 3005
+Debug: copy frame waste:  3  pts:  16666
+Debug: zero copy waste: 1499
+Debug: copy frame waste:  6  pts:  16708
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  16750
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  16791
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  16833
+Debug: zero copy waste: 500
+Debug: copy frame waste:  4  pts:  16875
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  16916
+Debug: zero copy waste: 2002
+Debug: copy frame waste:  3  pts:  16958
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  17000
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  4  pts:  17041
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  17083
+Debug: zero copy waste: 3503
+Debug: copy frame waste:  6  pts:  17125
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  3  pts:  17166
+Debug: zero copy waste: 3524
+Debug: copy frame waste:  2  pts:  17208
+Debug: zero copy waste: 4507
+Debug: copy frame waste:  3  pts:  17250
+Debug: zero copy waste: 506
+Debug: copy frame waste:  3  pts:  17291
+Debug: zero copy waste: 978
+Debug: copy frame waste:  2  pts:  17333
+Debug: copy frame waste:  3  pts:  17375
+Debug: zero copy waste: 502
+Debug: zero copy waste: 0
+Debug: copy frame waste:  5  pts:  17416
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  17458
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  3  pts:  17500
+Debug: zero copy waste: 504
+Debug: copy frame waste:  3  pts:  17541
+Debug: zero copy waste: 3488
+Debug: copy frame waste:  3  pts:  17583
+Debug: zero copy waste: 3498
+Debug: copy frame waste:  4  pts:  17625
+Debug: zero copy waste: 2506
+Debug: copy frame waste:  2  pts:  17666
+Debug: zero copy waste: 504
+Debug: copy frame waste:  3  pts:  17708
+Debug: zero copy waste: 1004
+Debug: copy frame waste:  5  pts:  17750
+Debug: zero copy waste: 1998
+Debug: copy frame waste:  6  pts:  17791
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  3  pts:  17833
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  17875
+Debug: zero copy waste: 501
+Debug: copy frame waste:  8  pts:  17916
+Debug: copy frame waste:  4  pts:  17958
+Debug: zero copy waste: 568
+Debug: zero copy waste: 0
+Debug: copy frame waste:  3  pts:  18000
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  18041
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  18083
+Debug: zero copy waste: 503
+Debug: copy frame waste:  7  pts:  18125
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  18166
+Debug: zero copy waste: 500
+Debug: copy frame waste:  5  pts:  18208
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  18250
+Debug: zero copy waste: 501
+Debug: copy frame waste:  6  pts:  18291
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  9  pts:  18333
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  18375
+Debug: zero copy waste: 499
+Debug: copy frame waste:  6  pts:  18416
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  18458
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  18500
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  2  pts:  18541
+Debug: zero copy waste: 1999
+Debug: copy frame waste:  0  pts:  18583
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  18625
+Debug: zero copy waste: 5021
+Debug: copy frame waste:  5  pts:  18666
+Debug: zero copy waste: 517
+Debug: copy frame waste:  2  pts:  18708
+Debug: zero copy waste: 492
+Debug: copy frame waste:  2  pts:  18750
+Debug: zero copy waste: 1507
+Debug: copy frame waste:  3  pts:  18791
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  3  pts:  18833
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  7  pts:  18875
+Debug: copy frame waste:  4  pts:  18916
+Debug: zero copy waste: 1002
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  18958
+Debug: zero copy waste: 499
+Debug: copy frame waste:  3  pts:  19000
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  19041
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  19083
+Debug: zero copy waste: 500
+Debug: copy frame waste:  5  pts:  19125
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  6  pts:  19166
+Debug: zero copy waste: 501
+Debug: copy frame waste:  6  pts:  19208
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  4  pts:  19250
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  19291
+Debug: zero copy waste: 1495
+Debug: copy frame waste:  5  pts:  19333
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  6  pts:  19375
+Debug: zero copy waste: 3497
+Debug: copy frame waste:  6  pts:  19416
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  5  pts:  19458
+Debug: zero copy waste: 2765
+Debug: copy frame waste:  5  pts:  19500
+Debug: zero copy waste: 2001
+Debug: copy frame waste:  6  pts:  19541
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  19583
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  19625
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  19666
+Debug: zero copy waste: 3495
+Debug: copy frame waste:  8  pts:  19708
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  19750
+Debug: zero copy waste: 1500
+Debug: copy frame waste:  4  pts:  19791
+Debug: zero copy waste: 1500
+Debug: copy frame waste:  5  pts:  19833
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  19875
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  19916
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  19958
+Debug: zero copy waste: 999
+Debug: copy frame waste:  3  pts:  20000
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  20041
+Debug: zero copy waste: 500
+Debug: copy frame waste:  3  pts:  20083
+Debug: zero copy waste: 997
+Debug: copy frame waste:  5  pts:  20125
+Debug: copy frame waste:  3  pts:  20166
+Debug: zero copy waste: 974
+Debug: zero copy waste: 0
+Debug: copy frame waste:  6  pts:  20208
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  5  pts:  20250
+Debug: zero copy waste: 500
+Debug: copy frame waste:  2  pts:  20291
+Debug: zero copy waste: 2507
+Debug: copy frame waste:  3  pts:  20333
+Debug: zero copy waste: 1503
+Debug: copy frame waste:  2  pts:  20375
+Debug: zero copy waste: 503
+Debug: copy frame waste:  4  pts:  20416
+Debug: zero copy waste: 1004
+Debug: copy frame waste:  3  pts:  20458
+Debug: zero copy waste: 1506
+Debug: copy frame waste:  4  pts:  20500
+Debug: zero copy waste: 519
+Debug: copy frame waste:  2  pts:  20541
+Debug: zero copy waste: 1004
+Debug: copy frame waste:  3  pts:  20583
+Debug: zero copy waste: 946
+Debug: copy frame waste:  3  pts:  20625
+Debug: zero copy waste: 486
+Debug: copy frame waste:  3  pts:  20666
+Debug: zero copy waste: 503
+Debug: copy frame waste:  3  pts:  20708
+Debug: zero copy waste: 959
+Debug: copy frame waste:  4  pts:  20750
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  3  pts:  20791
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  20833
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  3  pts:  20875
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  20916
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  5  pts:  20958
+Debug: zero copy waste: 501
+Debug: copy frame waste:  7  pts:  21000
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  21041
+Debug: zero copy waste: 501
+Debug: copy frame waste:  2  pts:  21083
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  21125
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  21166
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  21208
+Debug: zero copy waste: 1004
+Debug: copy frame waste:  4  pts:  21250
+Debug: zero copy waste: 2502
+Debug: copy frame waste:  4  pts:  21291
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  3  pts:  21333
+Debug: zero copy waste: 3503
+Debug: copy frame waste:  5  pts:  21375
+Debug: zero copy waste: 3005
+Debug: copy frame waste:  4  pts:  21416
+Debug: zero copy waste: 2502
+Debug: copy frame waste:  4  pts:  21458
+Debug: zero copy waste: 1501
+Debug: copy frame waste:  4  pts:  21500
+Debug: zero copy waste: 3018
+Debug: copy frame waste:  2  pts:  21541
+Debug: zero copy waste: 502
+Debug: copy frame waste:  6  pts:  21583
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  21625
+Debug: zero copy waste: 2002
+Debug: copy frame waste:  4  pts:  21666
+Debug: zero copy waste: 2500
+Debug: copy frame waste:  4  pts:  21708
+Debug: zero copy waste: 502
+Debug: copy frame waste:  13  pts:  21750
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  21791
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  21833
+Debug: zero copy waste: 500
+Debug: copy frame waste:  2  pts:  21875
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  3  pts:  21916
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  21958
+Debug: zero copy waste: 1004
+Debug: copy frame waste:  4  pts:  22000
+Debug: zero copy waste: 502
+Debug: copy frame waste:  2  pts:  22041
+Debug: zero copy waste: 1004
+Debug: copy frame waste:  4  pts:  22083
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  22125
+Debug: copy frame waste:  6  pts:  22166
+Debug: zero copy waste: 1502
+Debug: zero copy waste: 0
+Debug: copy frame waste:  2  pts:  22208
+Debug: zero copy waste: 2017
+Debug: copy frame waste:  4  pts:  22250
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  22291
+Debug: zero copy waste: 518
+Debug: copy frame waste:  3  pts:  22333
+Debug: zero copy waste: 998
+Debug: copy frame waste:  4  pts:  22375
+Debug: zero copy waste: 504
+Debug: copy frame waste:  4  pts:  22416
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  22458
+Debug: zero copy waste: 1504
+Debug: copy frame waste:  3  pts:  22500
+Debug: zero copy waste: 1505
+Debug: copy frame waste:  4  pts:  22541
+Debug: zero copy waste: 464
+Debug: copy frame waste:  2  pts:  22583
+Debug: zero copy waste: 504
+Debug: copy frame waste:  3  pts:  22625
+Debug: zero copy waste: 1005
+Debug: copy frame waste:  4  pts:  22666
+Debug: zero copy waste: 507
+Debug: copy frame waste:  3  pts:  22708
+Debug: zero copy waste: 1502
+Debug: copy frame waste:  7  pts:  22750
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  22791
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  22833
+Debug: zero copy waste: 1498
+Debug: copy frame waste:  5  pts:  22875
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  7  pts:  22916
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  2  pts:  22958
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  23000
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  23041
+Debug: copy frame waste:  2  pts:  23083
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  4  pts:  23125
+Debug: zero copy waste: 2501
+Debug: copy frame waste:  4  pts:  23166
+Debug: zero copy waste: 503
+Debug: copy frame waste:  8  pts:  23208
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  3  pts:  23250
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  23291
+Debug: zero copy waste: 3001
+Debug: copy frame waste:  3  pts:  23333
+Debug: zero copy waste: 1502
+Debug: copy frame waste:  3  pts:  23375
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  4  pts:  23416
+Debug: zero copy waste: 999
+Debug: copy frame waste:  4  pts:  23458
+Debug: zero copy waste: 905
+Debug: copy frame waste:  2  pts:  23500
+Debug: zero copy waste: 500
+Debug: copy frame waste:  0  pts:  23541
+Debug: zero copy waste: 517
+Debug: copy frame waste:  3  pts:  23583
+Debug: zero copy waste: 1504
+Debug: copy frame waste:  4  pts:  23625
+Debug: zero copy waste: 519
+Debug: copy frame waste:  3  pts:  23666
+Debug: zero copy waste: 1004
+Debug: copy frame waste:  3  pts:  23708
+Debug: zero copy waste: 2498
+Debug: copy frame waste:  4  pts:  23750
+Debug: zero copy waste: 1005
+Debug: copy frame waste:  2  pts:  23791
+Debug: zero copy waste: 507
+Debug: copy frame waste:  3  pts:  23833
+Debug: zero copy waste: 503
+Debug: copy frame waste:  4  pts:  23875
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  23916
+Debug: zero copy waste: 502
+Debug: copy frame waste:  7  pts:  23958
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  24000
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  5  pts:  24041
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  5  pts:  24083
+Debug: zero copy waste: 500
+Debug: copy frame waste:  4  pts:  24125
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  24166
+Debug: zero copy waste: 501
+Debug: copy frame waste:  7  pts:  24208
+Debug: zero copy waste: 2004
+Debug: copy frame waste:  9  pts:  24250
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  3  pts:  24291
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  24333
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  24375
+Debug: zero copy waste: 1503
+Debug: copy frame waste:  8  pts:  24416
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  8  pts:  24458
+Debug: zero copy waste: 1006
+Debug: copy frame waste:  6  pts:  24500
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  3  pts:  24541
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  24583
+Debug: zero copy waste: 2006
+Debug: copy frame waste:  5  pts:  24625
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  24666
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  24708
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  24750
+Debug: zero copy waste: 500
+Debug: copy frame waste:  5  pts:  24791
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  24833
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  3  pts:  24875
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  24916
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  24958
+Debug: zero copy waste: 919
+Debug: copy frame waste:  3  pts:  25000
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  25041
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  25083
+Debug: zero copy waste: 1516
+Debug: copy frame waste:  5  pts:  25125
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  25166
+Debug: copy frame waste:  3  pts:  25208
+Debug: zero copy waste: 314
+Debug: zero copy waste: 0
+Debug: copy frame waste:  4  pts:  25250
+Debug: zero copy waste: 2017
+Debug: copy frame waste:  5  pts:  25291
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  2  pts:  25333
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  2  pts:  25375
+Debug: zero copy waste: 2499
+Debug: copy frame waste:  5  pts:  25416
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  25458
+Debug: zero copy waste: 1006
+Debug: copy frame waste:  3  pts:  25500
+Debug: zero copy waste: 2005
+Debug: copy frame waste:  3  pts:  25541
+Debug: zero copy waste: 503
+Debug: copy frame waste:  3  pts:  25583
+Debug: zero copy waste: 506
+Debug: copy frame waste:  6  pts:  25625
+Debug: zero copy waste: 2006
+Debug: copy frame waste:  4  pts:  25666
+Debug: zero copy waste: 2002
+Debug: copy frame waste:  4  pts:  25708
+Debug: copy frame waste:  2  pts:  25750
+Debug: zero copy waste: 1002
+Debug: zero copy waste: 0
+Debug: copy frame waste:  4  pts:  25791
+Debug: zero copy waste: 1502
+Debug: copy frame waste:  5  pts:  25833
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  25875
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  3  pts:  25916
+Debug: zero copy waste: 998
+Debug: copy frame waste:  6  pts:  25958
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  4  pts:  26000
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  26041
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  26083
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  26125
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  5  pts:  26166
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  26208
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  4  pts:  26250
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  3  pts:  26291
+Debug: zero copy waste: 2000
+Debug: copy frame waste:  7  pts:  26333
+Debug: zero copy waste: 1005
+Debug: copy frame waste:  2  pts:  26375
+Debug: zero copy waste: 1500
+Debug: copy frame waste:  4  pts:  26416
+Debug: zero copy waste: 1499
+Debug: copy frame waste:  4  pts:  26458
+Debug: zero copy waste: 1420
+Debug: copy frame waste:  3  pts:  26500
+Debug: zero copy waste: 2006
+Debug: copy frame waste:  4  pts:  26541
+Debug: zero copy waste: 517
+Debug: copy frame waste:  3  pts:  26583
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  26625
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  26666
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  26708
+Debug: zero copy waste: 999
+Debug: copy frame waste:  4  pts:  26750
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  26791
+Debug: zero copy waste: 1501
+Debug: copy frame waste:  5  pts:  26833
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  26875
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  26916
+Debug: zero copy waste: 501
+Debug: copy frame waste:  4  pts:  26958
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  3  pts:  27000
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  27041
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  27083
+Debug: zero copy waste: 1017
+Debug: copy frame waste:  5  pts:  27125
+Debug: zero copy waste: 503
+Debug: copy frame waste:  2  pts:  27166
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  6  pts:  27208
+Debug: zero copy waste: 1003
+Debug: copy frame waste:  1  pts:  27250
+Debug: zero copy waste: 516
+Debug: copy frame waste:  2  pts:  27291
+Debug: zero copy waste: 1004
+Debug: copy frame waste:  3  pts:  27333
+Debug: zero copy waste: 503
+Debug: copy frame waste:  2  pts:  27375
+Debug: zero copy waste: 1500
+Debug: copy frame waste:  3  pts:  27416
+Debug: zero copy waste: 1009
+Debug: copy frame waste:  2  pts:  27458
+Debug: zero copy waste: 327
+Debug: copy frame waste:  2  pts:  27500
+Debug: zero copy waste: 486
+Debug: copy frame waste:  2  pts:  27541
+Debug: zero copy waste: 507
+Debug: copy frame waste:  3  pts:  27583
+Debug: copy frame waste:  2  pts:  27625
+Debug: zero copy waste: 500
+Debug: copy frame waste:  5  pts:  27666
+Debug: zero copy waste: 1006
+Debug: copy frame waste:  5  pts:  27708
+Debug: zero copy waste: 502
+Debug: copy frame waste:  4  pts:  27750
+Debug: zero copy waste: 503
+Debug: copy frame waste:  2  pts:  27791
+Debug: zero copy waste: 504
+Debug: copy frame waste:  4  pts:  27833
+Debug: zero copy waste: 505
+Debug: copy frame waste:  5  pts:  27875
+Debug: zero copy waste: 498
+Debug: copy frame waste:  3  pts:  27916
+Debug: zero copy waste: 3000
+Debug: copy frame waste:  4  pts:  27958
+Debug: zero copy waste: 501
+Debug: copy frame waste:  8  pts:  28000
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  5  pts:  28041
+Debug: zero copy waste: 502
+Debug: copy frame waste:  6  pts:  28083
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  28125
+Debug: zero copy waste: 999
+Debug: copy frame waste:  4  pts:  28166
+Debug: zero copy waste: 501
+Debug: copy frame waste:  2  pts:  28208
+Debug: zero copy waste: 501
+Debug: copy frame waste:  6  pts:  28250
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  28291
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  28333
+Debug: zero copy waste: 502
+Debug: copy frame waste:  7  pts:  28375
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  6  pts:  28416
+Debug: zero copy waste: 3496
+Debug: copy frame waste:  4  pts:  28458
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  6  pts:  28500
+Debug: zero copy waste: 1999
+Debug: copy frame waste:  7  pts:  28541
+Debug: zero copy waste: 3000
+Debug: copy frame waste:  4  pts:  28583
+Debug: zero copy waste: 1001
+Debug: copy frame waste:  4  pts:  28625
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  5  pts:  28666
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  4  pts:  28708
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  3  pts:  28750
+Debug: zero copy waste: 1002
+Debug: copy frame waste:  4  pts:  28791
+Debug: zero copy waste: 503
+Debug: copy frame waste:  3  pts:  28833
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  28875
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  28916
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  28958
+Debug: zero copy waste: 913
+Debug: "all closed and reseted"
+Debug: "avformat_open_input: d->format_ctx:'0x5e807a20', url:'D:/movies/Thousand.Planets.mp4'..."
+Debug: copy frame waste:  13  pts:  29000
+Debug: zero copy waste: 501
+Debug: copy frame waste:  3  pts:  29041
+Debug: "avformat_open_input: url:'D:/movies/Thousand.Planets.mp4' ret:0"
+Debug: zero copy waste: 2500
+Debug: "avfmtctx.flags: 2097153, iformat.flags"
+Debug: "QtAV::VideoDecoderFFmpeg thread type: Frame, count: 5"
+Debug: "set QtAV::VideoDecoderFFmpeg() meta properties:"
+Debug: "AVCodecContext.h264 options:"
+Debug: "skip_loop_filter=>0"
+Debug: "skip_frame=>0"
+Debug: "set QtAV::VideoDecoderFFmpeg() meta properties:"
+Warning: "no frame could be decompressed: Error number 140047 occurred 0/140047"
+Debug: copy frame waste:  6  pts:  29083
+Warning: "(repeat 1)no frame could be decompressed: Error number 140047 occurred 0/140047\nno frame could be decompressed: Error number 61082 occurred 0/61082"
+Warning: "no frame could be decompressed: Error number 30356 occurred 0/30356"
+Debug: zero copy waste: 496
+Warning: "no frame could be decompressed: Error number 14118 occurred 0/14118"
+Warning: "no frame could be decompressed: Error number 15983 occurred 0/15983"
+Debug: copy frame waste:  9  pts:  29125
+Debug: zero copy waste: 1998
+Debug: "got frame at 3704.169000s, diff=21"
+Debug: copy frame waste:  16  pts:  29166
+Debug: "setInSize => calculating aspect ratio from converted input data(1.777778)"
+Debug: copy frame waste:  7  pts:  29208
+Debug: QtAV::VideoFormat(pixelFormat: 15 "yuv420p" alpha: false, channels: 3, planes: 3, bpc: 8, bpp: 12/12 -8-8-8)
+Debug: "pixel format changed:  => yuv420p 15"
+Debug: material changed:  "gl material 16to8bit: 0, planar: 0, has alpha: 0, 2d texture: 0, 2nd plane rg: 0, xyz: 0"  =>  "gl material 16to8bit: 0, planar: 1, has alpha: 0, 2d texture: 1, 2nd plane rg: 0, xyz: 0"
+Debug: "plane linesize 0: padded = 1920, effective = 1920. theoretical plane size: 1920x1080"
+Debug: "plane linesize 1: padded = 960, effective = 960. theoretical plane size: 960x540"
+Debug: "plane linesize 2: padded = 960, effective = 960. theoretical plane size: 960x540"
+Debug: "effective_tex_width_ratio=1.000000"
+Debug: texture internal format:  QVector(33321, 33321, 33321)
+Debug: texture data format:  QVector(6403, 6403, 6403)
+Debug: texture data type:  QVector(5121, 5121, 5121)
+Debug: "///////////bpp 2, bpc: 8"
+Debug: "texture width: 1920 - 1920 = pad: 0. bpp(gl): 1"
+Debug: "texture width: 960 - 960 = pad: 0. bpp(gl): 1"
+Debug: "(repeat 1)texture width: 960 - 960 = pad: 0. bpp(gl): 1\ncreating texture for plane 0"
+Debug: "texture for plane 0 is created (id=13)"
+Debug: "creating texture for plane 1"
+Debug: "texture for plane 1 is created (id=14)"
+Debug: "creating texture for plane 2"
+Debug: "texture for plane 2 is created (id=15)"
+Debug: "[ShaderManager] cache a new shader material type(10): gl material 16to8bit: 0, planar: 1, has alpha: 0, 2d texture: 1, 2nd plane rg: 0, xyz: 0"
+Debug: "bind attribute: a_Position => 0"
+Debug: "bind attribute: a_TexCoords0 => 1"
+Debug: copy frame waste:  7  pts:  29250
+Debug: "uniform locations:"
+Debug: "u_Texture0: 2"
+Debug: "u_Texture1: 3"
+Debug: "u_Texture2: 4"
+Debug: "u_Matrix: 0"
+Debug: "u_colorMatrix: 1"
+Debug: "u_opacity: 5"
+Debug: input yuv limited range
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: creating VBO...
+Debug: creating VAO...
+Debug: vao updated
+Debug: geometry attributes changed, rebind vao...
+Debug: geometry updated
+Debug: zero copy waste: 29023
+Debug: zero copy waste: 1001
+Debug: zero copy waste: 502
+Debug: "AVCodecContext.h264 options:"
+Debug: "skip_loop_filter=>0"
+Debug: "skip_frame=>0"
+Debug: "set QtAV::VideoDecoderFFmpeg() meta properties:"
+Warning: "no frame could be decompressed: Error number 77302 occurred 0/77302"
+Debug: "AVCodecContext.h264 options:"
+Debug: "(repeat 1)no frame could be decompressed: Error number 77302 occurred 0/77302\nskip_loop_filter=>8"
+Debug: "skip_frame=>8"
+Debug: "set QtAV::VideoDecoderFFmpeg() meta properties:"
+Debug: zero copy waste: 108
+Warning: "no frame could be decompressed: Error number 24457 occurred 0/24457"
+Warning: "no frame could be decompressed: Error number 9832 occurred 0/9832"
+Warning: "no frame could be decompressed: Error number 4935 occurred 0/4935"
+Warning: "no frame could be decompressed: Error number 5184 occurred 0/5184"
+Warning: "no frame could be decompressed: Error number 5816 occurred 0/5816"
+Warning: "no frame could be decompressed: Error number 5119 occurred 0/5119"
+Debug: copy frame waste:  14  pts:  29291
+Debug: copy frame waste:  4  pts:  29333
+Warning: "no frame could be decompressed: Error number 4902 occurred 0/4902"
+Warning: "no frame could be decompressed: Error number 4499 occurred 0/4499"
+Debug: zero copy waste: 2000
+Debug: zero copy waste: 151
+Warning: "no frame could be decompressed: Error number 16993 occurred 0/16993"
+Debug: copy frame waste:  5  pts:  29375
+Warning: "no frame could be decompressed: Error number 3876 occurred 0/3876"
+Warning: "no frame could be decompressed: Error number 4279 occurred 0/4279"
+Debug: zero copy waste: 1502
+Debug: copy frame waste:  4  pts:  29416
+Warning: "no frame could be decompressed: Error number 4537 occurred 0/4537"
+Warning: "no frame could be decompressed: Error number 13338 occurred 0/13338"
+Warning: "no frame could be decompressed: Error number 6488 occurred 0/6488"
+Debug: copy frame waste:  3  pts:  29458
+Warning: "no frame could be decompressed: Error number 6555 occurred 0/6555"
+Debug: zero copy waste: 501
+Warning: "no frame could be decompressed: Error number 6820 occurred 0/6820"
+Debug: zero copy waste: 0
+Warning: "no frame could be decompressed: Error number 7121 occurred 0/7121"
+Warning: "no frame could be decompressed: Error number 6337 occurred 0/6337"
+Warning: "no frame could be decompressed: Error number 26923 occurred 0/26923"
+Warning: "no frame could be decompressed: Error number 14382 occurred 0/14382"
+Warning: "no frame could be decompressed: Error number 8195 occurred 0/8195"
+Debug: "AVCodecContext.h264 options:"
+Debug: "skip_loop_filter=>0"
+Debug: "skip_frame=>0"
+Debug: "set QtAV::VideoDecoderFFmpeg() meta properties:"
+Debug: copy frame waste:  3  pts:  29500
+Debug: "AVCodecContext.h264 options:"
+Debug: "skip_loop_filter=>8"
+Debug: "skip_frame=>8"
+Debug: "set QtAV::VideoDecoderFFmpeg() meta properties:"
+Warning: "no frame could be decompressed: Error number 9112 occurred 0/9112"
+Debug: "AVCodecContext.h264 options:"
+Debug: "skip_loop_filter=>0"
+Debug: "skip_frame=>0"
+Debug: "set QtAV::VideoDecoderFFmpeg() meta properties:"
+Warning: "no frame could be decompressed: Error number 9790 occurred 0/9790"
+Debug: zero copy waste: 292
+Warning: "no frame could be decompressed: Error number 12791 occurred 0/12791"
+Debug: copy frame waste:  3  pts:  29541
+Debug: "got frame at 3726.544000s, diff=14"
+Debug: copy frame waste:  5  pts:  29583
+Debug: zero copy waste: 1997
+Debug: zero copy waste: 501
+Debug: zero copy waste: 0
+Debug: copy frame waste:  6  pts:  29625
+Debug: zero copy waste: 1591
+Debug: copy frame waste:  7  pts:  29666
+Debug: zero copy waste: 1000
+Debug: copy frame waste:  4  pts:  29708
+Debug: copy frame waste:  4  pts:  29750
+Debug: zero copy waste: 1502
+Debug: copy frame waste:  5  pts:  29791
+Debug: zero copy waste: 501
+Debug: copy frame waste:  5  pts:  29833
+Debug: zero copy waste: 4004
+Debug: copy frame waste:  3  pts:  29875
+Debug: zero copy waste: 500
+Debug: copy frame waste:  8  pts:  29916
+Debug: zero copy waste: 501
+Debug: copy frame waste:  12  pts:  29958
+Debug: zero copy waste: 1004
+Debug: copy frame waste:  4  pts:  30000
+Debug: zero copy waste: 1497
+Debug: copy frame waste:  5  pts:  30041
+Debug: zero copy waste: 501
+Debug: copy frame waste:  7  pts:  30083
+Debug: zero copy waste: 502
+Debug: copy frame waste:  3  pts:  30125
+Debug: zero copy waste: 502
+Debug: copy frame waste:  6  pts:  30166
+Debug: zero copy waste: 502
+Debug: copy frame waste:  5  pts:  30208
+Debug: "timer: 6, current thread: 0x3e337540, player thread: 0x3e337540"
+Debug: "stopping demuxer thread..."
+Debug: stopping thread  QtAV::AudioThread(0x5e41c500)
+Debug: "audio thread stop after decode()"
+Debug: "Audio thread stops running..."
+Debug: stopping thread  QtAV::VideoThread(0x3e404c90)
+Debug: zero copy waste: 1502
+Debug: copy frame waste:  4  pts:  30250
+Debug: "Video thread stops running..."
+Debug: "setInSize => calculating aspect ratio from converted input data(0.000000)"
+Debug: "all avthread finished. try to exit demux thread<<<<<<"
+Debug: "Demux thread stops running...."
+Debug: "demuxer thread emit finished. repeat: -1/0"
+Debug: "avplayer emit stopped()"
+Warning: "Can not copy codec properties when it's open"
+Debug: "(repeat 1)Can not copy codec properties when it's open\nclosing d->format_ctx"
+Debug: "all audio/video threads stopped... state: 0"
+Debug: "setInSize => calculating aspect ratio from converted input data(0.000000)"
+Warning: "Can not copy codec properties when it's open"
+Warning: qrc:///qml/QMLPlayer/main.qml:133: TypeError: Type error
+Debug: zero copy waste: 373
+Debug: zero copy waste: 0
+Debug: "closing d->format_ctx"
 Debug: sync config to  "C:/Users/user/AppData/Roaming/QMLPlayer/QMLPlayer.ini"
 Debug: sync end
 Debug: "Not playing~"
 Warning: "No gl context"
 Debug: "(repeat 2)No gl context\nNot playing~"
+Debug: "source_voice: 0x5ff14fe0, master: 0x5ff13bd0"
 Debug: "source_voice: 0x0, master: 0x0"
 Debug: 
-Debug: "(repeat 1)source_voice: 0x0, master: 0x0\nExtractThread exiting..."
+Debug: "~AVThreadPrivate wake up paused thread"
+Debug: "(repeat 1)~AVThreadPrivate wake up paused thread\nExtractThread exiting..."
 Warning: "No gl context"
+Debug: "destroy GeometryRenderer 0x5e343570"
+Warning: Attempting to create QWindow-based QOffscreenSurface outside the gui thread. Expect failures.
+Debug: "destroy GeometryRenderer 0x5e1ab1c0"
+Warning: Attempting to create QWindow-based QOffscreenSurface outside the gui thread. Expect failures.
 Warning: ScreenSaver::restoreState: no data, doing nothing

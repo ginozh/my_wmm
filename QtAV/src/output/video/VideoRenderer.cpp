@@ -1,24 +1,30 @@
 /******************************************************************************
     QtAV:  Multimedia framework based on Qt and FFmpeg
     Copyright (C) 2012-2017 Wang Bin <wbsecg1@gmail.com>
-
 *   This file is part of QtAV
-
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
     License as published by the Free Software Foundation; either
     version 2.1 of the License, or (at your option) any later version.
-
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ******************************************************************************/
-
+#include <QOpenGLFramebufferObject> //storm
+#include <QOpenGLContext> 
+#include <QThreadStorage> 
+#include <QImage> 
+#include <QMatrix4x4> 
+#include <QSurface> 
+#include <QScreen> 
+#include "QtAV/VideoShader.h"
+#include "QtAV/GeometryRenderer.h"
+#include "QtAV/OpenGLVideo.h"
+#include "opengl/ShaderManager.h"
+#include <sys/time.h> //storm
+#include "opengl/OpenGLHelper.h"
 #include "QtAV/VideoRenderer.h"
 #include "QtAV/private/VideoRenderer_p.h"
 #include "QtAV/Filter.h"
@@ -28,26 +34,21 @@
 #include "QtAV/private/factory.h"
 #include "QtAV/private/mkid.h"
 #include "utils/Logger.h"
-
 namespace QtAV {
 FACTORY_DEFINE(VideoRenderer)
 VideoRendererId VideoRendererId_OpenGLWindow = mkid::id32base36_6<'Q', 'O', 'G', 'L', 'W', 'w'>::value;
-
 VideoRenderer::VideoRenderer()
     :AVOutput(*new VideoRendererPrivate)
 {
     // can not do 'if (widget()) connect to update()' because widget() is virtual
 }
-
 VideoRenderer::VideoRenderer(VideoRendererPrivate &d)
     :AVOutput(d)
 {
 }
-
 VideoRenderer::~VideoRenderer()
 {
 }
-
 bool VideoRenderer::receive(const VideoFrame &frame)
 {
     DPTR_D(VideoRenderer);
@@ -60,7 +61,6 @@ bool VideoRenderer::receive(const VideoFrame &frame)
     Q_UNUSED(locker); //TODO: double buffer for display/dec frame to avoid mutex
     return receiveFrame(frame);
 }
-
 bool VideoRenderer::setPreferredPixelFormat(VideoFormat::PixelFormat pixfmt)
 {
     DPTR_D(VideoRenderer);
@@ -461,9 +461,9 @@ QRegion VideoRenderer::backgroundRegion() const
 void VideoRenderer::drawBackground()
 {
 }
-
+#if 0
 void VideoRenderer::handlePaintEvent()
-{
+{float time_use=0; struct timeval start; struct timeval end; gettimeofday(&start,NULL); //storm
     DPTR_D(VideoRenderer);
     d.setupQuality();
     //begin paint. how about QPainter::beginNativePainting()?
@@ -535,10 +535,10 @@ void VideoRenderer::handlePaintEvent()
                 vf->apply(d.statistics, &d.video_frame); //painter and paint device are ready, pass video frame is ok.
             }
         }
-    }
+    }gettimeofday(&end,NULL);time_use=(end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec);qDebug()<<"VideoRenderer::handlePaintEvent zero copy waste:"<<time_use;//storm
     //end paint. how about QPainter::endNativePainting()?
 }
-
+#endif
 qreal VideoRenderer::brightness() const
 {
     return d_func().brightness;
@@ -680,4 +680,350 @@ void VideoRenderer::updateUi()
             QCoreApplication::instance()->postEvent(obj, new QEvent(QEvent::UpdateRequest));
     }
 }
+#if 1
+void VideoRenderer::handlePaintEvent()
+{float time_use=0; struct timeval start; struct timeval end; gettimeofday(&start,NULL); //storm
+    DPTR_D(VideoRenderer);
+    d.setupQuality();
+    //begin paint. how about QPainter::beginNativePainting()?
+    {
+        //lock is required only when drawing the frame
+        QMutexLocker locker(&d.img_mutex);
+        Q_UNUSED(locker);
+#if 1
+        if(d.video_frame){
+            // src/filter/GLSLFilter.cpp 84
+            if (!QOpenGLContext::currentContext()) {
+                qWarning() << "No current gl context for glsl filter: " << this;
+                return;
+            }
+            // OpenGLVideo.cpp
+            static QOpenGLFramebufferObject *fbo=NULL;
+            VideoFrame *frame= &d.video_frame;
+            static VideoMaterial *material=NULL;
+            static ShaderManager *manager=NULL;
+            static QMatrix4x4 matrix;
+            static QRectF rect;
+            if(!fbo)
+            {
+                fbo = new QOpenGLFramebufferObject(frame->size(), GL_TEXTURE_2D); //TODO: prefer 16bit rgb
+                QOpenGLContext *ctx = const_cast<QOpenGLContext*>(QOpenGLContext::currentContext()); //qt4 returns const
+                //d.glv.setOpenGLContext(ctx);
+                {
+                    qreal b = 0, c = 0, h = 0, s = 0;
+                    if (material) {
+                        b = material->brightness();
+                        c = material->contrast();
+                        h = material->hue();
+                        s = material->saturation();
+                        delete material;
+                        material = 0;
+                    }
+                    material = new VideoMaterial();
+                    material->setBrightness(b);
+                    material->setContrast(c);
+                    material->setHue(h);
+                    material->setSaturation(s);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+                    manager = ctx->findChild<ShaderManager*>(QStringLiteral("__qtav_shader_manager"));
+#endif
+                    ////updateViewport();
+                    {
+                        QSizeF surfaceSize = ctx->surface()->size();
+                        surfaceSize *= ctx->screen()->devicePixelRatio();
+                        //setProjectionMatrixToRect(QRectF(QPointF(), surfaceSize));
+                        QRectF r=QRectF(QPointF(), surfaceSize);
+                        // => setViewport
+                        {
+                            rect = r;
+                            matrix.setToIdentity();
+                            DYGL(glViewport(rect.x(), rect.y(), rect.width(), rect.height()));
+                        }
+
+                    }
+                    if (!manager)
+                    {
+                        // TODO: what if ctx is delete?
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+                        manager = new ShaderManager(ctx);
+                        ////QObject::connect(ctx, SIGNAL(aboutToBeDestroyed()), this, SLOT(resetGL()), Qt::DirectConnection); // direct to make sure there is a valid context. makeCurrent in window.aboutToBeDestroyed()?
+#endif
+                        manager->setObjectName(QStringLiteral("__qtav_shader_manager"));
+                        /// get gl info here because context is current(qt ensure it)
+                        //const QByteArray extensions(reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS)));
+                    }
+                    bool hasGLSL = QOpenGLShaderProgram::hasOpenGLShaderPrograms();
+                    qDebug("OpenGL version: %d.%d  hasGLSL: %d", ctx->format().majorVersion(), ctx->format().minorVersion(), hasGLSL);
+                }
+                //d.glv.setProjectionMatrixToRect(QRectF(0, 0, d.fbo->width(), d.fbo->height()));
+                //=>OpenGLVideo::setViewport(const QRectF &r)
+                {
+                    QRectF r = QRectF(0, 0, fbo->width(), fbo->height());
+                    {
+                        rect = r;
+                        matrix.setToIdentity();
+                        DYGL(glViewport(rect.x(), rect.y(), rect.width(), rect.height()));
+                    }
+                }
+                qDebug("new fbo texture: %d %dx%d", fbo->texture(), fbo->width(), fbo->height());
+            }
+            fbo->bind();
+            DYGL(glViewport(0, 0, fbo->width(), fbo->height()));
+            ///d.glv.setCurrentFrame(*frame);
+            {
+                material->setCurrentFrame(*frame);
+            }
+            QMatrix4x4 mat; // flip vertical
+            mat.scale(1, -1);
+            ///d.glv.render(QRectF(), QRectF(), mat); 
+            // src/opengl/OpenGLVideo.cpp  344
+            {
+            QRectF target=QRectF();
+            QRectF roi=QRectF();
+            QMatrix4x4 transform=mat;
+                const qint64 mt = material->type();
+                if(material->bind())
+                {
+                static VideoShader *shader = NULL; 
+                if (!shader)
+                    shader = manager->prepareMaterial(material, mt); //TODO: print shader type name if changed. prepareMaterial(,sample_code, pp_code)
+                DYGL(glViewport(0, 0, fbo->width(), fbo->height()));
+                shader->update(material);
+                shader->program()->setUniformValue(shader->matrixLocation(), transform*matrix);
+                //d.updateGeometry(shader, target, roi);
+                {
+                    QRectF t=target;
+                    QRectF r=roi;
+                    static qreal valiad_tex_width=0;
+                    static bool update_geo=false;
+                    static int tex_target=0;
+                    static QSize video_size;
+                    static GeometryRenderer* gr=NULL;
+                    static OpenGLVideo::MeshType mesh_type=OpenGLVideo::RectMesh;
+                    static bool norm_viewport=true;
+                    static TexturedGeometry *geometry=NULL;
+
+                    const bool roi_changed = valiad_tex_width != material->validTextureWidth() || roi != r || video_size != material->frameSize();
+                    const int tc = shader->textureLocationCount();
+                    if (roi_changed) {
+                        roi = r;
+                        valiad_tex_width = material->validTextureWidth();
+                        video_size = material->frameSize();
+                    }
+                    if (tex_target != shader->textureTarget()) {
+                        tex_target = shader->textureTarget();
+                        update_geo = true;
+                    }
+                    bool update_gr = false;
+                    static QThreadStorage<bool> new_thread;
+                    if (!new_thread.hasLocalData())
+                        new_thread.setLocalData(true);
+
+                    update_gr = new_thread.localData();
+                    if (!gr || update_gr) { // TODO: only update VAO, not the whole GeometryRenderer
+                        update_geo = true;
+                        new_thread.setLocalData(false);
+                        GeometryRenderer *r = new GeometryRenderer(); // local var is captured by lambda 
+                        gr = r;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && defined(Q_COMPILER_LAMBDA)
+                        QObject::connect(QOpenGLContext::currentContext(), &QOpenGLContext::aboutToBeDestroyed, [r]{
+                                qDebug("destroy GeometryRenderer %p", r);
+                                delete r;
+                                });
+#endif
+                    }
+                    // (-1, -1, 2, 2) must flip y
+                    QRectF target_rect = norm_viewport ? QRectF(-1, 1, 2, -2) : rect;
+                    if (target.isValid()) {
+                        if (roi_changed || target != t) {
+                            target = t;
+                            update_geo = true;
+                            //target_rect = target (if valid). // relate to gvf bug?
+                        }
+                    } else {
+                        if (roi_changed) {
+                            update_geo = true;
+                        }
+                    }
+                    if (update_geo)
+                    {
+                        if( geometry ) delete geometry;
+                        geometry = NULL;
+                        if (mesh_type == OpenGLVideo::SphereMesh)
+                            geometry = new Sphere();
+                        else
+                            geometry = new TexturedGeometry();
+                        //qDebug("updating geometry...");
+                        // setTextureCount may change the vertex data. Call it before setRect()
+                        qDebug() << "target rect: " << target_rect ;
+                        geometry->setTextureCount(shader->textureTarget() == GL_TEXTURE_RECTANGLE ? tc : 1);
+                        geometry->setGeometryRect(target_rect);
+                        geometry->setTextureRect(material->mapToTexture(0, roi));
+                        if (shader->textureTarget() == GL_TEXTURE_RECTANGLE) {
+                            for (int i = 1; i < tc; ++i) {
+                                // tc can > planes, but that will compute chroma plane
+                                geometry->setTextureRect(material->mapToTexture(i, roi), i);
+                            }
+                        }
+                        geometry->create();
+                        update_geo = false;
+                        gr->updateGeometry(geometry);
+                    }
+                }
+                }
+            }
+#if 0
+            {
+                GLuint tex;
+                // d.material->bind() // bind first because texture parameters(target) mapped from native buffer is unknown before it
+                // src/opengl/VideoShader.cpp 592
+                GLenum target=3553;
+                {
+                    //const int nb_planes = d.textures.size(); //number of texture id
+                    const int nb_planes = 1;
+                    //d.ensureTextures();
+                        DYGL(glGenTextures(1, &tex));
+                        //initTexture(tex, internal_format[p], data_format[p], data_type[p], texture_size[p].width(), texture_size[p].height());
+                        GLint internal_format=6408; GLenum format=32993; GLenum dataType=5121; int width=fbo->width(); int height=fbo->height();
+                        {
+                            DYGL(glBindTexture(target, tex));
+                            //setupQuality();
+                                DYGL(glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+                                DYGL(glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+                            // This is necessary for non-power-of-two textures
+                            DYGL(glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+                            DYGL(glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+                            DYGL(glTexImage2D(target, 0, internal_format, width, height, 0/*border, ES not support*/, format, dataType, NULL));
+                            DYGL(glBindTexture(target, 0));
+                        }
+                    //d.uploadPlane(p, d.update_texure);
+                    //=>void VideoMaterialPrivate::uploadPlane(int p, bool updateTexture)
+                    //  if (frame.map(GLTextureSurface, &tex, p)) 
+                    //  src/VideoFrame.cpp  424
+                    //  void *VideoFrame::map(SurfaceType type, void *handle, const VideoFormat& fmt, int plane)
+                    //      return d->surface_interop->map(type, fmt, handle, plane);
+                    //      src/directx/SurfaceInteropD3D9.cpp  129
+                    //      =>void* SurfaceInterop::map(SurfaceType type, const VideoFormat &fmt, void *handle, int plane)
+                    //          if (m_resource->map(m_surface, *((GLuint*)handle), frame_width, frame_height, plane))
+                    //          // src/directx/SurfaceInteropD3D9GL.cpp  61
+                    //          =>bool GLInteropResource::map(IDirect3DSurface9 *surface, GLuint tex, int w, int h, int)
+                    for (int i = 0; i < nb_planes; ++i) {
+                        const int p = (i + 1) % nb_planes; //0 must active at last?
+                        //d.uploadPlane(p, d.update_texure);
+                        gl().ActiveTexture(GL_TEXTURE0 + p); //0 must active?
+                        if (frame->map(GLTextureSurface, &tex, p)) {
+                            DYGL(glBindTexture(target, tex)); // glActiveTexture was called, but maybe bind to 0 in map
+                        }
+                    }
+                }
+                //const qint64 mt = d.material->type();
+                const qint64 mt = 12;
+                //VideoShader *shader = d.user_shader;
+                static VideoShader *shader = NULL; 
+                //shader = d.manager->prepareMaterial(d.material, mt); //TODO: print shader type name if changed. prepareMaterial(,sample_code, pp_code)
+                //src/opengl/ShaderManager.cpp  29
+                if(!shader){
+                    //shader = material->createShader();
+                    {
+                    shader = new VideoShader();
+                    // initialize shader
+                    //shader->setVideoFormat(currentFormat());
+                    shader->setVideoFormat(frame->format());
+                    //shader->setTextureTarget(textureTarget());
+                    shader->setTextureTarget(target);
+                    //shader->setMaterialType(type());
+                    shader->setMaterialType(mt);
+                    }
+                    shader->initialize();
+                    const qint32 type = mt;
+                }
+                //DYGL(glViewport(d.rect.x(), d.rect.y(), d.rect.width(), d.rect.height())); 
+                DYGL(glViewport(0, 0, fbo->width(), fbo->height()));
+                //shader->update(d.material);
+                //shader->program()->setUniformValue(shader->matrixLocation(), transform*d.matrix);
+                // uniform end. attribute begin
+                //d.updateGeometry(shader, target, roi);
+                //d.gr->render();
+                // src/opengl/GeometryRenderer.cpp  264
+                //DYGL(glDrawElements(g->primitive(), g->indexCount(), g->indexType(), ibo.isCreated() ? NULL : g->indexData())); // null: data in vao or ibo. not null: data in memory
+                //DYGL(glDrawElements(QtAV::Geometry::TriangleStrip, 0, QtAV::TypeU16, 0);
+                DYGL(glDrawElements(0x0005, 0, 0x1403, 0));
+
+                //d.material->unbind(); // => GLInteropResource::unmap
+                //d.frame.unmap(&d.textures[p]);
+                frame->unmap(&tex);
+                qDebug()<<"VideoRenderer::handlePaintEvent tex: "<<tex;
+            }
+#endif
+            {QImage img=fbo->toImage();static int idx=0;++idx;qDebug()<<"VideoRenderer::handlePaintEvent img idx: "<<idx<<" isNull: "<<img.isNull();if(idx>2 && idx<5) img.save(QString("%1.jpg").arg(idx));}// storm
+        }
+#endif
+        // do not apply filters if d.video_frame is already filtered. e.g. rendering an image and resize window to repaint
+        if (!d.video_frame.metaData(QStringLiteral("gpu_filtered")).toBool() && !d.filters.isEmpty() && d.statistics) {
+            // vo filter will not modify video frame, no lock required
+            foreach(Filter* filter, d.filters) {
+                VideoFilter *vf = static_cast<VideoFilter*>(filter);
+                if (!vf) {
+                    qWarning("a null filter!");
+                    //d.filters.removeOne(filter);
+                    continue;
+                }
+                if (!vf->isEnabled())
+                    continue;
+                // qpainter on video frame always runs on video thread. qpainter on renderer's paint device can work on rendering thread
+                // Here apply filters on frame on video thread, for example, GPU filters
+
+                //vf->prepareContext(d.filter_context, d.statistics, 0);
+                //if (!vf->context() || vf->context()->type() != VideoFilterContext::OpenGL)
+                if (!vf->isSupported(VideoFilterContext::OpenGL))
+                    continue;
+                vf->apply(d.statistics, &d.video_frame); //painter and paint device are ready, pass video frame is ok.
+                d.video_frame.setMetaData(QStringLiteral("gpu_filtered"), true);
+            }
+        }
+        /* begin paint. how about QPainter::beginNativePainting()?
+         * fill background color when necessary, e.g. renderer is resized, image is null
+         * if we access d.data which will be modified in AVThread, the following must be
+         * protected by mutex. otherwise, e.g. QPainterRenderer, it's not required if drawing
+         * on the shared data is safe
+         */
+        drawBackground();
+        /*
+         * NOTE: if data is not copyed in receiveFrame(), you should always call drawFrame()
+         */
+        if (d.video_frame.isValid()) {
+            drawFrame();
+            //qDebug("render elapsed: %lld", et.elapsed());
+            if (d.statistics) {
+                d.statistics->video_only.frameDisplayed(d.video_frame.timestamp());
+                d.statistics->video.current_time = QTime(0, 0, 0).addMSecs(int(d.video_frame.timestamp() * 1000.0));
+            }
+        }
+    }
+    hanlePendingTasks();
+    //TODO: move to AVOutput::applyFilters() //protected?
+    if (!d.filters.isEmpty() && d.filter_context && d.statistics) {
+        // vo filter will not modify video frame, no lock required
+        foreach(Filter* filter, d.filters) {
+            VideoFilter *vf = static_cast<VideoFilter*>(filter);
+            if (!vf) {
+                qWarning("a null filter!");
+                //d.filters.removeOne(filter);
+                continue;
+            }
+            if (!vf->isEnabled())
+                continue;
+            // qpainter rendering on renderer's paint device. only supported by none-null paint engine
+            if (!vf->context() || vf->context()->type()  == VideoFilterContext::OpenGL)
+                continue;
+            if (vf->prepareContext(d.filter_context, d.statistics, 0)) {
+                if (!vf->isSupported(d.filter_context->type()))
+                    continue;
+                vf->apply(d.statistics, &d.video_frame); //painter and paint device are ready, pass video frame is ok.
+            }
+        }
+    }gettimeofday(&end,NULL);time_use=(end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec);qDebug()<<"VideoRenderer::handlePaintEvent zero copy waste:"<<time_use;//storm
+    //end paint. how about QPainter::endNativePainting()?
+}
+#endif
 } //namespace QtAV

@@ -30,7 +30,7 @@
 #endif
 #include "QtAV/SurfaceInterop.h"
 #include "QtAV/OpenGLVideo.h"
-
+#include <QImage> //storm
 namespace QtAV {
 class GLSLFilterPrivate : public VideoFilterPrivate
 {
@@ -119,7 +119,7 @@ void GLSLFilter::process(Statistics *statistics, VideoFrame *frame)
     d.glv.setCurrentFrame(*frame);
     QMatrix4x4 mat; // flip vertical
     mat.scale(1, -1);
-    d.glv.render(QRectF(), QRectF(), mat);
+    d.glv.render(QRectF(), QRectF(), mat); //{QImage img=d.fbo->toImage();static int idx=0;img.save(QString("%1.jpg").arg(++idx));}// storm
     gl().BindFramebuffer(GL_FRAMEBUFFER, (GLuint)currentFbo);
     VideoFormat fmt(VideoFormat::Format_RGB32);
     VideoFrame f(d.fbo->width(), d.fbo->height(), fmt); //

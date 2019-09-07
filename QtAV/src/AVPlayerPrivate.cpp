@@ -521,7 +521,7 @@ bool AVPlayer::Private::tryApplyDecoderPriority(AVPlayer *player)
         vd->setCodecContext(avctx); // It's fine because AVDecoder copy the avctx properties
         vd->setOptions(vc_opt);
         if (vd->open()) {
-            qDebug("**************Video decoder found:%p", vd);
+            qDebug("**************tryApplyDecoderPriority Video decoder found:%p name: %s", vd, VideoDecoder::name(vid));
             break;
         }
         delete vd;
@@ -580,7 +580,8 @@ bool AVPlayer::Private::setupVideoThread(AVPlayer *player)
         vd->setOptions(vc_opt);
         if (vd->open()) {
             vdec = vd;
-            qDebug("**************Video decoder found:%p", vdec);
+            //qDebug("**************Video decoder found:%p", vdec);
+            qDebug("**************setupVideoThread Video decoder found:%p name: %s", vd, VideoDecoder::name(vid)); //storm
             break;
         }
         delete vd;

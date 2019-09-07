@@ -266,7 +266,7 @@ void GeometryRenderer::render()
     if (!g)
         return;
     bindBuffers();
-    if (g->indexCount() > 0) {
+    if (g->indexCount() > 0) { qDebug("GeometryRenderer::render primitive: %d indexCount: %d indexType: %d indexData: %p", g->primitive(), g->indexCount(), g->indexType(), g->indexData());
         DYGL(glDrawElements(g->primitive(), g->indexCount(), g->indexType(), ibo.isCreated() ? NULL : g->indexData())); // null: data in vao or ibo. not null: data in memory
     } else {
         DYGL(glDrawArrays(g->primitive(), 0, g->vertexCount()));

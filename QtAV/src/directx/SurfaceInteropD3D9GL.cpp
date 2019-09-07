@@ -23,7 +23,7 @@
 #define DX_LOG_COMPONENT "D3D9GL Interop"
 #include "utils/DirectXHelper.h"
 #include "opengl/OpenGLHelper.h"
-
+#include <sys/time.h> //storm
 //dynamic gl or desktop gl
 namespace QtAV {
 namespace d3d9 {
@@ -63,7 +63,7 @@ bool GLInteropResource::map(IDirect3DSurface9 *surface, GLuint tex, int w, int h
     if (!ensureResource(w, h, tex)) {
         releaseDX();
         return false;
-    }
+    }float time_use=0; struct timeval start; struct timeval end; gettimeofday(&start,NULL); //storm
     // open/close and register/unregster in every map/unmap to ensure called in current context and avoid crash (tested on intel driver)
     // interop operations begin
     WGL_ENSURE((interop_dev = gl().DXOpenDeviceNV(d3ddev)) != NULL, false);
@@ -75,7 +75,7 @@ bool GLInteropResource::map(IDirect3DSurface9 *surface, GLuint tex, int w, int h
     // lock dx resources
     WGL_ENSURE(gl().DXLockObjectsNV(interop_dev, 1, &interop_obj), false);
     WGL_ENSURE(gl().DXObjectAccessNV(interop_obj, WGL_ACCESS_READ_ONLY_NV), false);
-    DYGL(glBindTexture(GL_TEXTURE_2D, tex));
+    DYGL(glBindTexture(GL_TEXTURE_2D, tex));gettimeofday(&end,NULL);time_use=(end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec);qDebug()<<"SurfaceInteropD3D9GL.cpp map waste:"<<time_use;//storm
     return true;
 }
 

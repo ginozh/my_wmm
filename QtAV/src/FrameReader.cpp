@@ -102,7 +102,8 @@ bool FrameReader::Private::tryLoad()
                 continue;
             decoder.reset(vd);
             decoder->setCodecContext(demuxer.videoCodecContext());
-            decoder->setProperty("copyMode", "OptimizedCopy");
+            //decoder->setProperty("copyMode", "OptimizedCopy");
+            decoder->setProperty("copyMode", "ZeroCopy");
             if (!decoder->open()) {
                 decoder.reset(0);
                 continue;
@@ -344,12 +345,17 @@ void FrameReader::readMoreInternal()
             continue;
         }
         pkt = d->demuxer.packet();
+        qInfo()<<"FrameReader::readMoreInternal get pkt";//storm
+        printf("FrameReader::readMoreInternal get pkt\n");fflush(0);
         if (d->decoder->decode(pkt)) {
             const VideoFrame frame(d->decoder->frame());
             if (!frame) {
                 qDebug("no frame got, continue to decoder");
+                printf("FrameReader::readMoreInternal no frame got\n");fflush(0);
                 continue;
             }
+            qInfo()<<"FrameReader::readMoreInternal get frame";//storm
+            printf("FrameReader::readMoreInternal get frame\n");fflush(0);
             d->vframes.put(frame);
             Q_EMIT frameRead(frame);
             //qDebug("frame got @%.3f, queue enough: %d", frame.timestamp(), vframes.isEnough());

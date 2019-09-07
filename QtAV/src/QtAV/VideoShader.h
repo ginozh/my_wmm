@@ -105,12 +105,12 @@ protected:
     /// rebuild shader program before next rendering. call this if shader code is updated
     void rebuildLater();
 private:
+public: //storm
     /*!
      * \brief programReady
      * Called when program is linked and all uniforms are resolved
      */
     virtual void programReady() {}
-
     /// User configurable shader APIs BEGIN
     /*!
      * Keywords will be replaced in user shader code:

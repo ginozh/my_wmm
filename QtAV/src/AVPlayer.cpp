@@ -344,7 +344,8 @@ void AVPlayer::setPriority(const QVector<VideoDecoderId> &ids)
                 vd->setCodecContext(avctx); // It's fine because AVDecoder copy the avctx properties
                 vd->setOptions(player->d->vc_opt);
                 if (vd->open()) {
-                    qDebug("**************Video decoder found:%p", vd);
+                    ///qDebug("**************Video decoder found:%p", vd);
+                    qDebug("**************NewDecoderTask Video decoder found:%p name: %s", vd, VideoDecoderFactory::name(vid).c_str()); //storm
                     break;
                 }
                 delete vd;
