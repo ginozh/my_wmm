@@ -24,7 +24,7 @@ Debug: Registered audio backends:  ("XAudio2", "DirectSound", "null")
 Debug: "XAudio2_9"
 Debug: "Build with XAudio2 from DXSDK"
 Debug: "Try symbol 'XAudio2Create' from WinSDK dll"
-Debug: "xaudio2: 0x37c50090"
+Debug: "xaudio2: 0x37bc0090"
 Debug: "OpenGL version: 4.3  hasGLSL: 1"
 Debug: "GL_VERSION: 4.3.0 - Build 20.19.15.4531"
 Debug: "GL_VENDOR: Intel"
@@ -43,20 +43,19 @@ Debug: "Has RG texture: 1"
 Debug: QSurfaceFormat(version 4.3, options QFlags<QSurfaceFormat::FormatOption>(DeprecatedFunctions), depthBufferSize 24, redBufferSize 8, greenBufferSize 8, blueBufferSize 8, alphaBufferSize 8, stencilBufferSize 8, samples 0, swapBehavior QSurfaceFormat::SwapBehavior(DoubleBuffer), swapInterval 1, colorSpace QSurfaceFormat::ColorSpace(DefaultColorSpace), profile  QSurfaceFormat::OpenGLContextProfile(CompatibilityProfile))
 Debug: VideoRenderer::handlePaintEvent zero copy waste: 0
 Debug: VideoRenderer::handlePaintEvent zero copy waste: 0
-Debug: "VideoFilterContext 0x371f5c20 delete paint device in 0x371dc360"
+Debug: "VideoFilterContext 0x37126490 delete paint device in 0x3710a510"
 Debug: "OpenGL version: 4.3  hasGLSL: 1"
 Debug: VideoRenderer::handlePaintEvent zero copy waste: 0
 Debug: VideoRenderer::handlePaintEvent zero copy waste: 0
 Debug: "copyMode"  >>>  QVariant(int, 0)
 Debug: VideoRenderer::handlePaintEvent zero copy waste: 0
 Debug: onSelectionChange (QUrl("file:///C:/qtproject/movie/movie.mp4")) 1
-Debug: onSelectionChange (QUrl("file:///C:/qtproject/movie/movie.mp4")) 1
 Debug: "Not playing~"
 Debug: QHash(("analyzeduration", QVariant(int, 5000000))("probesize", QVariant(uint, 5000000)))
 Debug: VideoRenderer::handlePaintEvent zero copy waste: 0
 Debug: Loading  QVariant(QString, "C:/qtproject/movie/movie.mp4")  ...
 Debug: "all closed and reseted"
-Debug: "avformat_open_input: d->format_ctx:'0x30410a20', url:'C:/qtproject/movie/movie.mp4'..."
+Debug: "avformat_open_input: d->format_ctx:'0x2ecd0a20', url:'C:/qtproject/movie/movie.mp4'..."
 Debug: "avformat_open_input: url:'C:/qtproject/movie/movie.mp4' ret:0"
 Debug: "avfmtctx.flags: 2097153, iformat.flags"
 Debug: status changed  "已加载"
@@ -70,19 +69,19 @@ Debug: "has audio"
 Debug: "QtAV::AudioDecoderFFmpeg thread type: Single, count: 1"
 Debug: "source_voice: 0x0, master: 0x0"
 Debug: AudioOutput format:  QtAV::AudioFormat(44100Hz, 4Bytes, channelCount:1, channelLayout: "mono", sampleFormat: "flt") ; requested:  QtAV::AudioFormat(44100Hz, 4Bytes, channelCount:1, channelLayout: "mono", sampleFormat: "fltp")
-Debug: "source_voice:0x37db4fe0"
+Debug: "source_voice:0x37bb4fe0"
 Warning: "src audio parameters 'channel layout(or channels), sample rate and sample format must be set before initialize resampler"
 Debug: "new audio thread"
 Debug: "demux thread setAudioThread"
-Debug: "output not changed: 0x371bcf60"
+Debug: "output not changed: 0x370f2d50"
 Debug: "set AVThread output"
 Debug: "stream: 1, duration=308406 (6993 ms), time_base=0.000023"
 Debug: "codec: aac(AAC (Advanced Audio Coding))"
 Debug: "**********trying video decoder: DXVA..."
 Debug: "set QtAV::VideoDecoderD3D() meta properties:"
 Debug: "threads=>1"
-Debug: "copyMode=>0"
 Debug: "surfaces=>0"
+Debug: "copyMode=>0"
 Debug: "creating d3d9 device ex... dll: 0x7ffb99700000"
 Debug: "IDirect3DDevice9Ex created"
 Debug: "DXVA2 description:  DXVA2 (Intel(R) Iris(TM) Graphics 5100, vendor 32902(Intel), device 2606, revision 9)"
@@ -124,8 +123,8 @@ Debug: Check profile support: High
 Debug: NV12 is supported for output
 Debug: "using D3D9Ex: 1"
 Debug: "QtAV::VideoDecoderD3D thread type: Single, count: 1"
-Debug: "**************setupVideoThread Video decoder found:0x37153c40 name: DXVA"
-Debug: "setCapture 0x371dc0d0"
+Debug: "**************setupVideoThread Video decoder found:0x36fc2cc0 name: DXVA"
+Debug: "setCapture 0x3710a460"
 Debug: "stream: 0, duration=4197 (6995 ms), time_base=0.001667"
 Debug: "codec: h264(H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10)"
 Debug: "auto select clock: audio > external"
@@ -133,36 +132,36 @@ Debug: "Using AudioClock"
 Debug: "Clock initial value: 0.000000"
 Debug: "Starting audio thread..."
 Debug: "Starting video thread..."
-Debug: "get av queue a/v thread = 0x37152960 0x37154420"
+Debug: "get av queue a/v thread = 0x36fc2900 0x36fc27c0"
 Debug: ScreenSaver::retrieveState
 Debug: Succeed to enable screen saver (0)
 Debug: track found!!!!!
-Debug: status changed  "缓冲中..."
 Debug: "buffersrc_args=time_base=1/1000000:sample_rate=44100:sample_fmt=fltp:channel_layout=0x4"
+Debug: status changed  "缓冲中..."
+Debug: "AVClock started!!!!!!!!"
 Debug: "available hardware decoder output format 61 (dxva2_vld)"
 Debug: "available hardware decoder output format 128 (d3d11va_vld)"
 Debug: "available hardware decoder output format 348 (d3d11)"
 Debug: "available software decoder output format 0 (yuv420p)"
 Debug: >>>>>>>>>>>>>>>>>>>>>surfaces: 20, active_thread_type: 0, threads: 1, refs: 1
-Debug: "IDirectXVideoDecoderService=0x37235668 nb_surfaces=20 surface 1280x720"
-Debug: "AVClock started!!!!!!!!"
+Debug: "IDirectXVideoDecoderService=0x371659e8 nb_surfaces=20 surface 1280x720"
 Debug: "IDirectXVideoAccelerationService_CreateSurface succeed with 20 surfaces (1280x720)"
 Debug: Decoder configurations: 4
 Debug: configuration[0] ConfigBitstreamRaw 2
 Debug: configuration[1] ConfigBitstreamRaw 1
 Debug: configuration[2] ConfigBitstreamRaw 2
 Debug: configuration[3] ConfigBitstreamRaw 1
+Debug: status changed  "已缓冲"
 Warning: [FFmpeg:?] No such filter: ''
 Warning: [FFmpeg:?] Error avfilter_graph_parse_ptr(filter_graph, options.toUtf8().constData(), &inputs, &outputs, __null) @166 filter/LibAVFilter.cpp: (0xffffffea) Invalid argument
 Warning: "setup audio filter graph error"
 Debug: "swr speed=1.00"
 Debug: "out: {cl: 4, fmt: flt, freq: 44100}"
 Debug: "in {cl: 4, fmt: fltp, freq: 44100}"
-Debug: "IDirectXVideoDecoderService.CreateVideoDecoder succeed. decoder=0x3fc9c1d8"
+Debug: "IDirectXVideoDecoderService.CreateVideoDecoder succeed. decoder=0x3fc9eae8"
 Debug: "Using DXVA2 (Intel(R) Iris(TM) Graphics 5100, vendor 32902(Intel), device 2606, revision 9) for hardware decoding."
-Debug: VideoDecoderDXVA::frame zero copy waste: 503
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
 Debug: "buffersrc_args=video_size=1280x720:pix_fmt=30:time_base=1/1000000:pixel_aspect=1/1"
-Debug: status changed  "已缓冲"
 Warning: [FFmpeg:?] No such filter: ''
 Warning: [FFmpeg:?] Error avfilter_graph_parse_ptr(filter_graph, options.toUtf8().constData(), &inputs, &outputs, __null) @166 filter/LibAVFilter.cpp: (0xffffffea) Invalid argument
 Warning: "setup video filter graph error"
@@ -180,7 +179,7 @@ Debug: "///////////bpp 4, bpc: 8"
 Debug: "texture width: 1280 - 1280 = pad: 0. bpp(gl): 4"
 Debug: "creating texture for plane 0"
 Debug: "texture for plane 0 is created (id=4)"
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1549
+Debug: SurfaceInteropD3D9GL.cpp map waste: 0
 Debug: "[ShaderManager] cache a new shader material type(12): gl material 16to8bit: 0, planar: 0, has alpha: 1, 2d texture: 1, 2nd plane rg: 0, xyz: 0"
 Debug: #version 430
 #define highp
@@ -281,66 +280,65 @@ Debug: "creating VAO..."
 Debug: "vao updated"
 Debug: "geometry attributes changed, rebind vao..."
 Debug: "geometry updated"
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
 Debug: VideoRenderer::handlePaintEvent img idx:  1  isNull:  false
-Debug: SurfaceInteropD3D9GL.cpp map waste: 0
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1003
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  2  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1010
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1018
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  3  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 538
+Debug: SurfaceInteropD3D9GL.cpp map waste: 546
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  4  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 538
+Debug: SurfaceInteropD3D9GL.cpp map waste: 533
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  5  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 539
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1019
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  6  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 534
+Debug: SurfaceInteropD3D9GL.cpp map waste: 2023
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  7  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 519
+Debug: SurfaceInteropD3D9GL.cpp map waste: 569
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  8  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 3535
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1001
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  9  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1014
+Debug: SurfaceInteropD3D9GL.cpp map waste: 501
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  10  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 536
+Debug: SurfaceInteropD3D9GL.cpp map waste: 544
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  11  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 537
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1005
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  12  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 503
+Debug: SurfaceInteropD3D9GL.cpp map waste: 553
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  13  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1000
+Debug: SurfaceInteropD3D9GL.cpp map waste: 534
 Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  14  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 0
+Debug: VideoRenderer::handlePaintEvent img idx:  14  isNull:  false
+Debug: SurfaceInteropD3D9GL.cpp map waste: 502
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  15  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 521
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  16  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
@@ -348,829 +346,653 @@ Debug: SurfaceInteropD3D9GL.cpp map waste: 0
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  17  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 949
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1015
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  18  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 538
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1035
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  19  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 530
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1015
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  20  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 502
+Debug: SurfaceInteropD3D9GL.cpp map waste: 0
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  21  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1005
+Debug: SurfaceInteropD3D9GL.cpp map waste: 529
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  22  isNull:  false
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1029
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 0
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  23  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 501
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  24  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1002
+Debug: SurfaceInteropD3D9GL.cpp map waste: 2088
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  25  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 500
+Debug: SurfaceInteropD3D9GL.cpp map waste: 0
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  26  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1000
+Debug: SurfaceInteropD3D9GL.cpp map waste: 534
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  27  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 4591
+Debug: SurfaceInteropD3D9GL.cpp map waste: 519
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  28  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 531
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1005
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  29  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 537
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  30  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1016
+Debug: SurfaceInteropD3D9GL.cpp map waste: 0
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  31  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1002
+Debug: SurfaceInteropD3D9GL.cpp map waste: 503
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  32  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 497
+Debug: SurfaceInteropD3D9GL.cpp map waste: 603
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  33  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 505
+Debug: SurfaceInteropD3D9GL.cpp map waste: 516
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  34  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1535
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1018
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  35  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 500
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1045
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  36  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 547
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1001
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  37  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 499
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1001
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  38  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 504
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1020
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  39  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 498
+Debug: SurfaceInteropD3D9GL.cpp map waste: 525
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  40  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 535
+Debug: SurfaceInteropD3D9GL.cpp map waste: 0
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  41  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1042
+Debug: SurfaceInteropD3D9GL.cpp map waste: 500
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  42  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 534
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  43  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 505
+Debug: SurfaceInteropD3D9GL.cpp map waste: 530
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  44  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1001
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  45  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 537
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1031
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  46  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1027
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1043
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  47  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 506
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1011
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  48  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 500
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 499
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  49  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 502
+Debug: SurfaceInteropD3D9GL.cpp map waste: 0
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  50  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 538
+Debug: SurfaceInteropD3D9GL.cpp map waste: 0
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  51  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 503
+Debug: SurfaceInteropD3D9GL.cpp map waste: 0
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  52  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 501
+Debug: SurfaceInteropD3D9GL.cpp map waste: 0
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  53  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1631
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1028
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  54  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1005
+Debug: SurfaceInteropD3D9GL.cpp map waste: 534
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  55  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1002
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1033
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  56  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 505
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  57  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 3506
+Debug: SurfaceInteropD3D9GL.cpp map waste: 500
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  58  isNull:  false
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1029
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 534
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  59  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 499
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  60  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 545
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  61  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 549
+Debug: SurfaceInteropD3D9GL.cpp map waste: 501
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  62  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 521
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1523
 Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
 Debug: VideoRenderer::handlePaintEvent img idx:  63  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 527
+Debug: SurfaceInteropD3D9GL.cpp map waste: 502
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  64  isNull:  false
-Debug: SurfaceInteropD3D9GL.cpp map waste: 506
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 589
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  65  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1023
+Debug: SurfaceInteropD3D9GL.cpp map waste: 4019
 Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  66  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 547
+Debug: VideoRenderer::handlePaintEvent img idx:  66  isNull:  false
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1503
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  67  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 530
+Debug: SurfaceInteropD3D9GL.cpp map waste: 0
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  68  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 521
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  69  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 534
+Debug: SurfaceInteropD3D9GL.cpp map waste: 549
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  70  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1020
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  71  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 503
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1034
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  72  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 546
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1011
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  73  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 534
+Debug: SurfaceInteropD3D9GL.cpp map waste: 501
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  74  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 500
+Debug: SurfaceInteropD3D9GL.cpp map waste: 3003
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  75  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 506
+Debug: VideoDecoderDXVA::frame zero copy waste: 501
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1463
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  76  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 505
+Debug: SurfaceInteropD3D9GL.cpp map waste: 503
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  77  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 547
+Debug: SurfaceInteropD3D9GL.cpp map waste: 536
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  78  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 501
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1124
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  79  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1547
+Debug: SurfaceInteropD3D9GL.cpp map waste: 506
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  80  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 501
+Debug: SurfaceInteropD3D9GL.cpp map waste: 547
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  81  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1000
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  82  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 504
+Debug: SurfaceInteropD3D9GL.cpp map waste: 0
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  83  isNull:  false
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1001
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 697
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  84  isNull:  false
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1001
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 504
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  85  isNull:  false
-Debug: SurfaceInteropD3D9GL.cpp map waste: 500
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1005
 Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoDecoderDXVA::frame zero copy waste: 502
 Debug: VideoRenderer::handlePaintEvent img idx:  86  isNull:  false
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1501
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1004
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  87  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 498
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1502
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1002
 Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  88  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 527
+Debug: VideoRenderer::handlePaintEvent img idx:  88  isNull:  false
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1519
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  89  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 547
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1027
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  90  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 529
+Debug: SurfaceInteropD3D9GL.cpp map waste: 536
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  91  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 2524
+Debug: SurfaceInteropD3D9GL.cpp map waste: 537
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  92  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 504
+Debug: SurfaceInteropD3D9GL.cpp map waste: 525
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  93  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 501
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1049
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  94  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 533
+Debug: SurfaceInteropD3D9GL.cpp map waste: 0
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  95  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 515
+Debug: SurfaceInteropD3D9GL.cpp map waste: 505
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  96  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 2503
+Debug: SurfaceInteropD3D9GL.cpp map waste: 503
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  97  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 536
+Debug: SurfaceInteropD3D9GL.cpp map waste: 506
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  98  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 537
+Debug: SurfaceInteropD3D9GL.cpp map waste: 545
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  99  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 536
+Debug: SurfaceInteropD3D9GL.cpp map waste: 534
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  100  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 3020
+Debug: SurfaceInteropD3D9GL.cpp map waste: 537
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  101  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 525
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  102  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 506
+Debug: SurfaceInteropD3D9GL.cpp map waste: 543
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  103  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 545
+Debug: SurfaceInteropD3D9GL.cpp map waste: 494
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  104  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 546
+Debug: SurfaceInteropD3D9GL.cpp map waste: 534
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  105  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 537
+Debug: SurfaceInteropD3D9GL.cpp map waste: 535
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  106  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1505
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1033
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  107  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 535
+Debug: SurfaceInteropD3D9GL.cpp map waste: 534
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  108  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 504
+Debug: SurfaceInteropD3D9GL.cpp map waste: 523
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  109  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 521
+Debug: SurfaceInteropD3D9GL.cpp map waste: 503
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  110  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 548
+Debug: SurfaceInteropD3D9GL.cpp map waste: 534
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  111  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 536
+Debug: SurfaceInteropD3D9GL.cpp map waste: 535
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  112  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 504
+Debug: SurfaceInteropD3D9GL.cpp map waste: 534
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  113  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 533
+Debug: SurfaceInteropD3D9GL.cpp map waste: 532
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  114  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 534
+Debug: SurfaceInteropD3D9GL.cpp map waste: 536
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  115  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 534
+Debug: SurfaceInteropD3D9GL.cpp map waste: 533
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  116  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 534
+Debug: SurfaceInteropD3D9GL.cpp map waste: 703
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  117  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 508
+Debug: SurfaceInteropD3D9GL.cpp map waste: 0
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  118  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 549
+Debug: SurfaceInteropD3D9GL.cpp map waste: 0
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  119  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 500
+Debug: SurfaceInteropD3D9GL.cpp map waste: 522
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  120  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 488
+Debug: SurfaceInteropD3D9GL.cpp map waste: 502
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  121  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1008
+Debug: SurfaceInteropD3D9GL.cpp map waste: 534
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  122  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 501
+Debug: SurfaceInteropD3D9GL.cpp map waste: 532
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  123  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 506
+Debug: SurfaceInteropD3D9GL.cpp map waste: 517
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  124  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 536
+Debug: SurfaceInteropD3D9GL.cpp map waste: 500
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  125  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 549
+Debug: SurfaceInteropD3D9GL.cpp map waste: 545
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  126  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 535
+Debug: SurfaceInteropD3D9GL.cpp map waste: 501
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  127  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 535
+Debug: SurfaceInteropD3D9GL.cpp map waste: 0
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  128  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1013
+Debug: SurfaceInteropD3D9GL.cpp map waste: 536
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  129  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 531
+Debug: SurfaceInteropD3D9GL.cpp map waste: 503
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  130  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 547
+Debug: SurfaceInteropD3D9GL.cpp map waste: 527
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  131  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 499
+Debug: SurfaceInteropD3D9GL.cpp map waste: 536
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  132  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 547
+Debug: SurfaceInteropD3D9GL.cpp map waste: 531
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  133  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 516
+Debug: SurfaceInteropD3D9GL.cpp map waste: 526
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  134  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 577
+Debug: SurfaceInteropD3D9GL.cpp map waste: 544
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  135  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 535
+Debug: SurfaceInteropD3D9GL.cpp map waste: 523
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  136  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 508
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1016
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  137  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1506
+Debug: SurfaceInteropD3D9GL.cpp map waste: 537
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  138  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 505
+Debug: SurfaceInteropD3D9GL.cpp map waste: 603
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  139  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 536
+Debug: SurfaceInteropD3D9GL.cpp map waste: 504
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  140  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 536
+Debug: SurfaceInteropD3D9GL.cpp map waste: 535
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  141  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 499
+Debug: SurfaceInteropD3D9GL.cpp map waste: 537
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  142  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 677
+Debug: SurfaceInteropD3D9GL.cpp map waste: 538
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  143  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 501
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  144  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 609
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  145  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1506
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1032
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  146  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 518
+Debug: SurfaceInteropD3D9GL.cpp map waste: 529
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  147  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 530
+Debug: SurfaceInteropD3D9GL.cpp map waste: 534
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  148  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 548
+Debug: SurfaceInteropD3D9GL.cpp map waste: 687
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  149  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 535
+Debug: SurfaceInteropD3D9GL.cpp map waste: 532
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  150  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 519
+Debug: SurfaceInteropD3D9GL.cpp map waste: 537
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  151  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 2399
+Debug: SurfaceInteropD3D9GL.cpp map waste: 503
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  152  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 504
+Debug: SurfaceInteropD3D9GL.cpp map waste: 999
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  153  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 534
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  154  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 534
+Debug: SurfaceInteropD3D9GL.cpp map waste: 499
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  155  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 516
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1539
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  156  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 502
+Debug: SurfaceInteropD3D9GL.cpp map waste: 535
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  157  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 541
+Debug: SurfaceInteropD3D9GL.cpp map waste: 545
 Debug: target rect:  QRectF(-1,1 2x-2)
 Debug: VideoRenderer::handlePaintEvent img idx:  158  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 540
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  159  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 503
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1546
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  160  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 503
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  161  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
 Debug: SurfaceInteropD3D9GL.cpp map waste: 548
 Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  162  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1008
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  163  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 526
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  164  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 538
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  165  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1020
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  166  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 0
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  167  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 546
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  168  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1523
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  169  isNull:  false
+Debug: VideoRenderer::handlePaintEvent img idx:  159  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
 Debug: SurfaceInteropD3D9GL.cpp map waste: 515
 Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  170  isNull:  false
+Debug: VideoRenderer::handlePaintEvent img idx:  160  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 537
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1007
 Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  171  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 519
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  172  isNull:  false
+Debug: VideoRenderer::handlePaintEvent img idx:  161  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
 Debug: SurfaceInteropD3D9GL.cpp map waste: 534
 Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  173  isNull:  false
+Debug: VideoRenderer::handlePaintEvent img idx:  162  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 507
+Debug: SurfaceInteropD3D9GL.cpp map waste: 502
 Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  174  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1313
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  175  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 536
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  176  isNull:  false
+Debug: VideoRenderer::handlePaintEvent img idx:  163  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
 Debug: SurfaceInteropD3D9GL.cpp map waste: 535
 Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  177  isNull:  false
+Debug: VideoRenderer::handlePaintEvent img idx:  164  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 537
+Debug: SurfaceInteropD3D9GL.cpp map waste: 532
 Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  178  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 503
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  179  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 543
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  180  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 502
-Debug: SurfaceInteropD3D9GL.cpp map waste: 506
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  181  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1023
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  182  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 507
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  183  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 500
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1015
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  184  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: "(repeat 183)geometry updated\nEnd of file. erreof=1 feof=0"
-Debug: SurfaceInteropD3D9GL.cpp map waste: 521
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: "geometry updated"
-Debug: VideoRenderer::handlePaintEvent img idx:  185  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 501
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  186  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 553
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  187  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 540
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  188  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 991
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  189  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 0
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  190  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 541
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  191  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 541
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  192  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 543
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  193  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 503
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  194  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1954
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  195  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 538
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  196  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 540
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  197  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 961
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  198  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 519
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  199  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 527
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  200  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 1535
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  201  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 539
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  202  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 530
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  203  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 545
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  204  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 500
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  205  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 0
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  206  isNull:  false
-Debug: "(repeat 21)geometry updated\naudio thread gets an eof packet. pkt.pts: -1.000, d.render_pts0:-1.000"
-Warning: "[AudioDecoder] got_frame_ptr=false. decoded: 0, un: 3 Error number 0 occurred"
-Warning: "Decode audio failed. undecoded: 3"
-Debug: "audio decode eof done"
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 510
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: "geometry updated"
-Debug: VideoRenderer::handlePaintEvent img idx:  207  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 509
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  208  isNull:  false
-Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: SurfaceInteropD3D9GL.cpp map waste: 500
-Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  209  isNull:  false
+Debug: VideoRenderer::handlePaintEvent img idx:  165  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
 Debug: SurfaceInteropD3D9GL.cpp map waste: 534
 Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: VideoRenderer::handlePaintEvent img idx:  210  isNull:  false
+Debug: VideoRenderer::handlePaintEvent img idx:  166  isNull:  false
 Debug: VideoDecoderDXVA::frame zero copy waste: 0
-Debug: "(repeat 3)geometry updated\nvideo thread gets an eof packet."
-Debug: "delay 1.000000s @6.826s pts:-1.000"
-Warning: "video too fast!!! sleep 0.00 s, nb fast: 1, v_a: 0.0930"
-Warning: "no frame could be decompressed: Error number 0 occurred 3/3"
-Debug: "video decode eof done. d.render_pts0: -1.000"
-Debug: "Invalid packet! flush video codec context!!!!!!!!!! video packet queue size: 0"
-Debug: SurfaceInteropD3D9GL.cpp map waste: 999
+Debug: SurfaceInteropD3D9GL.cpp map waste: 505
 Debug: target rect:  QRectF(-1,1 2x-2)
-Debug: "(repeat 509)Invalid packet! flush video codec context!!!!!!!!!! video packet queue size: 0\ngeometry updated"
-Debug: "Invalid packet! flush video codec context!!!!!!!!!! video packet queue size: 0"
-Debug: VideoRenderer::handlePaintEvent img idx:  211  isNull:  false
-Debug: "(repeat 5191)Invalid packet! flush video codec context!!!!!!!!!! video packet queue size: 0\nwaiting audio thread......."
-Debug: "audio thread gets an eof packet. pkt.pts: -1.000, d.render_pts0:-1.000"
-Warning: "[AudioDecoder] got_frame_ptr=false. decoded: 0, un: 3 Error number 0 occurred"
-Warning: "Decode audio failed. undecoded: 3"
-Debug: "audio decode eof done"
+Debug: VideoRenderer::handlePaintEvent img idx:  167  isNull:  false
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 534
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoRenderer::handlePaintEvent img idx:  168  isNull:  false
+Debug: VideoDecoderDXVA::frame zero copy waste: 508
+Debug: SurfaceInteropD3D9GL.cpp map waste: 548
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoRenderer::handlePaintEvent img idx:  169  isNull:  false
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 3071
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoRenderer::handlePaintEvent img idx:  170  isNull:  false
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 533
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoRenderer::handlePaintEvent img idx:  171  isNull:  false
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 501
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoRenderer::handlePaintEvent img idx:  172  isNull:  false
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 2604
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoRenderer::handlePaintEvent img idx:  173  isNull:  false
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 533
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoRenderer::handlePaintEvent img idx:  174  isNull:  false
+Debug: "(repeat 173)geometry updated\ntimer: 5, current thread: 0x2ee0ebd0, player thread: 0x2ee0ebd0"
+Debug: "stopping demuxer thread..."
+Debug: stopping thread  QtAV::AudioThread(0x36fc2900)
 Debug: "Audio thread stops running..."
-Debug: "waiting video thread......."
-Debug: "video thread gets an eof packet."
-Debug: "delay 1.000000s @6.826s pts:-1.000"
-Warning: "video too fast!!! sleep 0.01 s, nb fast: 2, v_a: 0.0000"
-Warning: "no frame could be decompressed: Error number 0 occurred 3/3"
-Debug: "video decode eof done. d.render_pts0: -1.000"
+Debug: stopping thread  QtAV::VideoThread(0x36fc27c0)
+Debug: "End of file. erreof=1 feof=0"
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
 Debug: "Video thread stops running..."
 Debug: "setInSize => calculating aspect ratio from converted input data(0.000000)"
+Debug: "all avthread finished. try to exit demux thread<<<<<<"
 Debug: "Demux thread stops running...."
-Debug: "demuxer thread emit finished. repeat: 0/0"
+Debug: "demuxer thread emit finished. repeat: -1/0"
 Debug: "avplayer emit stopped()"
 Warning: "Can not copy codec properties when it's open"
-Debug: VideoRenderer::handlePaintEvent zero copy waste: 0
 Debug: "(repeat 1)Can not copy codec properties when it's open\nclosing d->format_ctx"
-Debug: >>>>>>>>>>>>>>disable slider
-Debug: VideoRenderer::handlePaintEvent zero copy waste: 0
-Debug: VideoRenderer::handlePaintEvent zero copy waste: 0
-Debug: Succeed to enable screen saver (1)
-Debug: status changed  ""
-Debug: >>>>>>>>>>>>>>disable slider
-Debug: Succeed to enable screen saver (1)
-Warning: QObject::killTimer(): Error: timer id 6 is not valid for object 0x1b4f4b0 (MainWindow, ), timer has not been killed
-Debug: "Not playing~"
+Debug: "all audio/video threads stopped... state: 0"
 Debug: sync config to  "C:/Users/user/AppData/Roaming/Player/Player.ini"
 Debug: sync end
-Debug: "(repeat 2)Not playing~\nsource_voice: 0x37db4fe0, master: 0x37db3bd0"
+Debug: "Not playing~"
+Debug: "(repeat 1)Not playing~\nsource_voice: 0x37bb4fe0, master: 0x37bb3bd0"
 Debug: "source_voice: 0x0, master: 0x0"
 Debug: 
 Debug: "~AVThreadPrivate wake up paused thread"
-Debug: "(repeat 1)~AVThreadPrivate wake up paused thread\nVideoFilterContext 0x371f5fe0 delete paint device in 0x371b6340"
-Debug: "destroy GeometryRenderer 0x3fc9c760"
+Debug: "(repeat 1)~AVThreadPrivate wake up paused thread\nVideoFilterContext 0x37125d10 delete paint device in 0x370e7dd0"
+Debug: "destroy GeometryRenderer 0x3f96e230"
 Warning: ScreenSaver::restoreState: no data, doing nothing

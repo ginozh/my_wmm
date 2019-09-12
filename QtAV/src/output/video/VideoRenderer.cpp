@@ -692,191 +692,6 @@ void VideoRenderer::handlePaintEvent()
         Q_UNUSED(locker);
 #if 1
         if(d.video_frame){
-#if 0
-            // src/filter/GLSLFilter.cpp 84
-            if (!QOpenGLContext::currentContext()) {
-                qWarning() << "No current gl context for glsl filter: " << this;
-                return;
-            }
-            // OpenGLVideo.cpp
-            static QOpenGLFramebufferObject *fbo=NULL;
-            VideoFrame *frame= &d.video_frame;
-            static VideoMaterial *material=NULL;
-            static ShaderManager *manager=NULL;
-            static QMatrix4x4 matrix;
-            static QRectF rect;
-            if(!fbo)
-            {
-                fbo = new QOpenGLFramebufferObject(frame->size(), GL_TEXTURE_2D); //TODO: prefer 16bit rgb
-                QOpenGLContext *ctx = const_cast<QOpenGLContext*>(QOpenGLContext::currentContext()); //qt4 returns const
-                //d.glv.setOpenGLContext(ctx);
-                {
-                    qreal b = 0, c = 0, h = 0, s = 0;
-                    if (material) {
-                        b = material->brightness();
-                        c = material->contrast();
-                        h = material->hue();
-                        s = material->saturation();
-                        delete material;
-                        material = 0;
-                    }
-                    material = new VideoMaterial();
-                    material->setBrightness(b);
-                    material->setContrast(c);
-                    material->setHue(h);
-                    material->setSaturation(s);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-                    manager = ctx->findChild<ShaderManager*>(QStringLiteral("__qtav_shader_manager"));
-#endif
-                    ////updateViewport();
-                    {
-                        QSizeF surfaceSize = ctx->surface()->size();
-                        surfaceSize *= ctx->screen()->devicePixelRatio();
-                        //setProjectionMatrixToRect(QRectF(QPointF(), surfaceSize));
-                        QRectF r=QRectF(QPointF(), surfaceSize);
-                        // => setViewport
-                        {
-                            rect = r;
-                            matrix.setToIdentity();
-                            DYGL(glViewport(rect.x(), rect.y(), rect.width(), rect.height()));
-                        }
-
-                    }
-                    if (!manager)
-                    {
-                        // TODO: what if ctx is delete?
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-                        manager = new ShaderManager(ctx);
-                        ////QObject::connect(ctx, SIGNAL(aboutToBeDestroyed()), this, SLOT(resetGL()), Qt::DirectConnection); // direct to make sure there is a valid context. makeCurrent in window.aboutToBeDestroyed()?
-#endif
-                        manager->setObjectName(QStringLiteral("__qtav_shader_manager"));
-                        /// get gl info here because context is current(qt ensure it)
-                        //const QByteArray extensions(reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS)));
-                    }
-                    bool hasGLSL = QOpenGLShaderProgram::hasOpenGLShaderPrograms();
-                    qDebug("OpenGL version: %d.%d  hasGLSL: %d", ctx->format().majorVersion(), ctx->format().minorVersion(), hasGLSL);
-                }
-                //d.glv.setProjectionMatrixToRect(QRectF(0, 0, d.fbo->width(), d.fbo->height()));
-                //=>OpenGLVideo::setViewport(const QRectF &r)
-                {
-                    QRectF r = QRectF(0, 0, fbo->width(), fbo->height());
-                    {
-                        rect = r;
-                        matrix.setToIdentity();
-                        DYGL(glViewport(rect.x(), rect.y(), rect.width(), rect.height()));
-                    }
-                }
-                qDebug("new fbo texture: %d %dx%d", fbo->texture(), fbo->width(), fbo->height());
-            }
-            fbo->bind();
-            DYGL(glViewport(0, 0, fbo->width(), fbo->height()));
-            ///d.glv.setCurrentFrame(*frame);
-            {
-                material->setCurrentFrame(*frame);
-            }
-            QMatrix4x4 mat; // flip vertical
-            mat.scale(1, -1);
-            ///d.glv.render(QRectF(), QRectF(), mat); 
-            // src/opengl/OpenGLVideo.cpp  344
-            {
-                QRectF target=QRectF();
-                QRectF roi=QRectF();
-                QMatrix4x4 transform=mat;
-                const qint64 mt = material->type();
-                if(material->bind())
-                {
-                    static VideoShader *shader = NULL; 
-                    if (!shader)
-                        shader = manager->prepareMaterial(material, mt); //TODO: print shader type name if changed. prepareMaterial(,sample_code, pp_code)
-                    DYGL(glViewport(0, 0, fbo->width(), fbo->height()));
-                    shader->update(material);
-                    shader->program()->setUniformValue(shader->matrixLocation(), transform*matrix);
-                    //d.updateGeometry(shader, target, roi);
-                    {
-                        QRectF t=target;
-                        QRectF r=roi;
-                        static qreal valiad_tex_width=0;
-                        static bool update_geo=false;
-                        static int tex_target=0;
-                        static QSize video_size;
-                        static GeometryRenderer* gr=NULL;
-                        static OpenGLVideo::MeshType mesh_type=OpenGLVideo::RectMesh;
-                        static bool norm_viewport=true;
-                        static TexturedGeometry *geometry=NULL;
-
-                        const bool roi_changed = valiad_tex_width != material->validTextureWidth() || roi != r || video_size != material->frameSize();
-                        const int tc = shader->textureLocationCount();
-                        if (roi_changed) {
-                            roi = r;
-                            valiad_tex_width = material->validTextureWidth();
-                            video_size = material->frameSize();
-                        }
-                        if (tex_target != shader->textureTarget()) {
-                            tex_target = shader->textureTarget();
-                            update_geo = true;
-                        }
-                        bool update_gr = false;
-                        static QThreadStorage<bool> new_thread;
-                        if (!new_thread.hasLocalData())
-                            new_thread.setLocalData(true);
-
-                        update_gr = new_thread.localData();
-                        if (!gr || update_gr) { // TODO: only update VAO, not the whole GeometryRenderer
-                            update_geo = true;
-                            new_thread.setLocalData(false);
-                            GeometryRenderer *r = new GeometryRenderer(); // local var is captured by lambda 
-                            gr = r;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && defined(Q_COMPILER_LAMBDA)
-                            QObject::connect(QOpenGLContext::currentContext(), &QOpenGLContext::aboutToBeDestroyed, [r]{
-                                    qDebug("destroy GeometryRenderer %p", r);
-                                    delete r;
-                                    });
-#endif
-                        }
-                        // (-1, -1, 2, 2) must flip y
-                        QRectF target_rect = norm_viewport ? QRectF(-1, 1, 2, -2) : rect;
-                        if (target.isValid()) {
-                            if (roi_changed || target != t) {
-                                target = t;
-                                update_geo = true;
-                                //target_rect = target (if valid). // relate to gvf bug?
-                            }
-                        } else {
-                            if (roi_changed) {
-                                update_geo = true;
-                            }
-                        }
-                        if (update_geo)
-                        {
-                            if( geometry ) delete geometry;
-                            geometry = NULL;
-                            if (mesh_type == OpenGLVideo::SphereMesh)
-                                geometry = new Sphere();
-                            else
-                                geometry = new TexturedGeometry();
-                            //qDebug("updating geometry...");
-                            // setTextureCount may change the vertex data. Call it before setRect()
-                            qDebug() << "target rect: " << target_rect ;
-                            geometry->setTextureCount(shader->textureTarget() == GL_TEXTURE_RECTANGLE ? tc : 1);
-                            geometry->setGeometryRect(target_rect);
-                            geometry->setTextureRect(material->mapToTexture(0, roi));
-                            if (shader->textureTarget() == GL_TEXTURE_RECTANGLE) {
-                                for (int i = 1; i < tc; ++i) {
-                                    // tc can > planes, but that will compute chroma plane
-                                    geometry->setTextureRect(material->mapToTexture(i, roi), i);
-                                }
-                            }
-                            geometry->create();
-                            update_geo = false;
-                            gr->updateGeometry(geometry);
-                            gr->render();
-                        }
-                    }
-                }
-                material->unbind(); // => GLInteropResource::unmap
-                {QImage img=fbo->toImage();static int idx=0;++idx;qDebug()<<"VideoRenderer::handlePaintEvent img idx: "<<idx<<" isNull: "<<img.isNull();if(idx==3 || idx==15) img.save(QString("images/%1.jpg").arg(idx));}// storm
-            }
-#endif
             {
             static QOpenGLFramebufferObject *fbo=NULL;
             VideoFrame *frame= &d.video_frame;
@@ -1183,6 +998,191 @@ void VideoRenderer::handlePaintEvent()
 
 
             }
+#if 0
+            // src/filter/GLSLFilter.cpp 84
+            if (!QOpenGLContext::currentContext()) {
+                qWarning() << "No current gl context for glsl filter: " << this;
+                return;
+            }
+            // OpenGLVideo.cpp
+            static QOpenGLFramebufferObject *fbo=NULL;
+            VideoFrame *frame= &d.video_frame;
+            static VideoMaterial *material=NULL;
+            static ShaderManager *manager=NULL;
+            static QMatrix4x4 matrix;
+            static QRectF rect;
+            if(!fbo)
+            {
+                fbo = new QOpenGLFramebufferObject(frame->size(), GL_TEXTURE_2D); //TODO: prefer 16bit rgb
+                QOpenGLContext *ctx = const_cast<QOpenGLContext*>(QOpenGLContext::currentContext()); //qt4 returns const
+                //d.glv.setOpenGLContext(ctx);
+                {
+                    qreal b = 0, c = 0, h = 0, s = 0;
+                    if (material) {
+                        b = material->brightness();
+                        c = material->contrast();
+                        h = material->hue();
+                        s = material->saturation();
+                        delete material;
+                        material = 0;
+                    }
+                    material = new VideoMaterial();
+                    material->setBrightness(b);
+                    material->setContrast(c);
+                    material->setHue(h);
+                    material->setSaturation(s);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+                    manager = ctx->findChild<ShaderManager*>(QStringLiteral("__qtav_shader_manager"));
+#endif
+                    ////updateViewport();
+                    {
+                        QSizeF surfaceSize = ctx->surface()->size();
+                        surfaceSize *= ctx->screen()->devicePixelRatio();
+                        //setProjectionMatrixToRect(QRectF(QPointF(), surfaceSize));
+                        QRectF r=QRectF(QPointF(), surfaceSize);
+                        // => setViewport
+                        {
+                            rect = r;
+                            matrix.setToIdentity();
+                            DYGL(glViewport(rect.x(), rect.y(), rect.width(), rect.height()));
+                        }
+
+                    }
+                    if (!manager)
+                    {
+                        // TODO: what if ctx is delete?
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+                        manager = new ShaderManager(ctx);
+                        ////QObject::connect(ctx, SIGNAL(aboutToBeDestroyed()), this, SLOT(resetGL()), Qt::DirectConnection); // direct to make sure there is a valid context. makeCurrent in window.aboutToBeDestroyed()?
+#endif
+                        manager->setObjectName(QStringLiteral("__qtav_shader_manager"));
+                        /// get gl info here because context is current(qt ensure it)
+                        //const QByteArray extensions(reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS)));
+                    }
+                    bool hasGLSL = QOpenGLShaderProgram::hasOpenGLShaderPrograms();
+                    qDebug("OpenGL version: %d.%d  hasGLSL: %d", ctx->format().majorVersion(), ctx->format().minorVersion(), hasGLSL);
+                }
+                //d.glv.setProjectionMatrixToRect(QRectF(0, 0, d.fbo->width(), d.fbo->height()));
+                //=>OpenGLVideo::setViewport(const QRectF &r)
+                {
+                    QRectF r = QRectF(0, 0, fbo->width(), fbo->height());
+                    {
+                        rect = r;
+                        matrix.setToIdentity();
+                        DYGL(glViewport(rect.x(), rect.y(), rect.width(), rect.height()));
+                    }
+                }
+                qDebug("new fbo texture: %d %dx%d", fbo->texture(), fbo->width(), fbo->height());
+            }
+            fbo->bind();
+            DYGL(glViewport(0, 0, fbo->width(), fbo->height()));
+            ///d.glv.setCurrentFrame(*frame);
+            {
+                material->setCurrentFrame(*frame);
+            }
+            QMatrix4x4 mat; // flip vertical
+            mat.scale(1, -1);
+            ///d.glv.render(QRectF(), QRectF(), mat); 
+            // src/opengl/OpenGLVideo.cpp  344
+            {
+                QRectF target=QRectF();
+                QRectF roi=QRectF();
+                QMatrix4x4 transform=mat;
+                const qint64 mt = material->type();
+                if(material->bind())
+                {
+                    static VideoShader *shader = NULL; 
+                    if (!shader)
+                        shader = manager->prepareMaterial(material, mt); //TODO: print shader type name if changed. prepareMaterial(,sample_code, pp_code)
+                    DYGL(glViewport(0, 0, fbo->width(), fbo->height()));
+                    shader->update(material);
+                    shader->program()->setUniformValue(shader->matrixLocation(), transform*matrix);
+                    //d.updateGeometry(shader, target, roi);
+                    {
+                        QRectF t=target;
+                        QRectF r=roi;
+                        static qreal valiad_tex_width=0;
+                        static bool update_geo=false;
+                        static int tex_target=0;
+                        static QSize video_size;
+                        static GeometryRenderer* gr=NULL;
+                        static OpenGLVideo::MeshType mesh_type=OpenGLVideo::RectMesh;
+                        static bool norm_viewport=true;
+                        static TexturedGeometry *geometry=NULL;
+
+                        const bool roi_changed = valiad_tex_width != material->validTextureWidth() || roi != r || video_size != material->frameSize();
+                        const int tc = shader->textureLocationCount();
+                        if (roi_changed) {
+                            roi = r;
+                            valiad_tex_width = material->validTextureWidth();
+                            video_size = material->frameSize();
+                        }
+                        if (tex_target != shader->textureTarget()) {
+                            tex_target = shader->textureTarget();
+                            update_geo = true;
+                        }
+                        bool update_gr = false;
+                        static QThreadStorage<bool> new_thread;
+                        if (!new_thread.hasLocalData())
+                            new_thread.setLocalData(true);
+
+                        update_gr = new_thread.localData();
+                        if (!gr || update_gr) { // TODO: only update VAO, not the whole GeometryRenderer
+                            update_geo = true;
+                            new_thread.setLocalData(false);
+                            GeometryRenderer *r = new GeometryRenderer(); // local var is captured by lambda 
+                            gr = r;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && defined(Q_COMPILER_LAMBDA)
+                            QObject::connect(QOpenGLContext::currentContext(), &QOpenGLContext::aboutToBeDestroyed, [r]{
+                                    qDebug("destroy GeometryRenderer %p", r);
+                                    delete r;
+                                    });
+#endif
+                        }
+                        // (-1, -1, 2, 2) must flip y
+                        QRectF target_rect = norm_viewport ? QRectF(-1, 1, 2, -2) : rect;
+                        if (target.isValid()) {
+                            if (roi_changed || target != t) {
+                                target = t;
+                                update_geo = true;
+                                //target_rect = target (if valid). // relate to gvf bug?
+                            }
+                        } else {
+                            if (roi_changed) {
+                                update_geo = true;
+                            }
+                        }
+                        if (update_geo)
+                        {
+                            if( geometry ) delete geometry;
+                            geometry = NULL;
+                            if (mesh_type == OpenGLVideo::SphereMesh)
+                                geometry = new Sphere();
+                            else
+                                geometry = new TexturedGeometry();
+                            //qDebug("updating geometry...");
+                            // setTextureCount may change the vertex data. Call it before setRect()
+                            qDebug() << "target rect: " << target_rect ;
+                            geometry->setTextureCount(shader->textureTarget() == GL_TEXTURE_RECTANGLE ? tc : 1);
+                            geometry->setGeometryRect(target_rect);
+                            geometry->setTextureRect(material->mapToTexture(0, roi));
+                            if (shader->textureTarget() == GL_TEXTURE_RECTANGLE) {
+                                for (int i = 1; i < tc; ++i) {
+                                    // tc can > planes, but that will compute chroma plane
+                                    geometry->setTextureRect(material->mapToTexture(i, roi), i);
+                                }
+                            }
+                            geometry->create();
+                            update_geo = false;
+                            gr->updateGeometry(geometry);
+                            gr->render();
+                        }
+                    }
+                }
+                material->unbind(); // => GLInteropResource::unmap
+                {QImage img=fbo->toImage();static int idx=0;++idx;qDebug()<<"VideoRenderer::handlePaintEvent img idx: "<<idx<<" isNull: "<<img.isNull();if(idx==3 || idx==15) img.save(QString("images/%1.jpg").arg(idx));}// storm
+            }
+#endif
 #if 0
             {
                 GLuint tex;

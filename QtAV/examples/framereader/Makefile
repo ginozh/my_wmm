@@ -218,6 +218,7 @@ Makefile: framereader.pro ../../.qmake.cache C:/msys64/mingw64/share/qt5/mkspecs
 		C:/msys64/mingw64/share/qt5/mkspecs/features/win32/default_pre.prf \
 		../../common.pri \
 		../../src/libQtAV.pri \
+		../../widgets/libQtAVWidgets.pri \
 		C:/msys64/mingw64/share/qt5/mkspecs/features/resolve_config.prf \
 		C:/msys64/mingw64/share/qt5/mkspecs/features/exclusive_builds_post.prf \
 		C:/msys64/mingw64/share/qt5/mkspecs/features/default_post.prf \
@@ -227,6 +228,7 @@ Makefile: framereader.pro ../../.qmake.cache C:/msys64/mingw64/share/qt5/mkspecs
 		C:/msys64/mingw64/share/qt5/mkspecs/features/resources.prf \
 		C:/msys64/mingw64/share/qt5/mkspecs/features/moc.prf \
 		C:/msys64/mingw64/share/qt5/mkspecs/features/win32/opengl.prf \
+		C:/msys64/mingw64/share/qt5/mkspecs/features/uic.prf \
 		C:/msys64/mingw64/share/qt5/mkspecs/features/qmake_use.prf \
 		C:/msys64/mingw64/share/qt5/mkspecs/features/file_copies.prf \
 		C:/msys64/mingw64/share/qt5/mkspecs/features/win32/windows.prf \
@@ -237,6 +239,8 @@ Makefile: framereader.pro ../../.qmake.cache C:/msys64/mingw64/share/qt5/mkspecs
 		framereader.pro \
 		C:/msys64/mingw64/lib/qtmaind.prl \
 		../../lib_win_x86_64/QtAV.prl \
+		../../lib_win_x86_64/QtAVWidgets.prl \
+		C:/msys64/mingw64/lib/Qt5Widgets.prl \
 		C:/msys64/mingw64/lib/Qt5Gui.prl \
 		C:/msys64/mingw64/lib/Qt5Core.prl
 	$(QMAKE) -o Makefile framereader.pro
@@ -397,6 +401,7 @@ C:/msys64/mingw64/share/qt5/mkspecs/features/default_pre.prf:
 C:/msys64/mingw64/share/qt5/mkspecs/features/win32/default_pre.prf:
 ../../common.pri:
 ../../src/libQtAV.pri:
+../../widgets/libQtAVWidgets.pri:
 C:/msys64/mingw64/share/qt5/mkspecs/features/resolve_config.prf:
 C:/msys64/mingw64/share/qt5/mkspecs/features/exclusive_builds_post.prf:
 C:/msys64/mingw64/share/qt5/mkspecs/features/default_post.prf:
@@ -406,6 +411,7 @@ C:/msys64/mingw64/share/qt5/mkspecs/features/qt.prf:
 C:/msys64/mingw64/share/qt5/mkspecs/features/resources.prf:
 C:/msys64/mingw64/share/qt5/mkspecs/features/moc.prf:
 C:/msys64/mingw64/share/qt5/mkspecs/features/win32/opengl.prf:
+C:/msys64/mingw64/share/qt5/mkspecs/features/uic.prf:
 C:/msys64/mingw64/share/qt5/mkspecs/features/qmake_use.prf:
 C:/msys64/mingw64/share/qt5/mkspecs/features/file_copies.prf:
 C:/msys64/mingw64/share/qt5/mkspecs/features/win32/windows.prf:
@@ -416,6 +422,8 @@ C:/msys64/mingw64/share/qt5/mkspecs/features/lex.prf:
 framereader.pro:
 C:/msys64/mingw64/lib/qtmaind.prl:
 ../../lib_win_x86_64/QtAV.prl:
+../../lib_win_x86_64/QtAVWidgets.prl:
+C:/msys64/mingw64/lib/Qt5Widgets.prl:
 C:/msys64/mingw64/lib/Qt5Gui.prl:
 C:/msys64/mingw64/lib/Qt5Core.prl:
 qmake: FORCE

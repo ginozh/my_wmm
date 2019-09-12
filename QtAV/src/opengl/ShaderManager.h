@@ -23,6 +23,7 @@
 #define QTAV_SHADERMANAGER_H
 
 #include <QtCore/QObject>
+#include <QtAV/QtAV_Global.h>  //storm
 
 namespace QtAV {
 class VideoShader;
@@ -32,7 +33,7 @@ class VideoMaterial;
  * Cache VideoShader and shader programes for different video material type.
  * TODO: ShaderManager does not change for a given vo, so we can expose VideoRenderer.shaderManager() to set custom shader. It's better than VideoRenderer.opengl() because OpenGLVideo exposes too many apis that may confuse user.
  */
-class ShaderManager : public QObject
+class Q_AV_EXPORT ShaderManager : public QObject //storm
 {
     Q_OBJECT
 public:

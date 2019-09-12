@@ -1,8 +1,8 @@
 /******************************************************************************
-    framereader:  this file is part of QtAV examples
-    Copyright (C) 2012-2016 Wang Bin <wbsecg1@gmail.com>
+    Simple Player:  this file is part of QtAV examples
+    Copyright (C) 2012-2015 Wang Bin <wbsecg1@gmail.com>
 
-*   This file is part of QtAV (from 2016)
+*   This file is part of QtAV
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,49 +17,16 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
-#include <cstdio>
-#include <cstdlib>
-#include <QtCore/QCoreApplication>
-#include <QtCore/QDateTime>
-#include <QtCore/QQueue>
-#include <QtCore/QStringList>
-#include <QtCore/QThread>
-#include <QtAV/FrameReader.h>
-using namespace QtAV;
+#include <QApplication>
+#include "playerwindow.h"
+#include <QtAVWidgets>
+
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
-
-    FrameReader r;
-    QStringList vdecnames;
-    vdecnames << "DXVA";
-    vdecnames << "FFmpeg";
-    r.setVideoDecoders(vdecnames);
-    r.setMedia(a.arguments().last());
-    QQueue<qint64> t;
-    int count = 0;
-    qint64 t0 = QDateTime::currentMSecsSinceEpoch();
-    while (r.readMore()) {
-        while (r.hasEnoughVideoFrames()) {
-            const VideoFrame f = r.getVideoFrame(); //TODO: if eof
-            if (!f)
-                continue;
-            count++;
-            //r.readMore();
-            const qint64 now = QDateTime::currentMSecsSinceEpoch();
-            const qint64 dt = now - t0;
-            t.enqueue(now);
-            printf("decode @%.3f count: %d, elapsed: %lld, fps: %.1f/%.1f\r\n", f.timestamp(), count, dt, count*1000.0/dt, t.size()*1000.0/(now - t.first()));fflush(0);
-            QThread::msleep(20);
-            if (t.size() > 10)
-                t.dequeue();
-        }
-    }
-    while (r.hasVideoFrame()) {
-        const VideoFrame f = r.getVideoFrame();
-        qDebug("pts: %.3f", f.timestamp());
-    }
-    qDebug("read done");
-    return 0;
+    QtAV::Widgets::registerRenderers();
+    QApplication a(argc, argv);
+    PlayerWindow player;
+    player.show();
+    player.resize(800, 600);
+    return a.exec();
 }
-
