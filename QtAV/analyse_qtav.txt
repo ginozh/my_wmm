@@ -121,6 +121,25 @@ AVPixelFormat VideoDecoderFFmpegHWPrivate::getFormat(struct AVCodecContext *avct
 3, play
 //src/VideoThread.cpp  240
 void VideoThread::run()
+    //class VideoDecoderDXVA(d3d9) : public VideoDecoderD3D
+    //class VideoDecoderD3D11 : public VideoDecoderD3D
+
+    //class VideoDecoderD3D : public VideoDecoderFFmpegHW
+    //class VideoDecoderVAAPI : public VideoDecoderFFmpegHW
+    //class VideoDecoderMediaCodec Q_DECL_FINAL : public VideoDecoderFFmpegHW
+    //class VideoDecoderVDA : public VideoDecoderFFmpegHW
+    //class VideoDecoderVideoToolbox : public VideoDecoderFFmpegHW
+
+    //class VideoDecoderFFmpegHW : public VideoDecoderFFmpegBase
+    //class VideoDecoderFFmpeg : public VideoDecoderFFmpegBase
+
+    //class VideoDecoderFFmpegBase : public VideoDecoder
+    //class VideoDecoderCUDA : public VideoDecoder
+    //class VideoDecoderCedarv : public VideoDecoder
+
+    //class Q_AV_EXPORT VideoDecoder : public AVDecoder
+    //class Q_AV_EXPORT AudioDecoder : public AVDecoder
+
     VideoDecoder *dec = static_cast<VideoDecoder*>(d.dec);
     Packet pkt;
     while (!d.stop) 
@@ -463,3 +482,31 @@ add_frame
 显示frame
 
 frameread.cpp + openglwidget.cpp
+见
+/c/qtproject/mpv video/out/opengl/context_dxinterop.c  302
+    // Create the OpenGL-side texture
+    gl->GenTextures(1, &p->texture);
+
+    // Now share the rendertarget with OpenGL as a texture
+    p->rtarget_h = gl->DXRegisterObjectNV(p->device_h, p->rtarget, p->texture,
+        GL_TEXTURE_2D, WGL_ACCESS_WRITE_DISCARD_NV);
+    if (!p->rtarget_h) {
+        MP_ERR(ctx->vo, "Couldn't share rendertarget with OpenGL: %s\n",
+               mp_LastError_to_str());
+        return -1;
+    }
+
+    // Lock the rendertarget for use from OpenGL. This will only be unlocked in
+    // swap_buffers() when it is blitted to the real Direct3D backbuffer.
+    if (!gl->DXLockObjectsNV(p->device_h, 1, &p->rtarget_h)) {
+        MP_ERR(ctx->vo, "Couldn't lock rendertarget: %s\n",
+               mp_LastError_to_str());
+        return -1;
+    }
+
+    gl->BindFramebuffer(GL_FRAMEBUFFER, p->main_fb);
+    gl->FramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+        GL_TEXTURE_2D, p->texture, 0);
+    gl->BindFramebuffer(GL_FRAMEBUFFER, 0);
+
+3, 精简最小代码

@@ -71,6 +71,62 @@ void OpenGLWidget::resizeGL(int width, int height)
     glviewh=height;
     QOpenGLWidget::resizeGL(width, height);
 }
+QRectF mapToTexture(int plane, const QRectF &roi, int materialw, int materialh, qreal effective_tex_width_ratio, int texWidth, VideoFormat& video_format, int target, int normalize=-1)
+{
+    const qreal tex0W = texWidth;
+    const qreal s = tex0W/qreal(materialw); // only apply to unnormalized input roi
+    const qreal pw = video_format.normalizedWidth(plane);
+    const qreal ph = video_format.normalizedHeight(plane);
+    if (normalize < 0)
+        normalize = target != GL_TEXTURE_RECTANGLE;
+    float x = roi.x();
+    float w = roi.width(); //TODO: texturewidth
+    float y = roi.y();
+    float h = roi.height();
+    if (normalize) {
+        if (qAbs(x) > 1) {
+            x /= tex0W;
+            x *= s;
+        }
+        if (qAbs(y) > 1)
+            y /= (float)materialh;
+        if (qAbs(w) > 1) {
+            w /= tex0W;
+            w *= s;
+        }
+        if (qAbs(h) > 1)
+            h /= (float)materialh;
+    } else { //FIXME: what about ==1?
+        if (qAbs(x) <= 1)
+            x *= tex0W;
+        else
+            x *= s;
+        if (qAbs(y) <= 1)
+            y *= (float)materialh;
+        if (qAbs(w) <= 1)
+            w *= tex0W;
+        else
+            w *= s;
+        if (qAbs(h) <= 1)
+            h *= (float)materialh;
+    }
+    // multiply later because we compare with 1 before it
+    x *= effective_tex_width_ratio;
+    w *= effective_tex_width_ratio;
+    return QRectF(x*pw, y*ph, w*pw, h*ph);
+}
+#if 0
+qint32 type(VideoFormat& video_format, int target)
+{
+    const VideoFormat &fmt = video_format;
+    const bool tex_2d = target == GL_TEXTURE_2D;
+    // 2d,alpha,planar,8bit
+    const int rg_biplane = fmt.planeCount()==2 && !OpenGLHelper::useDeprecatedFormats() && OpenGLHelper::hasRG();
+    int bpc  = fmt.bitsPerComponent();
+    const int channel16_to8 = bpc > 8 && (OpenGLHelper::depth16BitTexture() < 16 || !OpenGLHelper::has16BitTexture() || fmt.isBigEndian());
+    return (fmt.isXYZ()<<5)|(rg_biplane<<4)|(tex_2d<<3)|(fmt.hasAlpha()<<2)|(fmt.isPlanar()<<1)|(channel16_to8);
+}
+#endif
 void OpenGLWidget::paintGL()
 {
     qInfo()<<"OpenGLWidget::paintGL start";
@@ -82,8 +138,15 @@ void OpenGLWidget::paintGL()
         static ShaderManager *manager=NULL;
         static QMatrix4x4 matrix;
         static QRectF rect;
+#if 1
         GLint currentFbo = 0;
         DYGL(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFbo));
+#endif
+#if 0
+        GLuint currentFbo;
+        DYGL(glGenFramebuffers(1, &currentFbo));
+        DYGL(glBindFramebuffer(GL_FRAMEBUFFER, currentFbo));
+#endif
         if(!fbo)
         {
             fbo = new QOpenGLFramebufferObject(frame->size(), GL_TEXTURE_2D); //TODO: prefer 16bit rgb
@@ -134,6 +197,7 @@ void OpenGLWidget::paintGL()
         static OpenGLVideo::MeshType mesh_type=OpenGLVideo::RectMesh;
         static bool norm_viewport=true;
         static TexturedGeometry *geometry=NULL;
+        int shadertextureTarget= GL_TEXTURE_2D;//3553;//shader->textureTarget(); //3553
         {
             QRectF target=QRectF();
             QRectF roi=QRectF();
@@ -162,11 +226,14 @@ void OpenGLWidget::paintGL()
 #endif
                     }
                     const bool roi_changed = valiad_tex_width != material->validTextureWidth() || roi != r || video_size != material->frameSize();
-                    const int tc = shader->textureLocationCount();
+                    const int tc = 1;//shader->textureLocationCount();
                     QRectF target_rect = norm_viewport ? QRectF(-1, 1, 2, -2) : rect;
 #if 1
-                    if (tex_target != shader->textureTarget()) {
-                        tex_target = shader->textureTarget();
+                    //if (tex_target != shader->textureTarget()) 
+                    if (tex_target != shadertextureTarget) 
+                    {
+                        //tex_target = shader->textureTarget();
+                        tex_target = shadertextureTarget;//shader->textureTarget();
                         update_geo = true;
                     }
                     if (target.isValid()) {
@@ -192,10 +259,13 @@ void OpenGLWidget::paintGL()
                         //qDebug("updating geometry...");
                         // setTextureCount may change the vertex data. Call it before setRect()
                         qDebug() << "target rect: " << target_rect ;
-                        geometry->setTextureCount(shader->textureTarget() == GL_TEXTURE_RECTANGLE ? tc : 1);
+                        //geometry->setTextureCount(shader->textureTarget() == GL_TEXTURE_RECTANGLE ? tc : 1);
+                        geometry->setTextureCount(shadertextureTarget == GL_TEXTURE_RECTANGLE ? tc : 1);
                         geometry->setGeometryRect(target_rect);
                         geometry->setTextureRect(material->mapToTexture(0, roi));
-                        if (shader->textureTarget() == GL_TEXTURE_RECTANGLE) {
+                        //if (shader->textureTarget() == GL_TEXTURE_RECTANGLE) 
+                        if (shadertextureTarget == GL_TEXTURE_RECTANGLE) 
+                        {
                             for (int i = 1; i < tc; ++i) {
                                 // tc can > planes, but that will compute chroma plane
                                 geometry->setTextureRect(material->mapToTexture(i, roi), i);
@@ -382,8 +452,14 @@ void OpenGLWidget::paintGL()
         //{QImage img=fbo->toImage();static int idx=0;++idx;qDebug()<<"VideoRenderer::handlePaintEvent img idx: "<<idx<<" isNull: "<<img.isNull();/*if(idx==3 || idx==15)*/ img.save(QString("images%1.jpg").arg(idx));}// storm
         //{QImage img=fbo->toImage();static int idx=0;++idx;printf("VideoRenderer::handlePaintEvent img idx: %d  isNull: %d\n",idx,img.isNull());/*if(idx==3 || idx==15)*/ img.save(QString("images/%1.jpg").arg(idx));}// storm
         //gl().BindFramebuffer(GL_FRAMEBUFFER, (GLuint)currentFbo);
+#if 0
+        GLint currentFbo = 0;
+        DYGL(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFbo));
+#endif
         glBindFramebuffer(GL_FRAMEBUFFER, (GLuint)currentFbo);
         VideoFormat fmt(VideoFormat::Format_RGB32);
+        printf("OpenGLWidget::paintGL currentFbo: %d texture: %d\n", currentFbo, fbo->texture());fflush(0);
+#if 0
         VideoFrame f(fbo->width(), fbo->height(), fmt); //
         f.setBytesPerLine(fbo->width()*fmt.bytesPerPixel(), 0);
         // set interop;
@@ -402,84 +478,52 @@ void OpenGLWidget::paintGL()
         GLTextureInterop *interop = new GLTextureInterop(fbo->texture());
         f.setMetaData(QStringLiteral("surface_interop"), QVariant::fromValue(VideoSurfaceInteropPtr((interop))));
         *frame = f;
-
+#endif
         //drawFrame();
         {
             QRect roi = QRect(QPoint(), video_frame.size());//realROI();
             //d.glv.setCurrentFrame(d.video_frame);
             {
-                material->setCurrentFrame(*frame);
+                //material->setCurrentFrame(*frame);
             }
             //d.glv.render(QRectF(), roi, d.matrix);
             {
-                QRectF target=QRectF();
+                //QRectF target=QRectF();
                 ///QRectF roi=QRectF();
-                QMatrix4x4 transform=mat;
-                const qint64 mt = material->type();
-                if(material->bind())
+                //QMatrix4x4 transform=mat;
+                //const qint64 mt = material->type();
+                //const qint64 mt = type(fmt, shadertextureTarget);
+                int shadertextureTarget= GL_TEXTURE_2D;//3553;//shader->textureTarget(); //3553
+                glActiveTexture(GL_TEXTURE0); //必须从0开始
+                DYGL(glBindTexture(shadertextureTarget, fbo->texture())); // glActiveTexture was called, but maybe bind to 0 in map
+                //if(material->bind())
                 {
-                    if (!shader)
-                        shader = manager->prepareMaterial(material, mt); //TODO: print shader type name if changed. prepareMaterial(,sample_code, pp_code)
+                    //if (!shader)
+                    //    shader = manager->prepareMaterial(material, mt); //TODO: print shader type name if changed. prepareMaterial(,sample_code, pp_code)
                     DYGL(glViewport(0, 0, fbo->width(), fbo->height()));
-                    shader->update(material);
-                    shader->program()->setUniformValue(shader->matrixLocation(), transform*matrix);
+                    //shader->update(material);
+                    //shader->program()->setUniformValue(shader->matrixLocation(), transform*matrix);
                     //d.updateGeometry(shader, target, roi);
                     if(1){
-                        QRectF t=target;
-                        QRectF r=roi;
+                        ///QRectF t=target;
 
-                        if (!gr) { // TODO: only update VAO, not the whole GeometryRenderer
-                            GeometryRenderer *r = new GeometryRenderer(); // local var is captured by lambda 
-                            gr = r;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && defined(Q_COMPILER_LAMBDA)
-                            QObject::connect(QOpenGLContext::currentContext(), &QOpenGLContext::aboutToBeDestroyed, [r]{
-                                    qDebug("destroy GeometryRenderer %p", r);
-                                    delete r;
-                                    });
-#endif
-                        }
-                        const bool roi_changed = valiad_tex_width != material->validTextureWidth() || roi != r || video_size != material->frameSize();
-                        const int tc = shader->textureLocationCount();
-                        QRectF target_rect = norm_viewport ? QRectF(-1, 1, 2, -2) : rect;
-#if 1
-                        if (tex_target != shader->textureTarget()) {
-                            tex_target = shader->textureTarget();
-                            update_geo = true;
-                        }
-                        if (target.isValid()) {
-                            if (roi_changed || target != t) {
-                                target = t;
-                                update_geo = true;
-                                //target_rect = target (if valid). // relate to gvf bug?
-                            }
-                        } else {
-                            if (roi_changed) {
-                                update_geo = true;
-                            }
-                        }
-#endif
+                        const int tc = 1;//shader->textureLocationCount();
+                        QRectF target_rect = QRectF(-1, 1, 2, -2);
+                        update_geo = true;
                         if (update_geo)
                         {
                             if( geometry ) delete geometry;
                             geometry = NULL;
-                            if (mesh_type == OpenGLVideo::SphereMesh)
-                                geometry = new Sphere();
-                            else
-                                geometry = new TexturedGeometry();
+                            geometry = new TexturedGeometry();
                             //qDebug("updating geometry...");
                             // setTextureCount may change the vertex data. Call it before setRect()
                             qDebug() << "target rect: " << target_rect ;
-                            geometry->setTextureCount(shader->textureTarget() == GL_TEXTURE_RECTANGLE ? tc : 1);
+                            ///geometry->setTextureCount(shader->textureTarget() == GL_TEXTURE_RECTANGLE ? tc : 1);
+                            geometry->setTextureCount(1);
                             geometry->setGeometryRect(target_rect);
-                            geometry->setTextureRect(material->mapToTexture(0, roi));
-                            if (shader->textureTarget() == GL_TEXTURE_RECTANGLE) {
-                                for (int i = 1; i < tc; ++i) {
-                                    // tc can > planes, but that will compute chroma plane
-                                    geometry->setTextureRect(material->mapToTexture(i, roi), i);
-                                }
-                            }
+                            //geometry->setTextureRect(material->mapToTexture(0, roi));
+                            geometry->setTextureRect(mapToTexture(0, roi, fbo->width(), fbo->height(), 1, fbo->width(), fmt, shadertextureTarget));
                             geometry->create();
-                            update_geo = false;
                             {
                                 static int vbo_size=0; // QOpenGLBuffer.size() may get error 0x501
                                 static QOpenGLBuffer vbo; //VertexBuffer
@@ -513,20 +557,7 @@ void OpenGLWidget::paintGL()
                                     if (vbo.isCreated()) {
                                         vbo.bind();
                                         const int bs = g->vertexCount()*g->stride();
-                                        if (bs == vbo_size) { // vbo.size() error 0x501 on rpi, and query gl value can be slow
-                                            void* p = NULL;
-                                            if (support_map )
-                                                p = vbo.map(QOpenGLBuffer::WriteOnly);
-                                            if (p) {
-                                                memcpy(p, g->constVertexData(), bs);
-                                                vbo.unmap();
-                                            } else {
-                                                vbo.write(0, g->constVertexData(), bs);
-                                                vbo_size = bs;
-                                            }
-                                        } else {
-                                            vbo.allocate(g->vertexData(), bs);
-                                        }
+                                        vbo.allocate(g->vertexData(), bs);
                                         vbo.release();
                                     }
 #if QT_VAO
@@ -566,12 +597,7 @@ void OpenGLWidget::paintGL()
                                         }
                                         vbo.release(); // unbind after vao unbind? http://www.zwqxin.com/archives/opengl/vao-and-vbo-stuff.html
                                     } // TODO: bind pointers if vbo is disabled
-                                    // bind ibo to vao thus no bind is required later
-                                    if (ibo.isCreated())// if not bind here, glDrawElements(...,NULL) crashes and must use ibo data ptr, why?
-                                        ibo.bind();
                                     vao.release();
-                                    if (ibo.isCreated())
-                                        ibo.release();
 #endif
                                     qDebug("geometry updated");
                                 }
@@ -595,9 +621,6 @@ void OpenGLWidget::paintGL()
                                             bind_ibo = false;
                                         }
 #endif
-                                        //qDebug("bind ibo: %d vbo: %d; set v: %d", bind_ibo, bind_vbo, !setv_skip);
-                                        if (bind_ibo)
-                                            ibo.bind();
                                         // no vbo: set vertex attributes
                                         // has vbo, no vao: bind vbo & set vertex attributes
                                         // has vbo, has vao: skip
@@ -659,6 +682,7 @@ void OpenGLWidget::paintGL()
 
         return;
     }
+#if 0
     GLuint displayTexture=0;
     if(fbo)
     {
@@ -712,5 +736,6 @@ void OpenGLWidget::paintGL()
     glDisable(GL_TEXTURE_2D);
     glPopMatrix();
     qInfo()<<"OpenGLWidget::paintGL end";
+#endif
     return;
 }
