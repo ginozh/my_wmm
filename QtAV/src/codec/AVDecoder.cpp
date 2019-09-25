@@ -23,8 +23,8 @@
 #include <QtAV/private/AVDecoder_p.h>
 #include <QtAV/version.h>
 #include "utils/internal.h"
-#include "utils/Logger.h"
-
+//#include "utils/Logger.h"
+#include <QDebug> //storm
 namespace QtAV {
 
 static AVCodec* get_codec(const QString &name, const QString& hwa, AVCodecID cid)

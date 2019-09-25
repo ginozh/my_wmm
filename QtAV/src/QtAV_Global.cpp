@@ -456,8 +456,8 @@ InitFFmpegLog fflog;
 // Initialize Qt Resource System when the library is built
 // statically
 static void initResources() {
-    Q_INIT_RESOURCE(shaders);
-    Q_INIT_RESOURCE(QtAV);
+    ///Q_INIT_RESOURCE(shaders);  //storm
+    ///Q_INIT_RESOURCE(QtAV);
 }
 
 namespace {

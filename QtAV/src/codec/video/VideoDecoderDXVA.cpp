@@ -27,14 +27,14 @@
 #include "QtAV/private/AVCompat.h"
 #include "QtAV/private/factory.h"
 //#include "QtAV/private/mkid.h"
-#include "utils/Logger.h"
+//#include "utils/Logger.h"
+#include <QDebug> //storm
 #include "directx/SurfaceInteropD3D9.h"
 #include <QtCore/QSysInfo>
 #define DX_LOG_COMPONENT "DXVA2"
 #include "utils/DirectXHelper.h"
 #include <sys/time.h> //storm
 // d3d9ex: http://dxr.mozilla.org/mozilla-central/source/dom/media/wmf/DXVA2Manager.cpp
-
 // to use c api, add define COBJMACROS and CINTERFACE
 #define DXVA2API_USE_BITFIELDS
 extern "C" {

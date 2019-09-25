@@ -20,8 +20,8 @@
 ******************************************************************************/
 
 #include "DirectXHelper.h"
-#include "utils/Logger.h"
-
+//#include "utils/Logger.h"
+#include <QDebug> //storm
 namespace QtAV {
 namespace DXHelper {
 

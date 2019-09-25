@@ -2,8 +2,8 @@ TEMPLATE = lib
 MODULE_INCNAME = QtAV # for mac framework. also used in install_sdk.pro
 TARGET = QtAV
 QT += core gui
-      CONFIG *= config_opengl
-        CONFIG *= config_openglwindow
+CONFIG *= config_opengl
+CONFIG *= config_openglwindow
 CONFIG *= qtav-buildlib
 INCLUDEPATH += $$[QT_INSTALL_HEADERS] # TODO: ffmpeg dir
 
@@ -13,13 +13,15 @@ CONFIG(debug, debug|release): DEFINES += DEBUG
 PROJECTROOT = $$PWD/..
 include(../.qmake.cache)
 #!include(libQtAV.pri): error("could not find libQtAV.pri")
+# libQtAVd.dll.a
+
 
 NAME = QtAV
-PROJECT_TARGETNAME = $$qtLibraryTarget($$NAME)
+PROJECT_TARGETNAME = $$qtLibraryTarget($$NAME) # important debug: libQtAVd.dll.a
 
-isEmpty(PROJECTROOT): PROJECTROOT = $$PWD/..
-include($${PROJECTROOT}/common.pri)
-CONFIG += depend_includepath #?
+#isEmpty(PROJECTROOT): PROJECTROOT = $$PWD/..
+#include($${PROJECTROOT}/common.pri) #
+#CONFIG += depend_includepath #?
 
 PROJECT_SRCPATH = $$PWD
 PROJECT_LIBDIR = $$qtLongName($$BUILD_DIR/lib)
@@ -33,9 +35,9 @@ STATICLINK = 0
     VERSION = $$LIB_VERSION
     DESTDIR= $$PROJECT_LIBDIR
 }
-TARGET = $$PROJECT_TARGETNAME ##I commented out this before, why?
+TARGET = $$PROJECT_TARGETNAME ##
 CONFIG *= create_prl #
-DEFINES += BUILD_$$upper($$NAME)_LIB #win32-msvc*
+DEFINES += BUILD_$$upper($$NAME)_LIB #win32-msvc* #导出函数
 CONFIG *= shared #shared includes dll
 
 shared {

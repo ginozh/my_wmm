@@ -32,8 +32,9 @@ extern "C" {
 }
 using namespace Microsoft::WRL; //ComPtr
 #include "directx/SurfaceInteropD3D11.h"
-#include "utils/Logger.h"
+// #include "utils/Logger.h"
 #include <sys/time.h> //storm
+#include <QDebug> //storm
 // define __mingw_uuidof
 #ifdef __CRT_UUID_DECL
 __CRT_UUID_DECL(ID3D11VideoContext,0x61F21C45,0x3C0E,0x4a74,0x9C,0xEA,0x67,0x10,0x0D,0x9A,0xD5,0xE4)
@@ -42,7 +43,6 @@ __CRT_UUID_DECL(ID3D11VideoDevice,0x10EC4D5B,0x975A,0x4689,0xB9,0xE4,0xD0,0xAA,0
 
 namespace QtAV {
 static QString sD3D11Description;
-
 struct dxgi_fcc {
     int fourcc;
     DXGI_FORMAT dxgi;
