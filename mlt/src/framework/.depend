@@ -1,0 +1,81 @@
+mlt_frame.o: mlt_frame.c mlt_frame.h mlt_properties.h mlt_types.h \
+ mlt_pool.h mlt_events.h mlt_deque.h mlt_service.h mlt_producer.h \
+ mlt_filter.h mlt_profile.h mlt_factory.h mlt_repository.h mlt_log.h
+mlt_version.o: mlt_version.c mlt_version.h
+mlt_geometry.o: mlt_geometry.c mlt_geometry.h mlt_types.h mlt_pool.h \
+ mlt_tokeniser.h mlt_factory.h mlt_profile.h mlt_repository.h
+mlt_deque.o: mlt_deque.c mlt_deque.h mlt_types.h mlt_pool.h
+mlt_property.o: mlt_property.c mlt_property.h mlt_types.h mlt_pool.h \
+ mlt_animation.h
+mlt_properties.o: mlt_properties.c mlt_properties.h mlt_types.h \
+ mlt_pool.h mlt_events.h mlt_property.h mlt_deque.h mlt_log.h \
+ mlt_factory.h mlt_profile.h mlt_repository.h
+mlt_events.o: mlt_events.c mlt_properties.h mlt_types.h mlt_pool.h \
+ mlt_events.h
+mlt_parser.o: mlt_parser.c mlt.h mlt_animation.h mlt_types.h mlt_pool.h \
+ mlt_property.h mlt_factory.h mlt_profile.h mlt_repository.h mlt_frame.h \
+ mlt_properties.h mlt_events.h mlt_deque.h mlt_service.h mlt_multitrack.h \
+ mlt_producer.h mlt_filter.h mlt_transition.h mlt_consumer.h \
+ mlt_playlist.h mlt_field.h mlt_tractor.h mlt_tokeniser.h mlt_parser.h \
+ mlt_geometry.h mlt_log.h mlt_cache.h mlt_version.h mlt_slices.h
+mlt_service.o: mlt_service.c mlt_service.h mlt_properties.h mlt_types.h \
+ mlt_pool.h mlt_events.h mlt_filter.h mlt_frame.h mlt_deque.h mlt_cache.h \
+ mlt_factory.h mlt_profile.h mlt_repository.h mlt_log.h mlt_producer.h
+mlt_producer.o: mlt_producer.c mlt_producer.h mlt_service.h \
+ mlt_properties.h mlt_types.h mlt_pool.h mlt_events.h mlt_filter.h \
+ mlt_profile.h mlt_factory.h mlt_repository.h mlt_frame.h mlt_deque.h \
+ mlt_parser.h mlt_log.h
+mlt_multitrack.o: mlt_multitrack.c mlt_multitrack.h mlt_producer.h \
+ mlt_service.h mlt_properties.h mlt_types.h mlt_pool.h mlt_events.h \
+ mlt_filter.h mlt_profile.h mlt_playlist.h mlt_frame.h mlt_deque.h \
+ mlt_factory.h mlt_repository.h mlt_cache.h
+mlt_playlist.o: mlt_playlist.c mlt_playlist.h mlt_producer.h \
+ mlt_service.h mlt_properties.h mlt_types.h mlt_pool.h mlt_events.h \
+ mlt_filter.h mlt_profile.h mlt_tractor.h mlt_multitrack.h mlt_field.h \
+ mlt_frame.h mlt_deque.h mlt_transition.h
+mlt_consumer.o: mlt_consumer.c mlt_consumer.h mlt_service.h \
+ mlt_properties.h mlt_types.h mlt_pool.h mlt_events.h mlt_factory.h \
+ mlt_profile.h mlt_repository.h mlt_producer.h mlt_filter.h mlt_frame.h \
+ mlt_deque.h mlt_log.h
+mlt_filter.o: mlt_filter.c mlt_filter.h mlt_service.h mlt_properties.h \
+ mlt_types.h mlt_pool.h mlt_events.h mlt_frame.h mlt_deque.h \
+ mlt_producer.h mlt_profile.h
+mlt_transition.o: mlt_transition.c mlt_transition.h mlt_service.h \
+ mlt_properties.h mlt_types.h mlt_pool.h mlt_events.h mlt_frame.h \
+ mlt_deque.h mlt_log.h mlt_producer.h mlt_filter.h mlt_profile.h
+mlt_field.o: mlt_field.c mlt_field.h mlt_types.h mlt_pool.h mlt_service.h \
+ mlt_properties.h mlt_events.h mlt_filter.h mlt_transition.h \
+ mlt_multitrack.h mlt_producer.h mlt_profile.h mlt_tractor.h
+mlt_tractor.o: mlt_tractor.c mlt_tractor.h mlt_producer.h mlt_service.h \
+ mlt_properties.h mlt_types.h mlt_pool.h mlt_events.h mlt_filter.h \
+ mlt_profile.h mlt_frame.h mlt_deque.h mlt_multitrack.h mlt_field.h \
+ mlt_log.h mlt_transition.h
+mlt_factory.o: mlt_factory.c mlt.h mlt_animation.h mlt_types.h mlt_pool.h \
+ mlt_property.h mlt_factory.h mlt_profile.h mlt_repository.h mlt_frame.h \
+ mlt_properties.h mlt_events.h mlt_deque.h mlt_service.h mlt_multitrack.h \
+ mlt_producer.h mlt_filter.h mlt_transition.h mlt_consumer.h \
+ mlt_playlist.h mlt_field.h mlt_tractor.h mlt_tokeniser.h mlt_parser.h \
+ mlt_geometry.h mlt_log.h mlt_cache.h mlt_version.h mlt_slices.h
+mlt_repository.o: mlt_repository.c mlt_repository.h mlt_types.h \
+ mlt_pool.h mlt_profile.h mlt_properties.h mlt_events.h mlt_tokeniser.h \
+ mlt_log.h mlt_factory.h
+mlt_pool.o: mlt_pool.c mlt_properties.h mlt_types.h mlt_pool.h \
+ mlt_events.h mlt_deque.h mlt_log.h
+mlt_tokeniser.o: mlt_tokeniser.c mlt_tokeniser.h
+mlt_profile.o: mlt_profile.c mlt.h mlt_animation.h mlt_types.h mlt_pool.h \
+ mlt_property.h mlt_factory.h mlt_profile.h mlt_repository.h mlt_frame.h \
+ mlt_properties.h mlt_events.h mlt_deque.h mlt_service.h mlt_multitrack.h \
+ mlt_producer.h mlt_filter.h mlt_transition.h mlt_consumer.h \
+ mlt_playlist.h mlt_field.h mlt_tractor.h mlt_tokeniser.h mlt_parser.h \
+ mlt_geometry.h mlt_log.h mlt_cache.h mlt_version.h mlt_slices.h
+mlt_log.o: mlt_log.c mlt_log.h mlt_service.h mlt_properties.h mlt_types.h \
+ mlt_pool.h mlt_events.h
+mlt_cache.o: mlt_cache.c mlt_types.h mlt_pool.h mlt_log.h \
+ mlt_properties.h mlt_events.h mlt_cache.h mlt_frame.h mlt_deque.h \
+ mlt_service.h
+mlt_animation.o: mlt_animation.c mlt_animation.h mlt_types.h mlt_pool.h \
+ mlt_property.h mlt_tokeniser.h mlt_profile.h mlt_factory.h \
+ mlt_repository.h mlt_properties.h mlt_events.h
+mlt_slices.o: mlt_slices.c mlt_slices.h mlt_types.h mlt_pool.h \
+ mlt_properties.h mlt_events.h mlt_log.h mlt_factory.h mlt_profile.h \
+ mlt_repository.h

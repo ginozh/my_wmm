@@ -1,0 +1,484 @@
+一、研究代码
+./ffmpeg_g -y -i 1.MPG -c:v libx264 -c:a aac -b:v 350k -r 30  -debug_ts ffmpeg.mp4
+#video and audio d=3 (3 seconds)
+./ffmpeg_g -y -f lavfi -i nullsrc=s=1334x750:r=30 -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=48000 -frames:v 90 -c:v libx264 -b:v 3500k color.mkv
+#just video d=3 (3 seconds)
+./ffmpeg_g -y -f lavfi -i nullsrc=s=1334x750:r=30 -c:v libx264 -b:v 3500k -debug_ts -frames:v 90 -r 29.97 color.mkv
+
+OutputStream **output_streams = NULL;
+int         nb_output_streams = 0;
+OutputFile   **output_files   = NULL;
+int         nb_output_files   = 0;
+
+// 输出跟输入有关联的: attention
+// fftools/ffmpeg.c
+int main(int argc, char **argv)
+    avcodec_register_all(); 
+    //...
+
+    /* parse options and open all input/output files */
+    ret = ffmpeg_parse_options(argc, argv);
+    // fftools/ffmpeg_opt.c
+    ->int ffmpeg_parse_options(int argc, char **argv)
+        /* split the commandline into an internal representation */
+        ret = split_commandline(&octx, argc, argv, options, groups,
+                                FF_ARRAY_ELEMS(groups));
+        /* apply global options */
+        ret = parse_optgroup(NULL, &octx.global_opts);
+        /* configure terminal and setup signal handlers */
+        term_init();
+        /* open input files */
+        ret = open_files(&octx.groups[GROUP_INFILE], "input", open_input_file);
+        /* create the complex filtergraphs */
+        ret = init_complex_filters();
+        /* open output files */
+        ret = open_files(&octx.groups[GROUP_OUTFILE], "output", open_output_file);
+        => static int open_files(OptionGroupList *l, const char *inout, int (*open_file)(OptionsContext*, const char*))
+            open_output_file(o=0x7fffffffe410, filename=0x7fffffffed23 "ffmpeg.mp4");
+            => static int open_output_file(OptionsContext *o, const char *filename)
+                AVFormatContext *oc;
+                OutputFile *of;
+                GROW_ARRAY(output_files, nb_output_files);
+                of = av_mallocz(sizeof(*of));
+                of->start_time     = o->start_time;
+                // {ctx = 0x5555557e3980, opts = 0x0, ost_index = 0, recording_time = 9223372036854775807, start_time = -9223372036854775808, limit_filesize = 18446744073709551615, shortest = 0, header_written = 0}
+                err = avformat_alloc_output_context2(&oc, NULL, o->format, filename);
+                of->ctx = oc;
+                if (!o->video_disable && av_guess_codec(oc->oformat, NULL, filename, NULL, AVMEDIA_TYPE_VIDEO) != AV_CODEC_ID_NONE) 
+                    int area = 0, idx = -1;
+                    int qcr = avformat_query_codec(oc->oformat, oc->oformat->video_codec, 0);
+                    for (i = 0; i < nb_input_streams; i++)  //attention
+                        idx = i;
+                    if (idx >= 0) 
+                        new_video_stream (o=0x7fffffffe410, oc=0x5555579aa6c0, source_index=1)
+                        => static OutputStream *new_video_stream(OptionsContext *o, AVFormatContext *oc, int source_index)
+                            OutputStream *ost;
+                            ost = new_output_stream(o, oc, AVMEDIA_TYPE_VIDEO, source_index);
+                            // new_output_stream (o=0x7fffffffddd0, oc=0x5555557e3980, type=AVMEDIA_TYPE_VIDEO, source_index=0)
+                            => static OutputStream *new_output_stream(OptionsContext *o, AVFormatContext *oc, enum AVMediaType type, int source_index)
+                                OutputStream *ost;
+                                AVStream *st = avformat_new_stream(oc, NULL);
+                                int idx      = oc->nb_streams - 1, ret = 0;
+                                GROW_ARRAY(output_streams, nb_output_streams);
+                                ost = av_mallocz(sizeof(*ost));
+                                output_streams[nb_output_streams - 1] = ost;
+                                ost->file_index = nb_output_files - 1;
+                                ost->index      = idx;
+                                ost->st         = st;
+                                st->codecpar->codec_type = type;
+                                ret = choose_encoder(o, oc, ost);
+                                =>static int choose_encoder(OptionsContext *o, AVFormatContext *s, OutputStream *ost)
+                                    char *codec_name = NULL;
+                                    if (type == AVMEDIA_TYPE_VIDEO || type == AVMEDIA_TYPE_AUDIO || type == AVMEDIA_TYPE_SUBTITLE) {
+                                        MATCH_PER_STREAM_OPT(codec_names, str, codec_name, s, ost->st);
+
+                                ost->enc_ctx = avcodec_alloc_context3(ost->enc);
+                                // OutputStream* ost ={file_index = 0, index = 0, st = 0x5555557e4580 AVStream*, encoding_needed = 1,enc_ctx = 0x5555557e5500(AVCodecContext*) ,enc = 0x7ffff68d7980 AVCodec *<ff_libx264_encoder>}
+                                ost->enc_ctx->codec_type = type;
+                                ost->ref_par = avcodec_parameters_alloc();
+                                ost->encoder_opts  = filter_codec_opts(o->g->codec_opts, ost->enc->id, oc, st, ost->enc);
+                                MATCH_PER_STREAM_OPT(presets, str, preset, oc, st);
+                                if (preset && (!(ret = get_preset_file_2(preset, ost->enc->name, &s))))  // false
+                                MATCH_PER_STREAM_OPT(time_bases, str, time_base, oc, st);
+                                if (time_base) // false
+                                MATCH_PER_STREAM_OPT(enc_time_bases, str, time_base, oc, st);
+                                if (time_base) // false
+                                ost->max_frames = INT64_MAX;
+                                MATCH_PER_STREAM_OPT(max_frames, i64, ost->max_frames, oc, st);
+                                for (i = 0; i<o->nb_max_frames; i++) // o->nb_max_frames=1
+                                MATCH_PER_STREAM_OPT(bitstream_filters, str, bsfs, oc, st);
+                                while (bsfs && *bsfs) // false
+                                MATCH_PER_STREAM_OPT(codec_tags, str, codec_tag, oc, st);
+                                if (codec_tag) // false
+                                MATCH_PER_STREAM_OPT(qscale, dbl, qscale, oc, st);
+                                if (qscale >= 0)  //false
+                                ...;
+                                if (oc->oformat->flags & AVFMT_GLOBALHEADER) //true
+                                    ost->enc_ctx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER; 
+                                ost->sws_dict, ost->swr_opts, ost->resample_opts, ost->resample_opts;
+                                if (source_index >= 0 && !modffmpeg) { //true // attention
+                                    ost->sync_ist = input_streams[source_index];
+                                    input_streams[source_index]->discard = 0;
+                                    input_streams[source_index]->st->discard = input_streams[source_index]->user_set_discard;
+                                }
+                                ost->muxing_queue = av_fifo_alloc(8 * sizeof(AVPacket));
+                            // end new_output_stream
+                            // 计算给定的导出fps
+                            MATCH_PER_STREAM_OPT(frame_rates, str, frame_rate, oc, st);
+                            if (frame_rate && av_parse_video_rate(&ost->frame_rate, frame_rate) < 0) 
+                            MATCH_PER_STREAM_OPT(frame_aspect_ratios, str, frame_aspect_ratio, oc, st);
+                            if (frame_aspect_ratio) // false
+                            if (!ost->stream_copy) // true
+                                video_enc->bits_per_raw_sample = frame_bits_per_raw_sample; //0
+                                ost->avfilter = get_ost_filters(o, oc, ost);
+                            if (ost->stream_copy) //false
+                                check_streamcopy_filters(o, oc, ost, AVMEDIA_TYPE_VIDEO);
+                        // end new_video_stream
+                    // end if idx>=0
+                // end if (!o->video_disable
+                if (!o->audio_disable && av_guess_codec(oc->oformat, NULL, filename, NULL, AVMEDIA_TYPE_AUDIO) != AV_CODEC_ID_NONE) // true
+                    int best_score = 0, idx = -1;
+                    for (i = 0; i < nb_input_streams; i++) // attention
+                        if (ist->st->codecpar->codec_type == AVMEDIA_TYPE_AUDIO && score > best_score)//false
+                            best_score = score;
+                            idx = i;
+                    if (idx >= 0) //false
+                        new_audio_stream(o, oc, idx);
+                /* subtitles: pick first */
+                MATCH_PER_TYPE_OPT(codec_names, str, subtitle_codec_name, oc, "s");
+                if (!o->subtitle_disable && (avcodec_find_encoder(oc->oformat->subtitle_codec) || subtitle_codec_name)) // true
+                    for (i = 0; i < nb_input_streams; i++)
+                        if (input_streams[i]->st->codecpar->codec_type == AVMEDIA_TYPE_SUBTITLE) //false
+                /* Data only if codec id match */
+                if (!o->data_disable ) // true
+                    enum AVCodecID codec_id = av_guess_codec(oc->oformat, NULL, filename, NULL, AVMEDIA_TYPE_DATA);
+                    for (i = 0; codec_id != AV_CODEC_ID_NONE && i < nb_input_streams; i++) //false
+
+                /* handle attached files */
+                for (i = 0; i < o->nb_attachments; i++) //false
+
+                for (i = nb_output_streams - oc->nb_streams; i < nb_output_streams; i++) { //for all streams of this output file
+                    AVDictionaryEntry *e;
+                    ost = output_streams[i];
+
+                    if ((ost->stream_copy || ost->attachment_filename) //false
+
+                if (!oc->nb_streams && !(oc->oformat->flags & AVFMT_NOSTREAMS)) //false
+
+                /* check if all codec options have been used */
+
+                while ((e = av_dict_get(unused_opts, "", e, AV_DICT_IGNORE_SUFFIX))) //false
+
+                /* set the decoding_needed flags and create simple filtergraphs */
+                for (i = of->ost_index; i < nb_output_streams; i++) // true // attention
+                    if (ost->encoding_needed && ost->source_index >= 0) //true
+                        InputStream *ist = input_streams[ost->source_index];
+                        err = init_simple_filtergraph(ist, ost);
+
+                    /* set the filter output constraints */
+                    if (ost->filter) // true 
+                        OutputFilter *f = ost->filter;
+                        int count;
+                        switch (ost->enc_ctx->codec_type) {
+                        case AVMEDIA_TYPE_VIDEO:
+                            f->frame_rate = ost->frame_rate;
+                            f->width      = ost->enc_ctx->width;
+                            f->height     = ost->enc_ctx->height;
+                            
+                /* check filename in case of an image number is expected */
+                if (oc->oformat->flags & AVFMT_NEEDNUMBER) // false
+
+                if (!(oc->oformat->flags & AVFMT_NOFILE)) // true
+                    // important
+                    if ((err = avio_open2(&oc->pb, filename, AVIO_FLAG_WRITE,
+                                          &oc->interrupt_callback,
+                                          &of->opts)) < 0) 
+    
+                oc->max_delay = (int)(o->mux_max_delay * AV_TIME_BASE);
+                /* copy metadata */
+                for (i = 0; i < o->nb_metadata_map; i++) // false
+
+                /* copy chapters */
+                if (o->chapters_input_file >= nb_input_files) // true //no content //attention
+
+                /* copy global metadata by default */
+                if (!o->metadata_global_manual && nb_input_files) // true
+
+                if (!o->metadata_streams_manual) // true // attention // can remove
+                    for (i = of->ost_index; i < nb_output_streams; i++) 
+                        InputStream *ist;
+
+                /* process manually set programs */
+                for (i = 0; i < o->nb_program; i++) // false
+
+                /* process manually set metadata */
+                for (i = 0; i < o->nb_metadata; i++) // false
+            // end open_output_file
+        // end open_files
+
+        check_filter_outputs();
+        // fftools/ffmpeg_filter.c
+        => void check_filter_outputs(void) //支持查看是否正确
+        for (i = 0; i < nb_filtergraphs; i++) // nb_filtergraphs=1. see init_simple_filtergraph
+            for (n = 0; n < filtergraphs[i]->nb_outputs; n++) 
+                OutputFilter *output = filtergraphs[i]->outputs[n];
+                if (!output->ost) //false
+            
+        uninit_parse_context(&octx);
+    // end ffmpeg_parse_options
+
+    for (i = 0; i < nb_output_files; i++) {
+        if (strcmp(output_files[i]->ctx->oformat->name, "rtp"))
+            want_sdp = 0;
+    }
+
+    if (transcode() < 0)
+    //fftools/ffmpeg.c  4789
+    // main loop
+    static int transcode(void)
+        AVFormatContext *os;
+        OutputStream *ost;
+        InputStream *ist;
+
+        for (i = 0; i < nb_output_files; i++) {
+            AVFormatContext* ctx_input = (input_files && input_files[0]) ? input_files[0]->ctx : NULL;
+            AVFormatContext* ctx_output = output_files[i]->ctx;
+            if (ctx_input && ctx_input->duration != AV_NOPTS_VALUE &&
+                (!strcmp(ctx_output->oformat->name, "matroska") ||
+                 !strcmp(ctx_output->oformat->name, "segment"))) // false
+
+        //1, 初始化
+        ret = transcode_init();
+        ->static int transcode_init(void)
+            //filter . skip
+            for (i = 0; i < nb_filtergraphs; i++) {
+                FilterGraph *fg = filtergraphs[i];
+                for (j = 0; j < fg->nb_outputs; j++) {
+                    OutputFilter *ofilter = fg->outputs[j];
+                    if (!ofilter->ost || ofilter->ost->source_index >= 0) //true
+                        continue;
+
+            /* init framerate emulation */ //skip
+            for (i = 0; i < nb_input_files; i++) {
+                InputFile *ifile = input_files[i];
+                if (ifile->rate_emu) //false
+                        input_streams[j + ifile->ist_index]->start = av_gettime_relative();
+
+            /* init input streams */
+            for (i = 0; i < nb_input_streams; i++)
+                if ((ret = init_input_stream(i, error, sizeof(error))) < 0)  // attention
+
+            /* open each encoder */ //skip
+            for (i = 0; i < nb_output_streams; i++) {
+                // skip streams fed from filtergraphs until we have a frame for them
+                if (output_streams[i]->filter) //true
+                    continue;
+                ret = init_output_stream(output_streams[i], error, sizeof(error)); 
+
+            /* discard unused programs */ //skip
+            for (i = 0; i < nb_input_files; i++) {
+                InputFile *ifile = input_files[i];
+                for (j = 0; j < ifile->ctx->nb_programs; j++) // false
+                        if (!input_streams[ifile->ist_index + p->stream_index[k]]->discard) {
+
+            /* write headers for files with no streams */ //skip
+            for (i = 0; i < nb_output_files; i++) {
+                oc = output_files[i]->ctx;
+                if (oc->oformat->flags & AVFMT_NOSTREAMS && oc->nb_streams == 0) // false
+                    ret = check_init_output_file(output_files[i], i);
+
+            /* dump the stream mapping */ //skip
+            av_log(NULL, AV_LOG_INFO, "Stream mapping:\n");
+            for (i = 0; i < nb_input_streams; i++) {
+                ist = input_streams[i];
+                for (j = 0; j < ist->nb_filters; j++) {
+                    if (!filtergraph_is_simple(ist->filters[j]->graph)) //false
+
+            for (i = 0; i < nb_output_streams; i++) 
+                ost = output_streams[i];
+//PLEX  //skip
+                AVCodecContext* codec = ost->st->codec;
+                if (codec && codec->codec_type == AVMEDIA_TYPE_VIDEO && codec->width && plexContext.progress_url) // false
+//PLEX
+                //skip
+                if (ost->attachment_filename) //false
+
+                if (ost->filter && !filtergraph_is_simple(ost->filter->graph)) //false
+
+                if (!ost->stream_copy) //true // for log . can skip
+                    av_log...
+            atomic_store(&transcode_init_done, 1);
+        //end transcode_init
+
+        //loop
+        while (!received_sigterm) 
+            ret = transcode_step();
+            ->static int transcode_step(void)
+                InputStream  *ist = NULL;
+                OutputStream *ost = choose_output();
+                if (!ost) // false
+
+                if (ost->filter && !ost->filter->graph->graph) 
+                    if (ifilter_has_all_input_formats(ost->filter->graph)) //false
+
+                if (ost->filter && ost->filter->graph->graph) // false
+                else if (ost->filter) //true
+                    for (i = 0; i < ost->filter->graph->nb_inputs; i++) {
+                        InputFilter *ifilter = ost->filter->graph->inputs[i];
+                        if (!ifilter->ist->got_output && !input_files[ifilter->ist->file_index]->eof_reached) {
+                            ist = ifilter->ist;
+                            break; //true
+                        }
+                    }
+
+                ret = process_input(ist->file_index);
+                => static int process_input(int file_index)
+                    InputFile *ifile = input_files[file_index];
+                    ret = get_input_packet(ifile, &pkt);
+                    //pkt: 
+                    {buf = 0x5555557e1e80, pts = 0, dts = 0, data = 0x7fffe2685010 "", size = 1382400, stream_index = 0, flags = 1, side_data = 0x0, side_data_elems = 0, duration = 1, pos = -1, convergence_duration = 0}
+                    if (ret == AVERROR(EAGAIN)) //false
+                    if (ret < 0 && ifile->loop) //false
+                    if (ret < 0) //false
+                    reset_eagain();
+                    if (do_pkt_dump) //false
+                    if (pkt.stream_index >= ifile->nb_streams) //false
+
+                    InputStream *ist = input_streams[ifile->ist_index + pkt.stream_index];
+                    ist->data_size += pkt.size;
+                    ist->nb_packets++;
+                    if (ist->discard) //false
+                    if (exit_on_error && (pkt.flags & AV_PKT_FLAG_CORRUPT)) //false
+                    av_log(NULL, AV_LOG_INFO, "demuxer -> ist_index:%d type:%s ");
+                    if(!ist->wrap_correction_done && is->start_time != AV_NOPTS_VALUE && ist->st->pts_wrap_bits < 64)//false
+                    /* add the stream-global side data to the first packet */
+                    if (ist->nb_packets == 1) // true
+                        for (i = 0; i < ist->st->nb_side_data; i++) //false
+                    // deal pkg.dts, pkg.pts, duration
+                    if ((ist->dec_ctx->codec_type == AVMEDIA_TYPE_VIDEO ||
+                                ist->dec_ctx->codec_type == AVMEDIA_TYPE_AUDIO) &&
+                            pkt_dts != AV_NOPTS_VALUE && ist->next_dts == AV_NOPTS_VALUE && !copy_ts
+                            && (is->iformat->flags & AVFMT_TS_DISCONT) && ifile->last_ts != AV_NOPTS_VALUE) //false
+                    duration = av_rescale_q(ifile->duration, ifile->time_base, ist->st->time_base);
+                    // deal pkt_dts,
+                    if (pkt.dts != AV_NOPTS_VALUE) //true
+                        ifile->last_ts = av_rescale_q(pkt.dts, ist->st->time_base, AV_TIME_BASE_Q);
+                    av_log(NULL, AV_LOG_INFO, "demuxer+ffmpeg -> ist_index");
+
+                    process_input_packet(ist, &pkt, 0);
+                    =>static int process_input_packet(InputStream *ist, const AVPacket *pkt, int no_eof)
+                        //deal ist->next_dts, ist->next_pts, 
+                // end process_input
+
+                return reap_filters(0);
+                ->static int reap_filters(int flush)
+                    AVFrame *filtered_frame = NULL;
+                    /* Reap all buffers present in the buffer sinks */
+                    for (i = 0; i < nb_output_streams; i++) {
+                        OutputStream *ost = output_streams[i];
+                        OutputFile    *of = output_files[ost->file_index];
+                        AVFilterContext *filter;
+                        AVCodecContext *enc = ost->enc_ctx;
+
+                        if (!ost->filter || !ost->filter->graph->graph)
+                            continue;
+                        filter = ost->filter->filter;
+                        ret = init_output_stream(ost, error, sizeof(error)); if (!ost->initialized);
+                        =>static int init_output_stream(OutputStream *ost, char *error, int error_len)
+                            AVCodec      *codec = ost->enc;
+                            ret = init_output_stream_encode(ost);
+                            // ost->enc_ctx width, height, sample_aspect_ratio,pix_fmt,framerate, 
+                            =>static int init_output_stream_encode(OutputStream *ost)
+                                InputStream *ist = get_input_stream(ost); // attention
+                                AVCodecContext *enc_ctx = ost->enc_ctx;
+                                AVCodecContext *dec_ctx = NULL;
+
+                                set_encoder_id(output_files[ost->file_index], ost);
+                                ost->st->disposition          = ist->st->disposition; //attention
+                                dec_ctx = ist->dec_ctx;
+                                enc_ctx->chroma_sample_location = dec_ctx->chroma_sample_location;
+                                if (enc_ctx->codec_type == AVMEDIA_TYPE_VIDEO) // no content
+                                // reduce frame rate for mpeg4 to be within the spec limits
+                                if (enc_ctx->codec_id == AV_CODEC_ID_MPEG4) 
+                                    av_reduce(&ost->frame_rate.num, &ost->frame_rate.den,
+                                            ost->frame_rate.num, ost->frame_rate.den, 65535);
+                                ....;
+                                ost->mux_timebase = enc_ctx->time_base;
+                            // end init_output_stream_encode
+                            if ((ist = get_input_stream(ost))) //true
+                                dec = ist->dec_ctx; //attention
+                            //AVHW
+                            if ((ret = avcodec_open2(ost->enc_ctx, codec, &ost->encoder_opts)) < 0) 
+                            ret = avcodec_parameters_from_context(ost->st->codecpar, ost->enc_ctx);
+                            ret = avcodec_copy_context(ost->st->codec, ost->enc_ctx);
+                            dst_data = av_stream_new_side_data(ost->st, sd_src->type, sd_src->size);
+                            if (ist) //true skip
+                                for (i = 0; i < ist->st->nb_side_data; i++) //false
+                            if (ost->st->time_base.num <= 0 || ost->st->time_base.den <= 0)
+                                ost->st->time_base = av_add_q(ost->enc_ctx->time_base, (AVRational){0, 1});
+                            if (ost->st->duration <= 0 && ist && ist->st->duration > 0) //false skip
+                                ost->st->duration = av_rescale_q(ist->st->duration, ist->st->time_base, ost->st->time_base);
+                            ost->st->codec->codec= ost->enc_ctx->codec;
+
+                            ret = init_output_bsfs(ost); //no content
+
+                            ost->initialized = 1;
+
+                            // 写文件头
+                            ret = check_init_output_file(output_files[ost->file_index], ost->file_index);
+                            =>static int check_init_output_file(OutputFile *of, int file_index)
+                                ret = avformat_write_header(of->ctx, &of->opts);
+                                of->header_written = 1;
+                                av_dump_format(of->ctx, file_index, of->ctx->url, 1); // important
+                                =>void av_dump_format(AVFormatContext *ic, int index, const char *url, int is_output)
+                                    dump_stream_format(ic, i, index, is_output);
+                                    =>static void dump_stream_format(AVFormatContext *ic, int i, int index, int is_output)
+                                        AVStream *st = ic->streams[i];
+                                        if (fps)
+                                            print_fps(av_q2d(st->avg_frame_rate), tbr || tbn || tbc ? "fps, " : "fps");
+                                        if (tbr)
+                                            print_fps(av_q2d(st->r_frame_rate), tbn || tbc ? "tbr, " : "tbr");
+                                        if (tbn)
+                                            print_fps(1 / av_q2d(st->time_base), tbc ? "tbn, " : "tbn");
+                                        if (tbc)
+                                            print_fps(1 / av_q2d(st->codec->time_base), "tbc");
+                            
+                        // end init_output_stream
+
+                        ost->filtered_frame && !(ost->filtered_frame = av_frame_alloc()));
+                        while (1) 
+                            ret = av_buffersink_get_frame_flags(filter, filtered_frame,
+                                                               AV_BUFFERSINK_FLAG_NO_REQUEST);
+                // end reap_filters
+            // end transcode_step
+
+        // end while loop
+            
+        flush_encoders();
+
+        /* write the trailer if needed and close file */
+        for (i = 0; i < nb_output_files; i++) {
+            if ((ret = av_write_trailer(os)) < 0) {
+        }
+
+        /* close each encoder */
+
+        /* close each decoder */
+
+        /* finished ! */
+        ret = 0;
+
+二、取代码
+线程
+0, 设置do_video_out、do_audio_out中修改frame中data数据的回调函数
+1, 提供初始化工作函数: ffmpeg 必须要有输入才能有后面的操作, 所以音频、视频都给一个空的
+input, output, filter
+2, do_video_out函数中回调函数，只替换掉next_picture中的data部分，当然首先format需要保证一致
+回调函数wait图像数据
+
+变形
+libavfilter/vf_scale.c  416
+static int filter_frame(AVFilterLink *link, AVFrame *in)
+    out = ff_get_video_buffer(outlink, outlink->w, outlink->h); //1280*720 => 1334x750
+    if (   scale->in_color_matrix
+        || scale->out_color_matrix
+        || scale-> in_range != AVCOL_RANGE_UNSPECIFIED
+        || in_range != AVCOL_RANGE_UNSPECIFIED
+        || scale->out_range != AVCOL_RANGE_UNSPECIFIED) {
+        int in_full, out_full, brightness, contrast, saturation;
+        const int *inv_table, *table;
+
+        sws_getColorspaceDetails(scale->sws, (int **)&inv_table, &in_full,
+                                 (int **)&table, &out_full,
+                                 &brightness, &contrast, &saturation);
+        sws_setColorspaceDetails(scale->sws, inv_table, in_full,
+                                 table, out_full,
+                                 brightness, contrast, saturation);
+        out->color_range = out_full ? AVCOL_RANGE_JPEG : AVCOL_RANGE_MPEG; //AVCOL_RANGE_MPEG
+            table = inv_table;
+        //copy data
+        scale_slice(link, out, in, scale->sws, 0, link->h, 1, 0);
+
+
+其它:
+exit_program: 出错处理

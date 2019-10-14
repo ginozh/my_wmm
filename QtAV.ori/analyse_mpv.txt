@@ -1,0 +1,531 @@
+一、mpv研究
+1, gdb
+gdb --args mpv --vo=gpu --hwdec=yes /d/qtproject/movies/Wildlife.wmv
+set breakpoint pending on; # 无回答yes no的问题
+b wmain
+r
+
+2, log
+static enum AVPixelFormat get_format_hwdec(struct AVCodecContext *avctx,                                                         
+                                             const enum AVPixelFormat *fmt)
+video/decode/vd_lavc.c  836
+P: Requesting pixfmt 'dxva2_vld' from decoder.
+
+static bool receive_frame(struct dec_video *vd, struct mp_image **out_image)
+video/decode/vd_lavc.c  1106
+P: Using hardware decoding (dxva2)
+
+3, 代码分析
+3.1, receive_frame
+// osdep/main-fn-win.c
+int wmain(int argc, wchar_t *argv[])
+    int ret = mpv_main(argv_len - 1, argv_u8);
+    // player/main.c
+    =>int mpv_main(int argc, char *argv[])
+        struct MPContext *mpctx = mp_create();
+        int r = mp_initialize(mpctx, options);
+        mp_play_files(mpctx);
+        // player/loadfile.c
+        => void mp_play_files(struct MPContext *mpctx)
+            prepare_playlist(mpctx, mpctx->playlist);
+            for (;;) 
+            play_current_file(mpctx);
+            => static void play_current_file(struct MPContext *mpctx)
+                // init
+                mpctx->error_playing = MPV_ERROR_LOADING_FAILED;
+                mpctx->stop_play = 0;
+                mpctx->filename = NULL;
+                ...
+                mpctx->filename = talloc_strdup(NULL, mpctx->playing->filename);
+                ...
+                MP_INFO(mpctx, "Playing: %s\n", mpctx->filename);
+                // open
+                open_demux_reentrant(mpctx);
+                // playback
+                MP_VERBOSE(mpctx, "Starting playback...\n");
+                ...
+                while (!mpctx->stop_play)
+                run_playloop(mpctx);
+                // player/playloop.c
+                => void run_playloop(struct MPContext *mpctx)
+                    write_video(mpctx);
+                    // player/video.c
+                    => void write_video(struct MPContext *mpctx)
+                        struct vo *vo = mpctx->vo_chain->vo;
+                        int r = video_output_image(mpctx);
+                        // Fill mpctx->next_frames[] with a newly filtered or decoded image.
+                        // returns VD_* code
+                        // player/video.c
+                        => static int video_output_image(struct MPContext *mpctx)
+                            // Filter a new frame.
+                            r = video_decode_and_filter(mpctx);
+                            => static int video_decode_and_filter(struct MPContext *mpctx)
+                                // Decode a new image, or at least feed the decoder a packet.
+                                r = decode_image(mpctx);
+                                // Read a packet, store decoded image into d_video->waiting_decoded_mpi
+                                // returns VD_* code 
+                                => static int decode_image(struct MPContext *mpctx)
+                                    struct vo_chain *vo_c = mpctx->vo_chain; 
+                                    struct dec_video *d_video = vo_c->video_src;
+                                    video_work(d_video);
+                                    // video/decode/dec_video.c
+                                    => void video_work(struct dec_video *d_video)
+                                        send_packet(d_video, d_video->packet));
+                                        // video/decode/vd_lavc.c
+                                        => static bool send_packet(struct dec_video *vd, struct demux_packet *pkt)
+                                            do_send_packet(vd, ctx->requeue_packets[0]);
+                                            static bool send_packet(struct dec_video *vd, struct demux_packet *pkt)
+                                                return do_send_packet(vd, pkt);
+                                                =>static bool do_send_packet(struct dec_video *vd, struct demux_packet *pkt)
+                                                    AVPacket avpkt;
+                                                    mp_set_av_packet(&avpkt, pkt, &ctx->codec_timebase);
+                                                    int ret = avcodec_send_packet(avctx, pkt ? &avpkt : NULL); //ffmpeg
+                                        // end send_packet
+                                        bool progress = receive_frame(d_video, &d_video->current_mpi);
+                                        // video/decode/dec_video.c
+                                        =>static bool receive_frame(struct dec_video *d_video, struct mp_image **out_image)
+                                            struct mp_image *mpi = NULL;
+                                            bool progress = d_video->vd_driver->receive_frame(d_video, &mpi);
+                                            // video/decode/vd_lavc.c
+                                            => static bool receive_frame(struct dec_video *vd, struct mp_image **out_image)
+                                                bool progress = decode_frame(vd);
+                                                // Returns whether decoder is still active (!EOF state).
+                                                => static bool decode_frame(struct dec_video *vd)
+                                                    vd_ffmpeg_ctx *ctx = vd->priv;
+                                                    AVCodecContext *avctx = ctx->avctx;
+                                                    int ret = avcodec_receive_frame(avctx, ctx->pic); //ffmpeg
+                                                    AVFrameSideData *sd = NULL;
+                                                    sd = av_frame_get_side_data(ctx->pic, AV_FRAME_DATA_A53_CC);
+                                                    struct mp_image *mpi = mp_image_from_av_frame(ctx->pic);
+                                                    // video/mp_image.c
+                                                    // Create a new mp_image reference to av_frame.
+                                                    => struct mp_image *mp_image_from_av_frame(struct AVFrame *src)
+
+                                                    MP_TARRAY_APPEND(ctx, ctx->delay_queue, ctx->num_delay_queue, mpi); //mpi加入到delay_queue
+                                                if (ctx->hwdec_failed) 
+                                                    // Failed hardware decoding? Try again in software.
+                                                struct mp_image *res = ctx->delay_queue[0];
+                                                res = res ? mp_img_swap_to_native(res) : NULL;
+                                                struct mp_image *sw = mp_image_hw_download(res, ctx->hwdec_swpool);
+                                                // video/mp_image_pool.c
+                                                // Copies the contents of the HW surface img to system memory and retuns it.
+                                                // If swpool is not NULL, it's used to allocate the target image.
+                                                // img must be a hw surface with a AVHWFramesContext attached.
+                                                // The returned image is cropped as needed.
+                                                // Returns NULL on failure.
+                                                => struct mp_image *mp_image_hw_download(struct mp_image *src,
+                                                                                      struct mp_image_pool *swpool)
+                                                    AVHWFramesContext *fctx = (void *)src->hwctx->data;
+                                                    // Try to find the first format which we can apparently use.
+                                                    enum AVPixelFormat *fmts;
+                                                    struct mp_image *dst = mp_image_pool_get(swpool, imgfmt, fctx->width, fctx->height);
+                                                    // Target image must be writable, so unref it.
+                                                    AVFrame *dstav = mp_image_to_av_frame_and_unref(dst);
+                                                    AVFrame *srcav = mp_image_to_av_frame(src);
+                                                    int res = av_hwframe_transfer_data(dstav, srcav, 0);
+                                                    return dst;
+                                                mp_image_unrefp(&res);
+                                                res = sw;
+                                                *out_image = res;
+                                                ctx->hwdec_notified = true;
+                                            *out_image = mpi;
+                                        // end receive_frame
+                                    // end video_work
+                                    res = video_get_frame(d_video, &vo_c->input_mpi);
+                            struct mp_image *img = vf_read_output_frame(vo_c->vf);
+                            add_new_frame(mpctx, img);
+                            // Queue a frame to mpctx->next_frames[]. Call only if needs_new_frame() signals ok.
+                            => static void add_new_frame(struct MPContext *mpctx, struct mp_image *frame)
+                                mpctx->next_frames[mpctx->num_next_frames++] = frame;
+                                if (mpctx->num_next_frames == 1)
+                                handle_new_frame(mpctx);
+                        // end video_output_image
+    struct mp_image_params p = mpctx->next_frames[0]->params;
+    const struct vo_driver *info = mpctx->video_out->driver; //  name = 0x593748 <defaults+72> "gpu" description = 0x59374c <defaults+76> "Shader-based GPU Renderer", draw_frame = 0x517449 <draw_frame>
+
+                        MP_INFO(mpctx, "VO: [%s] %dx%d%s %s%s\n",
+                                info->name, p.w, p.h, extra, mp_imgfmt_to_name(p.imgfmt), sfmt);
+                        update_subtitles(mpctx, mpctx->next_frames[0]->pts));
+                        shift_frames(mpctx);
+                        schedule_frame(mpctx, frame);
+                        vo_queue_frame(vo, frame);
+                        // video/out/vo.c
+                        // Direct the VO thread to put the currently queued image on the screen.
+                        // vo_is_ready_for_frame() must have returned true before this call.
+                        // Ownership of frame is handed to the vo.
+                        => void vo_queue_frame(struct vo *vo, struct vo_frame *frame)
+                            struct vo_internal *in = vo->in;
+                            pthread_mutex_lock(&in->lock);
+                            in->frame_queued = frame;
+                            wakeup_locked(vo);
+                            pthread_mutex_unlock(&in->lock);
+                        mpctx->video_status = STATUS_READY;
+                        // After a seek, make sure to wait until the first frame is visible.
+                        vo_wait_frame(vo);
+                    // end write_video
+                
+                // end run_playloop
+                MP_VERBOSE(mpctx, "EOF code: %d  \n", mpctx->stop_play);
+
+3.2 display thread
+// video/out/vo.c  993
+static void *vo_thread(void *ptr)
+    struct vo *vo = ptr;
+    struct vo_internal *in = vo->in;
+    while (1) {
+    mp_dispatch_queue_process(vo->in->dispatch, 0);
+    // misc/dispatch.c 255
+    => void mp_dispatch_queue_process(struct mp_dispatch_queue *queue, double timeout)
+        while (1) {
+        struct mp_dispatch_item *item = queue->head;
+        pthread_mutex_unlock(&queue->lock);
+
+        item->fn(item->fn_data);
+        // video/out/vo.c
+        => static void run_reconfig(void *p)
+            void **pp = p;
+            struct vo *vo = pp[0];
+            struct mp_image_params *params = pp[1];
+            *ret = vo->driver->reconfig(vo, vo->params);
+            // video/out/vo_gpu.c
+            => static int reconfig(struct vo *vo, struct mp_image_params *params)
+                resize(vo);
+                => static void resize(struct vo *vo)
+                    MP_VERBOSE(vo, "Resize: %dx%d\n", vo->dwidth, vo->dheight);
+                    MP_VERBOSE(p, "Reported display depth: %d\n", fb_depth);
+                //  Using FBO format rgba16.
+                gl_video_config(p->renderer, params);
+        
+        pthread_mutex_lock(&queue->lock);
+        }
+    // mp_dispatch_queue_process
+    vo->driver->control(vo, VOCTRL_CHECK_EVENTS, NULL);
+    working = vo_render_frame_external(vo);
+    => bool vo_render_frame_external(struct vo *vo)
+        struct vo_internal *in = vo->in;
+        struct vo_frame *frame = NULL;
+        pthread_mutex_lock(&in->lock);
+        in->current_frame = in->frame_queued;
+        frame = vo_frame_ref(in->current_frame);
+        vo->driver->draw_frame(vo, frame);
+        // video/out/vo_gpu.c
+        => static void draw_frame(struct vo *vo, struct vo_frame *frame)
+            struct gpu_priv *p = vo->priv;
+            struct ra_swapchain *sw = p->ctx->swapchain;
+            struct ra_fbo fbo;
+            sw->fns->start_frame(sw, &fbo);
+            // video/out/opengl/context.c
+            => bool ra_gl_ctx_start_frame(struct ra_swapchain *sw, struct ra_fbo *out_fbo)
+                gl_video_render_frame(p->renderer, frame, fbo);
+                // video/out/gpu/video.c
+                => void gl_video_render_frame(struct gl_video *p, struct vo_frame *frame, struct ra_fbo fbo)
+                    struct ra_fbo dest_fbo = fbo;
+                    pass_draw_to_screen(p, dest_fbo);
+                    => static void pass_draw_to_screen(struct gl_video *p, struct ra_fbo fbo)
+                        GLSLF("// transparency checkerboard\n");
+                        GLSL(bvec2 tile = lessThan(fract(gl_FragCoord.xy * 1.0/32.0), vec2(0.5));)
+                        GLSL(vec3 background = vec3(tile.x == tile.y ? 0.93 : 0.87);)
+                        GLSL(color.rgb += background.rgb * (1.0 - color.a);)
+                        GLSL(color.a = 1.0;)
+                        finish_pass_fbo(p, fbo, &p->dst_rect);
+                        =>static void finish_pass_fbo(struct gl_video *p, struct ra_fbo fbo, const struct mp_rect *dst)
+                            pass_record(p, render_pass_quad(p, fbo, dst));
+                // end gl_video_render_frame
+                sw->fns->submit_frame(sw, frame));
+                // video/out/opengl/context_angle.c
+                => static bool angle_submit_frame(struct ra_swapchain *sw, const struct vo_frame *frame)
+                    struct priv *p = sw->ctx->priv;
+                    bool ret = ra_gl_ctx_submit_frame(sw, frame); //glfinish
+                    ID3D11DeviceContext_Flush(p->d3d11_context);
+        // end draw_frame
+        vo->driver->flip_page(vo);
+        // video/out/vo_gpu.c  94
+        => static void flip_page(struct vo *vo)
+            struct gpu_priv *p = vo->priv;
+            struct ra_swapchain *sw = p->ctx->swapchain;
+            sw->fns->swap_buffers(sw);
+            // video/out/opengl/context.c  317
+            => void ra_gl_ctx_swap_buffers(struct ra_swapchain *sw)
+                struct priv *p = sw->priv;
+                GL *gl = p->gl;
+                p->params.swap_buffers(sw->ctx);
+                // video/out/opengl/context_angle.c  512
+                => static void angle_swap_buffers(struct ra_ctx *ctx)
+                    struct priv *p = ctx->priv;
+                    if (p->dxgi_swapchain)
+                    d3d11_swap_buffers(ctx);
+                    => static void d3d11_swap_buffers(struct ra_ctx *ctx)
+                        HRESULT hr = IDXGISwapChain_Present(p->dxgi_swapchain, p->swapinterval, 0);
+        
+
+
+    }
+                
+
+
+四、ffmpeg硬件解码示例代码
+问题在于: 使用dxva2接口，需要将图像数据从gpu传入到cpu，耗时过长
+解决方案：Use dxva2 surface to fill RGB IDirect3DSurface9 shared with opengl via DXRegisterObjectNV
+1, dxva2
+/c/shareproject/FFMPEG/ffmpeg-mf/doc/examples/hw_decode.c
+libavutil/hwcontext_dxva2.c
+
+D3D11 Vs DXVA2
+http://codecs.forumotion.net/t2694-d3d11-vs-dxva2
+
+2, 理解IDirect3DSurface9
+d3d中的Surface（2d）绘制
+https://www.cnblogs.com/resound/archive/2010/08/11/1797618.html
+
+Direct3D tutorial sample
+https://code.msdn.microsoft.com/windowsapps/Direct3D-Tutorial-Sample-08667fb0/view/SourceCode#content
+3, DXRegisterObjectNV
+4, 结合
+see mpv
+https://github.com/mpv-player/mpv/commit/2d1f42089c31cd3238129303b13e1aa5ddfcfce2
+
+4.1 video/out/opengl/common.c
+DEF_FN_NAME(DXSetResourceShareHandleNV, "wglDXSetResourceShareHandleNV")
+DEF_FN_NAME(DXRegisterObjectNV, "wglDXRegisterObjectNV")
+
+4.2 video/out/opengl/context_dxinterop.c
+// Register the share handle with WGL_NV_DX_interop. Nvidia does not
+// require the use of share handles, but Intel does.
+gl->DXSetResourceShareHandleNV(p->rtarget, share_handle);
+// Create the OpenGL-side texture
+gl->GenTextures(1, &p->texture);
+// Now share the rendertarget with OpenGL as a texture
+p->rtarget_h = gl->DXRegisterObjectNV(p->device_h, p->rtarget, p->texture, GL_TEXTURE_2D,
+    WGL_ACCESS_WRITE_DISCARD_NV);
+
+5, 其它参考
+5.1 游戏开发者: In windows hardware video decoding is implemented with DXVA2 or D3D11 Video acceleration and we use NV_DX_interop to share textures to OpenGL.
+https://software.intel.com/en-us/forums/graphics-driver-bug-reporting/topic/707697
+
+5.2 https://social.msdn.microsoft.com/Forums/zh-CN/799c4b93-bc9a-4982-878d-a9ad5608efc0/dxva2
+背景：
+1). 对4K高清视频的播放目前采用的方案是DXVA2 native硬解码+opengl glsl绘图。
+2). DXVA2 硬解码后数据不拷贝回cpu内存，直接传递给opengl绘图。
+问题：
+目前的方法中解码后数据因为IDirect3DSurface9_LockRect和IDirect3DSurface9_UnLockRect无法传递到该函数外部，只能在解码后立即调用opengl绘图。
+static int dxva2_retrieve_data(AVCodecContext *s, AVFrame *frame)
+
+先使用wglDXRegisterObjectNV2关联一张texture，再在解码后使用d3d11的CopySubresourceRegion将texture拷贝出来即可以open gl用另一个线程使用了。
+
+c# https://github.com/dwmkerr/sharpgl
+
+三、问题点
+1, mpv播放
+# ok: direct3d
+$ mpv --vo=direct3d /c/shareproject/Desktop/upan/qqrtx/QQ/Wildlife.wmv
+Playing: C:/shareproject/Desktop/upan/qqrtx/QQ/Wildlife.wmv
+ (+) Video --vid=1 (vc1 1280x720 29.970fps)
+ (+) Audio --aid=1 --alang=eng (wmav2 2ch 44100Hz)
+File tags:
+ Comment: Footage: Small World Productions, Inc; Tourism New Zealand | Producer: Gary F. Spradling | Music: Steve Ball
+ Title: Wildlife in HD
+AO: [wasapi] 48000Hz stereo 2ch float
+VO: [direct3d] 1280x720 yuv420p
+
+# no: gpu
+#mpv --vo=gpu --hwdec=yes -v --log-file=./logwmv.log /d/qtproject/movies/Wildlife.wmv
+HAVE_GL_DXINTEROP_D3D9 HAVE_D3D_HWACCEL HAVE_D3D9_HWACCEL
+ra_hwdec_dxva2gldx ra_hwdec_d3d11egl ra_hwdec_dxva2egl
+video/out/opengl/hwdec_dxva2gldx.c
+video/out/gpu/hwdec.c
+video/hwdec.c
+
+video/decode/vd_lavc.c
+avcodec_receive_frame
+// Copies the contents of the HW surface img to system memory and retuns it.
+// If swpool is not NULL, it's used to allocate the target image.
+// img must be a hw surface with a AVHWFramesContext attached.
+// The returned image is cropped as needed.
+// Returns NULL on failure.
+struct mp_image *mp_image_hw_download(struct mp_image *src,
+                                      struct mp_image_pool *swpool)
+
+$ mpv /c/shareproject/Desktop/upan/qqrtx/QQ/Wildlife.wmv
+Playing: C:/shareproject/Desktop/upan/qqrtx/QQ/Wildlife.wmv
+ (+) Video --vid=1 (vc1 1280x720 29.970fps)
+ (+) Audio --aid=1 --alang=eng (wmav2 2ch 44100Hz)
+File tags:
+ Comment: Footage: Small World Productions, Inc; Tourism New Zealand | Producer: Gary F. Spradling | Music: Steve Ball
+ Title: Wildlife in HD
+AO: [wasapi] 48000Hz stereo 2ch float
+VO: [gpu] 1280x720 yuv420p
+ERR: ensureInitialized(139): D3D compiler module not found.
+// video/out/opengl/ra_gl.c
+// gl->GetProgramInfoLog(program, log_length, NULL, logstr);
+// MP_MSG(ra, pri, "shader link log (status=%d): %s\n", status, logstr);
+[vo/gpu/opengl] shader link log (status=0): D3D compiler module not found.
+[vo/gpu/opengl]
+[vo/gpu/opengl] after rendering: OpenGL error OUT_OF_MEMORY.
+
+四、mpv gpu代码分析
+1, init
+// video/decode/vd_lavc.c
+static int init(struct dec_video *vd, const char *decoder)
+    vd_ffmpeg_ctx *ctx = vd->priv = talloc_zero(NULL, vd_ffmpeg_ctx);
+    reinit(vd);
+    =>static void reinit(struct dec_video *vd)
+        select_and_set_hwdec(vd);
+        // Select if and which hwdec to use. Also makes sure to get the decode device.
+        => static void select_and_set_hwdec(struct dec_video *vd)
+            init_avctx(vd);
+            => static void init_avctx(struct dec_video *vd)
+                vd_ffmpeg_ctx *ctx = vd->priv;
+                struct vd_lavc_params *lavc_param = vd->opts->vd_lavc_params;
+                struct mp_codec_params *c = vd->codec;
+                const AVCodec *lavc_codec = NULL;
+                if (ctx->use_hwdec) {
+                    lavc_codec = ctx->hwdec.codec;
+                } else {
+                    lavc_codec = avcodec_find_decoder_by_name(ctx->decoder);
+                }
+                ctx->avctx = avcodec_alloc_context3(lavc_codec);
+                ctx->pic = av_frame_alloc();
+                if (ctx->use_hwdec) 
+                avctx->opaque = vd;
+                avctx->thread_count = 1;
+                avctx->hwaccel_flags |= AV_HWACCEL_FLAG_IGNORE_LEVEL;
+                avctx->hw_device_ctx = av_buffer_ref(ctx->hwdec_dev);
+                avctx->get_format = get_format_hwdec;
+                ctx->max_delay_queue = HWDEC_DELAY_QUEUE_COUNT;
+                mp_set_avctx_codec_headers(avctx, c);
+                // .\common\av_common.c
+                // Set avctx codec headers for decoding. Returns <0 on failure.
+                => int mp_set_avctx_codec_headers(AVCodecContext *avctx, struct mp_codec_params *c)
+
+// video/decode/vd_lavc.c
+static bool receive_frame(struct dec_video *vd, struct mp_image **out_image)
+    vd_ffmpeg_ctx *ctx = vd->priv;
+    bool progress = decode_frame(vd);
+static bool decode_frame(struct dec_video *vd)
+    vd_ffmpeg_ctx *ctx = vd->priv;
+    AVCodecContext *avctx = ctx->avctx;
+    int ret = avcodec_receive_frame(avctx, ctx->pic);
+    struct mp_image *mpi = mp_image_from_av_frame(ctx->pic);
+    // video/mp_image.c
+    // Create a new mp_image reference to av_frame.
+    => struct mp_image *mp_image_from_av_frame(struct AVFrame *src)
+    // 入数组
+    MP_TARRAY_APPEND(ctx, ctx->delay_queue, ctx->num_delay_queue, mpi);
+
+五、ffmpeg代码分析
+5.1, gpu=cpu
+// doc/examples/hw_decode.c
+ret = avcodec_receive_frame(avctx, frame);
+/* retrieve data from GPU to CPU */
+ret = av_hwframe_transfer_data(sw_frame, frame, 0));
+// libavutil/hwcontext.c
+=> int av_hwframe_transfer_data(AVFrame *dst, const AVFrame *src, int flags)
+    ret = ctx->internal->hw_type->transfer_data_from(ctx, dst, src);
+    // libavutil/hwcontext_dxva2.c
+    =>static int dxva2_map_frame(AVHWFramesContext *ctx, AVFrame *dst, const AVFrame *src,
+                               int flags)
+        IDirect3DSurface9 *surface = (IDirect3DSurface9*)src->data[3];
+        DXVA2Mapping      *map;
+        D3DLOCKED_RECT     LockedRect;
+        hr = IDirect3DSurface9_GetDesc(surface, &surfaceDesc);
+        hr = IDirect3DSurface9_LockRect(surface, &LockedRect, NULL, lock_flags);
+        map = av_mallocz(sizeof(*map));
+        err = ff_hwframe_map_create(src->hw_frames_ctx, dst, src,
+                                    dxva2_unmap_frame, map);
+        av_image_fill_pointers(dst->data, dst->format, surfaceDesc.Height,
+                               (uint8_t*)LockedRect.pBits, dst->linesize);
+
+1, 
+set breakpoint pending on: 无回答yes no的问题
+cd /c/shareproject/FFMPEG/ffmpeg-mf;
+vim test.gdb;
+set breakpoint pending on
+b main
+r
+b dxva2.c:332
+c
+bt
+
+2, 
+gdb --batch --command=test.gdb --args ./ffmpeg_g.exe -y -hwaccel dxva2 -i color.mp4 tmp.mp4
+fftools/ffmpeg_opt.c  806
+
+Thread 4 hit Breakpoint 18, ff_dxva2_decode_init (avctx=0x59aa3c0) at libavcodec/dxva2.c:645
+645         FFDXVASharedContext *sctx = DXVA_SHARED_CONTEXT(avctx);
+#0  ff_dxva2_decode_init (avctx=0x59aa3c0) at libavcodec/dxva2.c:645
+#1  0x00007fff1ec8bfa3 in hwaccel_init (hw_config=0x7fff1f9a7820 <__compound_literal.0>, hw_config=0x7fff1f9a7820 <__compound_literal.0>, avctx=0x59aa3c0) at libavcodec/decode.c:1305
+#2  ff_get_format (avctx=0x59aa3c0, fmt=<optimized out>) at libavcodec/decode.c:1444
+#3  0x00007fff1ed86a44 in ff_thread_get_format (avctx=<optimized out>, fmt=<optimized out>) at libavcodec/pthread_frame.c:947
+#4  0x00007fff1ee2c0d5 in get_pixel_format (force_callback=force_callback@entry=1, h=<optimized out>, h=<optimized out>) at libavcodec/h264_slice.c:865
+#5  0x00007fff1ee3ca11 in h264_init_ps (first_slice=1, sl=0x59aaa00, h=0x599bc00) at libavcodec/h264_slice.c:1108
+#6  h264_field_start (h=h@entry=0x599bc00, sl=sl@entry=0x59aaa00, first_slice=first_slice@entry=1, nal=<optimized out>, nal=<optimized out>) at libavcodec/h264_slice.c:1404
+#7  0x00007fff1ecc7448 in ff_h264_queue_decode_slice (h=h@entry=0x599bc00, nal=nal@entry=0x59b9ec8) at libavcodec/h264_slice.c:2120
+#8  0x00007fff1ee3b4eb in decode_nal_units (buf_size=3330, buf=0x4dcba80 "", h=0x599bc00) at libavcodec/h264dec.c:671
+#9  h264_decode_frame (avctx=0x59aa3c0, data=0x5a415c0, got_frame=0x59aa0c0, avpkt=<optimized out>) at libavcodec/h264dec.c:993
+#10 0x00007fff1ee1538f in frame_worker_thread (arg=0x59aa000) at libavcodec/pthread_frame.c:201
+#11 0x00007fff1f18669f in win32thread_worker (arg=0x59aa008) at ./compat/w32pthreads.h:71
+#12 0x00007fff5d70a8e6 in msvcrt!_beginthreadex () from C:\Windows\System32\msvcrt.dll
+#13 0x00007fff5d70a9bc in msvcrt!_endthreadex () from C:\Windows\System32\msvcrt.dll
+#14 0x00007fff5d1e3574 in KERNEL32!BaseThreadInitThunk () from C:\Windows\System32\kernel32.dll
+#15 0x00007fff5f17cb81 in ntdll!RtlUserThreadStart () from C:\Windows\SYSTEM32\ntdll.dll
+#16 0x0000000000000000 in ?? ()
+
+Thread 4 hit Breakpoint 2, dxva2_create_decoder (avctx=0x5a8a3c0) at libavcodec/dxva2.c:336
+336         D3DFORMAT surface_format = avctx->sw_pix_fmt == AV_PIX_FMT_YUV420P10 ?
+#0  dxva2_create_decoder (avctx=0x5a8a3c0) at libavcodec/dxva2.c:336
+#1  ff_dxva2_decode_init (avctx=0x5a8a3c0) at libavcodec/dxva2.c:698
+#2  0x00007fff1ec8bfa3 in hwaccel_init (hw_config=0x7fff1f9a7820 <__compound_literal.0>, hw_config=0x7fff1f9a7820 <__compound_literal.0>, avctx=0x5a8a3c0) at libavcodec/decode.c:1305
+#3  ff_get_format (avctx=0x5a8a3c0, fmt=<optimized out>) at libavcodec/decode.c:1444
+#4  0x00007fff1ed86a44 in ff_thread_get_format (avctx=<optimized out>, fmt=<optimized out>) at libavcodec/pthread_frame.c:947
+#5  0x00007fff1ee2c0d5 in get_pixel_format (force_callback=force_callback@entry=1, h=<optimized out>, h=<optimized out>) at libavcodec/h264_slice.c:865
+#6  0x00007fff1ee3ca11 in h264_init_ps (first_slice=1, sl=0x5a8aa00, h=0x5a7bc00) at libavcodec/h264_slice.c:1108
+#7  h264_field_start (h=h@entry=0x5a7bc00, sl=sl@entry=0x5a8aa00, first_slice=first_slice@entry=1, nal=<optimized out>, nal=<optimized out>) at libavcodec/h264_slice.c:1404
+#8  0x00007fff1ecc7448 in ff_h264_queue_decode_slice (h=h@entry=0x5a7bc00, nal=nal@entry=0x5b8db88) at libavcodec/h264_slice.c:2120
+#9  0x00007fff1ee3b4eb in decode_nal_units (buf_size=3330, buf=0x4e3ba80 "", h=0x5a7bc00) at libavcodec/h264dec.c:671
+#10 h264_decode_frame (avctx=0x5a8a3c0, data=0x5b215c0, got_frame=0x5a8a0c0, avpkt=<optimized out>) at libavcodec/h264dec.c:993
+#11 0x00007fff1ee1538f in frame_worker_thread (arg=0x5a8a000) at libavcodec/pthread_frame.c:201
+#12 0x00007fff1f18669f in win32thread_worker (arg=0x5a8a008) at ./compat/w32pthreads.h:71
+#13 0x00007fff5d70a8e6 in msvcrt!_beginthreadex () from C:\Windows\System32\msvcrt.dll
+#14 0x00007fff5d70a9bc in msvcrt!_endthreadex () from C:\Windows\System32\msvcrt.dll
+#15 0x00007fff5d1e3574 in KERNEL32!BaseThreadInitThunk () from C:\Windows\System32\kernel32.dll
+#16 0x00007fff5f17cb81 in ntdll!RtlUserThreadStart () from C:\Windows\SYSTEM32\ntdll.dll
+#17 0x0000000000000000 in ?? ()
+
+3
+fftools/ffmpeg_opt.c  806
+#0  add_input_streams (ic=<optimized out>, o=0x5ffa00)
+    at fftools/ffmpeg_opt.c:807
+#1  open_input_file (o=o@entry=0x5ffa00, filename=<optimized out>)
+    at fftools/ffmpeg_opt.c:1183
+#2  0x000000014001669c in open_files (l=0x3938698, l=0x3938698,
+    open_file=0x14001fdb0 <open_input_file>, inout=0x140039c27 "input")
+    at fftools/ffmpeg_opt.c:3315
+#3  ffmpeg_parse_options (argc=argc@entry=7, argv=argv@entry=0x39382e0)
+    at fftools/ffmpeg_opt.c:3355
+#4  0x0000000140035fad in main (argc=7, argv=0x39382e0)
+    at fftools/ffmpeg.c:5027
+
+// fftools/ffmpeg_opt.c
+static void add_input_streams(OptionsContext *o, AVFormatContext *ic)
+    ist->hwaccel_id = HWACCEL_GENERIC;
+    ist->hwaccel_device_type = type; //AV_HWDEVICE_TYPE_DXVA2
+
+#0  hw_device_setup_for_decode (ist=ist@entry=0x396c840)
+    at fftools/ffmpeg_hw.c:335
+#1  0x0000000140033cf0 in init_input_stream (error_len=1024,
+    error=0x5fedc0 "", ist_index=0) at fftools/ffmpeg.c:3096
+#2  transcode_init () at fftools/ffmpeg.c:3843
+#3  0x0000000140030fb6 in transcode () at fftools/ffmpeg.c:4816
+#4  0x0000000140036052 in main (argc=<optimized out>, argv=<optimized out>)
+    at fftools/ffmpeg.c:5056
+
+static int init_input_stream(int ist_index, char *error, int error_len)
+    ret = hw_device_setup_for_decode(ist);
+    // fftools/ffmpeg_hw.c
+    => int hw_device_setup_for_decode(InputStream *ist)
+        type = ist->hwaccel_device_type; //AV_HWDEVICE_TYPE_DXVA2
+        dev = hw_device_get_by_type(type);
+        err = hw_device_init_from_type(type, NULL, &dev);
+        ist->dec_ctx->hw_device_ctx = av_buffer_ref(dev->device_ref); // important
+    ret = avcodec_open2(ist->dec_ctx, codec, &ist->decoder_opts));
+

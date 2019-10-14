@@ -1,0 +1,3 @@
+melt \
+pango.mlt \
+$*

@@ -1,0 +1,598 @@
+一, 代码分析
+1, load file
+// src/AVPlayer.cpp  1123
+bool AVPlayer::load()
+    loaderThreadPool()->start(new LoadWorker(this));
+    =>LoadWorker::run()
+        m_player->loadInternal();
+        =>void AVPlayer::loadInternal()
+            d->demuxer.setMedia(d->current_source.toString());
+            d->loaded = d->demuxer.load();
+            // src/AVDemuxer.cpp 746
+            =>bool AVDemuxer::load()
+                d->format_ctx = avformat_alloc_context();
+                ret = avformat_open_input(&d->format_ctx, d->file.toUtf8().constData(), d->input_format, d->options.isEmpty() ? NULL : &d->dict);
+                Q_EMIT loaded();
+            d->media_end = mediaStartPosition() + duration();
+            // codec: ac3(ATSC A/52A (AC-3))
+            // stream: 0, duration=329453533333 (8236338 ms), time_base=0.000000
+            // codec: h264(H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10)
+            d->initStatistics();
+
+2, choose decoder. open
+AVPlayer::AVPlayer(QObject *parent) 
+    connect(&d->demuxer, SIGNAL(loaded()), this, SIGNAL(loaded()));
+// src/AVPlayer.cpp  1161
+void AVPlayer::play()
+    connect(this, SIGNAL(loaded()), this, SLOT(playInternal()));
+
+//  src/AVPlayer.cpp  1181
+void AVPlayer::playInternal()
+    d->setupAudioThread(this);
+    d->setupVideoThread(this);
+    // src/AVPlayerPrivate.cpp  554
+    => bool AVPlayer::Private::setupVideoThread(AVPlayer *player)
+        AVCodecContext *avctx = demuxer.videoCodecContext();
+        foreach(VideoDecoderId vid, vc_ids)
+            VideoDecoder *vd = VideoDecoder::create(vid);
+            vd->setCodecContext(avctx);
+            vd->setOptions(vc_opt);
+            vd->open();
+            // src/codec/AVDecoder.cpp:72
+            =>bool AVDecoder::open()
+                const QString hwa = property("hwaccel").toString();
+                AVCodec* codec = get_codec(codecName(), hwa, d.codec_ctx->codec_id);
+                // hwa extra init can be here
+                d.open();
+                // src/codec/video/VideoDecoderD3D.cpp  349
+                => bool VideoDecoderD3DPrivate::open()
+                    prepare();
+                    // ./src/codec/video/VideoDecoderFFmpegHW.cpp
+                    //=> bool VideoDecoderFFmpegHWPrivate::prepare()
+                        //// From vlc begin
+                        //// From vlc end
+                        codec_ctx->opaque = this;
+                        get_format = codec_ctx->get_format;
+                        get_buffer2 = codec_ctx->get_buffer2;
+                        codec_ctx->get_format = ffmpeg_get_va_format;
+                        codec_ctx->get_buffer2 = ffmpeg_get_va_buffer2;
+                    createDevice();
+                    // ./src/codec/video/VideoDecoderD3D11.cpp :225
+                    =>bool VideoDecoderD3D11Private::createDevice()
+                        PFN_D3D11_CREATE_DEVICE fCreateDevice = NULL;
+                        fCreateDevice = (PFN_D3D11_CREATE_DEVICE)GetProcAddress(dll, "D3D11CreateDevice");
+                        // D3D11 Video Acceleration (Intel(R) HD Graphics 4000, vendor 32902(Intel), device 358, revision 9)
+                        qDebug() << sD3D11Description;
+                    const d3d_format_t *fmt = getFormat(codec_ctx, codecs, &codec_guid);
+                    =>const d3d_format_t* VideoDecoderD3DPrivate::getFormat(const AVCodecContext *avctx, const QVector<GUID> &guids, GUID* selected) const
+                        foreach (const GUID& g, guids) 
+                            const dxva2_mode_t *mode = Dxva2FindMode(&g);
+                        /* Try all supported mode by our priority */
+                        const dxva2_mode_t *mode = dxva2_modes;
+                        for (; mode->name; ++mode) {
+                            if (!mode->codec || mode->codec != avctx->codec_id) 
+                                continue;
+                            //TODO: find_if
+                            foreach (const GUID& g, guids) {
+                                if (IsEqualGUID(*mode->guid, g)) {
+                            int dxfmt = fourccFor(mode->guid);
+                            return D3dFindFormat(dxfmt);
+                            => static const d3d_format_t *D3dFindFormat(int fourcc)
+                                for (unsigned i = 0; d3d_formats[i].name; i++) 
+                    // end getFormat;
+                    setupSurfaceInterop()
+                    // ./src/codec/video/VideoDecoderD3D11.cpp :365
+                    => bool VideoDecoderD3D11Private::setupSurfaceInterop()
+                        interop_res = d3d11::InteropResourcePtr(d3d11::InteropResource::create());
+                        // src/directx/SurfaceInteropD3D11.cpp  64
+                        =>InteropResource* InteropResource::create(InteropType type)
+                            return CreateInteropGL();
+                            // src/directx/SurfaceInteropD3D11GL.cpp
+                            InteropResource* CreateInteropGL()
+                                return new GLInteropResource();
+                                => GLInteropResource::GLInteropResource()
+                        interop_res->setDevice(d3ddev);
+                    // setupSurfaceInterop
+                // end d.open();
+                AV_ENSURE_OK(avcodec_open2(d.codec_ctx, codec, d.options.isEmpty() ? NULL : &d.dict), false);
+                // QtAV::VideoDecoderD3D thread type: Single, count: 1
+                qDebug("%s thread type: %s, count: %d", metaObject()->className(), thread_name[d.codec_ctx->active_thread_type], d.codec_ctx->thread_count);
+
+            //end vd->open();bool AVDecoder::open()
+            VideoThread *vthread = new VideoThread(player);
+            read_thread->setVideoThread(vthread);
+            vthread->setDecoder(vdec);
+    //end d->setupVideoThread(this);
+    // Starting video thread
+    qDebug("Starting video thread...");
+    d->vthread->start(); // VideoThread
+    d->read_thread->start(); // AVDemuxThread
+    Q_EMIT stateChanged(PlayingState);
+    Q_EMIT started(); //we called stop(), so must emit started()
+
+// src/codec/video/VideoDecoderFFmpegHW.cpp  156
+AVPixelFormat VideoDecoderFFmpegHWPrivate::getFormat(struct AVCodecContext *avctx, const AVPixelFormat *pi_fmt)
+    for (size_t i = 0; pi_fmt[i] != QTAV_PIX_FMT_C(NONE); i++) {
+        // Debug: "Using D3D11 Video Acceleration (Intel(R) HD Graphics 4000, vendor 32902(Intel), device 358, revision 9) for hardware decoding."
+        qDebug("Using %s for hardware decoding.", qPrintable(description));
+        return pi_fmt[i];
+    }
+
+3, play
+//src/VideoThread.cpp  240
+void VideoThread::run()
+    //class VideoDecoderDXVA(d3d9) : public VideoDecoderD3D
+    //class VideoDecoderD3D11 : public VideoDecoderD3D
+
+    //class VideoDecoderD3D : public VideoDecoderFFmpegHW
+    //class VideoDecoderVAAPI : public VideoDecoderFFmpegHW
+    //class VideoDecoderMediaCodec Q_DECL_FINAL : public VideoDecoderFFmpegHW
+    //class VideoDecoderVDA : public VideoDecoderFFmpegHW
+    //class VideoDecoderVideoToolbox : public VideoDecoderFFmpegHW
+
+    //class VideoDecoderFFmpegHW : public VideoDecoderFFmpegBase
+    //class VideoDecoderFFmpeg : public VideoDecoderFFmpegBase
+
+    //class VideoDecoderFFmpegBase : public VideoDecoder
+    //class VideoDecoderCUDA : public VideoDecoder
+    //class VideoDecoderCedarv : public VideoDecoder
+
+    //class Q_AV_EXPORT VideoDecoder : public AVDecoder
+    //class Q_AV_EXPORT AudioDecoder : public AVDecoder
+
+    VideoDecoder *dec = static_cast<VideoDecoder*>(d.dec);
+    Packet pkt;
+    while (!d.stop) 
+    pkt = d.packets.take(); //wait to dequeue
+    dec->decode(pkt);
+    // src/codec/video/VideoDecoderFFmpegBase.cpp  114
+    =>bool VideoDecoderFFmpegBase::decode(const Packet &packet)
+        if (packet.isEOF()) 
+        ret = avcodec_decode_video2(d.codec_ctx, d.frame, &got_frame_ptr, &eofpkt);
+        else
+        ret = avcodec_decode_video2(d.codec_ctx, d.frame, &got_frame_ptr, (AVPacket*)packet.asAVPacket());
+        // avcodec-57.dll
+            avcodec_flush_buffers=>avcodec_send_packet=>avpriv_dca_parse_core_frame_header=>avpriv_fits_header_parse_line=>av_parser_close=>avcodec_default_get_buffer2
+            // src/codec/video/VideoDecoderFFmpegHW.cpp  51
+            => static int ffmpeg_get_va_buffer2(struct AVCodecContext *ctx, AVFrame *frame, int flags)
+                VideoDecoderFFmpegHWPrivate *va = (VideoDecoderFFmpegHWPrivate*)ctx->opaque;
+                va->getBuffer(&frame->opaque, &frame->data[0]);
+                // src/codec/video/VideoDecoderD3D.cpp  429
+                => bool VideoDecoderD3DPrivate::getBuffer(void **opaque, uint8_t **data)//vlc_va_t *external, AVFrame *ff)
+                    va_surface_t *s = surfaces[i];
+                    s->ref = 1;
+                    s->order = surface_order++;
+                    *data = (uint8_t*)s->getSurface();
+                    *opaque = s;
+        // end avcodec_decode_video2
+    // end dec->decode(pkt);
+    VideoFrame frame = dec->frame();
+    // src/codec/video/VideoDecoderDXVA.cpp  176
+    => VideoFrame VideoDecoderDXVA::frame()
+        IDirect3DSurface9 *d3d = (IDirect3DSurface9*)(uintptr_t)d.frame->data[3];
+        if (copyMode() == ZeroCopy && d.interop_res) {//float time_use=0; struct timeval start; struct timeval end; gettimeofday(&start,NULL); //storm
+            d3d9::SurfaceInterop *interop = new d3d9::SurfaceInterop(d.interop_res);
+            interop->setSurface(d3d, d.width, d.height);
+            VideoFrame f(d.width, d.height, VideoFormat::Format_RGB32);
+            f.setBytesPerLine(d.width * 4); //used by gl to compute texture size
+            f.setMetaData(QStringLiteral("surface_interop"), QVariant::fromValue(VideoSurfaceInteropPtr(interop)));
+            f.setTimestamp(d.frame->pkt_pts/1000.0);
+            f.setDisplayAspectRatio(d.getDAR(d.frame));//gettimeofday(&end,NULL);time_use=(end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec);qDebug()<<"zero copy waste:"<<time_use;//storm
+            return f;
+    // no return even if d.stop is true. ensure frame is displayed. otherwise playing an image may be failed to display
+    deliverVideoFrame(frame);
+    // filters on vo will not change video frame, so it's safe to protect frame only in every individual vo
+    => bool VideoThread::deliverVideoFrame(VideoFrame &frame)
+        d.outputSet->lock();
+        d.outputSet->sendVideoFrame(frame); //TODO: group by format, convert group by group
+        // ./src/output/OutputSet.cpp
+        =>void OutputSet::sendVideoFrame(const VideoFrame &frame)
+            VideoFrame f(frame);
+            foreach(AVOutput *output, mOutputs) 
+            VideoRenderer *vo = static_cast<VideoRenderer*>(output);
+            vo->receive(f);
+            // src/output/video/VideoRenderer.cpp  51
+            => bool VideoRenderer::receive(const VideoFrame &frame)
+                setInSize(frame.width(), frame.height());
+                QMutexLocker locker(&d.img_mutex);
+                return receiveFrame(frame);
+                // src/output/video/OpenGLRendererBase.cpp  77 // class Q_AV_EXPORT OpenGLRendererBase : public VideoRenderer
+                => bool OpenGLRendererBase::receiveFrame(const VideoFrame& frame)
+                    d.video_frame = frame;
+                    d.frame_changed = true;
+                    updateUi(); //can not call updateGL() directly because no event and paintGL() will in video thread
+                    // src/output/video/VideoRenderer.cpp 659
+                    =>void VideoRenderer::updateUi()
+                        QObject *obj = (QObject*)widget();
+                        QCoreApplication::instance()->postEvent(obj, new QUpdateLaterEvent(QRegion(0, 0, rendererWidth(), rendererHeight())));
+        d.outputSet->unlock();
+    d.displayed_frame = frame; // capture video
+
+4, get avpacket
+// src/AVDemuxThread.cpp  530
+void AVDemuxThread::run()
+    Packet pkt;
+    PacketBuffer *vqueue = video_thread ? video_thread->packetQueue() : 0;
+        return const_cast<PacketBuffer*>(&d_func().packets);
+    AVThread* thread = !video_thread || (audio_thread && demuxer->hasAttacedPicture()) ? audio_thread : video_thread;
+    m_buffer = thread->packetQueue();
+    while (!end) {
+        processNextSeekTask();
+        demuxer->readFrame());
+        // src/AVDemuxer.cpp  431
+        => bool AVDemuxer::readFrame()
+            d->pkt = Packet();
+            AVPacket packet;
+            av_init_packet(&packet);
+            int ret = av_read_frame(d->format_ctx, &packet); //0: ok, <0: error/end
+            // TODO: v4l2 copy
+            d->pkt = Packet::fromAVPacket(&packet, av_q2d(d->format_ctx->streams[d->stream]->time_base));
+            av_packet_unref(&packet); //important!
+        // end readFrame
+        stream = demuxer->stream();
+        pkt = demuxer->packet();
+        // push queue
+        vqueue->blockFull(!audio_thread || !audio_thread->isRunning() || !aqueue || aqueue->isEnough());
+        vqueue->put(pkt); //affect audio_thread
+        // ./src/utils/BlockingQueue.h
+        => bool BlockingQueue<T, Container>::put(const T& t, unsigned long timeout_ms)
+        last_vpts = pkt.pts;
+
+5, display
+./widgets/OpenGLWidgetRenderer.cpp : public QOpenGLWidget, public OpenGLRendererBase(=>public VideoRenderer=>public AVOutput )
+#include <QtGui/QOpenGLFunctions>
+void OpenGLWidgetRenderer::paintGL()
+    onPaintGL();
+    // ./src/output/video/OpenGLRendererBase.cpp 115
+    =>void OpenGLRendererBase::onPaintGL()
+        handlePaintEvent();
+        // src/output/video/VideoRenderer.cpp  465
+        void VideoRenderer::handlePaintEvent()
+            // do not apply filters if d.video_frame is already filtered. e.g. rendering an image and resize window to repaint
+            foreach(Filter* filter, d.filters) {
+                VideoFilter *vf = static_cast<VideoFilter*>(filter);
+                vf->apply(d.statistics, &d.video_frame); //painter and paint device are ready, pass video frame is ok.
+                // ./src/filter/Filter.cpp 180
+                void VideoFilter::apply(Statistics *statistics, VideoFrame *frame)
+                    process(statistics, frame);
+                    // src/filter/GLSLFilter.cpp 84
+                    => void GLSLFilter::process(Statistics *statistics, VideoFrame *frame)
+                        GLint currentFbo = 0;
+                        DYGL(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFbo));
+                        d.fbo = new QOpenGLFramebufferObject(outputSize().isEmpty() ? frame->size() : outputSize(), GL_TEXTURE_2D); //TODO: prefer 16bit rgb
+                        QOpenGLContext *ctx = const_cast<QOpenGLContext*>(QOpenGLContext::currentContext()); //qt4 returns const
+                        d.glv.setOpenGLContext(ctx);
+                        d.glv.setProjectionMatrixToRect(QRectF(0, 0, d.fbo->width(), d.fbo->height()));
+                        d.fbo->bind();
+                        DYGL(glViewport(0, 0, d.fbo->width(), d.fbo->height()));
+                        d.glv.setCurrentFrame(*frame);
+                        //  src/opengl/OpenGLVideo.cpp  259
+                        =>void OpenGLVideo::setCurrentFrame(const VideoFrame &frame)
+                            d_func().material->setCurrentFrame(frame);
+                            //  src/opengl/VideoShader.cpp  478
+                            => void VideoMaterial::setCurrentFrame(const VideoFrame &frame)
+                                d.frame = frame; // VideoMaterialPrivate &d
+                        QMatrix4x4 mat; // flip vertical
+                        mat.scale(1, -1);
+                        d.glv.render(QRectF(), QRectF(), mat);
+                        // src/opengl/OpenGLVideo.cpp  344 // 如下
+                        =>void OpenGLVideo::render(const QRectF &target, const QRectF& roi, const QMatrix4x4& transform)
+                            d.material->bind() // bind first because texture parameters(target) mapped from native buffer is unknown before it
+                            // src/opengl/VideoShader.cpp 592
+                            // bool VideoMaterial::bind() //bind texture
+                                d.ensureResources()
+                                =>bool VideoMaterialPrivate::ensureResources()
+                                d.ensureTextures();
+                                => bool VideoMaterialPrivate::ensureTextures()
+                                    const int nb_planes = video_format.planeCount();
+                                    for (int p = 0; p < nb_planes; ++p) 
+                                    GLuint &tex = textures[p];
+                                    GLuint* handle = (GLuint*)frame.createInteropHandle(&tex, GLTextureSurface, p); // take the ownership
+                                    // src/VideoFrame.cpp  446
+                                    =>void* VideoFrame::createInteropHandle(void* handle, SurfaceType type, int plane)
+                                        const QVariant v = d->metadata.value(QStringLiteral("surface_interop"));
+                                        d->surface_interop = v.value<VideoSurfaceInteropPtr>();
+                                        return d->surface_interop->createHandle(handle, type, format(), plane, planeWidth(plane), planeHeight(plane));
+                                        // src/QtAV/SurfaceInterop.h:69
+                                            return 0;
+                                    DYGL(glGenTextures(1, &tex));
+                                    owns_texture[tex] = true;
+                                    initTexture(tex, internal_format[p], data_format[p], data_type[p], texture_size[p].width(), texture_size[p].height());
+                                d.uploadPlane(p, d.update_texure);
+                                =>void VideoMaterialPrivate::uploadPlane(int p, bool updateTexture)
+                                    GLuint &tex = textures[p];
+                                    if (frame.map(GLTextureSurface, &tex, p)) 
+                                    // src/VideoFrame.cpp  424
+                                    void *VideoFrame::map(SurfaceType type, void *handle, const VideoFormat& fmt, int plane)
+                                        return d->surface_interop->map(type, fmt, handle, plane);
+                                        // src/directx/SurfaceInteropD3D9.cpp  129
+                                        =>void* SurfaceInterop::map(SurfaceType type, const VideoFormat &fmt, void *handle, int plane)
+                                            if (type == GLTextureSurface)
+                                            if (m_resource->map(m_surface, *((GLuint*)handle), frame_width, frame_height, plane))
+                                            // src/directx/SurfaceInteropD3D9GL.cpp  61
+                                            =>bool GLInteropResource::map(IDirect3DSurface9 *surface, GLuint tex, int w, int h, int)
+                                                WGL_ENSURE((interop_dev = gl().DXOpenDeviceNV(d3ddev)) != NULL, false);
+                                                WGL_ENSURE((interop_obj = gl().DXRegisterObjectNV(interop_dev, dx_surface, tex, GL_TEXTURE_2D, WGL_ACCESS_READ_ONLY_NV)) != NULL, false);
+                                                DX_ENSURE_OK(d3ddev->StretchRect(surface, &src, dx_surface, NULL, D3DTEXF_NONE), false);
+                                                WGL_ENSURE(gl().DXLockObjectsNV(interop_dev, 1, &interop_obj), false);
+                                                WGL_ENSURE(gl().DXObjectAccessNV(interop_obj, WGL_ACCESS_READ_ONLY_NV), false);
+                                                DYGL(glBindTexture(GL_TEXTURE_2D, tex));
+                            // end d.material->bind()
+                            DYGL(glViewport(d.rect.x(), d.rect.y(), d.rect.width(), d.rect.height())); // viewport was used in gpu filters is wrong, qt quick fbo item's is right(so must ensure setProjectionMatrixToRect was called correctly)
+                            shader->update(d.material);
+                            shader->program()->setUniformValue(shader->matrixLocation(), transform*d.matrix);
+                            // uniform end. attribute begin
+                            d.updateGeometry(shader, target, roi);
+                            const bool blending = d.has_a;
+                            d.gr->render();
+                            // src/opengl/GeometryRenderer.cpp  264
+                            => void GeometryRenderer::render()
+                                bindBuffers();
+                                DYGL(glDrawElements(g->primitive(), g->indexCount(), g->indexType(), ibo.isCreated() ? NULL : g->indexData())); // null: data in vao or ibo. not null: data in memory
+                            // d.shader->program()->release(); //glUseProgram(0)
+                            d.material->unbind(); // => GLInteropResource::unmap
+                        // d.glv.render
+                        d.uploadPlane(p, d.update_texure);
+                        gl().BindFramebuffer(GL_FRAMEBUFFER, (GLuint)currentFbo);
+                        VideoFormat fmt(VideoFormat::Format_RGB32);
+                        VideoFrame f(d.fbo->width(), d.fbo->height(), fmt); //
+                        f.setBytesPerLine(d.fbo->width()*fmt.bytesPerPixel(), 0);
+                        // set interop;
+                        class GLTextureInterop : public VideoSurfaceInterop{
+                            void* map(SurfaceType, const VideoFormat &, void *handle, int plane) {
+                                Q_UNUSED(plane);
+                                GLuint* t = reinterpret_cast<GLuint*>(handle);
+                                *t = tex;
+                                return t;
+                            }
+                        }
+                        GLTextureInterop *interop = new GLTextureInterop(d.fbo->texture());
+                        f.setMetaData(QStringLiteral("surface_interop"), QVariant::fromValue(VideoSurfaceInteropPtr((interop))));
+                        *frame = f;
+                    // GLSLFilter::process
+            // end videofilter->apply
+            drawBackground();
+            if (d.video_frame.isValid()) 
+            drawFrame();
+            // src/output/video/OpenGLRendererBase.cpp  91
+            =>void OpenGLRendererBase::drawFrame()
+                QRect roi = realROI();
+                d.glv.setCurrentFrame(d.video_frame);
+                // src/opengl/OpenGLVideo.cpp  259
+                void OpenGLVideo::setCurrentFrame(const VideoFrame &frame)
+                    d_func().material->setCurrentFrame(frame);
+                    // src/opengl/VideoShader.cpp  478
+                    => void VideoMaterial::setCurrentFrame(const VideoFrame &frame)
+                        ColorSpace cs = frame.colorSpace();// ColorSpace_RGB;
+                        d.colorTransform.setInputColorRange(frame.colorRange());
+                        d.frame = frame;
+                    d_func().has_a = frame.format().hasAlpha();
+                d.frame_changed = false;
+                d.glv.render(QRectF(), roi, d.matrix);
+                // src/opengl/OpenGLVideo.cpp  344
+                =>void OpenGLVideo::render(const QRectF &target, const QRectF& roi, const QMatrix4x4& transform)
+                    d.material->bind() // bind first because texture parameters(target) mapped from native buffer is unknown before it
+                    // src/opengl/VideoShader.cpp 592
+                    // bool VideoMaterial::bind() //bind texture
+                        d.ensureResources()
+                        =>bool VideoMaterialPrivate::ensureResources()
+                        d.ensureTextures();
+                            return true;
+                        d.uploadPlane(p, d.update_texure);
+                        => void VideoMaterialPrivate::uploadPlane(int p, bool updateTexture)
+                            GLuint &tex = textures[p];
+                            gl().ActiveTexture(GL_TEXTURE0 + p); //0 must active?
+                            if (!frame.constBits(0))  //zerocopy
+                                GLuint tex0 = tex;
+                                if (frame.map(GLTextureSurface, &tex, p)) 
+                                // src/VideoFrame.cpp  419
+                                => void *VideoFrame::map(SurfaceType type, void *handle, int plane)
+                                    return map(type, handle, format(), plane);
+                                    =>void *VideoFrame::map(SurfaceType type, void *handle, const VideoFormat& fmt, int plane)
+                                        const QVariant v = d->metadata.value(QStringLiteral("surface_interop"));
+                                        d->surface_interop = v.value<VideoSurfaceInteropPtr>();
+                                        return d->surface_interop->map(type, fmt, handle, plane);
+                                        // src/filter/GLSLFilter.cpp  133
+                                        => void* map(SurfaceType, const VideoFormat &, void *handle, int plane) 
+                                            GLuint* t = reinterpret_cast<GLuint*>(handle);
+                                            *t = tex;
+                                            return t;
+                                DYGL(glBindTexture(target, tex)); // glActiveTexture was called, but maybe bind to 0 in map
+                                return; //zerocopy
+                            // zerocopy不会执行到这里
+                            DYGL(glBindTexture(target, tex));
+                            DYGL(glTexSubImage2D(target, 0, 0, 0, texture_size[p].width(), texture_size[p].height(), data_format[p], data_type[p], try_pbo ? 0 : frame.constBits(p)));
+                            // const uchar* Frame::constBits(int plane) const
+                                return d_func()->planes[plane];
+                    // end bind
+                    DYGL(glViewport(d.rect.x(), d.rect.y(), d.rect.width(), d.rect.height())); // viewport was used in gpu filters is wrong, qt quick fbo item's is right(so must ensure setProjectionMatrixToRect was called correctly)
+                    shader->update(d.material);
+                    // src/opengl/VideoShader.cpp  349 glsl
+                    =>bool VideoShader::update(VideoMaterial *material)
+                        initialize();
+                        =>void VideoShader::initialize(QOpenGLShaderProgram *shaderProgram)
+                            shaderProgram = program();
+                            build(shaderProgram);
+                            => bool VideoShader::build(QOpenGLShaderProgram *shaderProgram)
+                                shaderProgram->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShader());
+                                shaderProgram->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShader());
+                                haderProgram->link();
+                        program()->bind(); //glUseProgram(id). for glUniform
+                        program()->setUniformValue(textureLocation(i), (GLint)i);
+                        program()->setUniformValue(colorMatrixLocation(), material->colorMatrix());
+                        program()->setUniformValue(opacityLocation(), (GLfloat)1.0);
+                    // end update. compile shader, link program ..
+                    shader->program()->setUniformValue(shader->matrixLocation(), transform*d.matrix);
+                    d.gr->render();
+                    // ./src/opengl/GeometryRenderer.cpp  264
+                    =>void GeometryRenderer::render()
+                        bindBuffers();
+                        =>void GeometryRenderer::bindBuffers()
+                            vao.bind(); // vbo, ibo is ok now
+                        DYGL(glDrawArrays(g->primitive(), 0, g->vertexCount()));
+    
+6, capture
+// src/VideoCapture.cpp  51
+virtual void CaptureTask::run() 
+    QImage image(frame.toImage());
+    => QImage VideoFrame::toImage(QImage::Format fmt, const QSize& dstSize, const QRectF &roi) const
+        VideoFrame f(to(VideoFormat(VideoFormat::pixelFormatFromImageFormat(fmt)), dstSize, roi));
+        =>VideoFrame VideoFrame::to(const VideoFormat &fmt, const QSize& dstSize, const QRectF& roi) const
+            if (!isValid() || !constBits(0)) {// hw surface. map to host. only supports rgb packed formats now
+            VideoSurfaceInteropPtr si = v.value<VideoSurfaceInteropPtr>();
+            VideoFrame f;
+            f.setDisplayAspectRatio(displayAspectRatio());
+            f.setTimestamp(timestamp());
+            si->map(HostMemorySurface, fmt, &f);
+            // src/directx/SurfaceInteropD3D9.cpp  129
+            =>void* SurfaceInterop::map(SurfaceType type, const VideoFormat &fmt, void *handle, int plane)
+                return mapToHost(fmt, handle, plane);
+                =>void* SurfaceInterop::mapToHost(const VideoFormat &format, void *handle, int plane)
+                    D3DLOCKED_RECT lock;
+                    //YV12 need swap, not imc3?
+                    // imc3 U V pitch == Y pitch, but half of the U/V plane is space. we convert to yuv420p here
+                    // nv12 bpp(1)==1
+                    // 3rd plane is not used for nv12
+                    int pitch[3] = { lock.Pitch, 0, 0}; //compute chroma later
+                    quint8 *src[] = { (quint8*)lock.pBits, 0, 0}; //compute chroma later
+                    Q_ASSERT(src[0] && pitch[0] > 0);
+                    const bool swap_uv = desc.Format ==  MAKEFOURCC('I','M','C','3');
+                    // try to use SSE. fallback to normal copy if SSE is not supported
+                    VideoFrame frame(VideoFrame::fromGPU(fmt, frame_width, frame_height, desc.Height, src, pitch, true, swap_uv));
+                    // TODO: check rgb32 because d3d can use hw to convert
+                    if (format != fmt)
+                        frame = frame.to(format);
+                    VideoFrame *f = reinterpret_cast<VideoFrame*>(handle);
+                    frame.setTimestamp(f->timestamp());
+                    *f = frame;
+                    return f;
+        // end to
+        QImage image(f.frameDataPtr(), f.width(), f.height(), f.bytesPerLine(0), fmt);
+        return image.copy();
+
+二, 提取dxva
+采用减法方案
+样本: Thousand...mp4 时间耗时: display: 4ms, copyframe: 0ms, cpu: 7%
+1, 增加avdemuxer.cpp文件
+load()
+get_packet
+add_frame
+共享frame
+2, openglwidget.cpp
+显示frame
+
+frameread.cpp + openglwidget.cpp
+见 mpv
+/c/qtproject/mpv video/out/opengl/context_dxinterop.c  302
+    // Create the OpenGL-side texture
+    gl->GenTextures(1, &p->texture);
+
+    // Now share the rendertarget with OpenGL as a texture
+    p->rtarget_h = gl->DXRegisterObjectNV(p->device_h, p->rtarget, p->texture,
+        GL_TEXTURE_2D, WGL_ACCESS_WRITE_DISCARD_NV);
+    if (!p->rtarget_h) {
+        MP_ERR(ctx->vo, "Couldn't share rendertarget with OpenGL: %s\n",
+               mp_LastError_to_str());
+        return -1;
+    }
+
+    // Lock the rendertarget for use from OpenGL. This will only be unlocked in
+    // swap_buffers() when it is blitted to the real Direct3D backbuffer.
+    if (!gl->DXLockObjectsNV(p->device_h, 1, &p->rtarget_h)) {
+        MP_ERR(ctx->vo, "Couldn't lock rendertarget: %s\n",
+               mp_LastError_to_str());
+        return -1;
+    }
+
+    gl->BindFramebuffer(GL_FRAMEBUFFER, p->main_fb);
+    gl->FramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+        GL_TEXTURE_2D, p->texture, 0);
+    gl->BindFramebuffer(GL_FRAMEBUFFER, 0);
+
+3, 精简最小代码
+3.1, packet关联frame:
+    dec->decode(pkt);
+        ret = avcodec_decode_video2(d.codec_ctx, d.frame, &got_frame_ptr, (AVPacket*)packet.asAVPacket()); //d.frame
+            avcodec_flush_buffers=>avcodec_send_packet=>avpriv_dca_parse_core_frame_header=>avpriv_fits_header_parse_line=>av_parser_close=>avcodec_default_get_buffer2
+            => static int ffmpeg_get_va_buffer2(struct AVCodecContext *ctx, AVFrame *frame, int flags)
+                VideoDecoderFFmpegHWPrivate *va = (VideoDecoderFFmpegHWPrivate*)ctx->opaque;
+                va->getBuffer(&frame->opaque, &frame->data[0]);
+
+4, 参考AVPlayer、FFmpegReader
+AVReader: 提供VideoFrame
+AVDemuxer.setMedia(filename);
+AVDemuxer.load();// duration, get packet
+
+VideoDecoder *vd = VideoDecoder::create("DXVA");
+decoder->setCodecContext(demuxer.videoCodecContext());
+decoder->setProperty("copyMode", "ZeroCopy");
+decoder->open()
+4.1, load file
+void AVPlayer::play()
+bool AVPlayer::load()
+    loaderThreadPool()->start(new LoadWorker(this));
+    =>LoadWorker::run()
+        m_player->loadInternal();
+        =>void AVPlayer::loadInternal()
+            d->demuxer.setMedia(d->current_source.toString());
+            d->loaded = d->demuxer.load();
+
+4.2, choose decoder. open
+AVPlayer::AVPlayer(QObject *parent) 
+    connect(&d->demuxer, SIGNAL(loaded()), this, SIGNAL(loaded()));
+    d->read_thread = new AVDemuxThread(this);
+    d->read_thread->setDemuxer(&d->demuxer);
+// src/AVPlayer.cpp  1161
+void AVPlayer::play()
+    connect(this, SIGNAL(loaded()), this, SLOT(playInternal()));
+
+//  src/AVPlayer.cpp  1181
+void AVPlayer::playInternal()
+    d->setupAudioThread(this);
+    d->setupVideoThread(this);
+    // src/AVPlayerPrivate.cpp  554
+    => bool AVPlayer::Private::setupVideoThread(AVPlayer *player)
+        AVCodecContext *avctx = demuxer.videoCodecContext();
+        foreach(VideoDecoderId vid, vc_ids)
+            VideoDecoder *vd = VideoDecoder::create(vid);
+            vd->setCodecContext(avctx);
+            vd->setOptions(vc_opt);
+            vd->open();
+            VideoThread *vthread;
+            vthread = new VideoThread(player);
+            read_thread->setVideoThread(vthread);
+            vthread->setDecoder(vdec);
+    //end d->setupVideoThread(this);
+    // Starting video thread
+    qDebug("Starting video thread...");
+    d->vthread->start(); // VideoThread
+    d->read_thread->start(); // AVDemuxThread
+    Q_EMIT stateChanged(PlayingState);
+    Q_EMIT started(); //we called stop(), so must emit started()
+
+4.3, get avpacket
+// src/AVDemuxThread.cpp  530
+void AVDemuxThread::run()
+    Packet pkt;
+    PacketBuffer *vqueue = video_thread ? video_thread->packetQueue() : 0;
+        return const_cast<PacketBuffer*>(&d_func().packets);
+    AVThread* thread = !video_thread || (audio_thread && demuxer->hasAttacedPicture()) ? audio_thread : video_thread;
+    m_buffer = thread->packetQueue();
+    while (!end) {
+        processNextSeekTask();
+        demuxer->readFrame());
+        pkt = demuxer->packet();
+        // push queue
+        vqueue->blockFull(!audio_thread || !audio_thread->isRunning() || !aqueue || aqueue->isEnough());
+        vqueue->put(pkt); //affect audio_thread
+
+4.4, play
+//src/VideoThread.cpp  240
+void VideoThread::run()
+    VideoDecoder *dec = static_cast<VideoDecoder*>(d.dec);
+    Packet pkt;
+    while (!d.stop) 
+    pkt = d.packets.take(); //wait to dequeue
+    dec->decode(pkt);
+    VideoFrame frame = dec->frame();
+    deliverVideoFrame(frame);

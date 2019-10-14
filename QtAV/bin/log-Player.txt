@@ -1,0 +1,716 @@
+Debug: vo: gl
+Debug: QtAV 1.13.0(Sep  1 2019, 11:37:57)
+Multimedia framework base on Qt and FFmpeg.
+Distributed under the terms of LGPLv2.1 or later.
+Shanghai, China Copyright (C) 2012-2019 Wang Bin (aka. Lucas Wang) wbsecg1@gmail.com
+Donate: http://qtav.org/donate.html
+Source: https://github.com/wang-bin/QtAV
+Home page: http://qtav.org
+Debug: "Build with Qt-5.10.0"
+Debug: "FFmpeg/Libav configuration: --prefix=/mingw64 --target-os=mingw32 --arch=x86_64 --disable-debug --disable-static --enable-avresample --enable-dxva2 --enable-d3d11va --enable-fontconfig --enable-gnutls --enable-gpl --enable-libass --enable-libbluray --enable-libcaca --enable-libcelt --enable-libfreetype --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore_amrnb --enable-libopencore_amrwb --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libxvid --enable-libvpx --enable-libwebp --enable-openal --enable-libwavpack --enable-pic --enable-postproc --enable-runtime-cpudetect --enable-shared --enable-static --enable-swresample --enable-version3 --enable-zlib --disable-doc"
+Debug: "Build with avutil-55.78.100"
+Debug: "Build with avcodec-57.107.100"
+Debug: "Build with avformat-57.83.100"
+Debug: "Build with avfilter-6.107.100"
+Debug: "Build with avdevice-57.10.100"
+Debug: "Build with avresample-3.7.0"
+Debug: "Build with swresample-2.9.100"
+Debug: "Build with swscale-4.8.100"
+Debug: engine: "LibASS"
+Debug: engine: "FFmpeg"
+Debug: engine: "FFmpeg"
+Warning: "can not load cuda!"
+Debug: Registered audio backends:  ("XAudio2", "DirectSound", "null")
+Debug: "XAudio2_9"
+Debug: "Build with XAudio2 from DXSDK"
+Debug: "Try symbol 'XAudio2Create' from WinSDK dll"
+Debug: "xaudio2: 0x3a880090"
+Debug: "OpenGL version: 4.3  hasGLSL: 1"
+Debug: "GL_VERSION: 4.3.0 - Build 20.19.15.4531"
+Debug: "GL_VENDOR: Intel"
+Debug: "GL_RENDERER: Intel(R) Iris(TM) Graphics 5100"
+Debug: "GL_SHADING_LANGUAGE_VERSION: 4.30 - Build 20.19.15.4531"
+Debug: "Is OpenGLES: 0"
+Debug: "Is EGL: 0"
+Debug: "GLSL version: 430"
+Debug: "Has PBO: 1"
+Debug: resolving WGL_NV_DX_interop...
+Debug: "16 bit texture depth: 16.\n"
+Debug: "using gl_param_3r16"
+Debug: "Has 16bit texture: 1"
+Debug: "check gl3 rg: 0x822B"
+Debug: "Has RG texture: 1"
+Debug: QSurfaceFormat(version 4.3, options QFlags<QSurfaceFormat::FormatOption>(DeprecatedFunctions), depthBufferSize 24, redBufferSize 8, greenBufferSize 8, blueBufferSize 8, alphaBufferSize 8, stencilBufferSize 8, samples 0, swapBehavior QSurfaceFormat::SwapBehavior(DoubleBuffer), swapInterval 1, colorSpace QSurfaceFormat::ColorSpace(DefaultColorSpace), profile  QSurfaceFormat::OpenGLContextProfile(CompatibilityProfile))
+Debug: VideoRenderer::handlePaintEvent zero copy waste: 15611
+Debug: VideoRenderer::handlePaintEvent zero copy waste: 0
+Debug: "VideoFilterContext 0x39e29ff0 delete paint device in 0x39e0f9f0"
+Debug: "OpenGL version: 4.3  hasGLSL: 1"
+Debug: VideoRenderer::handlePaintEvent zero copy waste: 0
+Debug: VideoRenderer::handlePaintEvent zero copy waste: 0
+Debug: "copyMode"  >>>  QVariant(int, 0)
+Debug: VideoRenderer::handlePaintEvent zero copy waste: 0
+Debug: onSelectionChange (QUrl("file:///C:/qtproject/movie/movie.mp4")) 1
+Debug: onSelectionChange (QUrl("file:///C:/qtproject/movie/movie.mp4")) 1
+Debug: "Not playing~"
+Debug: QHash(("analyzeduration", QVariant(int, 5000000))("probesize", QVariant(uint, 5000000)))
+Debug: Loading  QVariant(QString, "C:/qtproject/movie/movie.mp4")  ...
+Debug: "all closed and reseted"
+Debug: "avformat_open_input: d->format_ctx:'0x4253e020', url:'C:/qtproject/movie/movie.mp4'..."
+Debug: VideoRenderer::handlePaintEvent zero copy waste: 0
+Debug: "avformat_open_input: url:'C:/qtproject/movie/movie.mp4' ret:0"
+Debug: "avfmtctx.flags: 2097153, iformat.flags"
+Debug: status changed  "已加载"
+Warning: "invalid index 0 (valid is 0~0) for stream type 2."
+Debug: "notify_interval: 33"
+Debug: "stream: 1, duration=308406 (6993 ms), time_base=0.000023"
+Debug: "codec: aac(AAC (Advanced Audio Coding))"
+Debug: "stream: 0, duration=4197 (6995 ms), time_base=0.001667"
+Debug: "codec: h264(H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10)"
+Debug: "has audio"
+Debug: "QtAV::AudioDecoderFFmpeg thread type: Single, count: 1"
+Debug: "source_voice: 0x0, master: 0x0"
+Debug: AudioOutput format:  QtAV::AudioFormat(44100Hz, 4Bytes, channelCount:1, channelLayout: "mono", sampleFormat: "flt") ; requested:  QtAV::AudioFormat(44100Hz, 4Bytes, channelCount:1, channelLayout: "mono", sampleFormat: "fltp")
+Debug: "source_voice:0x3a9a4fe0"
+Warning: "src audio parameters 'channel layout(or channels), sample rate and sample format must be set before initialize resampler"
+Debug: "new audio thread"
+Debug: "demux thread setAudioThread"
+Debug: "output not changed: 0x39df87b0"
+Debug: "set AVThread output"
+Debug: "stream: 1, duration=308406 (6993 ms), time_base=0.000023"
+Debug: "codec: aac(AAC (Advanced Audio Coding))"
+Debug: "**********trying video decoder: DXVA..."
+Debug: "set QtAV::VideoDecoderD3D() meta properties:"
+Debug: "threads=>1"
+Debug: "surfaces=>0"
+Debug: "copyMode=>0"
+Debug: "creating d3d9 device ex... dll: 0x7ff9daa10000"
+Debug: "IDirect3DDevice9Ex created"
+Debug: "DXVA2 description:  DXVA2 (Intel(R) Iris(TM) Graphics 5100, vendor 32902(Intel), device 2606, revision 9)"
+Debug: "OurDirect3DCreateDeviceManager9 Success!"
+Debug: "obtained IDirect3DDeviceManager9"
+Debug: - 'MPEG-2 variable-length decoder' is supported by hardware
+Debug: - 'MPEG-2 inverse discrete cosine transform' is supported by hardware
+Debug: - 'VC-1 variable-length decoder 2 (Intel)' is supported by hardware
+Debug: - 'VC-1 variable-length decoder (Intel)' is supported by hardware
+Debug: - 'VC-1 variable-length decoder' is supported by hardware
+Debug: - 'H.264 variable-length decoder, no film grain technology' is supported by hardware
+Debug: - 'H.264 stereo high profile, mbs flag set' is supported by hardware
+Debug: - 'H.264 stereo high profile' is supported by hardware
+Debug: - 'H.264 multiview high profile' is supported by hardware
+Debug: - 'H.264 scalable video coding, Scalable Constrained Baseline Profile' is supported by hardware
+Debug: - 'H.264 scalable video coding, Scalable Constrained High Profile' is supported by hardware
+Debug: - Unknown GUID = 91CD2D6E-897b-4fa1-b0-d7-51-dc-88-01-0e-0a
+Debug: - Unknown GUID = 8C56EB1E-2b47-466f-8d-33-7d-bc-d6-3f-3d-f2
+Debug: - 'HEVC Main profile' is supported by hardware
+Debug: - Unknown GUID = A74CCAE2-f466-45ae-86-f5-ab-8b-e8-af-84-83
+Debug: - 'Windows Media Video 9 IDCT' is supported by hardware
+Debug: - 'VC-1 inverse discrete cosine transform' is supported by hardware
+Debug: - Unknown GUID = 49761BEC-4b63-4349-a5-ff-87-ff-df-08-84-66
+Debug: codec does not match to h264: none
+Debug: codec does not match to h264: none
+Debug: codec does not match to h264: none
+Debug: codec does not match to h264: none
+Debug: codec does not match to h264: none
+Debug: codec does not match to h264: mpeg2video
+Debug: codec does not match to h264: mpeg2video
+Debug: codec does not match to h264: mpeg1video
+Debug: codec does not match to h264: none
+Debug: codec does not match to h264: none
+Debug: codec does not match to h264: none
+Debug: D3D found codec: H.264 variable-length decoder, film grain technology. Check runtime support for the codec.
+Debug: D3D found codec: H.264 variable-length decoder, no film grain technology (Intel ClearVideo). Check runtime support for the codec.
+Debug: D3D found codec: H.264 variable-length decoder, no film grain technology. Check runtime support for the codec.
+Debug: Check profile support: High
+Debug: NV12 is supported for output
+Debug: "using D3D9Ex: 1"
+Debug: "QtAV::VideoDecoderD3D thread type: Single, count: 1"
+Debug: "**************setupVideoThread Video decoder found:0x39e79c90 name: DXVA"
+Debug: "setCapture 0x39e0fad0"
+Debug: "stream: 0, duration=4197 (6995 ms), time_base=0.001667"
+Debug: "codec: h264(H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10)"
+Debug: "auto select clock: audio > external"
+Debug: "Using AudioClock"
+Debug: "Clock initial value: 0.000000"
+Debug: "Starting audio thread..."
+Debug: "Starting video thread..."
+Debug: "get av queue a/v thread = 0x39e79bb0 0x39e79ad0"
+Debug: ScreenSaver::retrieveState
+Debug: Succeed to enable screen saver (0)
+Debug: track found!!!!!
+Debug: status changed  "缓冲中..."
+Debug: "AVClock started!!!!!!!!"
+Debug: "available hardware decoder output format 61 (dxva2_vld)"
+Debug: "available hardware decoder output format 128 (d3d11va_vld)"
+Debug: "available hardware decoder output format 348 (d3d11)"
+Debug: "available software decoder output format 0 (yuv420p)"
+Debug: >>>>>>>>>>>>>>>>>>>>>surfaces: 20, active_thread_type: 0, threads: 1, refs: 1
+Debug: "IDirectXVideoDecoderService=0x39e5aed8 nb_surfaces=20 surface 1280x720"
+Debug: "buffersrc_args=time_base=1/1000000:sample_rate=44100:sample_fmt=fltp:channel_layout=0x4"
+Debug: "IDirectXVideoAccelerationService_CreateSurface succeed with 20 surfaces (1280x720)"
+Debug: Decoder configurations: 4
+Debug: configuration[0] ConfigBitstreamRaw 2
+Debug: configuration[1] ConfigBitstreamRaw 1
+Debug: configuration[2] ConfigBitstreamRaw 2
+Debug: configuration[3] ConfigBitstreamRaw 1
+Debug: status changed  "已缓冲"
+Debug: "IDirectXVideoDecoderService.CreateVideoDecoder succeed. decoder=0x426e52f8"
+Debug: "Using DXVA2 (Intel(R) Iris(TM) Graphics 5100, vendor 32902(Intel), device 2606, revision 9) for hardware decoding."
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: "buffersrc_args=video_size=1280x720:pix_fmt=30:time_base=1/1000000:pixel_aspect=1/1"
+Warning: [FFmpeg:?] No such filter: ''
+Warning: [FFmpeg:?] Error avfilter_graph_parse_ptr(filter_graph, options.toUtf8().constData(), &inputs, &outputs, __null) @166 filter/LibAVFilter.cpp: (0xffffffea) Invalid argument
+Warning: "setup audio filter graph error"
+Debug: "swr speed=1.00"
+Debug: "out: {cl: 4, fmt: flt, freq: 44100}"
+Debug: "in {cl: 4, fmt: fltp, freq: 44100}"
+Warning: [FFmpeg:?] No such filter: ''
+Warning: [FFmpeg:?] Error avfilter_graph_parse_ptr(filter_graph, options.toUtf8().constData(), &inputs, &outputs, __null) @166 filter/LibAVFilter.cpp: (0xffffffea) Invalid argument
+Warning: "setup video filter graph error"
+Debug: "setInSize => calculating aspect ratio from converted input data(1.777778)"
+Debug: "OpenGL version: 4.3  hasGLSL: 1"
+Debug: "new fbo texture: 3 1280x720"
+Debug: QtAV::VideoFormat(pixelFormat: 4 "bgra" alpha: true, channels: 4, planes: 1, bpc: 8, bpp: 32/32 -32)
+Debug: "pixel format changed:  => bgra 4"
+Debug: "plane linesize 0: padded = 5120, effective = 5120. theoretical plane size: 1280x720"
+Debug: "effective_tex_width_ratio=1.000000"
+Debug: texture internal format:  QVector(6408)
+Debug: texture data format:  QVector(32993)
+Debug: texture data type:  QVector(5121)
+Debug: "///////////bpp 4, bpc: 8"
+Debug: "texture width: 1280 - 1280 = pad: 0. bpp(gl): 4"
+Debug: "creating texture for plane 0"
+Debug: "texture for plane 0 is created (id=4)"
+Debug: SurfaceInteropD3D9GL.cpp map waste: 3026
+Debug: "[ShaderManager] cache a new shader material type(12): gl material 16to8bit: 0, planar: 0, has alpha: 1, 2d texture: 1, 2nd plane rg: 0, xyz: 0"
+Debug: #version 430
+#define highp
+#define mediump
+#define lowp
+#define attribute in
+#define varying out
+
+attribute vec4 a_Position;
+attribute vec2 a_TexCoords0;
+uniform mat4 u_Matrix;
+varying vec2 v_TexCoords0;
+#ifdef MULTI_COORD
+attribute vec2 a_TexCoords1;
+attribute vec2 a_TexCoords2;
+varying vec2 v_TexCoords1;
+varying vec2 v_TexCoords2;
+#ifdef HAS_ALPHA
+attribute vec2 a_TexCoords3;
+varying vec2 v_TexCoords3;
+#endif
+#endif 
+
+
+void main() {
+    gl_Position = u_Matrix * a_Position;
+    v_TexCoords0 = a_TexCoords0;
+#ifdef MULTI_COORD
+    v_TexCoords1 = a_TexCoords1;
+    v_TexCoords2 = a_TexCoords2;
+#ifdef HAS_ALPHA
+    v_TexCoords3 = a_TexCoords3;
+#endif
+#endif 
+}
+
+Debug: #version 430
+#define highp
+#define mediump
+#define lowp
+#if __VERSION__ < 130
+#define texture texture2D
+#else
+#define texture2D texture
+#endif 
+#define varying in
+#define gl_FragColor out_color
+out vec4 gl_FragColor;
+#define HAS_ALPHA
+#define USE_RG
+
+
+uniform sampler2D u_Texture0;
+varying vec2 v_TexCoords0;
+uniform mat4 u_colorMatrix;
+uniform float u_opacity;
+uniform mat4 u_c;
+
+uniform vec2 u_texelSize[1];
+uniform vec2 u_textureSize[1];
+
+
+#ifndef USER_SAMPLER
+vec4 sample2d(sampler2D tex, vec2 pos, int plane)
+{
+    return texture(tex, pos);
+}
+#endif
+
+void main() {
+    vec4 c = sample2d(u_Texture0, v_TexCoords0, 0);
+    c = u_c * c;
+#ifndef HAS_ALPHA
+    c.a = 1.0; 
+#endif 
+#ifdef XYZ_GAMMA
+    c.rgb = pow(c.rgb, vec3(2.6));
+#endif 
+    c = u_colorMatrix * c;
+#ifdef XYZ_GAMMA
+    c.rgb = pow(c.rgb, vec3(1.0/2.2));
+#endif 
+    gl_FragColor = clamp(c, 0.0, 1.0) * u_opacity;
+    
+}
+
+Debug: "bind attribute: a_Position => 0"
+Debug: "bind attribute: a_TexCoords0 => 1"
+Debug: "uniform locations:"
+Debug: "u_Texture0: 1"
+Debug: "u_Matrix: 0"
+Debug: "u_colorMatrix: 3"
+Debug: "u_opacity: 4"
+Debug: "u_c: 2"
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: "creating VBO..."
+Debug: "creating VAO..."
+Debug: "vao updated"
+Debug: "geometry attributes changed, rebind vao..."
+Debug: "geometry updated"
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: "creating VBO..."
+Debug: "creating VAO..."
+Debug: "vao updated"
+Debug: "geometry attributes changed, rebind vao..."
+Debug: "geometry updated"
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1002
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1004
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1499
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1038
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1004
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 2509
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1003
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 484
+Debug: SurfaceInteropD3D9GL.cpp map waste: 2498
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1026
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 471
+Debug: SurfaceInteropD3D9GL.cpp map waste: 507
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 520
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 538
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1028
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 2551
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 672
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1050
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 470
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 505
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 995
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1002
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1030
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 501
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1021
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1023
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1017
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1494
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1019
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1028
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 548
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1001
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1052
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1011
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1003
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1033
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1001
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 520
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1041
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1002
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1000
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 998
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 500
+Debug: SurfaceInteropD3D9GL.cpp map waste: 500
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 972
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 501
+Debug: SurfaceInteropD3D9GL.cpp map waste: 998
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1037
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 998
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 468
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1009
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 468
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1002
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 525
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1001
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 541
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1000
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1003
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1011
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1004
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1004
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 993
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1011
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1503
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1004
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1002
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1006
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 505
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 468
+Debug: SurfaceInteropD3D9GL.cpp map waste: 501
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 502
+Debug: SurfaceInteropD3D9GL.cpp map waste: 500
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1033
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1007
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 467
+Debug: SurfaceInteropD3D9GL.cpp map waste: 501
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 468
+Debug: SurfaceInteropD3D9GL.cpp map waste: 499
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 467
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1002
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1009
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 2002
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1023
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 506
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 658
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 502
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1001
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 508
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 467
+Debug: SurfaceInteropD3D9GL.cpp map waste: 497
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1004
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 986
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1002
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 501
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1025
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 952
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 519
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1043
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 531
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 536
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 505
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 532
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1005
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1002
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1010
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 502
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 540
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1016
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 504
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: SurfaceInteropD3D9GL.cpp map waste: 1529
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: target rect:  QRectF(-1,1 2x-2)
+Debug: "(repeat 204)geometry updated\ntimer: 6, current thread: 0x31b39530, player thread: 0x31b39530"
+Debug: "stopping demuxer thread..."
+Debug: stopping thread  QtAV::AudioThread(0x39e79bb0)
+Debug: "Audio thread stops running..."
+Debug: stopping thread  QtAV::VideoThread(0x39e79ad0)
+Debug: VideoDecoderDXVA::frame zero copy waste: 0
+Debug: "Video thread stops running..."
+Debug: "setInSize => calculating aspect ratio from converted input data(0.000000)"
+Debug: "all avthread finished. try to exit demux thread<<<<<<"
+Debug: "Demux thread stops running...."
+Debug: "demuxer thread emit finished. repeat: -1/0"
+Debug: "avplayer emit stopped()"
+Warning: "Can not copy codec properties when it's open"
+Debug: "(repeat 1)Can not copy codec properties when it's open\nclosing d->format_ctx"
+Debug: "all audio/video threads stopped... state: 0"
+Debug: sync config to  "C:/Users/user/AppData/Roaming/Player/Player.ini"
+Debug: sync end
+Debug: "Not playing~"
+Debug: "(repeat 1)Not playing~\nsource_voice: 0x3a9a4fe0, master: 0x3a9a3bd0"
+Debug: "source_voice: 0x0, master: 0x0"
+Debug: 
+Debug: "~AVThreadPrivate wake up paused thread"
+Debug: "(repeat 1)~AVThreadPrivate wake up paused thread\nVideoFilterContext 0x39e2a2c0 delete paint device in 0x39d42910"
+Debug: "destroy GeometryRenderer 0x39e8c230"
+Warning: ScreenSaver::restoreState: no data, doing nothing

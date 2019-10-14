@@ -1,0 +1,11 @@
+f=mov
+vcodec=dnxhd
+vb=90M
+threads=2
+acodec=pcm_s16le
+g=1
+bf=0
+
+meta.preset.extension=mov
+meta.preset.note=A lightly compressed intermediate codec developed by Avid also known as SMPTE VC-3
+meta.preset.name=intermediate/DNxHD (HD 720p 23.98 fps)
