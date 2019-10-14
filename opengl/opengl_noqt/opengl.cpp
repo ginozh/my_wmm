@@ -347,9 +347,35 @@ int opengl(unsigned char* in, unsigned char* out, int w, int h)
     return 0;
 }
 #if 0
+QImage image1, image2;
+QImage* mask;
 int main(int argc, char *argv[])
 {
-    opengl();
+    int glw=1280, glh=720;
+    {
+        QImage& image=image1;
+        QString fileName="c:\\shareproject\\jpg\\4.jpg";
+        //QString fileName="c:\\shareproject\\jpg\\512img003.jpg";
+        image.load(fileName);
+        if (image.isNull()) {
+            qDebug()<<"error";
+            //return -1;
+        }
+        image = image.convertToFormat(QImage::Format_RGBA8888);
+    }
+    mask=new QImage(glw, glh,QImage::Format_RGBA8888);
+
+    unsigned char* mask_pixels = (unsigned char *) mask->bits();
+    unsigned char *pixels = (unsigned char *) image1.bits();
+    opengl(pixels, mask_pixels, glw, glh);
+    mask->save(QString("%1.jpg").arg(1));
+    /////opengl();
     return 0;
 }
 #endif
+#if 1
+int main(int argc, char *argv[])
+{
+    /////opengl();
+    return 0;
+}

@@ -119,14 +119,16 @@ void MainWindow::Render()
                 , image1.width(), image1.height()
                 , curr_effect_number, total_effect_number))
 #endif
-    if(!MMGlobalContext::instance()->fragRenderForOtherThread(m_effectName, pixels
-                , curr_effect_number, total_effect_number, pixels2))
+    /*if(!MMGlobalContext::instance()->fragRenderForOtherThread(m_effectName, pixels
+                , curr_effect_number, total_effect_number, pixels2))*/
+    if(!MMGlobalContext::instance()->fragRenderForOtherThread(m_effectName2, pixels))
     {
         int dt = startTime.msecsTo(QTime::currentTime());
         qDebug()<< "opengl waste: " << dt<<" curr_effect_number: "<<curr_effect_number;
-        glFlush();
+        ///glFlush();
+        glFinish();
         glReadPixels(0, 0, glw, glh, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *)mask_pixels);
-        //mask.save(QString("%1.jpg").arg(curr_effect_number));
+        mask->save(QString("%1.jpg").arg(curr_effect_number));
         lblImage->setPixmap(QPixmap::fromImage(*mask));
     }
     else
@@ -146,7 +148,7 @@ int main(int argc, char *argv[])
     outFile.close();
 
     outFile.open(QIODevice::WriteOnly | QIODevice::Append);
-    //qInstallMessageHandler(myMessageHandler);
+    qInstallMessageHandler(myMessageHandler);
 
 
     MainWindow mainWindow;
