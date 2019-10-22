@@ -31,13 +31,13 @@ const float PI = 3.141592653589793;
 
 #ifdef debug
 float iGlobalTime = u_global_time;
-vec2 curPos = vec2(0.5,0.5);//vec2(iGlobalTime/100.0,iGlobalTime/100.0);
+vec2 curPos = vec2(iGlobalTime/100.0,iGlobalTime/100.0);
 vec2 nextPos = vec2((iGlobalTime+1.0)/100.0,(iGlobalTime+1.0)/100.0);
 float alpha = 0.1;//range [0,100]
 //mod: a mod b == a - (b * floor(a/b))
-float CurRotate = 0.0;//iGlobalTime-1.0;//45.0;//0.0;//iGlobalTime*360.0/25.0;//sin(iGlobalTime*5.9)*360.0;//degree
+float CurRotate = iGlobalTime-1.0;//45.0;//0.0;//iGlobalTime*360.0/25.0;//sin(iGlobalTime*5.9)*360.0;//degree
 float nextRotate = 45.0;//(iGlobalTime+1.0)*360.0/25.0;//sin(iGlobalTime*5.0)*360.0;
-vec2 curScale = vec2(iGlobalTime/26.0, iGlobalTime/26.0);//vec2(1.0,1.0);//vec2(iGlobalTime/26.0, iGlobalTime/26.0);//vec2(sin(iGlobalTime*6.0)); //range [0,1]
+vec2 curScale = vec2(iGlobalTime/100.0+0.5, iGlobalTime/100.0+0.5);//vec2(1.0,1.0);//vec2(iGlobalTime/26.0, iGlobalTime/26.0);//vec2(sin(iGlobalTime*6.0)); //range [0,1]
 vec2 nextScale = vec2(1.0,1.0);//vec2((iGlobalTime+1.0)/26.0, (iGlobalTime+1.0)/26.0);//vec2(sin(iGlobalTime*5.9));//range [0,1]
 #else  
 vec2 curPos = u_curPos;// current position [(0.0,0.0),(1.0,1.0)]

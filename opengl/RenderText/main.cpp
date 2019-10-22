@@ -161,7 +161,7 @@ int main()
         // Swap the buffers
         glfwSwapBuffers(window);
         int64_t wasteTime = startTime.msecsTo(QTime::currentTime());
-        qInfo()<< "waste: " << wasteTime;
+        ///qInfo()<< "waste: " << wasteTime;
     }
 
     glfwTerminate();

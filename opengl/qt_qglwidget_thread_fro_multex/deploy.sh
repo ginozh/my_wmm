@@ -1,7 +1,7 @@
 #!/bin/bash
 
 <<COMMENT
-@author: ginozhang
+@author: storm
 @date: 2017-11-04
 @description:  ldd在shell脚本环境下有时无效，只能在shell下运行
 COMMENT

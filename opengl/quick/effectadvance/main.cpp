@@ -40,7 +40,7 @@ int main(int argc, char **argv)
     qInstallMessageHandler(myMessageHandler);
 
     qSetMessagePattern("[%{time yyyyMMdd h:mm:ss.zzz} %{if-debug}D%{endif}%{if-info}I%{endif}%{if-warning}W%{endif}%{if-critical}C%{endif}%{if-fatal}F%{endif}] %{file}:%{line} - %{message}");
-#if 1
+#if 0
     if (!QGuiApplicationPrivate::platform_integration->hasCapability(QPlatformIntegration::ThreadedOpenGL)) {
         QQuickView view;
         view.setSource(QUrl("qrc:///error.qml"));

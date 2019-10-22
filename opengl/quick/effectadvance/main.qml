@@ -56,13 +56,13 @@ Item {
                     width:box.width;height:box.height;
                     id: textlabel
                     text: model.text
-                    x:model.posx
-                    y:model.posy
+                    //x:200;//model.posx
+                    //y:200;//model.posy
                     // sets the font color of our custom delegates
                     color: model.color
                     //horizontalAlignment: TextEdit.AlignHCenter
                     font.family: "宋体"
-                    font.pixelSize: 200
+                    font.pixelSize: 50
                     //font.bold:true
                     textFormat: TextEdit.PlainText;//TextEdit.RichText
                     //font.hintingPreference: Font.PreferNoHinting
@@ -146,7 +146,7 @@ Item {
                 //sourceItem: sourceRed
                 sourceItem: textlabel
                 //sourceItem: image
-                //hideSource: true
+                hideSource: true
                 //live: true
             }
             //property color tint: root.sliderToColor(colorizeSlider.value)
@@ -162,7 +162,7 @@ Item {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 from: 1
-                value: 70
+                value: 1
                 to: 100
                 height: 40
             }
