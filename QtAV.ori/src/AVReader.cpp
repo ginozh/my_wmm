@@ -1,12 +1,12 @@
 #include "AVReader.h"
 #include <QDebug>
-#include "filter/FilterManager.h"
-#include "output/OutputSet.h"
+///#include "filter/FilterManager.h"
+///#include "output/OutputSet.h"
 #include "QtAV/AudioDecoder.h"
 #include "QtAV/AudioFormat.h"
 #include "QtAV/AudioResampler.h"
-#include "QtAV/MediaIO.h"
-#include "QtAV/VideoCapture.h"
+//#include "QtAV/MediaIO.h"
+//#include "QtAV/VideoCapture.h"
 #include "QtAV/private/AVCompat.h"
 #if AV_MODULE_CHECK(LIBAVFORMAT, 55, 18, 0, 39, 100)
 extern "C" {
@@ -26,13 +26,13 @@ extern "C" {
 #include "QtAV/AVDemuxer.h"
 #include "QtAV/Packet.h"
 #include "QtAV/AudioDecoder.h"
-#include "QtAV/MediaIO.h"
-#include "QtAV/VideoRenderer.h"
+//#include "QtAV/MediaIO.h"
+///#include "QtAV/VideoRenderer.h"
 #include "QtAV/AVClock.h"
-#include "QtAV/VideoCapture.h"
-#include "QtAV/VideoCapture.h"
-#include "filter/FilterManager.h"
-#include "output/OutputSet.h"
+//#include "QtAV/VideoCapture.h"
+//#include "QtAV/VideoCapture.h"
+///#include "filter/FilterManager.h"
+///#include "output/OutputSet.h"
 #include "AudioThread.h"
 #include "FFmpegThread.h"
 #include "AVDemuxMyThread.h"
@@ -109,16 +109,16 @@ AVReader::AVReader(QObject *parent) :
     , buffer_value(-1)
     , read_thread(0)
     , clock(new AVClock(AVClock::AudioClock))
-    , vo(0)
-    , ao(new AudioOutput())
+    //, vo(0)
+    ///, ao(new AudioOutput())
     , adec(0)
     , vdec(0)
     , athread(0)
     , vthread(0)
-    , vcapture(0)
+    //, vcapture(0)
     , speed(1.0)
-    , vos(0)
-    , aos(0)
+    //, vos(0)
+    //, aos(0)
     , fbrightness(0)
     , fcontrast(0)
     , fsaturation(0)
@@ -180,16 +180,18 @@ AVReader::AVReader(QObject *parent) :
     connect(read_thread, SIGNAL(internalSubtitlePacketRead(int, QtAV::Packet)), this, SIGNAL(internalSubtitlePacketRead(int, QtAV::Packet)), Qt::DirectConnection);
     //end avplayer
 #endif
-    vcapture = new VideoCapture(this);
+    ///vcapture = new VideoCapture(this);
 }
 
 AVReader::~AVReader()
 {
+#if 0
     // avplayerprivate
     if (ao) {
         delete ao;
         ao = 0;
     }
+#endif
     if (adec) {
         delete adec;
         adec = 0;
@@ -198,6 +200,7 @@ AVReader::~AVReader()
         delete vdec;
         vdec = 0;
     }
+#if 0
     if (vos) {
         vos->clearOutputs();
         delete vos;
@@ -208,10 +211,13 @@ AVReader::~AVReader()
         delete aos;
         aos = 0;
     }
+#endif
+#if 0
     if (vcapture) {
         delete vcapture;
         vcapture = 0;
     }
+#endif
     if (clock) {
         delete clock;
         clock = 0;
@@ -477,17 +483,18 @@ bool AVReader::setupVideoThread(AVReader *player)
         vthread->setDemuxer(&demuxer);
         vthread->setClock(clock);
         vthread->setStatistics(&statistics);
-        vthread->setVideoCapture(vcapture);
-        vthread->setOutputSet(vos);
+        ///vthread->setVideoCapture(vcapture);
+        ///vthread->setOutputSet(vos);
         ////read_thread->setVideoThread(vthread);
-
+#if 0
         QList<Filter*> filters = FilterManager::instance().videoFilters(NULL); //storm
         if (filters.size() > 0) {
             foreach (Filter *filter, filters) {
                 vthread->installFilter(filter);
             }
         }
-        QObject::connect(vthread, SIGNAL(finished()), player, SLOT(tryClearVideoRenderers()), Qt::DirectConnection);
+#endif
+        /////QObject::connect(vthread, SIGNAL(finished()), player, SLOT(tryClearVideoRenderers()), Qt::DirectConnection);
     }
 
     // we set the thre state before the thread start
@@ -542,7 +549,7 @@ AVClock* AVReader::masterClock()
 {
     return clock;
 }
-
+#if 0
 void AVReader::addVideoRenderer(VideoRenderer *renderer)
 {return;
 }
@@ -562,7 +569,8 @@ void AVReader::setRenderer(VideoRenderer *r)
 VideoRenderer *AVReader::renderer()
 {return NULL;
 }
-
+#endif
+#if 0
 QList<VideoRenderer*> AVReader::videoOutputs()
 {
     if (!vos)
@@ -578,7 +586,7 @@ QList<VideoRenderer*> AVReader::videoOutputs()
 AudioOutput* AVReader::audio()
 {return NULL;
 }
-
+#endif
 void AVReader::setSpeed(qreal speed)
 {return;
 }
@@ -626,7 +634,7 @@ const Statistics& AVReader::fstatistics() const
 {
     return statistics;
 }
-
+#if 0
 bool AVReader::installFilter(AudioFilter *filter, int index)
 {return false;
 }
@@ -652,7 +660,7 @@ QList<Filter*> AVReader::videoFilters() const
 {
     return FilterManager::instance().videoFilters(NULL); //storm
 }
-
+#endif
 void AVReader::setPriority(const QVector<VideoDecoderId> &ids)
 {return ;
 }
@@ -768,7 +776,7 @@ QString AVReader::file() const
         return current_source.toString();
     return QString();
 }
-
+#if 0
 void AVReader::setIODevice(QIODevice* device)
 {return;
 }
@@ -784,7 +792,7 @@ MediaIO* AVReader::input() const
 VideoCapture* AVReader::videoCapture() const
 {return NULL;
 }
-
+#endif
 void AVReader::play(const QString& path)
 {
     setFile(path);
@@ -865,11 +873,13 @@ void AVReader::loadInternal()
     if (current_source.type() == QVariant::String) {
         demuxer.setMedia(current_source.toString());
     } else {
+#if 0
         if (current_source.canConvert<QIODevice*>()) {
             demuxer.setMedia(current_source.value<QIODevice*>());
         } else { // MediaIO
             demuxer.setMedia(current_source.value<QtAV::MediaIO*>());
         }
+#endif
     }
     bloaded = demuxer.load();
     status = demuxer.mediaStatus();
@@ -1304,7 +1314,7 @@ void AVReader::playInternal()
     // TODO: add isVideo() or hasVideo()?
     if (masterClock()->isClockAuto()) {
         qDebug("auto select clock: audio > external");
-        if (!demuxer.audioCodecContext() || !ao || !ao->isOpen() || !athread) {
+        if (!demuxer.audioCodecContext() /*|| !ao || !ao->isOpen()*/ || !athread) {
             masterClock()->setClockType(AVClock::ExternalClock);
             qDebug("No audio found or audio not supported. Using ExternalClock.");
         } else {
@@ -1442,10 +1452,12 @@ void AVReader::stopNotifyTimer()
 void AVReader::onStarted()
 {
     if (speed != 1.0) {
+#if 0
         //TODO: check clock type?
         if (ao && ao->isAvailable()) {
             ao->setSpeed(speed);
         }
+#endif
         masterClock()->setSpeed(speed);
     } else {
         applyFrameRate();
@@ -1470,11 +1482,11 @@ void AVReader::onSeekFinished(qint64 value)
     else
         Q_EMIT positionChanged(value);
 }
-
+#if 0
 void AVReader::tryClearVideoRenderers()
 {return;
 }
-
+#endif
 void AVReader::seekChapter(int incr)
 {
     if (!chapters())

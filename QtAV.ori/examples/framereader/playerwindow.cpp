@@ -67,11 +67,11 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QWidget(parent)
         //r.setMedia("c:\\qtproject\\movie\\movie.mp4");
         r.setMedia("c:\\qtproject\\Thousand.Planets.mp4");
 #endif
-#if 0
+#if 1
         QTimer *timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(processSecondThing()));
-        timer->setSingleShot(true);
-        timer->start(50);
+        //timer->setSingleShot(true);
+        timer->start(100);
 #endif
         });
     connect(m_nextBtn, &QAbstractButton::clicked, this,
@@ -79,7 +79,7 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QWidget(parent)
 #if 1
             VideoFrame frame = m_avr.GetFrame(0); //TODO: if eof
             if(frame.isValid())
-                {QImage img=frame.toImage();static int idx=0;++idx;printf("FFmpegThread::run img idx: %d  isNull: %d pts: %f\n",idx,img.isNull(),frame.timestamp());fflush(0);if(idx>25 && idx<=60) img.save(QString("images%1.jpg").arg(idx));}// storm
+                {QImage img=frame.toImage();static int idx=0;++idx;printf("QAbstractButton::clicked img idx: %d  isNull: %d pts: %f\n",idx,img.isNull(),frame.timestamp());fflush(0);if(idx>25 && idx<=60) img.save(QString("images%1.jpg").arg(idx));}// storm
 
 #endif
 #if 0

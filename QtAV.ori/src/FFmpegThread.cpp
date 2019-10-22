@@ -2,13 +2,13 @@
 #include "AVThread_p.h"
 #include "QtAV/Packet.h"
 #include "QtAV/AVClock.h"
-#include "QtAV/VideoCapture.h"
+// #include "QtAV/VideoCapture.h"
 #include "QtAV/VideoDecoder.h"
-#include "QtAV/VideoRenderer.h"
+//#include "QtAV/VideoRenderer.h"
 #include "QtAV/Statistics.h"
-#include "QtAV/Filter.h"
-#include "QtAV/FilterContext.h"
-#include "output/OutputSet.h"
+//#include "QtAV/Filter.h"
+//#include "QtAV/FilterContext.h"
+///#include "output/OutputSet.h"
 #include "QtAV/private/AVCompat.h"
 #include <QtCore/QFileInfo>
 #include <QDebug>
@@ -72,16 +72,18 @@ public:
         AVThreadPrivate()
       , force_fps(0)
       , force_dt(0)
-      , capture(0)
-      , filter_context(0)
+      //, capture(0)
+      //, filter_context(0)
     {
     }
     ~FFmpegThreadPrivate() {
+#if 0
         //not neccesary context is managed by filters.
         if (filter_context) {
             delete filter_context;
             filter_context = 0;
         }
+#endif
     }
 
     VideoFrameConverter conv;
@@ -90,8 +92,8 @@ public:
     int force_dt; //unit: ms. force_fps = 1/force_dt.
 
     double pts; //current decoded pts. for capture. TODO: remove
-    VideoCapture *capture;
-    VideoFilterContext *filter_context;//TODO: use own smart ptr. QSharedPointer "=" is ugly
+    //VideoCapture *capture;
+    ///VideoFilterContext *filter_context;//TODO: use own smart ptr. QSharedPointer "=" is ugly
     VideoFrame displayed_frame;
 };
 
@@ -116,7 +118,7 @@ FFmpegThread::FFmpegThread(QObject *parent) :
     seek_tasks.blockFull(false);
 //end AVDemuxMyThread
 }
-
+#if 0
 //it is called in main thread usually, but is being used in video thread,
 VideoCapture* FFmpegThread::setVideoCapture(VideoCapture *cap)
 {
@@ -167,6 +169,7 @@ void FFmpegThread::clearRenderers()
 {
     d_func().outputSet->sendVideoFrame(VideoFrame());
 }
+#endif
 
 VideoFrame FFmpegThread::displayedFrame() const
 {
@@ -230,6 +233,7 @@ void FFmpegThread::setEQ(int b, int c, int s)
         delete task;
     }
 }
+#if 0
 
 void FFmpegThread::applyFilters(VideoFrame &frame)
 {
@@ -282,6 +286,7 @@ bool FFmpegThread::deliverVideoFrame(VideoFrame &frame)
     Q_EMIT frameDelivered();
     return true;
 }
+#endif
 #if 0
 //TODO: if output is null or dummy, the use duration to wait
 void FFmpegThread::run()
@@ -1640,6 +1645,8 @@ void FFmpegThread::run()
                 pkt_data = pkt.data.constData();
             continue;
         }
+        printf("FFmpegThread::run img pkt_pts: %f pkt_dts: %f pts: %f\n"
+                ,frame.timestamp(),pkt.pts, pkt.dts);fflush(0);
         ///qDebug("pts0: %f, pkt_pts: %f pkt_dts: %f, clock: %d\n", d.render_pts0, pkt.pts, pkt.dts, d.clock->clockType()); {QImage img=frame.toImage();static int idx=0;++idx;if(idx>25 && idx<=60){printf("FFmpegThread::run img idx: %d  isNull: %d pts: %f\n",idx,img.isNull(),frame.timestamp());fflush(0);img.save(QString("selfimages%1.jpg").arg(idx));}}// storm
         pkt_data = pkt.data.constData();
         if (frame.timestamp() < 0)

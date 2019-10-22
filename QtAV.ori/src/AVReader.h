@@ -12,7 +12,7 @@
 #include <limits>
 #include <QtCore/QHash>
 #include <QtCore/QScopedPointer>
-#include <QtAV/AudioOutput.h>
+///#include <QtAV/AudioOutput.h>
 #include <QtAV/AVClock.h>
 #include <QtAV/Statistics.h>
 #include <QtAV/VideoDecoder.h>
@@ -24,13 +24,13 @@ QT_END_NAMESPACE
 
 namespace QtAV {
 // avplayer
-class MediaIO;
-class AudioOutput;
-class VideoRenderer;
-class Filter;
-class AudioFilter;
-class VideoFilter;
-class VideoCapture;
+//class MediaIO;
+//class AudioOutput;
+///class VideoRenderer;
+///class Filter;
+///class AudioFilter;
+///class VideoFilter;
+//class VideoCapture;
 //end avplayer
 
 static const qint64 kInvalidPosition = std::numeric_limits<qint64>::max();
@@ -89,6 +89,7 @@ public:
      */
     void setFile(const QString& path);
     QString file() const;
+#if 0
     /*!
      * \brief setIODevice
      * Play media stream from QIODevice. AVPlayer does not take the ownership. You have to manage device lifetime.
@@ -100,7 +101,7 @@ public:
      */
     void setInput(MediaIO* in);
     MediaIO* input() const;
-
+#endif
     bool isLoaded() const;
     /*!
      * \brief setAsyncLoad
@@ -241,7 +242,7 @@ public:
      * Capture the current frame using videoCapture()->capture()
      * \sa VideoCapture
      */
-    VideoCapture *videoCapture() const;
+    ///VideoCapture *videoCapture() const;
     //TODO: no replay, replay without parsing the stream if it's already loaded. (not implemented). to force reload the stream, unload() then play()
     /*!
      * \brief play
@@ -258,21 +259,22 @@ public:
      */
     SState state() const;
     void setState(SState value);
-
+#if 0
     // TODO: use id as parameter and return ptr?
     void addVideoRenderer(VideoRenderer *renderer);
     void removeVideoRenderer(VideoRenderer *renderer);
     void clearVideoRenderers();
     void setRenderer(VideoRenderer* renderer);
     VideoRenderer* renderer();
-    QList<VideoRenderer*> videoOutputs();
+#endif
+    ///QList<VideoRenderer*> videoOutputs();
     /*!
      * \brief audio
      * AVPlayer always has an AudioOutput instance. You can access or control audio output properties through audio().
      * To disable audio output, set audio()->setBackends(QStringList() << "null") before starting playback
      * \return
      */
-    AudioOutput* audio();
+    //AudioOutput* audio();
     /*!
      * \brief setSpeed
      * Set playback speed.
@@ -316,12 +318,14 @@ public:
      * \return false if audio/video thread is not ready. But the filter will be installed when thread is ready.
      * false if already installed.
      */
+#if 0
     bool installFilter(AudioFilter* filter, int index = 0x7FFFFFFF);
     bool installFilter(VideoFilter* filter, int index = 0x7FFFFFFF);
     bool uninstallFilter(AudioFilter* filter);
     bool uninstallFilter(VideoFilter* filter);
     QList<Filter*> audioFilters() const;
     QList<Filter*> videoFilters() const;
+#endif
     /*!
      * \brief setPriority
      * A suitable decoder will be applied when video is playing. The decoder does not change in current playback if no decoder is found.
@@ -587,7 +591,7 @@ private Q_SLOTS:
     void onStarted();
     void updateMediaStatus(QtAV::MediaStatus status);
     void onSeekFinished(qint64 value);
-    void tryClearVideoRenderers();
+    /////void tryClearVideoRenderers();
     void seekChapter(int incr);
 protected:
     // TODO: set position check timer interval
@@ -630,6 +634,7 @@ public:
     void updateBufferValue(PacketBuffer *buf);
     void updateBufferValue();
     //TODO: addAVOutput()
+#if 0
     template<class Out>
     void setAVOutput(Out *&pOut, Out *pNew, AVThread *thread) {
         Out *old = pOut;
@@ -672,6 +677,7 @@ public:
             old = 0;
         }
     }
+#endif
 
     bool auto_load;
     bool async_load;
@@ -700,17 +706,17 @@ public:
     AVDemuxer demuxer;
     AVDemuxMyThread *read_thread;
     AVClock *clock;
-    VideoRenderer *vo; //list? // TODO: remove
-    AudioOutput *ao; // TODO: remove
+    ////VideoRenderer *vo; //list? // TODO: remove
+    ///AudioOutput *ao; // TODO: remove
     AudioDecoder *adec;
     VideoDecoder *vdec;
     AudioThread *athread;
     FFmpegThread *vthread;
 
-    VideoCapture *vcapture;
+    ///VideoCapture *vcapture;
     Statistics statistics;
     qreal speed;
-    OutputSet *vos, *aos;
+    ////OutputSet *vos, *aos;
     QVector<VideoDecoderId> vc_ids;
     int fbrightness, fcontrast, fsaturation;
 

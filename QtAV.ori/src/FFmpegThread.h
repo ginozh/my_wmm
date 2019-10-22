@@ -19,7 +19,7 @@ class AVDemuxer;
 class AVThread;
 //end AVDemuxMyThread
 
-class VideoCapture;
+//class VideoCapture;
 class FFmpegThreadPrivate;
 class FFmpegThread : public AVThread
 {
@@ -27,8 +27,8 @@ class FFmpegThread : public AVThread
     DPTR_DECLARE_PRIVATE(FFmpegThread)
 public:
     explicit FFmpegThread(QObject *parent = 0);
-    VideoCapture *setVideoCapture(VideoCapture* cap); //ensure thread safe
-    VideoCapture *videoCapture() const;
+    //VideoCapture *setVideoCapture(VideoCapture* cap); //ensure thread safe
+    //VideoCapture *videoCapture() const;
     VideoFrame displayedFrame() const;
     void setFrameRate(qreal value);
     //virtual bool event(QEvent *event);
@@ -38,13 +38,13 @@ public:
     void setEQ(int b, int c, int s);
 
 public Q_SLOTS:
-    void addCaptureTask();
-    void clearRenderers();
+    //void addCaptureTask();
+    //void clearRenderers();
 
 protected:
-    void applyFilters(VideoFrame& frame);
+    ////void applyFilters(VideoFrame& frame);
     // deliver video frame to video renderers. frame may be converted to a suitable format for renderer
-    bool deliverVideoFrame(VideoFrame &frame);
+    //bool deliverVideoFrame(VideoFrame &frame);
     virtual void run();
     // wait for value msec. every usleep is a small time, then process next task and get new delay
 public:
