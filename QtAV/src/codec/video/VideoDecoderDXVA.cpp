@@ -190,7 +190,7 @@ VideoFrame VideoDecoderDXVA::frame()
         f.setBytesPerLine(d.width * 4); //used by gl to compute texture size
         f.setMetaData(QStringLiteral("surface_interop"), QVariant::fromValue(VideoSurfaceInteropPtr(interop)));
         f.setTimestamp(d.frame->pkt_pts/1000.0);
-        f.setDisplayAspectRatio(d.getDAR(d.frame));gettimeofday(&end,NULL);time_use=(end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec);qDebug()<<"VideoDecoderDXVA::frame zero copy waste:"<<time_use;//storm
+        f.setDisplayAspectRatio(d.getDAR(d.frame));gettimeofday(&end,NULL);time_use=(end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec);qDebug()<<"VideoDecoderDXVA::frame zero copy waste:"<<time_use<<" pts: "<<d.frame->pkt_pts;//storm
         return f;
     }
     class ScopedD3DLock {

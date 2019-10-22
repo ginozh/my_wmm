@@ -19,11 +19,11 @@
 ******************************************************************************/
 #include <QApplication>
 #include "playerwindow.h"
-#include <QtAVWidgets>
+///#include <QtAVWidgets>
 
 int main(int argc, char *argv[])
 {
-    QtAV::Widgets::registerRenderers();
+    ///QtAV::Widgets::registerRenderers();
     QApplication a(argc, argv);
     PlayerWindow player;
     player.show();

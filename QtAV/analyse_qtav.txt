@@ -25,6 +25,7 @@ AVPlayer::AVPlayer(QObject *parent)
 // src/AVPlayer.cpp  1161
 void AVPlayer::play()
     connect(this, SIGNAL(loaded()), this, SLOT(playInternal()));
+
 //  src/AVPlayer.cpp  1181
 void AVPlayer::playInternal()
     d->setupAudioThread(this);
@@ -98,8 +99,7 @@ void AVPlayer::playInternal()
                 qDebug("%s thread type: %s, count: %d", metaObject()->className(), thread_name[d.codec_ctx->active_thread_type], d.codec_ctx->thread_count);
 
             //end vd->open();bool AVDecoder::open()
-            VideoThread *vthread;
-            vthread = new VideoThread(player);
+            VideoThread *vthread = new VideoThread(player);
             read_thread->setVideoThread(vthread);
             vthread->setDecoder(vdec);
     //end d->setupVideoThread(this);
@@ -320,6 +320,9 @@ void OpenGLWidgetRenderer::paintGL()
                             // end d.material->bind()
                             DYGL(glViewport(d.rect.x(), d.rect.y(), d.rect.width(), d.rect.height())); // viewport was used in gpu filters is wrong, qt quick fbo item's is right(so must ensure setProjectionMatrixToRect was called correctly)
                             shader->update(d.material);
+                                const VideoFormat fmt(material->currentFormat()); //FIXME: maybe changed in setCurrentFrame(
+                                //format is out of date because we may use the same shader for different formats
+                                setVideoFormat(fmt);
                             shader->program()->setUniformValue(shader->matrixLocation(), transform*d.matrix);
                             // uniform end. attribute begin
                             d.updateGeometry(shader, target, roi);
@@ -482,7 +485,7 @@ add_frame
 显示frame
 
 frameread.cpp + openglwidget.cpp
-见
+见 mpv
 /c/qtproject/mpv video/out/opengl/context_dxinterop.c  302
     // Create the OpenGL-side texture
     gl->GenTextures(1, &p->texture);
@@ -510,3 +513,192 @@ frameread.cpp + openglwidget.cpp
     gl->BindFramebuffer(GL_FRAMEBUFFER, 0);
 
 3, 精简最小代码
+3.1, packet关联frame:
+    dec->decode(pkt);
+        ret = avcodec_decode_video2(d.codec_ctx, d.frame, &got_frame_ptr, (AVPacket*)packet.asAVPacket()); //d.frame
+            avcodec_flush_buffers=>avcodec_send_packet=>avpriv_dca_parse_core_frame_header=>avpriv_fits_header_parse_line=>av_parser_close=>avcodec_default_get_buffer2
+            => static int ffmpeg_get_va_buffer2(struct AVCodecContext *ctx, AVFrame *frame, int flags)
+                VideoDecoderFFmpegHWPrivate *va = (VideoDecoderFFmpegHWPrivate*)ctx->opaque;
+                va->getBuffer(&frame->opaque, &frame->data[0]);
+
+4, 参考AVPlayer、FFmpegReader
+AVReader: 提供VideoFrame
+AVDemuxer.setMedia(filename);
+AVDemuxer.load();// duration, get packet
+
+VideoDecoder *vd = VideoDecoder::create("DXVA");
+decoder->setCodecContext(demuxer.videoCodecContext());
+decoder->setProperty("copyMode", "ZeroCopy");
+decoder->open()
+4.1, load file
+void AVPlayer::play()
+bool AVPlayer::load()
+    loaderThreadPool()->start(new LoadWorker(this));
+    =>LoadWorker::run()
+        m_player->loadInternal();
+        =>void AVPlayer::loadInternal()
+            d->demuxer.setMedia(d->current_source.toString());
+            d->loaded = d->demuxer.load();
+
+4.2, choose decoder. open
+AVPlayer::AVPlayer(QObject *parent) 
+    connect(&d->demuxer, SIGNAL(loaded()), this, SIGNAL(loaded()));
+    d->read_thread = new AVDemuxThread(this);
+    d->read_thread->setDemuxer(&d->demuxer);
+// src/AVPlayer.cpp  1161
+void AVPlayer::play()
+    connect(this, SIGNAL(loaded()), this, SLOT(playInternal()));
+
+//  src/AVPlayer.cpp  1181
+void AVPlayer::playInternal()
+    d->setupAudioThread(this);
+    // src/AVPlayerPrivate.cpp  346
+    => bool AVPlayer::Private::setupAudioThread(AVPlayer *player)
+    d->setupVideoThread(this);
+    // src/AVPlayerPrivate.cpp  554
+    => bool AVPlayer::Private::setupVideoThread(AVPlayer *player)
+        AVCodecContext *avctx = demuxer.videoCodecContext();
+        foreach(VideoDecoderId vid, vc_ids)
+            VideoDecoder *vd = VideoDecoder::create(vid);
+            vd->setCodecContext(avctx);
+            vd->setOptions(vc_opt);
+            vd->open();
+            VideoThread *vthread;
+            vthread = new VideoThread(player);
+            read_thread->setVideoThread(vthread);
+            vthread->setDecoder(vdec);
+    //end d->setupVideoThread(this);
+    // Starting video thread
+    qDebug("Starting video thread...");
+    d->vthread->start(); // VideoThread
+    d->read_thread->start(); // AVDemuxThread
+    Q_EMIT stateChanged(PlayingState);
+    Q_EMIT started(); //we called stop(), so must emit started()
+
+4.3, get avpacket
+// src/AVDemuxThread.cpp  530
+void AVDemuxThread::run()
+    Packet pkt;
+    PacketBuffer *vqueue = video_thread ? video_thread->packetQueue() : 0;
+        return const_cast<PacketBuffer*>(&d_func().packets);
+    AVThread* thread = !video_thread || (audio_thread && demuxer->hasAttacedPicture()) ? audio_thread : video_thread;
+    m_buffer = thread->packetQueue();
+    while (!end) {
+        processNextSeekTask();
+        demuxer->readFrame());
+        pkt = demuxer->packet();
+        // push queue
+        vqueue->blockFull(!audio_thread || !audio_thread->isRunning() || !aqueue || aqueue->isEnough());
+        vqueue->put(pkt); //affect audio_thread
+
+4.4, video play
+//src/VideoThread.cpp  240
+void VideoThread::run()
+    VideoDecoder *dec = static_cast<VideoDecoder*>(d.dec);
+    Packet pkt;
+    while (!d.stop) 
+    pkt = d.packets.take(); //wait to dequeue
+    dec->decode(pkt);
+    VideoFrame frame = dec->frame();
+    deliverVideoFrame(frame);
+
+4.5, audio play
+//src/AudioThread.cpp  75
+
+5, 接下来工作
+5.1, seek
+帧
+5.2, 声音处理
+采用原来处理方式, convert -> fifo -> 一帧一帧
+劣势在于一旦某个有问题则都有问题，需要测试qtav的处理能力
+5.3, 采用gpu texture缓存图像?
+暂时实时获取packet、frame、texture
+最后来处理
+5.4, dxva失败如何处理?
+采用ffmpeg, 颜色不对，可能是format不对
+5.5, FFMPEG解码流程
+解码一样，只不过不会将yuv420p直接scale成rgba模式，而是转三个数据映射为texture0、texture1、texture2，由opengl处理(见../log_ffmpeg.log u_Texture2)
+// opengl/VideoShader.cpp 125
+const char* VideoShader::fragmentShader() const
+    // const VideoFormat fmt(material->currentFormat()); //FIXME: maybe changed in setCurrentFrame(
+现有的处理是先scale成glw、glh的rgba模式再处理
+=> 优化成: 不再scale,根据image格式传到gpu上去处理 (需要验证一下)
+5.6, open video的不同之处
+包括info
+5.6.1
+1) open avformat and find stream
+// src/AVPlayer.cpp 644
+void AVPlayer::loadInternal()
+    d->loaded = d->demuxer.load();
+    // src/AVDemuxer.cpp 746
+    =>bool AVDemuxer::load()
+        d->format_ctx = avformat_alloc_context();
+        ret = avformat_open_input(&d->format_ctx, d->file.toUtf8().constData(), d->input_format, d->options.isEmpty() ? NULL : &d->dict);
+        ret = avformat_find_stream_info(d->format_ctx, NULL);
+        d->prepareStreams()
+        => bool AVDemuxer::Private::prepareStreams()
+            setStream(AVDemuxer::AudioStream, -1);
+            setStream(AVDemuxer::VideoStream, -1);
+            => bool AVDemuxer::Private::setStream(AVDemuxer::StreamType st, int streamValue)
+                s = av_find_best_stream(format_ctx , st == AudioStream ? AVMEDIA_TYPE_AUDIO : st == VideoStream ? AVMEDIA_TYPE_VIDEO
+                        : st == SubtitleStream ? AVMEDIA_TYPE_SUBTITLE : AVMEDIA_TYPE_UNKNOWN , streamValue, -1, NULL, 0); // streamValue -1 is ok
+                si->stream = s;
+                si->wanted_stream = streamValue;
+                si->avctx = format_ctx->streams[s]->codec;
+    d->initStatistics();
+    => void AVPlayer::Private::initStatistics()
+        initBaseStatistics(); // url, start_time, duration, bit_rate, format
+        initAudioStatistics(demuxer.audioStream());
+        initVideoStatistics(demuxer.videoStream()); // width, height, pix_fmt, rotate
+
+2) open avcodec: 选择是否硬件加速
+// src/AVPlayer.cpp 644
+//  src/AVPlayer.cpp  1181
+void AVPlayer::playInternal()
+    d->setupAudioThread(this);
+    // src/AVPlayerPrivate.cpp  344
+    =>bool AVPlayer::Private::setupAudioThread(AVPlayer *player)
+        adec = AudioDecoder::create();
+        adec->setCodecContext(avctx);
+        adec->open()
+        athread = new AudioThread(player);
+        initAudioStatistics(ademuxer->audioStream());
+    d->setupVideoThread(this);
+    // src/AVPlayerPrivate.cpp  554
+    => bool AVPlayer::Private::setupVideoThread(AVPlayer *player)
+        AVCodecContext *avctx = demuxer.videoCodecContext();
+        foreach(VideoDecoderId vid, vc_ids)
+            VideoDecoder *vd = VideoDecoder::create(vid);
+            vd->setCodecContext(avctx);
+            vd->setOptions(vc_opt);
+            vd->setProperty("copyMode", "ZeroCopy"); //storm
+            if (vd->open()) { break;}//hit
+            vdec = vd;
+            // src/codec/AVDecoder.cpp:72
+        vthread = new VideoThread(player);
+        initVideoStatistics(demuxer.videoStream());
+
+5.6.2
+1) open avformat and find stream and open avcodec
+// FFmpegReader.cpp
+void FFmpegReader::Open()
+ret1 = stream_setup(true);
+=>int FFmpegReader::stream_setup(bool bVideo) 
+    AVFormatContext *ic = NULL;
+    ic = avformat_alloc_context();
+    err = avformat_open_input(&ic, is->filename->toStdString().c_str(), NULL, NULL); //storm
+    err = avformat_find_stream_info(ic, NULL);
+    st_index[AVMEDIA_TYPE_VIDEO] = av_find_best_stream(ic, AVMEDIA_TYPE_VIDEO, wanted_stream[AVMEDIA_TYPE_VIDEO], -1, NULL, 0);
+    st_index[AVMEDIA_TYPE_SUBTITLE] = av_find_best_stream(ic, AVMEDIA_TYPE_SUBTITLE, wanted_stream[AVMEDIA_TYPE_SUBTITLE], (st_index[AVMEDIA_TYPE_AUDIO] >= 0 ?  st_index[AVMEDIA_TYPE_AUDIO] : st_index[AVMEDIA_TYPE_VIDEO]), NULL, 0);
+    ret = stream_component_open(is, st_index[AVMEDIA_TYPE_VIDEO]);
+    => int FFmpegReader::stream_component_open(PlayerState *is, int stream_index)
+        avctx = avcodec_alloc_context3(NULL);
+        ret = avcodec_parameters_to_context(avctx, ic->streams[stream_index]->codecpar);
+        av_codec_set_pkt_timebase(avctx, ic->streams[stream_index]->time_base);
+        codec = avcodec_find_decoder(avctx->codec_id);
+        if (forced_codec_name)
+            codec = avcodec_find_decoder_by_name(forced_codec_name);
+        if (!codec || (ret = avcodec_open2(avctx, codec, &opts)) < 0) 
+        UpdateVideoInfo(ic, avctx, ic->streams[stream_index], stream_index); //
+        => void FFmpegReader::UpdateVideoInfo(AVFormatContext *pFormatCtx, AVCodecContext *pCodecCtx , AVStream *pStream, int stream_index)
+            // width, height, fps, pixel_ratio, pix_fmt, duration, rotate, video_length(Calculate number of frames)
