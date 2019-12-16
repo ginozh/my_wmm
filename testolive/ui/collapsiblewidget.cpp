@@ -1,6 +1,6 @@
 #include "collapsiblewidget.h"
 
-#include "ui/checkboxex.h"
+///#include "ui/checkboxex.h"
 
 #include <QDebug>
 #include <QLabel>
@@ -27,15 +27,15 @@ CollapsibleWidget::CollapsibleWidget(QWidget* parent) : QWidget(parent) {
     title_bar_layout = new QHBoxLayout();
 	title_bar_layout->setMargin(5);
 	title_bar->setLayout(title_bar_layout);
-	enabled_check = new CheckboxEx();
-	enabled_check->setChecked(true);
+	///enabled_check = new CheckboxEx();
+	///enabled_check->setChecked(true);
 	header = new QLabel();
     collapse_button = new QPushButton();
     collapse_button->setIconSize(collapse_button->iconSize()*0.5);
     collapse_button->setStyleSheet("QPushButton { border: none; }");
     setText(tr("<untitled>"));
     title_bar_layout->addWidget(collapse_button);
-    title_bar_layout->addWidget(enabled_check);
+    ///title_bar_layout->addWidget(enabled_check);
     title_bar_layout->addWidget(header);
     title_bar_layout->addStretch();
     layout->addWidget(title_bar);
@@ -78,7 +78,7 @@ void CollapsibleWidget::setContents(QWidget* c) {
 	contents = c;
 	if (!existing) {
 		layout->addWidget(contents);
-		connect(enabled_check, SIGNAL(toggled(bool)), this, SLOT(on_enabled_change(bool)));
+		////connect(enabled_check, SIGNAL(toggled(bool)), this, SLOT(on_enabled_change(bool)));
 		connect(collapse_button, SIGNAL(clicked()), this, SLOT(on_visible_change()));
 	}
 }

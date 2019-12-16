@@ -33,7 +33,7 @@
 #include <QtCore/QSysInfo>
 #define DX_LOG_COMPONENT "DXVA2"
 #include "utils/DirectXHelper.h"
-#include <sys/time.h> //storm
+//#include <sys/time.h> //storm
 // d3d9ex: http://dxr.mozilla.org/mozilla-central/source/dom/media/wmf/DXVA2Manager.cpp
 // to use c api, add define COBJMACROS and CINTERFACE
 #define DXVA2API_USE_BITFIELDS
@@ -183,14 +183,14 @@ VideoFrame VideoDecoderDXVA::frame()
         return VideoFrame();
 
     IDirect3DSurface9 *d3d = (IDirect3DSurface9*)(uintptr_t)d.frame->data[3];
-    if (copyMode() == ZeroCopy && d.interop_res) {float time_use=0; struct timeval start; struct timeval end; gettimeofday(&start,NULL); //storm
+    if (copyMode() == ZeroCopy && d.interop_res) {//float time_use=0; struct timeval start; struct timeval end; gettimeofday(&start,NULL); //storm
         d3d9::SurfaceInterop *interop = new d3d9::SurfaceInterop(d.interop_res);
         interop->setSurface(d3d, d.width, d.height);
         VideoFrame f(d.width, d.height, VideoFormat::Format_RGB32);
         f.setBytesPerLine(d.width * 4); //used by gl to compute texture size
         f.setMetaData(QStringLiteral("surface_interop"), QVariant::fromValue(VideoSurfaceInteropPtr(interop)));
         f.setTimestamp(d.frame->pkt_pts/1000.0);
-        f.setDisplayAspectRatio(d.getDAR(d.frame));gettimeofday(&end,NULL);time_use=(end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec);qDebug()<<"VideoDecoderDXVA::frame zero copy waste:"<<time_use<<" pts: "<<d.frame->pkt_pts;//storm
+        f.setDisplayAspectRatio(d.getDAR(d.frame));//gettimeofday(&end,NULL);time_use=(end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec);qDebug()<<"VideoDecoderDXVA::frame zero copy waste:"<<time_use<<" pts: "<<d.frame->pkt_pts;//storm
         return f;
     }
     class ScopedD3DLock {

@@ -1,20 +1,20 @@
-#include "effectrow.h"
+﻿#include "effectrow.h"
 
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QMessageBox>
 
-#include "project/undo.h"
-#include "project/clip.h"
-#include "project/sequence.h"
-#include "panels/panels.h"
-#include "panels/effectcontrols.h"
-#include "panels/viewer.h"
-#include "panels/grapheditor.h"
+//#include "project/undo.h"
+//#include "project/clip.h"
+//#include "project/sequence.h"
+//#include "panels/panels.h"
+//#include "panels/effectcontrols.h"
+//#include "panels/viewer.h"
+//#include "panels/grapheditor.h"
 #include "effect.h"
 #include "ui/viewerwidget.h"
-#include "ui/keyframenavigator.h"
-#include "ui/clickablelabel.h"
+//#include "ui/keyframenavigator.h"
+//#include "ui/clickablelabel.h"
 
 EffectRow::EffectRow(Effect *parent, bool save, QGridLayout *uilayout, const QString &n, int row, bool keyframable) :
 	parent_effect(parent),
@@ -25,25 +25,25 @@ EffectRow::EffectRow(Effect *parent, bool save, QGridLayout *uilayout, const QSt
 	ui_row(row),
 	just_made_unsafe_keyframe(false)
 {
-	label = new ClickableLabel(name + ":");
+/*	label = new ClickableLabel(name + ":");
 
 	ui->addWidget(label, row, 0);
-
+*/
 	column_count = 1;
 
-	keyframe_nav = nullptr;
+	//keyframe_nav = nullptr;
 	if (parent_effect->meta != nullptr
 			&& parent_effect->meta->type != EFFECT_TYPE_TRANSITION
 			&& keyframable) {
-		connect(label, SIGNAL(clicked()), this, SLOT(focus_row()));
-
+		//connect(label, SIGNAL(clicked()), this, SLOT(focus_row()));
+/*
 		keyframe_nav = new KeyframeNavigator();
 		connect(keyframe_nav, SIGNAL(goto_previous_key()), this, SLOT(goto_previous_key()));
 		connect(keyframe_nav, SIGNAL(toggle_key()), this, SLOT(toggle_key()));
 		connect(keyframe_nav, SIGNAL(goto_next_key()), this, SLOT(goto_next_key()));
 		connect(keyframe_nav, SIGNAL(keyframe_enabled_changed(bool)), this, SLOT(set_keyframe_enabled(bool)));
 		connect(keyframe_nav, SIGNAL(clicked()), this, SLOT(focus_row()));
-		ui->addWidget(keyframe_nav, row, 6);
+		ui->addWidget(keyframe_nav, row, 6);*/
 	}
 }
 
@@ -54,19 +54,20 @@ bool EffectRow::isKeyframing() {
 void EffectRow::setKeyframing(bool b) {
 	if (parent_effect->meta->type != EFFECT_TYPE_TRANSITION) {
 		keyframing = b;
-		if (keyframe_nav != nullptr) {
+		/*if (keyframe_nav != nullptr) {
 			keyframe_nav->enable_keyframes(b);
-		}
+		}*/
 	}
 }
 
 void EffectRow::set_keyframe_enabled(bool enabled) {
 	if (enabled) {
+        /*
 		ComboAction* ca = new ComboAction();
 		ca->append(new SetKeyframing(this, true));
 		set_keyframe_now(ca);
-		undo_stack.push(ca);
-	} else {
+		undo_stack.push(ca);*/
+	} else {/*
 		if (QMessageBox::question(panel_effect_controls,
 								  tr("Disable Keyframes"),
 								  tr("Disabling keyframes will delete all current keyframes. Are you sure you want to do this?"),
@@ -84,11 +85,12 @@ void EffectRow::set_keyframe_enabled(bool enabled) {
 			panel_effect_controls->update_keyframes();
 		} else {
 			setKeyframing(true);
-		}
+		}*/
 	}
 }
 
 void EffectRow::goto_previous_key() {
+#if 0
 	long key = LONG_MIN;
 	Clip* c = parent_effect->parent_clip;
 	for (int i=0;i<fieldCount();i++) {
@@ -100,10 +102,12 @@ void EffectRow::goto_previous_key() {
 			}
 		}
 	}
-	if (key != LONG_MIN) panel_sequence_viewer->seek(key);
+	//if (key != LONG_MIN) panel_sequence_viewer->seek(key);
+#endif
 }
 
 void EffectRow::toggle_key() {
+#if 0
 	QVector<EffectField*> key_fields;
 	QVector<int> key_field_index;
 	Clip* c = parent_effect->parent_clip;
@@ -117,7 +121,7 @@ void EffectRow::toggle_key() {
 			}
 		}
 	}
-
+/*
 	ComboAction* ca = new ComboAction();
 	if (key_fields.size() == 0) {
 		// keyframe doesn't exist, set one
@@ -127,11 +131,13 @@ void EffectRow::toggle_key() {
 			ca->append(new KeyframeDelete(key_fields.at(i), key_field_index.at(i)));
 		}
 	}
-	undo_stack.push(ca);
-	update_ui(false);
+	undo_stack.push(ca);*/
+	//update_ui(false);
+#endif
 }
 
 void EffectRow::goto_next_key() {
+#if 0
 	long key = LONG_MAX;
 	Clip* c = parent_effect->parent_clip;
 	for (int i=0;i<fieldCount();i++) {
@@ -143,11 +149,12 @@ void EffectRow::goto_next_key() {
 			}
 		}
 	}
-	if (key != LONG_MAX) panel_sequence_viewer->seek(key);
+	//if (key != LONG_MAX) panel_sequence_viewer->seek(key);
+#endif
 }
 
 void EffectRow::focus_row() {
-	panel_graph_editor->set_row(this);
+	//panel_graph_editor->set_row(this);
 }
 
 EffectField* EffectRow::add_field(int type, const QString& id, int colspan) {
@@ -173,6 +180,7 @@ EffectRow::~EffectRow() {
 }
 
 void EffectRow::set_keyframe_now(ComboAction* ca) {
+#if 0
 	long time = sequence->playhead-parent_effect->parent_clip->timeline_in+parent_effect->parent_clip->clip_in;
 
 	if (!just_made_unsafe_keyframe) {
@@ -214,7 +222,7 @@ void EffectRow::set_keyframe_now(ComboAction* ca) {
 	for (int i=0;i<fieldCount();i++) {
 		field(i)->keyframes[unsafe_keys.at(i)].data = field(i)->get_current_data();
 	}
-
+/*
 	if (ca != nullptr)	{
 		for (int i=0;i<fieldCount();i++) {
 			if (key_is_new.at(i)) ca->append(new KeyframeFieldSet(field(i), unsafe_keys.at(i)));
@@ -226,7 +234,7 @@ void EffectRow::set_keyframe_now(ComboAction* ca) {
 	}
 
 	panel_effect_controls->update_keyframes();
-
+*/
 
 
 
@@ -264,6 +272,7 @@ void EffectRow::set_keyframe_now(ComboAction* ca) {
 	}
 
 	panel_effect_controls->update_keyframes();*/
+#endif
 }
 
 void EffectRow::delete_keyframe_at_time(ComboAction* ca, long time) {
@@ -271,7 +280,7 @@ void EffectRow::delete_keyframe_at_time(ComboAction* ca, long time) {
 		EffectField* f = field(j);
 		for (int i=0;i<f->keyframes.size();i++) {
 			if (f->keyframes.at(i).time == time) {
-				ca->append(new KeyframeDelete(f, i));
+				//ca->append(new KeyframeDelete(f, i));
 				break;
 			}
 		}

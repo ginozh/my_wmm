@@ -228,7 +228,7 @@ bool VideoThread::deliverVideoFrame(VideoFrame &frame)
             d.outputSet->unlock();
             return false;
         }
-        frame = outFrame;
+        frame = outFrame; qDebug("VideoThread::deliverVideoFrame pts: %f", frame.timestamp()); //storm
     }
     d.outputSet->sendVideoFrame(frame); //TODO: group by format, convert group by group
     d.outputSet->unlock();
@@ -657,7 +657,7 @@ void VideoThread::run()
                 pkt_data = pkt.data.constData();
             continue;
         }
-        qDebug("pts0: %f, pkt_pts: %f pkt_dts: %f, clock: %d\n", d.render_pts0, pkt.pts, pkt.dts, d.clock->clockType()); {QImage img=frame.toImage();static int idx=0;++idx;printf("VideoThread::run img idx: %d  isNull: %d d.packets: %d\n",idx,img.isNull(),d.packets.size());fflush(0);if(idx>25 && idx<=60) img.save(QString("images%1.jpg").arg(idx));}// storm
+        qDebug("VideoThread::run pts0: %f pts: %f pkt_pts: %f pkt_dts: %f clock: %d", d.render_pts0, frame.timestamp(), pkt.pts, pkt.dts, d.clock->clockType()); /*{QImage img=frame.toImage();static int idx=0;++idx;printf("VideoThread::run img idx: %d  isNull: %d d.packets: %d\n",idx,img.isNull(),d.packets.size());fflush(0);if(idx>25 && idx<=60) img.save(QString("images%1.jpg").arg(idx));}*/// storm
         pkt_data = pkt.data.constData();
         if (frame.timestamp() < 0)
             frame.setTimestamp(pkt.pts); // pkt.pts is wrong. >= real timestamp

@@ -10,7 +10,14 @@
 #include <QtMath>
 #include <iostream>
 #include <tr1/memory>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include "math.h"
+#include <glm/glm.hpp>
+
 using namespace std;
+float u_chroma_similarity=0.45;
+float u_chroma_transparence=0.2;
 
 QString createAss();
 void testDate();
@@ -24,13 +31,15 @@ void testInt();
 void testSacle();
 void testCppVirtual();
 void testGetSamplesPerFrame();
+void testQJson();
+void testChroma();
+void testMovRotateScale();
 
 int main(int argc, char *argv[])
 {
 	cout << "programe start" << endl;
     QCoreApplication a(argc, argv);
 
-    //testCppVirtual();
     // testSacle();
 
     //testInt();
@@ -51,9 +60,16 @@ int main(int argc, char *argv[])
 
     // createASpeed();
 
-    testGetSamplesPerFrame();
+    //testCppVirtual();
 
+    //testGetSamplesPerFrame();
+
+    //testQJson();
+
+    //testChroma();
     //qDebug()<<"qLn: "<<qLn(10)<<" qPow: "<<qPow(3.3,2);
+
+    testMovRotateScale();
 
 	cout << "programe end" << endl;
     return 0;//a.exec();
@@ -125,8 +141,8 @@ void testDouble()
     double dframenumber=(double)(pts+video_pts_offset) * (double)num/(double)den;
     //int64_t framenumber = round(dframenumber) + 1;
     int64_t framenumber = round((double)(pts+video_pts_offset) * (double)num/(double)den) + 1;
-    printf("dframenumber: %f\n", dframenumber);
-    printf("framenumber: %d\n", framenumber);
+    ////printf("dframenumber: %f\n", dframenumber);
+    ////printf("framenumber: %ld\n", framenumber);
     qDebug() << fixed << qSetRealNumberPrecision(6)<<"framenumber: "<<framenumber<<" dframenumber: "<<(double)dframenumber;
 }
 
@@ -340,7 +356,7 @@ void testMemoryLeak()
 {
     QVector<La*> vLa;
     vLa.push_back(new La());
-    La* a=new La();
+    ////La* a=new La();
     for(int i=0; i<vLa.count(); i++)
     {
         qDebug()<<"i: "<<i<<" address: "<<(size_t)vLa[i];
@@ -382,7 +398,7 @@ void createASpeed()
 
 void testInt()
 {
-    int iRotate=-630, iHFlip=0, iVFlip=0;
+    int iRotate=-630;///, iHFlip=0, iVFlip=0;
     if(iRotate>=360)
     {
         iRotate=iRotate%360;
@@ -470,4 +486,430 @@ void testGetSamplesPerFrame()
         <<" sample_rate/fps: "<<(float)sample_rate/fps
         <<" sample_rate: "<<sample_rate
         <<" fps: "<<fps<<endl;
+}
+void testQJson()
+{
+#if 0
+    //"{\"method\":\"QtImageReader::NewObject\",\"params\":{\"id\":\"%1\"}}"
+    QJsonObject params,jsonObj; // assume this has been populated with Json data
+    params.insert("id","1");
+    jsonObj.insert("method","QtImageReader::NewObject");
+    jsonObj.insert("params",params);
+
+    QJsonDocument doc(jsonObj);
+    QString strJson(doc.toJson(QJsonDocument::Compact));
+    qDebug()<<"testQJson strJson: "<<strJson;
+
+    if(jsonObj.contains("method") && jsonObj["method"].isString())
+    {
+        QString method=jsonObj["method"].toString();
+
+    }
+#endif
+}
+typedef union vec3
+{
+	float data[3];   /**< All compoments at once    */
+	struct {
+        float x;     /**< Alias for first component */
+        float y;     /**< Alias fo second component */
+        float z;     /**< Alias fo third component  */
+    };
+	struct {
+        float r;     /**< Alias for first component */
+        float g;     /**< Alias fo second component */
+        float b;     /**< Alias fo third component  */
+    };
+	struct {
+        float red;   /**< Alias for first component */
+        float green; /**< Alias fo second component */
+        float blue;  /**< Alias fo third component  */
+    };
+    vec3(){}
+    vec3(float data1, float data2, float data3){ data[0]=data1;data[1]=data2;data[2]=data3;}
+} vec3;
+typedef union vec4
+{
+	float data[4];    /**< All compoments at once    */
+	struct {
+        float x;      /**< Alias for first component */
+        float y;      /**< Alias for second component */
+        float z;      /**< Alias for third component  */
+        float w;      /**< Alias for fourth component */
+    };
+	struct {
+        float left;   /**< Alias for first component */
+        float top;    /**< Alias for second component */
+        float width;  /**< Alias for third component  */
+        float height; /**< Alias for fourth component */
+    };
+	struct {
+        float r;      /**< Alias for first component */
+        float g;      /**< Alias for second component */
+        float b;      /**< Alias for third component  */
+        float a;      /**< Alias for fourth component */
+    };
+	struct {
+        float red;    /**< Alias for first component */
+        float green;  /**< Alias for second component */
+        float blue;   /**< Alias for third component  */
+        float alpha;  /**< Alias for fourth component */
+    };
+    vec4(){}
+    vec4(float data1, float data2, float data3, float data4){data[0]=data1;data[1]=data2;data[2]=data3;data[3]=data4;}
+} vec4;
+vec3 rgbToLab(vec3 inColor)
+{
+	float x;
+	float y;
+	float z;
+	float l;
+	float a;
+	float b;
+
+	//RGB to XYZ color
+	if(inColor.r > 0.04045)
+		x = pow(((inColor.r + 0.055) / 1.055), 2.4);
+	else
+		x = inColor.r / 12.92;
+
+	if(inColor.g > 0.04045)
+		y = pow(((inColor.g + 0.055) / 1.055), 2.4);
+	else
+		y = inColor.g / 12.92;
+
+    if(inColor.b > 0.04045)
+		z = pow(((inColor.b + 0.055) / 1.055), 2.4);
+	else
+		z = inColor.b / 12.92;
+
+	//for final RGB to XYZ, multiply the previous x, y, and z by 100,
+	//but since we will divide the final values by 95.047, 100, and
+	//108.883, for optimizations I have combined that all below
+	l = (x * 0.4124 + y * 0.3576 + z * 0.1805) / 0.95047;
+	a = (x * 0.2126 + y * 0.7152 + z * 0.0722) / 1.00000;
+	b = (x * 0.0193 + y * 0.1192 + z * 0.9505) / 1.08883;
+
+	if(l > 0.008856)
+		l = pow(l, (1.0 / 3.0));
+	else
+		l = (7.787 * l) + (16.0 / 116.0);
+
+	if(a > 0.008856)
+		a = pow(a, (1.0 / 3.0));
+	else
+		a = (7.787 * a) + (16.0 / 116.0);
+
+    if(b > 0.008856)
+		b = pow(b, (1.0 / 3.0));
+	else
+		b = (7.787 * b) + (16.0 / 116.0);
+
+	//return L*, a*, b*
+	return vec3((116.0 * a) - 16.0, 500.0 * (l - a), 200.0 * (a - b));
+}
+
+//CIE94
+float deltaE(vec3 labA, vec3 labB)
+{
+	float deltaL = labA.x - labB.x;
+	float deltaA = labA.y - labB.y;
+	float deltaB = labA.z - labB.z;
+	float c1 = sqrt(labA.y * labA.y + labA.z * labA.z);
+	float c2 = sqrt(labB.y * labB.y + labB.z * labB.z);
+	float deltaC = c1 - c2;
+	float deltaH = deltaA * deltaA + deltaB * deltaB - deltaC * deltaC;
+	if(deltaH < 0.0)
+		deltaH = 0.0;
+	else
+		deltaH = sqrt(deltaH);
+	float sc = 1.0 + 0.045 * c1;
+	float sh = 1.0 + 0.015 * c1;
+	float deltaLKlsl = deltaL / 1.0;
+	float deltaCkcsc = deltaC / sc;
+	float deltaHkhsh = deltaH / sh;
+	float delta = deltaLKlsl * deltaLKlsl + deltaCkcsc * deltaCkcsc + deltaHkhsh * deltaHkhsh;
+	if(delta < 0.0)
+		delta = 0.0;
+	else
+		delta = sqrt(delta);
+	return delta;
+}
+
+vec4 rgb_to_xyz(vec4 color) {
+	float var_R = (color.r); //R from 0.0 to 255.0
+	float var_G = (color.g); //G from 0.0 to 255.0
+	float var_B = (color.b); //B from 0.0 to 255.0
+
+	if (var_R > 0.04045) {
+		var_R = pow(((var_R + 0.055) / 1.055), 2.4);
+	} else {
+		var_R = var_R / 12.92;
+	}
+	if (var_G > 0.04045) {
+		var_G = pow(((var_G + 0.055) / 1.055), 2.4);
+	} else {
+		var_G = var_G / 12.92;
+	}
+
+	if (var_B > 0.04045) {
+		var_B = pow(((var_B + 0.055) / 1.055), 2.4);
+	} else {
+		var_B = var_B / 12.92;
+	}
+
+	var_R = var_R * 100.0;
+	var_G = var_G * 100.0;
+	var_B = var_B * 100.0;
+
+	//Observer. = 2.0°, Illuminant = D65
+	float X = var_R * 0.4124 + var_G * 0.3576 + var_B * 0.1805;
+	float Y = var_R * 0.2126 + var_G * 0.7152 + var_B * 0.0722;
+	float Z = var_R * 0.0193 + var_G * 0.1192 + var_B * 0.9505;
+
+	return vec4(X, Y, Z, color.a);
+}
+
+vec4 xyz_to_lab(vec4 color) {
+
+	float ref_X = 95.047; //Observer= 2.0°, Illuminant= D65
+	float ref_Y = 100.000;
+	float ref_Z = 108.883;
+
+	float var_X = color.r / ref_X;
+	float var_Y = color.g / ref_Y;
+	float var_Z = color.b / ref_Z;
+
+	if (var_X > 0.008856) {
+		var_X = pow(var_X, (1.0 / 3.0));
+	} else {
+		var_X = (7.787 * var_X) + (16.0 / 116.0);
+	}
+	if (var_Y > 0.008856) {
+		var_Y = pow(var_Y, (1.0 / 3.0));
+	} else {
+		var_Y = (7.787 * var_Y) + (16.0 / 116.0);
+	}
+	if (var_Z > 0.008856) {
+		var_Z = pow(var_Z, (1.0 / 3.0));
+	} else {
+		var_Z = (7.787 * var_Z) + (16.0 / 116.0);
+	}
+
+	float L = (116.0 * var_Y) - 16.0;
+	float a = 500.0 * (var_X - var_Y);
+	float b = 200.0 * (var_Y - var_Z);
+
+	return vec4(L, a, b, color.a);
+}
+
+vec4 lab_to_lch(vec4 color) {
+
+	const float MPI = 3.14159265359;
+
+	float var_H = atan2(color.b, color.g); //in GLSL this is atan2
+
+	if (var_H > 0.0) {
+		var_H = (var_H / MPI) * 180.0;
+	} else {
+		var_H = 360.0 - (abs(var_H) / MPI) * 180.0;
+	}
+
+	float C = sqrt(pow(color.g, 2.0) + pow(color.b, 2.0));
+	float H = var_H;
+
+	return vec4(color.r, C, H, color.a);
+}
+// ---------------------------
+vec4 lch_to_lab(vec4 color) {
+	float a = cos(qDegreesToRadians(color.b)) * color.g;
+	float b = sin(qDegreesToRadians(color.b)) * color.g;
+
+	return vec4(color.r, a, b, color.a);
+}
+
+vec4 lab_to_xyz(vec4 color) {
+	float var_Y = (color.r + 16.0) / 116.0;
+	float var_X = color.g / 500.0 + var_Y;
+	float var_Z = var_Y - color.b / 200.0;
+
+	if (pow(var_Y, 3.0) > 0.008856) {
+		var_Y = pow(var_Y, 3.0);
+	} else {
+		var_Y = (var_Y - 16.0 / 116.0) / 7.787;
+	}
+	if (pow(var_X, 3.0) > 0.008856) {
+		var_X = pow(var_X, 3.0);
+	} else {
+		var_X = (var_X - 16.0 / 116.0) / 7.787;
+	}
+	if (pow(var_Z, 3.0) > 0.008856) {
+		var_Z = pow(var_Z, 3.0);
+	} else {
+		var_Z = (var_Z - 16.0 / 116.0) / 7.787;
+	}
+
+	float ref_X = 95.047; //Observer= 2.0 degrees, Illuminant= D65
+	float ref_Y = 100.000;
+	float ref_Z = 108.883;
+
+	float X = ref_X * var_X;
+	float Y = ref_Y * var_Y;
+	float Z = ref_Z * var_Z;
+
+	return vec4(X, Y, Z, color.a);
+}
+
+vec4 xyz_to_rgb(vec4 color) {
+	float var_X = color.r / 100.0; //X from 0.0 to  95.047      (Observer = 2.0 degrees, Illuminant = D65);
+	float var_Y = color.g / 100.0; //Y from 0.0 to 100.000;
+	float var_Z = color.b / 100.0; //Z from 0.0 to 108.883;
+
+	float var_R = var_X * 3.2406 + var_Y * -1.5372 + var_Z * -0.4986;
+	float var_G = var_X * -0.9689 + var_Y * 1.8758 + var_Z * 0.0415;
+	float var_B = var_X * 0.0557 + var_Y * -0.2040 + var_Z * 1.0570;
+
+	if (var_R > 0.0031308) {
+		var_R = 1.055 * pow(var_R, (1.0 / 2.4)) - 0.055;
+	} else {
+		var_R = 12.92 * var_R;
+	}
+	if (var_G > 0.0031308) {
+		var_G = 1.055 * pow(var_G, (1.0 / 2.4)) - 0.055;
+	} else {
+		var_G = 12.92 * var_G;
+	}
+	if (var_B > 0.0031308) {
+		var_B = 1.055 * pow(var_B, (1.0 / 2.4)) - 0.055;
+	} else {
+		var_B = 12.92 * var_B;
+	}
+
+	float R = var_R;
+	float G = var_G;
+	float B = var_B;
+
+	return vec4(R, G, B, color.a);
+}
+
+
+vec4 rgb_to_lch(vec4 color) {
+	vec4 xyz = rgb_to_xyz(color);
+	vec4 lab = xyz_to_lab(xyz);
+	vec4 lch = lab_to_lch(lab);
+	return lch;
+}
+
+
+vec4 lch_to_rgb(vec4 color) {
+	vec4 lab = lch_to_lab(color);
+	vec4 xyz = lab_to_xyz(lab);
+	vec4 rgb = xyz_to_rgb(xyz);
+	return rgb;
+}
+
+vec4 rgb_to_lab(vec4 color) {
+	vec4 xyz = rgb_to_xyz(color);
+	vec4 lab = xyz_to_lab(xyz);
+	return lab;
+}
+
+vec4 lab_to_rgb(vec4 color) {
+	vec4 xyz = lab_to_xyz(color);
+	vec4 rgb = xyz_to_rgb(xyz);
+	return rgb;
+}
+
+float distanceThreeDimensions(vec4 lab1, vec4 lab2)
+{
+    return sqrt(pow((lab1.r - lab2.r),2.0) + pow((lab1.g - lab2.g),2.0) + pow((lab1.b - lab2.b),2.0));
+}
+
+float calcAlpha(vec4 lab1, vec4 lab2)
+{
+	float blendThreshold = u_chroma_similarity*100.0;//float(PREFIX(blendThreshold));
+    float eraseThreshold = u_chroma_transparence*100.0 ;//0.0;//float(PREFIX(eraseThreshold));
+    blendThreshold += eraseThreshold;
+    float difThreshold = blendThreshold - eraseThreshold;
+	
+	float cDistance = distanceThreeDimensions(lab1, lab2);
+    qDebug()<<"cDistance : "<<cDistance;
+    float alpha = 1.0;
+    if (cDistance < eraseThreshold)
+    {
+        alpha = 0.0;
+    }
+    else if (cDistance < blendThreshold)
+    {
+        cDistance = ((blendThreshold - cDistance) / difThreshold);
+        cDistance = cDistance * cDistance;
+        alpha = 1.0 - cDistance;
+    }
+	return alpha;
+}
+void testChroma()
+{
+    vec3 retColor3(255.0,255.0,255.0);
+    vec4 retColor(retColor3.r, retColor3.g, retColor3.b,1.0);
+    //vec4 retColor(0,0,0,1.0);
+    float u_chroma_r=1;
+    float u_chroma_g=1;
+    float u_chroma_b=1;
+    if (u_chroma_transparence != 1.0)
+    {
+        vec4 lab = rgb_to_lab(retColor);
+
+        vec4 blk = vec4(u_chroma_r, u_chroma_g, u_chroma_b,1.0);
+        vec4 black_lab = rgb_to_lab(blk);
+
+        float a=calcAlpha(lab, black_lab);
+        retColor.a = retColor.a * a;
+        qDebug()<<"calcAlpha : "<<a;
+    }
+    {
+        vec3 lab = rgbToLab(retColor3);
+
+        vec3 blk = vec3(u_chroma_r, u_chroma_g, u_chroma_b);
+        vec3 black_lab = rgbToLab(blk);
+        float d = deltaE(lab, black_lab);
+        qDebug()<<" deltaE: "<<d;
+    }
+}
+
+#include <glm/glm.hpp>
+using namespace glm;
+float u_global_time=1.0;
+float u_total_time=100.0;
+#define motionBlur vec2(0.5)
+#define radialBlur 0.5
+#define rotateblur 0.5
+float iGlobalTime = u_global_time;
+vec2 curPos = vec2(iGlobalTime/100.0,iGlobalTime/100.0);
+vec2 nextPos = vec2((iGlobalTime+1.0)/100.0,(iGlobalTime+1.0)/100.0);
+float alpha = 100.0;//range [0,100]
+float CurRotate = 0.0;//iGlobalTime*360.0/25.0;//sin(iGlobalTime*5.9)*360.0;//degree
+float nextRotate = 0.0;//(iGlobalTime+1.0)*360.0/25.0;//sin(iGlobalTime*5.0)*360.0;
+vec2 curScale = vec2(1.0,1.0);//vec2(iGlobalTime/26.0, iGlobalTime/26.0);//vec2(sin(iGlobalTime*6.0)); //range [0,1]
+vec2 nextScale = vec2(1.0,1.0);//vec2((iGlobalTime+1.0)/26.0, (iGlobalTime+1.0)/26.0);//vec2(sin(iGlobalTime*5.9));//range [0,1]
+void testMovRotateScale()
+{
+    vec2 qt_TexCoord0=vec2(0.5);
+    vec2 gl_FragCoord=vec2(400,400);
+
+    vec2 iResolution = gl_FragCoord / qt_TexCoord0;
+
+	vec2 tc = qt_TexCoord0;
+	vec2 uv=gl_FragCoord/iResolution; // qt_TexCoord0
+	vec2 center = vec2(0.5);
+
+    vec2 tmp1=nextPos - curPos + vec2(0.0001);
+    vec2 tmp2=tmp1*iResolution;
+    vec2 tmp3=normalize(tmp2);
+    vec2 tmp4=nextPos - curPos+vec2(0.00001);
+    vec2 tmp5=vec2(length(tmp4));
+    vec2 tmp6=gl_FragCoord-iResolution/vec2(2.0);
+    vec2 tmp7=motionBlur*tmp3*tmp5*tmp6/iResolution;
+    //vec2 tmp=motionBlur*normalize((nextPos - curPos + vec2(0.0001))*iResolution);
+	vec2 dir = motionBlur*normalize((nextPos - curPos + vec2(0.0001))*iResolution)*length(nextPos - curPos+vec2(0.00001))* (gl_FragCoord-iResolution/vec2(2.0) )/iResolution;
+	float processRota = CurRotate*0.01745329;
 }

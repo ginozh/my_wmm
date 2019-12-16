@@ -1,11 +1,9 @@
-#include "sequence.h"
+﻿#include "sequence.h"
 
 #include "clip.h"
 #include "transition.h"
-
 #include <QCoreApplication>
 
-#include "debug.h"
 
 Sequence::Sequence() :
 	playhead(0),
@@ -58,6 +56,7 @@ long Sequence::getEndFrame() {
 }
 
 void Sequence::hard_delete_transition(Clip *c, int type) {
+#if 0
 	int transition_index = (type == TA_OPENING_TRANSITION) ? c->opening_transition : c->closing_transition;
 	if (transition_index > -1) {
 		bool del = true;
@@ -92,6 +91,7 @@ void Sequence::hard_delete_transition(Clip *c, int type) {
 			c->closing_transition = -1;
 		}
 	}
+#endif
 }
 
 void Sequence::getTrackLimits(int* video_tracks, int* audio_tracks) {

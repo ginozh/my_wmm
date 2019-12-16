@@ -188,7 +188,7 @@ sub-tests-uninstall_subtargets: sub-src-libQtAV-pro-uninstall_subtargets sub-wid
 	@test -d tests/ || mkdir -p tests/
 	cd tests/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV.ori/tests/tests.pro ) && $(MAKE) -f Makefile uninstall
 
-Makefile: QtAV.pro .qmake.cache C:/msys64/mingw64/share/qt5/mkspecs/win32-g++/qmake.conf C:/msys64/mingw64/share/qt5/mkspecs/features/spec_pre.prf \
+Makefile: QtAV.pro .qmake.conf .qmake.cache C:/msys64/mingw64/share/qt5/mkspecs/win32-g++/qmake.conf C:/msys64/mingw64/share/qt5/mkspecs/features/spec_pre.prf \
 		C:/msys64/mingw64/share/qt5/mkspecs/qdevice.pri \
 		C:/msys64/mingw64/share/qt5/mkspecs/features/device_config.prf \
 		C:/msys64/mingw64/share/qt5/mkspecs/common/g++-base.conf \
@@ -337,8 +337,7 @@ Makefile: QtAV.pro .qmake.cache C:/msys64/mingw64/share/qt5/mkspecs/win32-g++/qm
 		C:/msys64/mingw64/share/qt5/mkspecs/features/qt_config.prf \
 		C:/msys64/mingw64/share/qt5/mkspecs/win32-g++/qmake.conf \
 		C:/msys64/mingw64/share/qt5/mkspecs/features/spec_post.prf \
-		.qmake.cache \
-		.qmake.stash \
+		.qmake.conf \
 		C:/msys64/mingw64/share/qt5/mkspecs/features/exclusive_builds.prf \
 		C:/msys64/mingw64/share/qt5/mkspecs/features/toolchain.prf \
 		C:/msys64/mingw64/share/qt5/mkspecs/features/default_pre.prf \
@@ -510,8 +509,7 @@ C:/msys64/mingw64/share/qt5/mkspecs/features/qt_functions.prf:
 C:/msys64/mingw64/share/qt5/mkspecs/features/qt_config.prf:
 C:/msys64/mingw64/share/qt5/mkspecs/win32-g++/qmake.conf:
 C:/msys64/mingw64/share/qt5/mkspecs/features/spec_post.prf:
-.qmake.cache:
-.qmake.stash:
+.qmake.conf:
 C:/msys64/mingw64/share/qt5/mkspecs/features/exclusive_builds.prf:
 C:/msys64/mingw64/share/qt5/mkspecs/features/toolchain.prf:
 C:/msys64/mingw64/share/qt5/mkspecs/features/default_pre.prf:

@@ -1,4 +1,4 @@
-#include "clip.h"
+﻿#include "clip.h"
 
 #include "project/effect.h"
 #include "project/transition.h"
@@ -150,7 +150,7 @@ void Clip::queue_remove_earliest() {
 	queue.removeAt(earliest_frame);
 }
 
-Transition* Clip::get_opening_transition() {
+Transition* Clip::get_opening_transition() {opening_transition = -1; return nullptr;
 	if (opening_transition > -1) {
 		if (this->sequence == nullptr) {
 			return clipboard_transitions.at(opening_transition);
@@ -161,7 +161,7 @@ Transition* Clip::get_opening_transition() {
 	return nullptr;
 }
 
-Transition* Clip::get_closing_transition() {
+Transition* Clip::get_closing_transition() {closing_transition=-1; return nullptr;
 	if (closing_transition > -1) {
 		if (this->sequence == nullptr) {
 			return clipboard_transitions.at(closing_transition);
@@ -186,7 +186,7 @@ Clip::~Clip() {
 	av_packet_free(&pkt);
 }
 
-long Clip::get_clip_in_with_transition() {
+long Clip::get_clip_in_with_transition() {return 0;
 	if (get_opening_transition() != nullptr && get_opening_transition()->secondary_clip != nullptr) {
 		// we must be the secondary clip, so return (timeline in - length)
 		return clip_in - get_opening_transition()->get_true_length();
@@ -194,7 +194,7 @@ long Clip::get_clip_in_with_transition() {
 	return clip_in;
 }
 
-long Clip::get_timeline_in_with_transition() {
+long Clip::get_timeline_in_with_transition() {return 0;
 	if (get_opening_transition() != nullptr && get_opening_transition()->secondary_clip != nullptr) {
 		// we must be the secondary clip, so return (timeline in - length)
 		return timeline_in - get_opening_transition()->get_true_length();

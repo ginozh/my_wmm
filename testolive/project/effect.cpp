@@ -1,39 +1,40 @@
 #include "effect.h"
 
-#include "panels/panels.h"
-#include "panels/viewer.h"
+//#include "panels/panels.h"
+//#include "panels/viewer.h"
 #include "ui/viewerwidget.h"
 #include "ui/collapsiblewidget.h"
-#include "panels/project.h"
-#include "project/undo.h"
+///#include "panels/project.h"
+//#include "project/undo.h"
 #include "project/sequence.h"
 #include "project/clip.h"
-#include "panels/timeline.h"
-#include "panels/effectcontrols.h"
-#include "panels/grapheditor.h"
-#include "ui/checkboxex.h"
-#include "debug.h"
-#include "io/path.h"
-#include "mainwindow.h"
-#include "io/math.h"
-#include "transition.h"
+///#include "panels/timeline.h"
+//#include "panels/effectcontrols.h"
+//#include "panels/grapheditor.h"
+//#include "ui/checkboxex.h"
+//#include "debug.h"
+//#include "io/path.h"
+//#include "mainwindow.h"
+//#include "io/math.h"
+//#include "transition.h"
 
 #include "effects/internal/transformeffect.h"
-#include "effects/internal/texteffect.h"
-#include "effects/internal/timecodeeffect.h"
-#include "effects/internal/solideffect.h"
-#include "effects/internal/audionoiseeffect.h"
-#include "effects/internal/toneeffect.h"
-#include "effects/internal/volumeeffect.h"
-#include "effects/internal/paneffect.h"
-#include "effects/internal/shakeeffect.h"
-#include "effects/internal/cornerpineffect.h"
+//#include "effects/internal/texteffect.h"
+//#include "effects/internal/timecodeeffect.h"
+//#include "effects/internal/solideffect.h"
+//#include "effects/internal/audionoiseeffect.h"
+//#include "effects/internal/toneeffect.h"
+//#include "effects/internal/volumeeffect.h"
+//#include "effects/internal/paneffect.h"
+//#include "effects/internal/shakeeffect.h"
+//#include "effects/internal/cornerpineffect.h"
 #ifndef NOVST
-#include "effects/internal/vsthost.h"
+//#include "effects/internal/vsthost.h"
 #endif
-#include "effects/internal/fillleftrighteffect.h"
-#include "effects/internal/frei0reffect.h"
+//#include "effects/internal/fillleftrighteffect.h"
+//#include "effects/internal/frei0reffect.h"
 
+#include "Clipt.h"
 #include <QCheckBox>
 #include <QGridLayout>
 #include <QXmlStreamReader>
@@ -51,6 +52,24 @@ ViewerWidget* viewer_widget = 0; //storm
 bool shaders_are_enabled = true;
 QVector<EffectMeta> effects;
 
+Effect* create_effect(Clipt* c, const EffectMeta* em) {
+	if (em->internal >= 0 && em->internal < EFFECT_INTERNAL_COUNT) {
+        qDebug()<<"effect.cpp::create_effect em->internal: "<<em->internal;
+		// must be an internal effect
+		switch (em->internal) {
+		case EFFECT_INTERNAL_TRANSFORM: return new TransformEffect(c, em);
+		}
+	} else if (!em->filename.isEmpty()) {
+		// load effect from file
+		return new Effect(c, em);
+	} else {
+		qCritical() << "Invalid effect data";
+		/*QMessageBox::critical(mainWindow,
+							  QCoreApplication::translate("Effect", "Invalid effect"),
+							  QCoreApplication::translate("Effect", "No candidate for effect '%1'. This effect may be corrupt. Try reinstalling it or Olive.").arg(em->name));*/
+	}
+	return nullptr;
+}
 Effect* create_effect(Clip* c, const EffectMeta* em) {
 	if (em->internal >= 0 && em->internal < EFFECT_INTERNAL_COUNT) {
         qDebug()<<"effect.cpp::create_effect em->internal: "<<em->internal;
@@ -74,9 +93,6 @@ Effect* create_effect(Clip* c, const EffectMeta* em) {
 #ifndef NOFREI0R
 		case EFFECT_INTERNAL_FREI0R: return new Frei0rEffect(c, em);
 #endif
-#else
-		case EFFECT_INTERNAL_VOLUME: return new VolumeEffect(c, em);
-		case EFFECT_INTERNAL_PAN: return new PanEffect(c, em);
 #endif
 		}
 	} else if (!em->filename.isEmpty()) {
@@ -84,9 +100,9 @@ Effect* create_effect(Clip* c, const EffectMeta* em) {
 		return new Effect(c, em);
 	} else {
 		qCritical() << "Invalid effect data";
-		QMessageBox::critical(mainWindow,
+		/*QMessageBox::critical(mainWindow,
 							  QCoreApplication::translate("Effect", "Invalid effect"),
-							  QCoreApplication::translate("Effect", "No candidate for effect '%1'. This effect may be corrupt. Try reinstalling it or Olive.").arg(em->name));
+							  QCoreApplication::translate("Effect", "No candidate for effect '%1'. This effect may be corrupt. Try reinstalling it or Olive.").arg(em->name));*/
 	}
 	return nullptr;
 }
@@ -100,6 +116,221 @@ const EffectMeta* get_internal_meta(int internal_id, int type) {
 	return nullptr;
 }
 
+Effect::Effect(Clipt* c, const EffectMeta *em) :
+	parent_clipt(c),
+	parent_clip(NULL),
+	meta(em),
+	enable_shader(false),
+	enable_coords(false),
+	enable_superimpose(false),
+	enable_image(false),
+	glslProgram(nullptr),
+	texture(nullptr),
+	enable_always_update(false),
+	isOpen(false),
+	bound(false)
+{
+	// set up base UI
+	container = new CollapsibleWidget();
+	////connect(container->enabled_check, SIGNAL(clicked(bool)), this, SLOT(field_changed()));
+	ui = new QWidget();
+	ui_layout = new QGridLayout();
+	ui_layout->setSpacing(4);
+	ui->setLayout(ui_layout);
+	container->setContents(ui);
+
+	connect(container->title_bar, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(show_context_menu(const QPoint&)));
+
+	if (em != nullptr) {
+		// set up UI from effect file
+		container->setText(em->name);
+
+		if (!em->filename.isEmpty() && em->internal == -1) {
+			QFile effect_file(em->filename);
+			if (effect_file.open(QFile::ReadOnly)) {
+				QXmlStreamReader reader(&effect_file);
+
+				while (!reader.atEnd()) {
+					if (reader.name() == "row" && reader.isStartElement()) {
+						QString row_name;
+						const QXmlStreamAttributes& attributes = reader.attributes();
+						for (int i=0;i<attributes.size();i++) {
+							const QXmlStreamAttribute& attr = attributes.at(i);
+							if (attr.name() == "name") {
+								row_name = attr.value().toString();
+							}
+						}
+						if (!row_name.isEmpty()) {
+							EffectRow* row = add_row(row_name);
+							while (!reader.atEnd() && !(reader.name() == "row" && reader.isEndElement())) {
+								reader.readNext();
+								if (reader.name() == "field" && reader.isStartElement()) {
+									int type = EFFECT_TYPE_VIDEO;
+									QString id;
+
+									// get field type
+									const QXmlStreamAttributes& attributes = reader.attributes();
+									for (int i=0;i<attributes.size();i++) {
+										const QXmlStreamAttribute& attr = attributes.at(i);
+										if (attr.name() == "type") {
+											QString comp = attr.value().toString().toUpper();
+											if (comp == "DOUBLE") {
+												type = EFFECT_FIELD_DOUBLE;
+											} else if (comp == "BOOL") {
+												type = EFFECT_FIELD_BOOL;
+											} else if (comp == "COLOR") {
+												type = EFFECT_FIELD_COLOR;
+											} else if (comp == "COMBO") {
+												type = EFFECT_FIELD_COMBO;
+											} else if (comp == "FONT") {
+												type = EFFECT_FIELD_FONT;
+											} else if (comp == "STRING") {
+												type = EFFECT_FIELD_STRING;
+											} else if (comp == "FILE") {
+												type = EFFECT_FIELD_FILE;
+											}
+										} else if (attr.name() == "id") {
+											id = attr.value().toString();
+										}
+									}
+
+									if (id.isEmpty()) {
+										qCritical() << "Couldn't load field from" << em->filename << "- ID cannot be empty.";
+									} else if (type > -1) {
+										EffectField* field = row->add_field(type, id);
+										connect(field, SIGNAL(changed()), this, SLOT(field_changed()));
+										switch (type) {
+										case EFFECT_FIELD_DOUBLE:
+											for (int i=0;i<attributes.size();i++) {
+												const QXmlStreamAttribute& attr = attributes.at(i);
+												if (attr.name() == "default") {
+													field->set_double_default_value(attr.value().toDouble());
+												} else if (attr.name() == "min") {
+													field->set_double_minimum_value(attr.value().toDouble());
+												} else if (attr.name() == "max") {
+													field->set_double_maximum_value(attr.value().toDouble());
+												}
+											}
+											break;
+										case EFFECT_FIELD_COLOR:
+										{
+											QColor color;
+											for (int i=0;i<attributes.size();i++) {
+												const QXmlStreamAttribute& attr = attributes.at(i);
+												if (attr.name() == "r") {
+													color.setRed(attr.value().toInt());
+												} else if (attr.name() == "g") {
+													color.setGreen(attr.value().toInt());
+												} else if (attr.name() == "b") {
+													color.setBlue(attr.value().toInt());
+												} else if (attr.name() == "rf") {
+													color.setRedF(attr.value().toDouble());
+												} else if (attr.name() == "gf") {
+													color.setGreenF(attr.value().toDouble());
+												} else if (attr.name() == "bf") {
+													color.setBlueF(attr.value().toDouble());
+												} else if (attr.name() == "hex") {
+													color.setNamedColor(attr.value().toString());
+												}
+											}
+											field->set_color_value(color);
+										}
+											break;
+										case EFFECT_FIELD_STRING:
+											for (int i=0;i<attributes.size();i++) {
+												const QXmlStreamAttribute& attr = attributes.at(i);
+												if (attr.name() == "default") {
+													field->set_string_value(attr.value().toString());
+												}
+											}
+											break;
+										case EFFECT_FIELD_BOOL:
+											for (int i=0;i<attributes.size();i++) {
+												const QXmlStreamAttribute& attr = attributes.at(i);
+												if (attr.name() == "default") {
+													field->set_bool_value(attr.value() == "1");
+												}
+											}
+											break;
+										case EFFECT_FIELD_COMBO:
+										{
+											int combo_index = 0;
+											for (int i=0;i<attributes.size();i++) {
+												const QXmlStreamAttribute& attr = attributes.at(i);
+												if (attr.name() == "default") {
+													combo_index = attr.value().toInt();
+													break;
+												}
+											}
+											while (!reader.atEnd() && !(reader.name() == "field" && reader.isEndElement())) {
+												reader.readNext();
+												if (reader.name() == "option" && reader.isStartElement()) {
+													reader.readNext();
+													field->add_combo_item(reader.text().toString(), 0);
+												}
+											}
+											field->set_combo_index(combo_index);
+										}
+											break;
+										case EFFECT_FIELD_FONT:
+											for (int i=0;i<attributes.size();i++) {
+												const QXmlStreamAttribute& attr = attributes.at(i);
+												if (attr.name() == "default") {
+													field->set_font_name(attr.value().toString());
+												}
+											}
+											break;
+										case EFFECT_FIELD_FILE:
+											for (int i=0;i<attributes.size();i++) {
+												const QXmlStreamAttribute& attr = attributes.at(i);
+												if (attr.name() == "filename") {
+													field->set_filename(attr.value().toString());
+												}
+											}
+											break;
+										}
+									}
+								}
+							}
+						}
+					} else if (reader.name() == "shader" && reader.isStartElement()) {
+						enable_shader = true;
+						const QXmlStreamAttributes& attributes = reader.attributes();
+						for (int i=0;i<attributes.size();i++) {
+							const QXmlStreamAttribute& attr = attributes.at(i);
+							if (attr.name() == "vert") {
+								vertPath = attr.value().toString();
+							} else if (attr.name() == "frag") {
+								fragPath = attr.value().toString();
+							}
+						}
+					}/* else if (reader.name() == "superimpose" && reader.isStartElement()) {
+						enable_superimpose = true;
+						const QXmlStreamAttributes& attributes = reader.attributes();
+						for (int i=0;i<attributes.size();i++) {
+							const QXmlStreamAttribute& attr = attributes.at(i);
+							if (attr.name() == "script") {
+								QFile script_file(get_effects_dir() + "/" + attr.value().toString());
+								if (script_file.open(QFile::ReadOnly)) {
+									script = script_file.readAll();
+								} else {
+									qCritical() << "Failed to open superimpose script file for" << em->filename;
+									enable_superimpose = false;
+								}
+								break;
+							}
+						}
+					}*/
+					reader.readNext();
+				}
+
+				effect_file.close();
+			} else {
+				qCritical() << "Failed to open effect file" << em->filename;
+			}
+		}
+	}
+}
 Effect::Effect(Clip* c, const EffectMeta *em) :
 	parent_clip(c),
 	meta(em),
@@ -115,7 +346,7 @@ Effect::Effect(Clip* c, const EffectMeta *em) :
 {
 	// set up base UI
 	container = new CollapsibleWidget();
-	connect(container->enabled_check, SIGNAL(clicked(bool)), this, SLOT(field_changed()));
+	////connect(container->enabled_check, SIGNAL(clicked(bool)), this, SLOT(field_changed()));
 	ui = new QWidget();
 	ui_layout = new QGridLayout();
 	ui_layout->setSpacing(4);
@@ -454,12 +685,12 @@ int Effect::get_index_in_clip() {
 	return -1;
 }
 
-bool Effect::is_enabled() {
-	return container->enabled_check->isChecked();
+bool Effect::is_enabled() {return true;
+	//return container->enabled_check->isChecked();
 }
 
-void Effect::set_enabled(bool b) {
-	container->enabled_check->setChecked(b);
+void Effect::set_enabled(bool b) {return;
+	//container->enabled_check->setChecked(b);
 }
 
 QVariant load_data_from_string(int type, const QString& string) {
@@ -621,7 +852,7 @@ bool Effect::is_open() {
 
 void Effect::validate_meta_path() {
 	if (!meta->path.isEmpty() || (vertPath.isEmpty() && fragPath.isEmpty())) return;
-	QList<QString> effects_paths = get_effects_paths();
+	QList<QString> effects_paths ;//= get_effects_paths();
 	const QString& test_fn = vertPath.isEmpty() ? fragPath : vertPath;
 	for (int i=0;i<effects_paths.size();i++) {
 		if (QFileInfo::exists(effects_paths.at(i) + "/" + test_fn)) {
@@ -796,31 +1027,44 @@ void Effect::gizmo_draw(double, GLTextureCoords &) {}
 void Effect::gizmo_move(EffectGizmo* gizmo, int x_movement, int y_movement, double timecode, bool done) {
 	for (int i=0;i<gizmos.size();i++) {
 		if (gizmos.at(i) == gizmo) {
-			ComboAction* ca = nullptr;
-			if (done) ca = new ComboAction();
+			//ComboAction* ca = nullptr;
+			//if (done) ca = new ComboAction();
 			if (gizmo->x_field1 != nullptr) {
 				gizmo->x_field1->set_double_value(gizmo->x_field1->get_double_value(timecode) + x_movement*gizmo->x_field_multi1);
-				gizmo->x_field1->make_key_from_change(ca);
+				//gizmo->x_field1->make_key_from_change(ca);
 			}
 			if (gizmo->y_field1 != nullptr) {
 				gizmo->y_field1->set_double_value(gizmo->y_field1->get_double_value(timecode) + y_movement*gizmo->y_field_multi1);
-				gizmo->y_field1->make_key_from_change(ca);
+				//gizmo->y_field1->make_key_from_change(ca);
 			}
 			if (gizmo->x_field2 != nullptr) {
 				gizmo->x_field2->set_double_value(gizmo->x_field2->get_double_value(timecode) + x_movement*gizmo->x_field_multi2);
-				gizmo->x_field2->make_key_from_change(ca);
+				//gizmo->x_field2->make_key_from_change(ca);
 			}
 			if (gizmo->y_field2 != nullptr) {
 				gizmo->y_field2->set_double_value(gizmo->y_field2->get_double_value(timecode) + y_movement*gizmo->y_field_multi2);
-				gizmo->y_field2->make_key_from_change(ca);
+				//gizmo->y_field2->make_key_from_change(ca);
 			}
-			if (done) undo_stack.push(ca);
+			//if (done) undo_stack.push(ca);
 			break;
 		}
 	}
 }
 
 void Effect::gizmo_world_to_screen() {
+    int width, height;
+	if (parent_clip != nullptr && parent_clip->sequence != nullptr) {
+        width=parent_clip->sequence->width;
+        height=parent_clip->sequence->height;
+    }
+    else if (parent_clipt != nullptr && parent_clipt->m_glwidget != nullptr) {
+        width=parent_clipt->m_glwidget->glw;
+        height=parent_clipt->m_glwidget->glh;
+    }
+    else
+    {
+        return;
+    }
 	GLfloat view_val[16];
 	GLfloat projection_val[16];
 	glGetFloatv(GL_MODELVIEW_MATRIX, view_val);
@@ -835,8 +1079,8 @@ void Effect::gizmo_world_to_screen() {
 		for (int j=0;j<g->get_point_count();j++) {
 			QVector4D screen_pos = QVector4D(g->world_pos[j].x(), g->world_pos[j].y(), 0, 1.0) * (view_matrix * projection_matrix);
 
-			int adjusted_sx1 = qRound(((screen_pos.x()*0.5f)+0.5f)*parent_clip->sequence->width);
-			int adjusted_sy1 = qRound((1.0f-((screen_pos.y()*0.5f)+0.5f))*parent_clip->sequence->height);
+			int adjusted_sx1 = qRound(((screen_pos.x()*0.5f)+0.5f)*width);
+			int adjusted_sy1 = qRound((1.0f-((screen_pos.y()*0.5f)+0.5f))*height);
             qDebug()<<"Effect::gizmo_world_to_screen i: "<<i<<" j: "<<j<<" adjusted_sx1: "<<adjusted_sx1<<" adjusted_sy1: "<<adjusted_sy1<<" world_posx: "<<g->world_pos[j].x()<<" world_posy: "<<g->world_pos[j].y();//storm
 			g->screen_pos[j] = QPoint(adjusted_sx1, adjusted_sy1);
 		}

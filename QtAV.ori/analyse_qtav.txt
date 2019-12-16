@@ -618,9 +618,11 @@ void VideoThread::run()
 采用ffmpeg, 颜色不对，可能是format不对
 5.5, FFMPEG解码流程
 解码一样，只不过不会将yuv420p直接scale成rgba模式，而是转三个数据映射为texture0、texture1、texture2，由opengl处理(见../log_ffmpeg.log u_Texture2)
-// opengl/VideoShader.cpp 125
+// src/opengl/VideoShader.cpp 125
 const char* VideoShader::fragmentShader() const
     // const VideoFormat fmt(material->currentFormat()); //FIXME: maybe changed in setCurrentFrame(
+设置glsl中变量值: VideoShader::update(VideoMaterial *material)
+
 现有的处理是先scale成glw、glh的rgba模式再处理
 => 优化成: 不再scale,根据image格式传到gpu上去处理 (需要验证一下)
 5.6, open video的不同之处

@@ -1,4 +1,4 @@
-#include "cacher.h"
+﻿#include "cacher.h"
 
 #include "project/clip.h"
 #include "project/sequence.h"
@@ -890,7 +890,7 @@ void open_clip_worker(Clip* clip) {
 void cache_clip_worker(Clip* clip, long playhead, bool reset, bool scrubbing, QVector<Clip*> nests) {
 	if (reset) {
 		// note: for video, playhead is in "internal clip" frames - for audio, it's the timeline playhead
-		reset_cache(clip, playhead);
+		///reset_cache(clip, playhead);
 		clip->audio_reset = false;
 	}
 

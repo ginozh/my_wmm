@@ -237,7 +237,7 @@ sub-playerthread-uninstall_subtargets: FORCE
 	@test -d playerthread/ || mkdir -p playerthread/
 	cd playerthread/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV.ori/tests/playerthread/playerthread.pro ) && $(MAKE) -f Makefile uninstall
 
-Makefile: tests.pro ../.qmake.cache C:/msys64/mingw64/share/qt5/mkspecs/win32-g++/qmake.conf C:/msys64/mingw64/share/qt5/mkspecs/features/spec_pre.prf \
+Makefile: tests.pro ../.qmake.conf ../.qmake.cache C:/msys64/mingw64/share/qt5/mkspecs/win32-g++/qmake.conf C:/msys64/mingw64/share/qt5/mkspecs/features/spec_pre.prf \
 		C:/msys64/mingw64/share/qt5/mkspecs/qdevice.pri \
 		C:/msys64/mingw64/share/qt5/mkspecs/features/device_config.prf \
 		C:/msys64/mingw64/share/qt5/mkspecs/common/g++-base.conf \
@@ -386,6 +386,7 @@ Makefile: tests.pro ../.qmake.cache C:/msys64/mingw64/share/qt5/mkspecs/win32-g+
 		C:/msys64/mingw64/share/qt5/mkspecs/features/qt_config.prf \
 		C:/msys64/mingw64/share/qt5/mkspecs/win32-g++/qmake.conf \
 		C:/msys64/mingw64/share/qt5/mkspecs/features/spec_post.prf \
+		../.qmake.conf \
 		../.qmake.cache \
 		../.qmake.stash \
 		C:/msys64/mingw64/share/qt5/mkspecs/features/exclusive_builds.prf \
@@ -555,6 +556,7 @@ C:/msys64/mingw64/share/qt5/mkspecs/features/qt_functions.prf:
 C:/msys64/mingw64/share/qt5/mkspecs/features/qt_config.prf:
 C:/msys64/mingw64/share/qt5/mkspecs/win32-g++/qmake.conf:
 C:/msys64/mingw64/share/qt5/mkspecs/features/spec_post.prf:
+../.qmake.conf:
 ../.qmake.cache:
 ../.qmake.stash:
 C:/msys64/mingw64/share/qt5/mkspecs/features/exclusive_builds.prf:

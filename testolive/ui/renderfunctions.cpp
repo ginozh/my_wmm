@@ -3,6 +3,7 @@
 #include <QOpenGLFramebufferObject>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QImage>
 #include <QDebug>
 
 #include "project/clip.h"
@@ -237,8 +238,23 @@ GLuint compose_sequence(Viewer* viewer,
 							c->texture->setMipLevels(c->texture->maximumMipLevels());
 							c->texture->setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
 							c->texture->allocateStorage(get_gl_pix_fmt_from_av(c->pix_fmt), QOpenGLTexture::UInt8);
+                            qDebug()<<"texture new QOpenGLTexture. width: "<<c->stream->codecpar->width<<" height: "<<c->stream->codecpar->height
+                                <<" format: "<<get_gl_tex_fmt_from_av(c->pix_fmt)<<" fixfmt: "<<get_gl_pix_fmt_from_av(c->pix_fmt);
 						}
+#if 0
 						get_clip_frame(c, qMax(playhead, c->timeline_in), texture_failed);
+#else
+                        {
+                            static QImage* image=nullptr;
+                            if(image==nullptr)
+                            {
+                                //image=new QImage("\\\\Mac\\Home\\Desktop\\upan\\jpg\\1_ori_scale.jpg");
+                                image=new QImage("\\\\Mac\\Home\\Desktop\\upan\\jpg\\5.jpg");
+                                image=new QImage(image->convertToFormat(QImage::Format_RGBA8888));
+                            }
+                            c->texture->setData(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,image->bits());
+                        }
+#endif
 						textureID = c->texture->textureId();
 						break;
 					case MEDIA_TYPE_SEQUENCE:
@@ -321,7 +337,7 @@ GLuint compose_sequence(Viewer* viewer,
 
 					Effect* first_gizmo_effect = nullptr;
 					Effect* selected_effect = nullptr;
-
+#if 0
 					for (int j=0;j<c->effects.size();j++) {
 						Effect* e = c->effects.at(j);
 						process_effect(ctx, c, e, timecode, coords, composite_texture, fbo_switcher, texture_failed, TA_NO_TRANSITION);
@@ -331,7 +347,7 @@ GLuint compose_sequence(Viewer* viewer,
 							if (e->container->selected) selected_effect = e;
 						}
 					}
-
+#endif
 					if (selected_effect != nullptr) {
 						(*gizmos) = selected_effect;
 					} else /*if (is_clip_selected(c, true))*/ { //storm

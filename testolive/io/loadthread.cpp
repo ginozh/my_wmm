@@ -95,7 +95,7 @@ void LoadThread::load_effect(QXmlStreamReader& stream, Clip* c) {
 	} else {
 		type = TA_NO_TRANSITION;
 	}
-
+    qDebug()<<"LoadThread::load_effect effect_name: "<<effect_name<<" meta: "<<meta;
 	emit start_create_effect_ui(&stream, c, type, &effect_name, meta, effect_length, effect_enabled);
 	waitCond.wait(&mutex);
 }
@@ -537,10 +537,11 @@ Media* LoadThread::find_loaded_folder_by_id(int id) {
 
 void LoadThread::run() {
 	mutex.lock();
-    project_url="C:/Users/user/AppData/Roaming/olive-editor/autorecovery.ove";//storm
+    //project_url="C:/Users/user/AppData/Roaming/olive-editor/test.ove";//storm
+    project_url="C:/Users/user/AppData/Roaming/olive-editor/edit.ove";//storm
 	QFile file(project_url);
 	if (!file.open(QIODevice::ReadOnly)) {
-		qCritical() << "Could not open file";
+		qCritical() << "Could not open file. project_url: "<<project_url;
 		return;
 	}
 

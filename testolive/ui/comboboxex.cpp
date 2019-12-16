@@ -1,8 +1,8 @@
 #include "comboboxex.h"
 
-#include "project/undo.h"
-#include "panels/project.h"
-#include "mainwindow.h"
+///#include "project/undo.h"
+//#include "panels/project.h"
+//#include "mainwindow.h"
 
 #include <QUndoCommand>
 #include <QWheelEvent>

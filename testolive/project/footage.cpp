@@ -20,10 +20,12 @@ Footage::~Footage() {
 }
 
 void Footage::reset() {
+#if 1
 	if (preview_gen != nullptr) {
 		preview_gen->cancel();
 		preview_gen->wait();
 	}
+#endif
 	video_tracks.clear();
 	audio_tracks.clear();
 	ready = false;

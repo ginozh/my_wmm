@@ -7,5 +7,5 @@
 COMMENT
 
 #g++ -LC:/msys32/mingw32/bin `pkg-config --cflags --libs opencv` -o hello main.cpp
-g++ -IC:/msys32/mingw32/include/opencv -IC:/msys32/mingw32/include -LC:/msys32/mingw32/bin \
-    -lopencv_imgcodecs330 -lopencv_highgui330 -lopencv_core330 -o hello main.cpp
+g++ -IC:/msys64/mingw64/include/opencv -IC:/msys64/mingw64/include -LC:/msys64/mingw64/bin \
+    -lopencv_imgcodecs340 -lopencv_highgui340 -lopencv_core340 -o hello main.cpp

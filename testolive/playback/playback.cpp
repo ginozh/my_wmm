@@ -1,4 +1,4 @@
-#include "playback.h"
+﻿#include "playback.h"
 
 #include "project/clip.h"
 #include "project/sequence.h"
@@ -121,7 +121,7 @@ void cache_clip(Clip* clip, long playhead, bool reset, bool scrubbing, QVector<C
 	}
 }
 
-double get_timecode(Clip* c, long playhead) {
+double get_timecode(Clip* c, long playhead) {return 10;
 	return ((double)(playhead-c->get_timeline_in_with_transition()+c->get_clip_in_with_transition())/(double)c->sequence->frame_rate);
 }
 
@@ -129,7 +129,7 @@ void get_clip_frame(Clip* c, long playhead, bool& texture_failed) {
 	if (c->finished_opening) {
 		const FootageStream* ms = c->media->to_footage()->get_stream_from_file_index(c->track < 0, c->media_stream);
 
-		int64_t target_pts = qMax(static_cast<int64_t>(0), playhead_to_timestamp(c, playhead));
+		int64_t target_pts = 0;// qMax(static_cast<int64_t>(0), playhead_to_timestamp(c, playhead));
 		int64_t second_pts = qRound64(av_q2d(av_inv_q(c->stream->time_base)));
 		if (ms->video_interlacing != VIDEO_PROGRESSIVE) {
 			target_pts *= 2;
@@ -370,7 +370,7 @@ int retrieve_next_frame(Clip* c, AVFrame* f) {
 	return result;
 }
 
-bool is_clip_active(Clip* c, long playhead) {
+bool is_clip_active(Clip* c, long playhead) {return true;
 	return c->enabled
 			&& c->get_timeline_in_with_transition() < playhead + ceil(c->sequence->frame_rate*2)
 			&& c->get_timeline_out_with_transition() > playhead

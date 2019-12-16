@@ -234,7 +234,8 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent* event) {
 	}
 }
 
-void OpenGLWidget::mouseReleaseEvent(QMouseEvent *event) {
+void OpenGLWidget::mouseReleaseEvent(QMouseEvent *event) 
+{
 	if (dragging
 			&& gizmos != nullptr
 			&& event->button() == Qt::LeftButton
@@ -391,7 +392,17 @@ void OpenGLWidget::paintGL() {
 		// clear to solid black
 
         qDebug()<<"OpenGLWidget::paintGL width: "<<width()<<" height: "<<height();
-		glClearColor(0.0, 0.0, 0.0, 0.0); //第四个参数alpha必须为0,否则显示不出图像
+#if 0
+		if(!renderer->fboOverlay && !renderer->texColorBuffer) 
+        {
+            glClearColor(1.0, 1.0, 1.0, 1.0);
+            glViewport(0, 0, glw, glh);
+            goto END_paint;
+        }
+        else
+            glClearColor(0.0, 0.0, 0.0, 0.0); //第四个参数alpha必须为0,否则显示不出图像
+#endif
+        glClearColor(1.0, 1.0, 1.0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
         glViewport(0, 0, glw, glh);
 
@@ -416,7 +427,7 @@ void OpenGLWidget::paintGL() {
 #endif
             qDebug()<<"OpenGLWidget fboOverlay->texture: "<<renderer->fboOverlay->texture();
         }
-        else
+        else if(renderer->texColorBuffer)
         {
             glBindTexture(GL_TEXTURE_2D, renderer->texColorBuffer);
         }
@@ -448,7 +459,7 @@ void OpenGLWidget::paintGL() {
 
 		glDisable(GL_TEXTURE_2D);
         glPopMatrix();
-
+END_paint:
 		renderer->mutex.unlock();
 
 		if (renderer->did_texture_fail()) {

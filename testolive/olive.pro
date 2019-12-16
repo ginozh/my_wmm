@@ -135,6 +135,7 @@ SOURCES += \
     project/effectloaders.cpp \
     io/crossplatformlib.cpp \
     effects/internal/vsthost.cpp \
+    Clipt.cpp \
     ui/flowlayout.cpp
 
 HEADERS += \
@@ -236,6 +237,7 @@ HEADERS += \
     project/effectloaders.h \
     io/crossplatformlib.h \
     effects/internal/vsthost.h \
+    Clipt.h \
     ui/flowlayout.h
 
 FORMS +=

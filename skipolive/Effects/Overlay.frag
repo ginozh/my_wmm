@@ -6,6 +6,8 @@ varying vec2 vTexCoord;
 
 uniform sampler2D mSample0;
 uniform sampler2D mSample1;
+uniform sampler2D mSample2;
+uniform int u_sample_cnt;
 uniform vec2 u_resolution;
 uniform float u_global_time;
 uniform float u_total_time;
@@ -15,15 +17,21 @@ vec2 resolution = u_resolution;
 void main() 
 {
     vec4 color;
+    vec4 color1;
+    vec4 color2;
     vec4 overlay_color;
     float overlay_alpa;
 
     color = texture2D(mSample0, vTexCoord);
-    overlay_color = texture2D(mSample1, vTexCoord);
-    overlay_alpa = overlay_color.a;
-    if(overlay_alpa>0.0)
+    color1 = texture2D(mSample1, vTexCoord);
+    color2 = texture2D(mSample2, vTexCoord);
+    if(color1.a>0.0)
     {
-		color = mix(color,overlay_color,overlay_alpa);
+		color = mix(color,color1,color1.a);
+    }
+    if(color2.a>0.0)
+    {
+		color = mix(color,color2,color2.a);
     }
     gl_FragColor = color;
 }

@@ -87,14 +87,16 @@ MainWindow::MainWindow(QWidget *parent)
                     m_Viewer = new Viewer(this);
                     vbox->addWidget(m_Viewer);
                     viewer_widget = m_Viewer->viewer_widget;
-#elif 0
+#elif 1
                     m_viewer_widget = new ViewerWidget(NULL);
                     vbox->addWidget(m_viewer_widget);
+                    m_viewer_widget->setFixedSize(1280,720);
                     viewer_widget = m_viewer_widget;
 #else
                     viewer_container = new ViewerContainer(NULL);
                     viewer_container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
                     vbox->addWidget(viewer_container);
+                    viewer_container->setFixedSize(1280,720);
                     viewer_widget = viewer_container->child;
 #endif
                 }
@@ -102,17 +104,18 @@ MainWindow::MainWindow(QWidget *parent)
                     QPushButton* m_pbmedia = new QPushButton("load");
                     vbox->addWidget(m_pbmedia);
                     connect(m_pbmedia, &QAbstractButton::clicked, [=]() {
-                            QString autorecovery="C:/Users/user/AppData/Roaming/olive-editor/autorecovery.ove";
+                            ////QString autorecovery="C:/Users/user/AppData/Roaming/olive-editor/test.ove";
                             init_effects();
-                            LoadThread* lt = new LoadThread(NULL, true); 
+                            ///QThread::msleep(100); //wait for initeffect
+                            ////LoadThread* lt = new LoadThread(NULL, true); 
                             //QObject::connect(lt, SIGNAL(success()), this, SLOT(thread_done()));
                             //QObject::connect(lt, SIGNAL(error()), this, SLOT(die()));
                             //QObject::connect(lt, SIGNAL(report_progress(int)), bar, SLOT(setValue(int)));
-                            lt->start();
+                            ///lt->start();
                             });
                 }
                 {
-                    QPushButton* m_pbmedia = new QPushButton("update");
+                    QPushButton* m_pbmedia = new QPushButton("startgetframe");
                     vbox->addWidget(m_pbmedia);
                     connect(m_pbmedia, &QAbstractButton::clicked, [=]() {
 #if 0
@@ -123,7 +126,7 @@ MainWindow::MainWindow(QWidget *parent)
                             ///set_sequence(true, sequence); //project\sequence.cpp
                             viewer_widget->frame_update();
 #else
-                            viewer_container->adjust();
+                            if(viewer_container) viewer_container->adjust();
                             viewer_widget->frame_update();
 #endif
                             });

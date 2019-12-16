@@ -1190,7 +1190,8 @@ void AVPlayer::playInternal()
     d->stop_position_norm = normalizedPosition(d->stop_position);
     // FIXME: if call play() frequently playInternal may not be called if disconnect here
     disconnect(this, SIGNAL(loaded()), this, SLOT(playInternal()));
-    if (!d->setupAudioThread(this)) {
+    // if (!d->setupAudioThread(this))  //storm
+    {
         d->read_thread->setAudioThread(0); //set 0 before delete. ptr is used in demux thread when set 0
         if (d->athread) {
             qDebug("release audio thread.");

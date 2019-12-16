@@ -535,7 +535,7 @@ void VideoRenderer::handlePaintEvent()
                 vf->apply(d.statistics, &d.video_frame); //painter and paint device are ready, pass video frame is ok.
             }
         }
-    }gettimeofday(&end,NULL);time_use=(end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec);qDebug()<<"VideoRenderer::handlePaintEvent zero copy waste:"<<time_use;//storm
+    }//gettimeofday(&end,NULL);time_use=(end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec);qDebug()<<"VideoRenderer::handlePaintEvent zero copy waste:"<<time_use;//storm
     //end paint. how about QPainter::endNativePainting()?
 }
 #endif
@@ -693,11 +693,11 @@ void VideoRenderer::handlePaintEvent()
 #if 1
         if(d.video_frame){
             {
-                qDebug()<<"VideoRenderer::handlePaintEvent pts:"<<d.video_frame.timestamp();//storm
+                //qDebug()<<"VideoRenderer::handlePaintEvent pts:"<<d.video_frame.timestamp();//storm
             static QOpenGLFramebufferObject *fbo=NULL;
             VideoFrame *frame= &d.video_frame;
             static VideoMaterial *material=NULL;
-            static ShaderManager *manager=NULL;
+            //static ShaderManager *manager=NULL;
             static QMatrix4x4 matrix;
             static QRectF rect;
             GLint currentFbo = 0;
@@ -716,6 +716,7 @@ void VideoRenderer::handlePaintEvent()
                         material->setHue(h);
                         material->setSaturation(s);
                     }
+#if 0
                     if (!manager)
                     {
                         // TODO: what if ctx is delete?
@@ -727,6 +728,7 @@ void VideoRenderer::handlePaintEvent()
                         /// get gl info here because context is current(qt ensure it)
                         //const QByteArray extensions(reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS)));
                     }
+#endif
                     bool hasGLSL = QOpenGLShaderProgram::hasOpenGLShaderPrograms();
                     qDebug("OpenGL version: %d.%d  hasGLSL: %d", ctx->format().majorVersion(), ctx->format().minorVersion(), hasGLSL);
                 }
@@ -756,11 +758,15 @@ void VideoRenderer::handlePaintEvent()
                 QRectF target=QRectF();
                 QRectF roi=QRectF();
                 QMatrix4x4 transform=mat;
-                const qint64 mt = material->type();
+                ///const qint64 mt = material->type();
                 if(material->bind())
                 {
                     if (!shader)
-                        shader = manager->prepareMaterial(material, mt); //TODO: print shader type name if changed. prepareMaterial(,sample_code, pp_code)
+                    {
+                        //shader = manager->prepareMaterial(material, mt); //TODO: print shader type name if changed. prepareMaterial(,sample_code, pp_code)
+                        shader = material->createShader();
+                        shader->initialize();
+                    }
                     DYGL(glViewport(0, 0, fbo->width(), fbo->height()));
                     shader->update(material);
                     shader->program()->setUniformValue(shader->matrixLocation(), transform*matrix);
@@ -1052,7 +1058,7 @@ void VideoRenderer::handlePaintEvent()
             glPopMatrix();
 #endif
 #if 1
-            ///{QImage img=fbo->toImage();static int idx=0;++idx;qDebug()<<"VideoRenderer::handlePaintEvent img idx: "<<idx<<" isNull: "<<img.isNull();if(idx==3 || idx==15) img.save(QString("images/%1.jpg").arg(idx));}// storm
+            {QImage img=fbo->toImage();static int idx=0;++idx;qDebug()<<"VideoRenderer::handlePaintEvent img idx: "<<idx<<" isNull: "<<img.isNull();if(idx==1 || idx==15) img.save(QString("%1.jpg").arg(idx));}// storm
             gl().BindFramebuffer(GL_FRAMEBUFFER, (GLuint)currentFbo);
             VideoFormat fmt(VideoFormat::Format_RGB32);
             VideoFrame f(fbo->width(), fbo->height(), fmt); //
@@ -1086,11 +1092,15 @@ void VideoRenderer::handlePaintEvent()
                 QRectF target=QRectF();
                 ///QRectF roi=QRectF();
                 QMatrix4x4 transform=mat;
-                const qint64 mt = material->type();
+                //const qint64 mt = material->type();
                 if(material->bind())
                 {
                     if (!shader)
-                        shader = manager->prepareMaterial(material, mt); //TODO: print shader type name if changed. prepareMaterial(,sample_code, pp_code)
+                    {
+                        //shader = manager->prepareMaterial(material, mt); //TODO: print shader type name if changed. prepareMaterial(,sample_code, pp_code)
+                        shader = material->createShader();
+                        shader->initialize();
+                    }
                     DYGL(glViewport(0, 0, fbo->width(), fbo->height()));
                     shader->update(material);
                     shader->program()->setUniformValue(shader->matrixLocation(), transform*matrix);

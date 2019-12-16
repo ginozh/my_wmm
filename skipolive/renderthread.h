@@ -59,11 +59,14 @@ public:
     OpenGLWidget* m_glwidget=NULL;
     QOpenGLTexture* texture=nullptr;
     QOpenGLTexture* texture2=nullptr;
+    QOpenGLTexture* texture3=nullptr;
     QOpenGLFramebufferObject** fbo=nullptr;
     QOpenGLFramebufferObject** fbo2=nullptr;
+    QOpenGLFramebufferObject** fbo3=nullptr;
     QOpenGLFramebufferObject* fbotest=nullptr;
     QOpenGLFramebufferObject* fbotest1=nullptr;
     QOpenGLFramebufferObject* fbotest2=nullptr;
+    QOpenGLFramebufferObject* fbotest3=nullptr;
     Clip* clip=nullptr;
 
     QOpenGLShaderProgram* glslProgram=nullptr;

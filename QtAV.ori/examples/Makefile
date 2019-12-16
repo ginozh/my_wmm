@@ -159,7 +159,7 @@ sub-QMLPlayer-uninstall_subtargets: sub-common-uninstall_subtargets FORCE
 	@test -d QMLPlayer/ || mkdir -p QMLPlayer/
 	cd QMLPlayer/ && ( test -e Makefile || $(QMAKE) -o Makefile C:/qtproject/QtAV.ori/examples/QMLPlayer/QMLPlayer.pro ) && $(MAKE) -f Makefile uninstall
 
-Makefile: examples.pro ../.qmake.cache C:/msys64/mingw64/share/qt5/mkspecs/win32-g++/qmake.conf C:/msys64/mingw64/share/qt5/mkspecs/features/spec_pre.prf \
+Makefile: examples.pro ../.qmake.conf ../.qmake.cache C:/msys64/mingw64/share/qt5/mkspecs/win32-g++/qmake.conf C:/msys64/mingw64/share/qt5/mkspecs/features/spec_pre.prf \
 		C:/msys64/mingw64/share/qt5/mkspecs/qdevice.pri \
 		C:/msys64/mingw64/share/qt5/mkspecs/features/device_config.prf \
 		C:/msys64/mingw64/share/qt5/mkspecs/common/g++-base.conf \
@@ -308,6 +308,7 @@ Makefile: examples.pro ../.qmake.cache C:/msys64/mingw64/share/qt5/mkspecs/win32
 		C:/msys64/mingw64/share/qt5/mkspecs/features/qt_config.prf \
 		C:/msys64/mingw64/share/qt5/mkspecs/win32-g++/qmake.conf \
 		C:/msys64/mingw64/share/qt5/mkspecs/features/spec_post.prf \
+		../.qmake.conf \
 		../.qmake.cache \
 		../.qmake.stash \
 		C:/msys64/mingw64/share/qt5/mkspecs/features/exclusive_builds.prf \
@@ -477,6 +478,7 @@ C:/msys64/mingw64/share/qt5/mkspecs/features/qt_functions.prf:
 C:/msys64/mingw64/share/qt5/mkspecs/features/qt_config.prf:
 C:/msys64/mingw64/share/qt5/mkspecs/win32-g++/qmake.conf:
 C:/msys64/mingw64/share/qt5/mkspecs/features/spec_post.prf:
+../.qmake.conf:
 ../.qmake.cache:
 ../.qmake.stash:
 C:/msys64/mingw64/share/qt5/mkspecs/features/exclusive_builds.prf:

@@ -3,8 +3,7 @@
 #include <QVector>
 
 #include "effectfield.h"
-#include "undo.h"
-#include "panels/panels.h"
+//#include "undo.h"
 
 EffectKeyframe::EffectKeyframe() {
 	pre_handle_x = -40;
@@ -34,13 +33,15 @@ void delete_keyframes(QVector<EffectField *>& selected_key_fields, QVector<int> 
 	}
 
 	if (fields.size() > 0) {
+#if 0
 		ComboAction* ca = new ComboAction();
 		for (int i=0;i<key_indices.size();i++) {
 			ca->append(new KeyframeDelete(fields.at(i), key_indices.at(i)));
 		}
 		undo_stack.push(ca);
+#endif
 		selected_keys.clear();
 		selected_key_fields.clear();
-		update_ui(false);
+		//update_ui(false);
 	}
 }

@@ -25,6 +25,8 @@
 #ifndef QT_NO_OPENGL
 #include "QtAV/VideoFormat.h"
 #include "opengl/gl_api.h"
+//storm
+#define QT_OPENGL_DYNAMIC
 // for dynamicgl. qglfunctions before qt5.3 does not have portable gl functions
 #ifdef QT_OPENGL_DYNAMIC
 #define DYGL(glFunc) QOpenGLContext::currentContext()->functions()->glFunc

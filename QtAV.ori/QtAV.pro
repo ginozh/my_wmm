@@ -79,7 +79,8 @@ mac|ios {
 }
 runConfigTests()
 !config_avresample:!config_swresample {
-  error("libavresample or libswresample is required. Setup your environment correctly then delete $$BUILD_DIR/.qmake.conf and run qmake again")
+  #storm
+  #error("libavresample or libswresample is required. Setup your environment correctly then delete $$BUILD_DIR/.qmake.conf and run qmake again")
 }
 PACKAGE_VERSION = $$QTAV_VERSION
 PACKAGE_NAME= QtAV

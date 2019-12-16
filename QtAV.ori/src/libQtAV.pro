@@ -2,6 +2,10 @@ TEMPLATE = lib
 MODULE_INCNAME = QtAV # for mac framework. also used in install_sdk.pro
 TARGET = QtAV
 QT += core gui
+DEFINES += QT_OPENGL_DYNAMIC=1
+CONFIG *= config_dxva
+CONFIG *= dynamicgl
+
 #CONFIG *= ltcg
 greaterThan(QT_MAJOR_VERSION, 4) {
   contains(QT_CONFIG, opengl) {
@@ -99,7 +103,9 @@ win32 {
     !static:QMAKE_LFLAGS *= /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcmtd.lib #for msbuild vs2013
 }
 capi {
-contains(QT_CONFIG, egl)|contains(QT_CONFIG, dynamicgl)|contains(QT_CONFIG, opengles2) {
+#storm
+#contains(QT_CONFIG, egl)|contains(QT_CONFIG, dynamicgl)|contains(QT_CONFIG, opengles2) 
+{
   CONFIG *= enable_egl
   !ios {
     winrt: DEFINES += CAPI_LINK_EGL #required by capi_egl.*

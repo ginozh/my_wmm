@@ -18,6 +18,7 @@ class QPushButton;
 class QMouseEvent;
 
 struct Clip;
+class Clipt;
 class QXmlStreamReader;
 class QXmlStreamWriter;
 class Effect;
@@ -41,6 +42,7 @@ extern QVector<EffectMeta> effects;
 
 double log_volume(double linear);
 Effect* create_effect(Clip* c, const EffectMeta *em);
+Effect* create_effect(Clipt* c, const EffectMeta *em);
 const EffectMeta* get_internal_meta(int internal_id, int type);
 
 enum EffectType {
@@ -115,8 +117,10 @@ class Effect : public QObject {
 	Q_OBJECT
 public:
 	Effect(Clip* c, const EffectMeta* em);
+	Effect(Clipt* c, const EffectMeta* em);
 	~Effect();
-	Clip* parent_clip;
+	Clip* parent_clip=nullptr;
+	Clipt* parent_clipt=nullptr;
 	const EffectMeta* meta;
 	int id;
 	QString name;

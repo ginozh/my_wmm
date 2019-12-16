@@ -21,14 +21,14 @@ GLuint draw_clipt(QOpenGLContext* ctx, QOpenGLFramebufferObject* fbo, GLuint tex
 	glPushMatrix();
 	glLoadIdentity();
 	glOrtho(0, 1, 0, 1, -1, 1);
-
+#if 0
 	GLint current_fbo = 0;
 	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &current_fbo);
-
+#endif
 	fbo->bind();
 
 	if (clear) glClear(GL_COLOR_BUFFER_BIT);
-
+#if 0
 	// get current blend mode
 	GLint src_rgb, src_alpha, dst_rgb, dst_alpha;
 	glGetIntegerv(GL_BLEND_SRC_RGB, &src_rgb);
@@ -37,7 +37,7 @@ GLuint draw_clipt(QOpenGLContext* ctx, QOpenGLFramebufferObject* fbo, GLuint tex
 	glGetIntegerv(GL_BLEND_DST_ALPHA, &dst_alpha);
 
 	ctx->functions()->glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ONE, GL_ONE);
-
+#endif
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBegin(GL_QUADS);
 	glTexCoord2f(0, 0); // top left
@@ -50,7 +50,7 @@ GLuint draw_clipt(QOpenGLContext* ctx, QOpenGLFramebufferObject* fbo, GLuint tex
 	glVertex2f(0, 1); // bottom left
 	glEnd();
 	glBindTexture(GL_TEXTURE_2D, 0);
-
+#if 0
 //	fbo->release();
 	ctx->functions()->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, current_fbo);
 
@@ -58,7 +58,7 @@ GLuint draw_clipt(QOpenGLContext* ctx, QOpenGLFramebufferObject* fbo, GLuint tex
 	ctx->functions()->glBlendFuncSeparate(src_rgb, dst_rgb, src_alpha, dst_alpha);
 
 	//if (default_fbo != nullptr) default_fbo->bind();
-
+#endif
 	glPopMatrix();
 	return fbo->texture();
 }
@@ -203,7 +203,7 @@ GLuint RenderThread::compose_sequencet()
     glPushMatrix();
     glLoadIdentity();
     glOrtho(-half_width, half_width, -half_height, half_height, -1, 10);
-    for(int iclip=0; iclip<2; iclip++)
+    for(int iclip=0; iclip<3; iclip++)
     {
         ////ctx->functions()->glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ONE, GL_ONE);
         ///glColor4f(1.0, 1.0, 1.0, 1.0);
@@ -243,7 +243,7 @@ GLuint RenderThread::compose_sequencet()
             textureID = texture->textureId();
 #endif
         }
-        else 
+        else if(iclip==1)
         {
             video_width = 1024;//c->getWidth();
             video_height = 768;//c->getHeight();
@@ -275,12 +275,44 @@ GLuint RenderThread::compose_sequencet()
             textureID = texture2->textureId();
 #endif
         }
+        else 
+        {
+            video_width = 1024;//c->getWidth();
+            video_height = 768;//c->getHeight();
+            // set up opengl texture
+            if (texture3 == nullptr) 
+            {
+                texture3 = new QOpenGLTexture(QOpenGLTexture::Target2D);
+                texture3->setSize(video_width, video_height);
+                texture3->setFormat(QOpenGLTexture::RGBA8_UNorm);
+                texture3->setMipLevels(texture3->maximumMipLevels());
+                texture3->setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
+                texture3->allocateStorage(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8);
+                qDebug()<<"texture3 new QOpenGLTexture. width: "<<video_width<<" height: "<<video_height
+                    <<" format: "<<QOpenGLTexture::RGBA8_UNorm<<" fixfmt: "<<QOpenGLTexture::RGBA;
+            }
+#if 0
+            get_clip_frame(c, qMax(playhead, c->timeline_in), texture_failed);
+#else
+            {
+                static QImage* image3=nullptr;
+                if(image3==nullptr)
+                {
+                    image3=new QImage("\\\\Mac\\Home\\Desktop\\upan\\jpg\\1_ori_scale.jpg");
+                    //image3=new QImage("\\\\Mac\\Home\\Desktop\\upan\\jpg\\5.jpg");
+                    image3=new QImage(image3->convertToFormat(QImage::Format_RGBA8888));
+                }
+                texture3->setData(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,image3->bits());
+            }
+            textureID = texture3->textureId();
+#endif
+        }
         glPushMatrix();
 
         if(iclip==0)
         {
             // start preparing cache
-            //if (fbo == nullptr) 
+            if (fbo == nullptr) 
             {
                 fbo = new QOpenGLFramebufferObject* [2];
                 fbo[0] = new QOpenGLFramebufferObject(video_width, video_height);
@@ -288,14 +320,25 @@ GLuint RenderThread::compose_sequencet()
                 ctx->functions()->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, current_fbo);
             }
         }
-        else
+        else if(iclip==1)
         {
             // start preparing cache
-            //if (fbo2 == nullptr) 
+            if (fbo2 == nullptr) 
             {
                 fbo2 = new QOpenGLFramebufferObject* [2];
                 fbo2[0] = new QOpenGLFramebufferObject(video_width, video_height);
                 fbo2[1] = new QOpenGLFramebufferObject(video_width, video_height);
+                ctx->functions()->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, current_fbo);
+            }
+        }
+        else
+        {
+            // start preparing cache
+            if (fbo3 == nullptr) 
+            {
+                fbo3 = new QOpenGLFramebufferObject* [2];
+                fbo3[0] = new QOpenGLFramebufferObject(video_width, video_height);
+                fbo3[1] = new QOpenGLFramebufferObject(video_width, video_height);
                 ctx->functions()->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, current_fbo);
             }
         }
@@ -357,8 +400,10 @@ GLuint RenderThread::compose_sequencet()
             ///QImage img=fbo[fbo_switcher]->toImage();
             ///img.save(QString("oriclip%1.png").arg(iclip));
         }
-        else
+        else if(iclip==1)
             composite_texture = draw_clipt(ctx, fbo2[fbo_switcher], textureID, true);
+        else
+            composite_texture = draw_clipt(ctx, fbo3[fbo_switcher], textureID, true);
 
         fbo_switcher = !fbo_switcher;
 
@@ -454,7 +499,7 @@ GLuint RenderThread::compose_sequencet()
                 }
             }
 #if 1
-            if(iclip==1)
+            if(iclip==2)
             {
                 Effect* e = clip->effects.at(0);
                 //process_effectt(ctx, c, e, timecode, coords, composite_texture, fbo_switcher, texture_failed, TA_NO_TRANSITION);
@@ -473,10 +518,16 @@ GLuint RenderThread::compose_sequencet()
         {
             fbotest2 = new QOpenGLFramebufferObject(m_glwidget->glw, m_glwidget->glh);
         }
+        if (fbotest3 == nullptr) 
+        {
+            fbotest3 = new QOpenGLFramebufferObject(m_glwidget->glw, m_glwidget->glh);
+        }
         if(iclip==0)
             fbotest=fbotest1;
-        else
+        else if(iclip==1)
             fbotest=fbotest2;
+        else
+            fbotest=fbotest3;
         fbotest->bind();
 #else
         fbo[fbo_switcher]->bind();
@@ -515,18 +566,17 @@ GLuint RenderThread::compose_sequencet()
         QOpenGLFramebufferObject::bindDefault();
 
 #if 1
-        ////QImage img=fbotest->toImage();
+        QImage img=fbotest->toImage();
 #else
         QImage img=fbo[fbo_switcher]->toImage();
         fbo_switcher = !fbo_switcher;
 #endif
-        ///img.save(QString("clip%1.png").arg(iclip));
+        img.save(QString("clip%1.png").arg(iclip));
 
 #endif
         /////saveOpenglBuffer("renderfunctions_compose_sequence"); //storm
 
         // prepare gizmos
-        if(iclip==1)
         {
             if (gizmos != nullptr ) 
             {
@@ -584,6 +634,9 @@ GLuint RenderThread::compose_sequencet()
         ctx->functions()->glActiveTexture(GL_TEXTURE1); //必须从0开始
         glBindTexture(GL_TEXTURE_2D, fbotest2->texture());
         glslProgramOverlay->setUniformValue("mSample1", 1);
+        ctx->functions()->glActiveTexture(GL_TEXTURE2); //必须从0开始
+        glBindTexture(GL_TEXTURE_2D, fbotest3->texture());
+        glslProgramOverlay->setUniformValue("mSample2", 2);
         //composite_texture = draw_clipt(ctx, fbo[fbo_switcher], composite_texture, true);
         //fbo_switcher = !fbo_switcher;
         {

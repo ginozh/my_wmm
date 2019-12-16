@@ -33,7 +33,7 @@ extern "C" {
 using namespace Microsoft::WRL; //ComPtr
 #include "directx/SurfaceInteropD3D11.h"
 // #include "utils/Logger.h"
-#include <sys/time.h> //storm
+//#include <sys/time.h> //storm
 #include <QDebug> //storm
 // define __mingw_uuidof
 #ifdef __CRT_UUID_DECL
@@ -178,7 +178,7 @@ VideoFrame VideoDecoderD3D11::frame()
     surface->GetDesc(&view_desc);
     D3D11_TEXTURE2D_DESC tex_desc;
     texture->GetDesc(&tex_desc);
-    if (copyMode() == VideoDecoderFFmpegHW::ZeroCopy && d.interop_res) { float time_use=0; struct timeval start; struct timeval end; gettimeofday(&start,NULL); //storm
+    if (copyMode() == VideoDecoderFFmpegHW::ZeroCopy && d.interop_res) { //float time_use=0; struct timeval start; struct timeval end; gettimeofday(&start,NULL); //storm
         d3d11::SurfaceInterop *interop = new d3d11::SurfaceInterop(d.interop_res);
         interop->setSurface(texture, view_desc.Texture2D.ArraySlice, d.width, d.height);
         VideoFormat fmt(d.interop_res->format(tex_desc.Format));
@@ -188,7 +188,7 @@ VideoFrame VideoDecoderD3D11::frame()
         }
         f.setMetaData(QStringLiteral("surface_interop"), QVariant::fromValue(VideoSurfaceInteropPtr(interop)));
         f.setTimestamp(d.frame->pkt_pts/1000.0);
-        f.setDisplayAspectRatio(d.getDAR(d.frame)); gettimeofday(&end,NULL);time_use=(end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec);qDebug()<<"zero copy waste:"<<time_use;//storm
+        f.setDisplayAspectRatio(d.getDAR(d.frame)); //gettimeofday(&end,NULL);time_use=(end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec);qDebug()<<"zero copy waste:"<<time_use;//storm
         return f;
     }
 //    qDebug("process for view: %p, texture: %p", surface, texture.Get());

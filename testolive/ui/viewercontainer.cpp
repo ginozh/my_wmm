@@ -6,9 +6,7 @@
 #include <QVBoxLayout>
 
 #include "viewerwidget.h"
-#include "panels/viewer.h"
 #include "project/sequence.h"
-#include "debug.h"
 
 // enforces aspect ratio
 ViewerContainer::ViewerContainer(QWidget *parent) :
@@ -73,7 +71,10 @@ void ViewerContainer::adjust() {
 				widget_height = widget_width / aspect_ratio;
 				widget_y = (height() / 2) - (widget_height / 2);
 			}
-
+            qDebug()<<"ViewerContainer::adjust fit widget_x: "<<widget_x<<" widget_y: "<<widget_y
+                <<"widget_width: "<<widget_width<<" widget_height: "<<widget_height<<" sequence width: "
+                <<sequence->width<<" height: "<<sequence->height<<" width(): "<<width()<<" height(): "
+                <<height();
 			child->move(widget_x, widget_y);
 			child->resize(widget_width, widget_height);
 

@@ -35,8 +35,9 @@ QString get_config_path() {
 
 QList<QString> get_effects_paths() {
 	QList<QString> effects_paths;
-	effects_paths.append(get_app_dir() + "/effects");
-	effects_paths.append(get_app_dir() + "/../share/olive-editor/effects");
+	//effects_paths.append(get_app_dir() + "/effects");
+	//effects_paths.append(get_app_dir() + "/../share/olive-editor/effects");
+	////effects_paths.append("effects");
 	QString env_path(qgetenv("OLIVE_EFFECTS_PATH"));
 	if (!env_path.isEmpty()) effects_paths.append(env_path);
 	return effects_paths;

@@ -53,21 +53,23 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QWidget(parent)
     hb->addWidget(m_stopBtn);
     connect(m_startBtn, &QAbstractButton::clicked, this,
         [=]() { 
-#if 1
+#if 0
         ///m_avr.setFile("c:\\qtproject\\Thousand.Planets.mp4");
-        m_avr.play("c:\\qtproject\\Thousand.Planets.mp4");
+        //m_avr.play("c:\\qtproject\\Thousand.Planets.mp4");
+        m_avr.play("Z:\\Desktop\\upan\\qqrtx\\QQ\\manqingshidakuxing.avi");
         ///m_player->play(file);
 #endif
-#if 0
+#if 1
         //framereader ok
         QStringList vdecnames;
-        vdecnames << "DXVA";
-        ///vdecnames << "FFmpeg";
+        //vdecnames << "DXVA";
+        vdecnames << "FFmpeg";
         r.setVideoDecoders(vdecnames);
         //r.setMedia("c:\\qtproject\\movie\\movie.mp4");
-        r.setMedia("c:\\qtproject\\Thousand.Planets.mp4");
+        //r.setMedia("c:\\qtproject\\Thousand.Planets.mp4");
+        r.setMedia("Z:\\Desktop\\upan\\qqrtx\\QQ\\manqingshidakuxing.avi");
 #endif
-#if 1
+#if 0
         QTimer *timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(processSecondThing()));
         //timer->setSingleShot(true);
@@ -76,13 +78,13 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QWidget(parent)
         });
     connect(m_nextBtn, &QAbstractButton::clicked, this,
             [=]() { 
-#if 1
+#if 0
             VideoFrame frame = m_avr.GetFrame(0); //TODO: if eof
             if(frame.isValid())
                 {QImage img=frame.toImage();static int idx=0;++idx;printf("QAbstractButton::clicked img idx: %d  isNull: %d pts: %f\n",idx,img.isNull(),frame.timestamp());fflush(0);if(idx>25 && idx<=60) img.save(QString("images%1.jpg").arg(idx));}// storm
 
 #endif
-#if 0
+#if 1
         //framereader ok
             while (r.readMore()) {
                 while (r.hasEnoughVideoFrames()) {

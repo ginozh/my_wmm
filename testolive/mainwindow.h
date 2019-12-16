@@ -36,9 +36,9 @@ protected:
 
 private slots:
 private:
-    Viewer* m_Viewer;
-    ViewerWidget* m_viewer_widget;
-    ViewerContainer* viewer_container;
+    Viewer* m_Viewer=NULL;
+    ViewerWidget* m_viewer_widget=NULL;
+    ViewerContainer* viewer_container=NULL;
 };
 extern MainWindow* mainWindow;
 

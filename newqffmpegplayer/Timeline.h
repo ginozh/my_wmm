@@ -7,7 +7,6 @@
 #include <QThread>
 #include "SDL.h"
 
-#endif
 class Timeline
 {
     public:

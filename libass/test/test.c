@@ -197,8 +197,8 @@ static void print_font_providers(ASS_Library *ass_library)
 
 int main(int argc, char *argv[])
 {
-    const int frame_w = 1280;//924;//872;//1280;
-    const int frame_h = 720;//288;//720;
+    const int frame_w = 640;//1280;//924;//872;//1280;
+    const int frame_h = 360;//720;//288;//720;
 
     if (argc < 4) {
         printf("usage: %s <image file> <subtitle file> <time>\n", argv[0]);
@@ -210,8 +210,8 @@ int main(int argc, char *argv[])
 
     print_font_providers(ass_library);
 
-    //init(frame_w, frame_h);
-    init(1280, 720);
+    init(frame_w, frame_h);
+    //init(1280, 720);
     ASS_Track *track = ass_read_file(ass_library, subfile, NULL);
     if (!track) {
         printf("track init failed!\n");

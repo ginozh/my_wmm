@@ -579,7 +579,7 @@ void FFmpegThread::run()
         const qreal pts = frame.timestamp();
         d.pts_history.push_back(pts);
         // seek finished because we can ensure no packet before seek decoded when render_pts0 is set
-        qDebug("pts0: %f, pts: %f pkt_pts: %f pkt_dts: %f, clock: %d\n", d.render_pts0, pts, pkt.pts, pkt.dts, d.clock->clockType()); {QImage img=frame.toImage();static int idx=0;++idx;printf("FFmpegThread::run img idx: %d  isNull: %d\n",idx,img.isNull());/*if(idx==3 || idx==15)*/ img.save(QString("images%1.jpg").arg(idx));}// storm
+        qDebug("pts0: %f pts: %f pkt_pts: %f pkt_dts: %f clock: %d\n", d.render_pts0, pts, pkt.pts, pkt.dts, d.clock->clockType()); {QImage img=frame.toImage();static int idx=0;++idx;printf("FFmpegThread::run img idx: %d  isNull: %d\n",idx,img.isNull());/*if(idx==3 || idx==15)*/ img.save(QString("images%1.jpg").arg(idx));}// storm
         if (d.render_pts0 >= 0.0) {
             if (pts < d.render_pts0) {
                 if (!pkt.isEOF())

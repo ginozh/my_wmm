@@ -3,7 +3,7 @@
 #include <QtMath>
 #include <QVector>
 
-#include "debug.h"
+//#include "debug.h"
 
 int lerp(int a, int b, double t) {
 	return qRound(((1.0 - t) * a) + (t * b));

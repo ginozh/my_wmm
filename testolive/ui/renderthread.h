@@ -7,9 +7,14 @@
 #include <QOffscreenSurface>
 #include <QOpenGLContext>
 #include <QOpenGLFramebufferObject>
+#include <QOpenGLTexture>
 
+struct Clip;
+class Clipt;
 struct Sequence;
 class Effect;
+class ViewerWidget;
+class Viewer;
 
 class RenderThread : public QThread {
 	Q_OBJECT
@@ -40,7 +45,6 @@ private:
 	QOffscreenSurface surface;
 	QOpenGLContext* share_ctx;
 	QOpenGLContext* ctx;
-	Sequence* seq;
 	int divider;
 	int tex_width;
 	int tex_height;
@@ -49,6 +53,23 @@ private:
 	bool running;
 	QString save_fn;
 	GLvoid *pixel_buffer;
+signals:
+	void start_create_effect_ui(Clipt* c);
+public:
+    GLuint compose_sequencet(void* viewer,
+            QOpenGLContext* ctx,
+            void* seq,
+            QVector<Clip*>& nests,
+            bool video,
+            bool render_audio,
+            Effect** gizmos,
+            bool& texture_failed,
+            bool rendering) ;
+    void setGLWidget(ViewerWidget*);
+    ViewerWidget* m_glwidget=NULL;
+    QOpenGLTexture* texture=nullptr;
+    QOpenGLFramebufferObject** fbo=nullptr;
+    Clipt* clip=nullptr;
 };
 
 #endif // RENDERTHREAD_H

@@ -1,19 +1,19 @@
 #include "effectfield.h"
 
 #include "ui/labelslider.h"
-#include "ui/colorbutton.h"
-#include "ui/texteditex.h"
+//#include "ui/colorbutton.h"
+//#include "ui/texteditex.h"
 #include "ui/checkboxex.h"
 #include "ui/comboboxex.h"
-#include "ui/fontcombobox.h"
-#include "ui/embeddedfilechooser.h"
+//#include "ui/fontcombobox.h"
+//#include "ui/embeddedfilechooser.h"
 
-#include "io/config.h"
+//#include "io/config.h"
 
 #include "effectrow.h"
 #include "effect.h"
 
-#include "project/undo.h"
+//#include "project/undo.h"
 #include "project/clip.h"
 #include "project/sequence.h"
 
@@ -22,13 +22,14 @@
 #include <QDateTime>
 #include <QtMath>
 
-#include "debug.h"
+//#include "debug.h"
 
 EffectField::EffectField(EffectRow *parent, int t, const QString &i) :
 	parent_row(parent),
 	type(t),
 	id(i)
 {
+    qDebug()<<"EffectField::EffectField t: "<<t;
 	switch (t) {
 	case EFFECT_FIELD_DOUBLE:
 	{
@@ -38,6 +39,7 @@ EffectField::EffectField(EffectRow *parent, int t, const QString &i) :
 		connect(ls, SIGNAL(clicked()), this, SIGNAL(clicked()));
 	}
 		break;
+#if 0
 	case EFFECT_FIELD_COLOR:
 	{
 		ColorButton* cb = new ColorButton();
@@ -57,6 +59,7 @@ EffectField::EffectField(EffectRow *parent, int t, const QString &i) :
 		connect(edit, SIGNAL(textChanged()), this, SLOT(ui_element_change()));
 	}
 		break;
+#endif
 	case EFFECT_FIELD_BOOL:
 	{
 		CheckboxEx* cb = new CheckboxEx();
@@ -72,6 +75,7 @@ EffectField::EffectField(EffectRow *parent, int t, const QString &i) :
 		connect(cb, SIGNAL(activated(int)), this, SLOT(ui_element_change()));
 	}
 		break;
+#if 0
 	case EFFECT_FIELD_FONT:
 	{
 		FontCombobox* fcb = new FontCombobox();
@@ -86,6 +90,7 @@ EffectField::EffectField(EffectRow *parent, int t, const QString &i) :
 		connect(efc, SIGNAL(changed()), this, SLOT(ui_element_change()));
 	}
 		break;
+#endif
 	}
 }
 
@@ -138,12 +143,12 @@ double EffectField::get_validated_keyframe_handle(int key, bool post) {
 QVariant EffectField::get_previous_data() {
 	switch (type) {
 	case EFFECT_FIELD_DOUBLE: return static_cast<LabelSlider*>(ui_element)->getPreviousValue();
-	case EFFECT_FIELD_COLOR: return static_cast<ColorButton*>(ui_element)->getPreviousValue();
-	case EFFECT_FIELD_STRING: return static_cast<TextEditEx*>(ui_element)->getPreviousValue();
+	///case EFFECT_FIELD_COLOR: return static_cast<ColorButton*>(ui_element)->getPreviousValue();
+	///case EFFECT_FIELD_STRING: return static_cast<TextEditEx*>(ui_element)->getPreviousValue();
 	case EFFECT_FIELD_BOOL: return !static_cast<QCheckBox*>(ui_element)->isChecked();
 	case EFFECT_FIELD_COMBO: return static_cast<ComboBoxEx*>(ui_element)->getPreviousIndex();
-	case EFFECT_FIELD_FONT: return static_cast<FontCombobox*>(ui_element)->getPreviousValue();
-	case EFFECT_FIELD_FILE: return static_cast<EmbeddedFileChooser*>(ui_element)->getPreviousValue();
+	///case EFFECT_FIELD_FONT: return static_cast<FontCombobox*>(ui_element)->getPreviousValue();
+	///case EFFECT_FIELD_FILE: return static_cast<EmbeddedFileChooser*>(ui_element)->getPreviousValue();
 	}
 	return QVariant();
 }
@@ -151,12 +156,12 @@ QVariant EffectField::get_previous_data() {
 QVariant EffectField::get_current_data() {
 	switch (type) {
 	case EFFECT_FIELD_DOUBLE: return static_cast<LabelSlider*>(ui_element)->value();
-	case EFFECT_FIELD_COLOR: return static_cast<ColorButton*>(ui_element)->get_color();
-	case EFFECT_FIELD_STRING: return static_cast<TextEditEx*>(ui_element)->getPlainTextEx();
+	///case EFFECT_FIELD_COLOR: return static_cast<ColorButton*>(ui_element)->get_color();
+	///case EFFECT_FIELD_STRING: return static_cast<TextEditEx*>(ui_element)->getPlainTextEx();
 	case EFFECT_FIELD_BOOL: return static_cast<QCheckBox*>(ui_element)->isChecked();
 	case EFFECT_FIELD_COMBO: return static_cast<ComboBoxEx*>(ui_element)->currentIndex();
-	case EFFECT_FIELD_FONT: return static_cast<FontCombobox*>(ui_element)->currentText();
-	case EFFECT_FIELD_FILE: return static_cast<EmbeddedFileChooser*>(ui_element)->getFilename();
+	///case EFFECT_FIELD_FONT: return static_cast<FontCombobox*>(ui_element)->currentText();
+	///case EFFECT_FIELD_FILE: return static_cast<EmbeddedFileChooser*>(ui_element)->getFilename();
 	}
 	return QVariant();
 }
@@ -172,12 +177,12 @@ long EffectField::timecodeToFrame(double timecode) {
 void EffectField::set_current_data(const QVariant& data) {
 	switch (type) {
 	case EFFECT_FIELD_DOUBLE: return static_cast<LabelSlider*>(ui_element)->set_value(data.toDouble(), false);
-	case EFFECT_FIELD_COLOR: return static_cast<ColorButton*>(ui_element)->set_color(data.value<QColor>());
-	case EFFECT_FIELD_STRING: return static_cast<TextEditEx*>(ui_element)->setPlainTextEx(data.toString());
+	//case EFFECT_FIELD_COLOR: return static_cast<ColorButton*>(ui_element)->set_color(data.value<QColor>());
+	//case EFFECT_FIELD_STRING: return static_cast<TextEditEx*>(ui_element)->setPlainTextEx(data.toString());
 	case EFFECT_FIELD_BOOL: return static_cast<QCheckBox*>(ui_element)->setChecked(data.toBool());
 	case EFFECT_FIELD_COMBO: return static_cast<ComboBoxEx*>(ui_element)->setCurrentIndexEx(data.toInt());
-	case EFFECT_FIELD_FONT: return static_cast<FontCombobox*>(ui_element)->setCurrentTextEx(data.toString());
-	case EFFECT_FIELD_FILE: return static_cast<EmbeddedFileChooser*>(ui_element)->setFilename(data.toString());
+	///case EFFECT_FIELD_FONT: return static_cast<FontCombobox*>(ui_element)->setCurrentTextEx(data.toString());
+	///case EFFECT_FIELD_FILE: return static_cast<EmbeddedFileChooser*>(ui_element)->setFilename(data.toString());
 	}
 }
 
@@ -271,6 +276,7 @@ QVariant EffectField::validate_keyframe_data(double timecode, bool async) {
 			static_cast<LabelSlider*>(ui_element)->set_value(value, false);
 		}
 			break;
+#if 0
 		case EFFECT_FIELD_COLOR:
 		{
 			QColor value;
@@ -293,6 +299,7 @@ QVariant EffectField::validate_keyframe_data(double timecode, bool async) {
 			}
 			static_cast<TextEditEx*>(ui_element)->setPlainTextEx(before_data.toString());
 			break;
+#endif
 		case EFFECT_FIELD_BOOL:
 			if (async) {
 				return before_data;
@@ -305,6 +312,7 @@ QVariant EffectField::validate_keyframe_data(double timecode, bool async) {
 			}
 			static_cast<ComboBoxEx*>(ui_element)->setCurrentIndexEx(before_data.toInt());
 			break;
+#if 0
 		case EFFECT_FIELD_FONT:
 			if (async) {
 				return before_data;
@@ -317,17 +325,20 @@ QVariant EffectField::validate_keyframe_data(double timecode, bool async) {
 			}
 			static_cast<EmbeddedFileChooser*>(ui_element)->setFilename(before_data.toString());
 			break;
+#endif
 		}
 	}
 	return QVariant();
 }
 
 void EffectField::ui_element_change() {
+#if 0
 	bool dragging_double = (type == EFFECT_FIELD_DOUBLE && static_cast<LabelSlider*>(ui_element)->is_dragging());
 	ComboAction* ca = nullptr;
 	if (!dragging_double) ca = new ComboAction();
 	make_key_from_change(ca);
 	if (!dragging_double) undo_stack.push(ca);
+#endif
 	emit changed();
 }
 
@@ -336,7 +347,7 @@ void EffectField::make_key_from_change(ComboAction* ca) {
 		parent_row->set_keyframe_now(ca);
 	} else if (ca != nullptr) {
 		// set undo
-		ca->append(new EffectFieldUndo(this));
+		///ca->append(new EffectFieldUndo(this));
 	}
 }
 
@@ -418,50 +429,58 @@ void EffectField::set_bool_value(bool b) {
 	return static_cast<QCheckBox*>(ui_element)->setChecked(b);
 }
 
-QString EffectField::get_string_value(double timecode, bool async) {
+QString EffectField::get_string_value(double timecode, bool async) {return "";
+#if 0
 	if (async && hasKeyframes()) {
 		return validate_keyframe_data(timecode, true).toString();
 	}
 	validate_keyframe_data(timecode);
 	return static_cast<TextEditEx*>(ui_element)->getPlainTextEx();
+#endif
 }
 
 void EffectField::set_string_value(const QString& s) {
-	static_cast<TextEditEx*>(ui_element)->setPlainTextEx(s);
+	//static_cast<TextEditEx*>(ui_element)->setPlainTextEx(s);
 }
 
-QString EffectField::get_font_name(double timecode, bool async) {
+QString EffectField::get_font_name(double timecode, bool async) {return "";
+#if 0
 	if (async && hasKeyframes()) {
 		return validate_keyframe_data(timecode, true).toString();
 	}
 	validate_keyframe_data(timecode);
 	return static_cast<FontCombobox*>(ui_element)->currentText();
+#endif
 }
 
 void EffectField::set_font_name(const QString& s) {
-	static_cast<FontCombobox*>(ui_element)->setCurrentText(s);
+	//static_cast<FontCombobox*>(ui_element)->setCurrentText(s);
 }
 
-QColor EffectField::get_color_value(double timecode, bool async) {
+QColor EffectField::get_color_value(double timecode, bool async) {return QColor();
+#if 0
 	if (async && hasKeyframes()) {
 		return validate_keyframe_data(timecode, true).value<QColor>();
 	}
 	validate_keyframe_data(timecode);
 	return static_cast<ColorButton*>(ui_element)->get_color();
+#endif
 }
 
 void EffectField::set_color_value(QColor color) {
-	static_cast<ColorButton*>(ui_element)->set_color(color);
+	//static_cast<ColorButton*>(ui_element)->set_color(color);
 }
 
-QString EffectField::get_filename(double timecode, bool async) {
+QString EffectField::get_filename(double timecode, bool async) {return "";
+#if 0
 	if (async && hasKeyframes()) {
 		return validate_keyframe_data(timecode, true).toString();
 	}
 	validate_keyframe_data(timecode);
 	return static_cast<EmbeddedFileChooser*>(ui_element)->getFilename();
+#endif
 }
 
 void EffectField::set_filename(const QString &s) {
-	static_cast<EmbeddedFileChooser*>(ui_element)->setFilename(s);
+	//static_cast<EmbeddedFileChooser*>(ui_element)->setFilename(s);
 }

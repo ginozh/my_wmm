@@ -12,6 +12,7 @@
 
 class Viewer;
 struct Clip;
+class Clipt;
 struct FootageStream;
 class QOpenGLFramebufferObject;
 class Effect;
@@ -76,6 +77,11 @@ private slots:
 	void set_fit_zoom();
 	void set_custom_zoom();
 	void set_menu_zoom(QAction *action);
+public slots:
+	void create_effect_ui(Clipt* c);
+public:
+    int glw=1280;
+    int glh=720;
 };
 
 #endif // VIEWERWIDGET_H

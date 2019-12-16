@@ -45,5 +45,5 @@ LIBS += -lSDL
 
 INCLUDEPATH += $$PWD/ffmpeg/include/ \
                 $$PWD/gl/include/ \
-                c:/msys32/mingw32/include/SDL/
+                c:/msys64/mingw64/include/SDL/
 

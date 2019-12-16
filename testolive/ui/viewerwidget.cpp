@@ -1,31 +1,13 @@
 ﻿#include "viewerwidget.h"
 
-#include "panels/panels.h"
-#include "panels/viewer.h"
-#include "panels/timeline.h"
-#include "panels/project.h"
-#include "project/sequence.h"
 #include "project/clip.h"
 #include "project/effect.h"
-#include "project/transition.h"
-#include "playback/playback.h"
-#include "playback/audio.h"
-#include "project/footage.h"
-#include "playback/cacher.h"
-#include "io/config.h"
-#include "debug.h"
-#include "io/math.h"
-#include "ui/collapsiblewidget.h"
-#include "project/undo.h"
 #include "project/media.h"
 #include "ui/viewercontainer.h"
-#include "io/avtogl.h"
-#include "ui/timelinewidget.h"
 #include "ui/renderfunctions.h"
 #include "ui/renderthread.h"
-#include "ui/viewerwindow.h"
-#include "mainwindow.h"
-
+#include "io/config.h"
+#include "Clipt.h"
 #include <QPainter>
 #include <QAudioOutput>
 #include <QOpenGLShaderProgram>
@@ -55,8 +37,7 @@ ViewerWidget::ViewerWidget(QWidget *parent) :
 	waveform_scroll(0),
 	dragging(false),
 	gizmos(nullptr),
-	selected_gizmo(nullptr),
-	window(nullptr)
+	selected_gizmo(nullptr)
 {
 	setMouseTracking(true);
 	setFocusPolicy(Qt::ClickFocus);
@@ -70,6 +51,7 @@ ViewerWidget::ViewerWidget(QWidget *parent) :
 
 	renderer = new RenderThread();
 	renderer->start(QThread::HighPriority);
+    renderer->setGLWidget(this);
 	connect(renderer, SIGNAL(ready()), this, SLOT(queue_repaint()));
 	connect(renderer, SIGNAL(finished()), renderer, SLOT(deleteLater()));
 }
@@ -112,6 +94,7 @@ void ViewerWidget::retry() {
 }
 
 void ViewerWidget::initializeGL() {
+    qDebug()<<"ViewerWidget::initializeGL";
 	initializeOpenGLFunctions();
 
 	connect(context(), SIGNAL(aboutToBeDestroyed()), this, SLOT(context_destroy()), Qt::DirectConnection);
@@ -119,28 +102,12 @@ void ViewerWidget::initializeGL() {
 }
 
 void ViewerWidget::frame_update() {
-#if 0
-	if (viewer->seq != nullptr) {
-        qDebug()<<"ViewerWidget::frame_update";
-		bool render_audio = (viewer->playing || audio_rendering);
-
-		// send context to other thread for drawing
-		if (waveform) {
-			update();
-		} else {
-			doneCurrent();
-			renderer->start_render(context(), viewer->seq);
-		}
-
-		// render the audio
-	}
-#else
-    if(sequence)
+    qDebug()<<"ViewerWidget::frame_update";
+    ///if(sequence)
     {
     doneCurrent();
-    renderer->start_render(context(), sequence);
+    renderer->start_render(context(), nullptr);
     }
-#endif
 }
 
 RenderThread *ViewerWidget::get_renderer() {
@@ -169,7 +136,7 @@ void ViewerWidget::context_destroy() {
 
 EffectGizmo* ViewerWidget::get_gizmo_from_mouse(int x, int y) {
 	if (gizmos != nullptr) {
-		double multiplier = double(sequence->width) / double(width());
+		double multiplier = double(glw) / double(width());
 		QPoint mouse_pos(qRound(x*multiplier), qRound((height()-y)*multiplier));
 		int dot_size = 2 * qRound(GIZMO_DOT_SIZE * multiplier);
 		int target_size = 2 * qRound(GIZMO_TARGET_SIZE * multiplier);
@@ -206,12 +173,13 @@ EffectGizmo* ViewerWidget::get_gizmo_from_mouse(int x, int y) {
 
 void ViewerWidget::move_gizmos(QMouseEvent *event, bool done) {
 	if (selected_gizmo != nullptr) {
-		double multiplier = double(sequence->width) / double(width());
+		double multiplier = double(glw) / double(width());
 
 		int x_movement = qRound((event->pos().x() - drag_start_x)*multiplier);
 		int y_movement = qRound((event->pos().y() - drag_start_y)*multiplier);
 
-		gizmos->gizmo_move(selected_gizmo, x_movement, y_movement, get_timecode(gizmos->parent_clip, gizmos->parent_clip->sequence->playhead), done);
+		//gizmos->gizmo_move(selected_gizmo, x_movement, y_movement, get_timecode(gizmos->parent_clip, gizmos->parent_clip->sequence->playhead), done);
+		gizmos->gizmo_move(selected_gizmo, x_movement, y_movement, 0.0, done);
 
 		gizmo_x_mvmt += x_movement;
 		gizmo_y_mvmt += y_movement;
@@ -234,7 +202,8 @@ void ViewerWidget::mousePressEvent(QMouseEvent* event) {
 		gizmo_y_mvmt = 0;
 
 		selected_gizmo = get_gizmo_from_mouse(event->pos().x(), event->pos().y());
-        qDebug()<<"ViewerWidget::mousePressEvent drag_start_x: "<<drag_start_x<<" drag_start_y: "<<drag_start_y<<" gizmos->gizmo_count: "<<(gizmos?gizmos->gizmo_count():0)<<" selected_gizmo: "<<selected_gizmo;
+        qDebug()<<"ViewerWidget::mousePressEvent drag_start_x: "<<drag_start_x<<" drag_start_y: "<<drag_start_y
+            <<" gizmos: "<<gizmos<<" gizmos->gizmo_count: "<<(gizmos?gizmos->gizmo_count():0)<<" selected_gizmo: "<<selected_gizmo;
 		if (selected_gizmo != nullptr) {
 			selected_gizmo->set_previous_value();
 		}
@@ -244,9 +213,9 @@ void ViewerWidget::mousePressEvent(QMouseEvent* event) {
 
 void ViewerWidget::mouseMoveEvent(QMouseEvent* event) {
 	unsetCursor();
-	if (panel_timeline && panel_timeline->tool == TIMELINE_TOOL_HAND) {
+	/*if (panel_timeline && panel_timeline->tool == TIMELINE_TOOL_HAND) {
 		setCursor(Qt::OpenHandCursor);
-	}
+	}*/
 	if (dragging) {
 		if (waveform) {
 			seek_from_click(event->x());
@@ -288,12 +257,12 @@ void ViewerWidget::close_window() {
 void ViewerWidget::draw_waveform_func() {
 }
 
-void ViewerWidget::draw_title_safe_area() {
+void ViewerWidget::draw_title_safe_area() {return;
 	double halfWidth = 0.5;
 	double halfHeight = 0.5;
 	double viewportAr = (double) width() / (double) height();
 	double halfAr = viewportAr*0.5;
-#if 0
+#if 1
 	if (config.use_custom_title_safe_ratio && config.custom_title_safe_ratio > 0) {
 		if (config.custom_title_safe_ratio > viewportAr) {
 			halfHeight = (config.custom_title_safe_ratio/viewportAr)*0.5;
@@ -360,12 +329,12 @@ void ViewerWidget::draw_gizmos() {
 	float color[4];
 	glGetFloatv(GL_CURRENT_COLOR, color);
 
-	float dot_size = GIZMO_DOT_SIZE / width() * sequence->width;
-	float target_size = GIZMO_TARGET_SIZE / width() * sequence->width;
+	float dot_size = GIZMO_DOT_SIZE / width() * glw;
+	float target_size = GIZMO_TARGET_SIZE / width() * glw;
 
 	glPushMatrix();
 	glLoadIdentity();
-	glOrtho(0, sequence->width, 0, sequence->height, -1, 10);
+	glOrtho(0, glw, 0, glh, -1, 10);
 	float gizmo_z = 0.0f;
 	for (int j=0;j<gizmos->gizmo_count();j++) {
 		EffectGizmo* g = gizmos->gizmo(j);
@@ -428,6 +397,7 @@ void ViewerWidget::paintGL() {
 
 		// clear to solid black
 
+        qDebug()<<"OpenGLWidget::paintGL width: "<<width()<<" height: "<<height();
 		glClearColor(0.0, 0.0, 0.0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
 
@@ -458,12 +428,12 @@ void ViewerWidget::paintGL() {
 		glEnd();
         ////saveOpenglBuffer(); //storm
 		glBindTexture(GL_TEXTURE_2D, 0);
-
+#if 1
 		// draw title/action safe area
 		if (config.show_title_safe_area) {
 			draw_title_safe_area();
 		}
-
+#endif
 		gizmos = renderer->gizmos;
 		if (gizmos != nullptr) {
 			draw_gizmos();
@@ -475,7 +445,25 @@ void ViewerWidget::paintGL() {
 
 		if (renderer->did_texture_fail()) {
 			doneCurrent();
-			renderer->start_render(context(), sequence);
+			renderer->start_render(context(), nullptr);
 		}
 	}
+}
+void ViewerWidget::create_effect_ui(Clipt* c)
+{
+    if(c)
+    {
+        qDebug()<<"OpenGLWidget::create_effect_ui clip: "<<c;
+#if 0
+        Effect* e = create_effect(c, get_internal_meta(EFFECT_INTERNAL_TRANSFORM, EFFECT_TYPE_EFFECT));
+        e->set_enabled(true);
+        c->effects.append(e);
+#else
+        c->createEffect();
+#endif
+    }
+    else
+    {
+        qInfo()<<"OpenGLWidget::create_effect_ui error no clip";
+    }
 }
