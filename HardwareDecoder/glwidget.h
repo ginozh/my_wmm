@@ -6,6 +6,7 @@
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
 #include <QMatrix4x4>
+#include <QOpenGLShaderProgram>
 #include "logo.h"
 #include "videoframe.h"
 #include "hwdecoder.h"
@@ -67,8 +68,17 @@ private:
     QMatrix4x4 m_world;
     static bool m_transparent;
 
+private:
+    void initShaderProgram();
+    void initGeometry();
     int glvieww, glviewh;
     VideoFramePtr m_frame=nullptr;
+    GLuint m_texture;
+    QVector<QVector3D> m_vertices;
+    QVector<QVector3D> m_normals;
+    QOpenGLShaderProgram m_shaderProgram;
+    int m_in_pos;
+    int m_in_tc;
 };
 
 #endif

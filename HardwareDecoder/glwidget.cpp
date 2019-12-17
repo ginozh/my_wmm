@@ -3,9 +3,11 @@
 #include <QOpenGLShaderProgram>
 #include <QCoreApplication>
 #include <math.h>
+#include <QTime>
+#include <QDebug>
 
 bool GLWidget::m_transparent = false;
-
+#define OUTPUT_WASTE
 GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget(parent),
       m_xRot(0),
@@ -160,6 +162,7 @@ void GLWidget::initializeGL()
     connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &GLWidget::cleanup);
 
     initializeOpenGLFunctions();
+#if 0
     glClearColor(0, 0, 0, m_transparent ? 0 : 1);
 
     m_program = new QOpenGLShaderProgram;
@@ -198,6 +201,16 @@ void GLWidget::initializeGL()
     m_program->setUniformValue(m_lightPosLoc, QVector3D(0, 0, 70));
 
     m_program->release();
+#endif
+    initShaderProgram();
+    initGeometry();
+
+    glClearColor(0.f, 0.f, 0.f, 1.0f);
+
+    glGenTextures(1,&m_texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
 void GLWidget::setupVertexAttribs()
@@ -215,49 +228,51 @@ void GLWidget::paintGL()
 {
     static int count=0;
     qDebug()<<"GLWidget::paintGL count: "<<(++count);
-#if 0
+    glDepthMask(GL_TRUE);
+
+    glClearColor(0.f, 0.f, 0.f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
+
+    glFrontFace(GL_CW);
+    glCullFace(GL_FRONT);
     glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
 
-    m_world.setToIdentity();
-    m_world.rotate(180.0f - (m_xRot / 16.0f), 1, 0, 0);
-    m_world.rotate(m_yRot / 16.0f, 0, 1, 0);
-    m_world.rotate(m_zRot / 16.0f, 0, 0, 1);
+    if (!m_frame.isNull())
+        m_frame->map(m_texture);
 
-    QOpenGLVertexArrayObject::Binder vaoBinder(&m_vao);
-    m_program->bind();
-    m_program->setUniformValue(m_projMatrixLoc, m_proj);
-    m_program->setUniformValue(m_mvMatrixLoc, m_camera * m_world);
-    QMatrix3x3 normalMatrix = m_world.normalMatrix();
-    m_program->setUniformValue(m_normalMatrixLoc, normalMatrix);
-
-    glDrawArrays(GL_TRIANGLES, 0, m_logo.vertexCount());
-
-    m_program->release();
+    GLuint texture = m_texture;
+#if defined(Q_OS_WIN)
+    texture = 0;
 #endif
-    glViewport(0, 0, glvieww, glviewh);
+    m_shaderProgram.setUniformValue("frameTexture", texture);
 
-     // 1.1 设置背景色
-    glClearColor(255 / 255.0, 252 / 255.0, 235 / 255.0, 1);
-        // 1.2 清空颜色、深度、模板换缓冲区
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        // 1.3 设置颜色
-    glColor4f(148 / 255.0, 65 / 255.0, 148 / 255.0, 1);
-        // 1.4 设置坐标系 glOrtho
-    glOrtho(-1.0, 1.0, -1.0, 1.0, -1, 1);
-        // 1.5 开始渲染 glbegin beginMode
-        // 不同mode需要重新begin end
-    glBegin(GL_LINE_LOOP);
-        // 1.6 设置顶点（正方形，圆形，）
-    glVertex2f(0.5, 0.5);
-    glVertex2f(0.5, -0.5);
-    glVertex2f(-0.5, -0.5);
-    glVertex2f(-0.5, 0.5);
-        // 1.7 结束渲染
-    glEnd();
-        // 1.8 刷新缓冲区
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    m_shaderProgram.bind();
+
+    m_shaderProgram.enableAttributeArray(m_in_tc);
+    m_shaderProgram.enableAttributeArray(m_in_pos);
+    m_shaderProgram.setAttributeArray(m_in_pos, m_vertices.constData());
+    m_shaderProgram.setAttributeArray(m_in_tc, m_normals.constData());
+
+    glDrawArrays(GL_TRIANGLES, 0, m_vertices.size());
+
+    m_shaderProgram.disableAttributeArray(m_in_tc);
+    m_shaderProgram.disableAttributeArray(m_in_pos);
+
+    m_shaderProgram.release();
+
+    if (!m_frame.isNull())
+        m_frame->unmap();
+
     glFlush();
+
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -301,8 +316,67 @@ VideoFrame* GLWidget::createHWVideoFrame(const AVFrame *frame)
 void* GLWidget::createHWVideoFrame(const void *f)
 {
     qDebug()<<"GLWidget::createHWVideoFrame";
+#ifdef OUTPUT_WASTE
+    QTime startTime = QTime::currentTime();
+#endif
     const AVFrame *frame = (AVFrame*)f;
     IDirect3DSurface9 *d3d9surface = (IDirect3DSurface9*)frame->data[3];
     SurfaceD3D9* videoSurface = new SurfaceD3D9(d3d9surface, frame->width, frame->height);
+#ifdef OUTPUT_WASTE
+    int64_t wasteTime = startTime.msecsTo(QTime::currentTime());
+    qInfo()<< "GLWidget::createHWVideoFrame waste: " << wasteTime;
+#endif
     return (void*)new VideoFrame(videoSurface);
+}
+void GLWidget::initShaderProgram()
+{
+    QOpenGLShader *vshader = new QOpenGLShader(QOpenGLShader::Vertex, &m_shaderProgram);
+    const char *vsrc =
+            "varying mediump vec2 interp_tc;\n"
+            "attribute mediump vec4 in_pos;\n"
+            "attribute mediump vec4 in_tc;\n"
+            "\n"
+            "void main() {\n"
+            "    interp_tc = in_tc.xy;\n"
+            "    gl_Position = in_pos;\n"
+            "}\n";
+    vshader->compileSourceCode(vsrc);
+
+    QOpenGLShader *fshader = new QOpenGLShader(QOpenGLShader::Fragment, &m_shaderProgram);
+    const char *fsrc =
+            "uniform sampler2D frameTexture; \n"
+            "varying mediump vec2 interp_tc;\n"
+            "void main() \n"
+            "{ \n"
+            "    gl_FragColor = texture2D(frameTexture, interp_tc);\n"
+            "}\n";
+    fshader->compileSourceCode(fsrc);
+
+    m_shaderProgram.addShader(vshader);
+    m_shaderProgram.addShader(fshader);
+    m_shaderProgram.link();
+
+    m_in_pos = m_shaderProgram.attributeLocation("in_pos");
+    m_in_tc = m_shaderProgram.attributeLocation("in_tc");
+}
+void GLWidget::initGeometry()
+{
+    m_vertices.clear();
+    m_vertices.clear();
+
+    m_vertices << QVector3D(-1.0, -1.0, 0);
+    m_vertices << QVector3D(1.0, -1.0, 0);
+    m_vertices << QVector3D(-1.0, 1.0, 0);
+
+    m_vertices << QVector3D(-1.0, 1.0, 0);
+    m_vertices << QVector3D(1.0, -1.0, 0);
+    m_vertices << QVector3D(1.0, 1.0, 0);
+
+    m_normals << QVector3D(0.0, 0.0, 0);
+    m_normals << QVector3D(1.0, 0.0, 0);
+    m_normals << QVector3D(0.0, 1.0, 0);
+
+    m_normals << QVector3D(0.0, 1.0, 0);
+    m_normals << QVector3D(1.0, 0.0, 0);
+    m_normals << QVector3D(1.0, 1.0, 0);
 }

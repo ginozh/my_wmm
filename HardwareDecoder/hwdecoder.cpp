@@ -149,12 +149,12 @@ int HWDecoder::decode(AVPacket *packet)
         }
 
         VideoFrame* videoFrame;
+        void* videoframe;
         if (frame->format == m_hwPixFmt) {
             ///videoFrame = createHWVideoFrame(frame.data());
 #if 1
             if(m_glwidget)
             {
-                void* videoframe;
                 void* avframe = (void*)frame.data();
                 QMetaObject::invokeMethod(m_glwidget,
                         "createHWVideoFrame",
@@ -168,7 +168,7 @@ int HWDecoder::decode(AVPacket *packet)
             videoFrame = createSWVideoFrame(frame.data());
         }
 
-        ///sendFrame(videoFrame);
+        sendFrame((VideoFrame*)videoframe);
     }
 
     return 0;
