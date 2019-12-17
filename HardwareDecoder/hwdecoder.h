@@ -8,14 +8,14 @@ extern "C" {
 #include <libavutil/hwcontext.h>
 #include <libavformat/avformat.h>
 }
-
+class GLWidget;
 class HWDecoder: public QObject
 {
     Q_OBJECT
 public:
     static enum AVPixelFormat getFormat(AVCodecContext *ctx, const enum AVPixelFormat *pix_fmts);
 
-    HWDecoder(QObject * parent = nullptr);
+    HWDecoder(QObject * parent = nullptr, GLWidget* glwidget = nullptr);
     ~HWDecoder();
 
     bool init(AVCodecParameters* codecParameters);
@@ -44,6 +44,8 @@ private:
     AVBufferRef *m_hwDeviceCtx;
 
     AVCodec *m_decoder;    
+
+    GLWidget* m_glwidget;
 };
 
 struct AVFrameDeleter

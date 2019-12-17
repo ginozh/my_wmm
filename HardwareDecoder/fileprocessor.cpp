@@ -12,10 +12,12 @@ FileProcessor::FileProcessor(QObject *parent, GLWidget *glwidget)
 
 {
     m_source = new VideoSource(this);
-    m_decoder = HWDecoderFactory::createDecoder(this);
+    m_decoder = HWDecoderFactory::createDecoder(this, m_glWidget);
     //connect(m_decoder, &HWDecoder::frameDecoded, m_source, &VideoSource::setFrame);
     if(m_glWidget)
+    {
         connect(m_decoder, &HWDecoder::frameDecoded, m_glWidget, &GLWidget::setFrame);
+    }
 }
 
 FileProcessor::~FileProcessor()

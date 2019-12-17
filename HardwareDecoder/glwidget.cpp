@@ -286,3 +286,23 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     }
     m_lastPos = event->pos();
 }
+
+#include "d3d9decoder.h"
+#include "surfaced3d9.h"
+#if 0
+VideoFrame* GLWidget::createHWVideoFrame(const AVFrame *frame)
+{
+    qDebug()<<"GLWidget::createHWVideoFrame";
+    IDirect3DSurface9 *d3d9surface = (IDirect3DSurface9*)frame->data[3];
+    SurfaceD3D9* videoSurface = new SurfaceD3D9(d3d9surface, frame->width, frame->height);
+    return new VideoFrame(videoSurface);
+}
+#endif
+void* GLWidget::createHWVideoFrame(const void *f)
+{
+    qDebug()<<"GLWidget::createHWVideoFrame";
+    const AVFrame *frame = (AVFrame*)f;
+    IDirect3DSurface9 *d3d9surface = (IDirect3DSurface9*)frame->data[3];
+    SurfaceD3D9* videoSurface = new SurfaceD3D9(d3d9surface, frame->width, frame->height);
+    return (void*)new VideoFrame(videoSurface);
+}

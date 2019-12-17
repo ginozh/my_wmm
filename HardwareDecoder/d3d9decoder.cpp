@@ -1,8 +1,9 @@
 #include "d3d9decoder.h"
 #include "surfaced3d9.h"
+#include "glwidget.h"
 
 
-D3D9Decoder::D3D9Decoder(QObject * parent) : HWDecoder(parent)
+D3D9Decoder::D3D9Decoder(QObject * parent, GLWidget* glwidget) : HWDecoder(parent, glwidget)
 {
     m_deviceName = "dxva2";
     m_hwPixFmt = AV_PIX_FMT_DXVA2_VLD;

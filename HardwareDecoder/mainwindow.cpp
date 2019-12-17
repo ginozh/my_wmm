@@ -40,7 +40,8 @@ MainWindow::MainWindow()
         mainLayout->addLayout(hbox);
         {
             m_leUrl = new QLineEdit;
-            m_leUrl->setText("Z:\\Desktop\\upan\\qqrtx\\QQ\\Wildlife.wmv"); 
+            //m_leUrl->setText("Z:\\Desktop\\upan\\qqrtx\\QQ\\Wildlife.wmv"); 
+            m_leUrl->setText("C:\\shareproject\\OpenglEffectAdvance\\example\\Wildlife.wmv"); 
             hbox->addWidget(m_leUrl);
 
             //m_pbOpenFile = new QPushButton("Open File");
@@ -50,7 +51,7 @@ MainWindow::MainWindow()
             hbox->addWidget(m_pbStart);
             connect(m_pbStart, &QAbstractButton::clicked, [=]() {
                     m_url=m_leUrl->text().trimmed();
-                    m_fileProcessor = new FileProcessor();
+                    m_fileProcessor = new FileProcessor(this, glWidget);
                     m_fileProcessor->processMedia(m_url);
                     });
         }

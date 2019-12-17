@@ -3,11 +3,11 @@
 
 #include <QQmlEngine>
 #include "hwdecoder.h"
-
+class GLWidget;
 class HWDecoderFactory
 {
 public:
-    static HWDecoder *createDecoder(QObject * parent = nullptr);
+    static HWDecoder *createDecoder(QObject * parent = nullptr, GLWidget* glwidget = nullptr);
 
 };
 

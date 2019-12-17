@@ -1,4 +1,5 @@
 #include "hwdecoderfactory.h"
+#include "glwidget.h"
 
 #if defined(Q_OS_WIN)
 #include "d3d9decoder.h"
@@ -12,10 +13,10 @@
 #include "vaapidecoder.h"
 #endif
 
-HWDecoder *HWDecoderFactory::createDecoder(QObject *parent)
+HWDecoder *HWDecoderFactory::createDecoder(QObject *parent, GLWidget* glwidget)
 {
 #if defined(Q_OS_WIN)
-    return new D3D9Decoder(parent);
+    return new D3D9Decoder(parent, glwidget);
 #endif
 
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)

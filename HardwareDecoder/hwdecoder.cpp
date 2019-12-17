@@ -1,14 +1,16 @@
 #include "hwdecoder.h"
+#include "glwidget.h"
 #include <QDebug>
 
 AVPixelFormat HWDecoder::m_hwPixFmt = AV_PIX_FMT_NONE;
 
-HWDecoder::HWDecoder(QObject * parent)
+HWDecoder::HWDecoder(QObject * parent, GLWidget* glwidget)
     : QObject(parent),
       m_type(AV_HWDEVICE_TYPE_NONE),
       m_hwDeviceCtx(nullptr),
       m_decoder(nullptr),
-      m_decoderCtx(nullptr)
+      m_decoderCtx(nullptr),
+      m_glwidget(glwidget)
 {
     av_register_all();
 }
@@ -148,12 +150,25 @@ int HWDecoder::decode(AVPacket *packet)
 
         VideoFrame* videoFrame;
         if (frame->format == m_hwPixFmt) {
-            videoFrame = createHWVideoFrame(frame.data());
+            ///videoFrame = createHWVideoFrame(frame.data());
+#if 1
+            if(m_glwidget)
+            {
+                void* videoframe;
+                void* avframe = (void*)frame.data();
+                QMetaObject::invokeMethod(m_glwidget,
+                        "createHWVideoFrame",
+                        Qt::BlockingQueuedConnection,
+                        Q_RETURN_ARG(void*, videoframe),
+                        Q_ARG(const void*,   avframe)
+                        );
+            }
+#endif
         } else {
             videoFrame = createSWVideoFrame(frame.data());
         }
 
-        sendFrame(videoFrame);
+        ///sendFrame(videoFrame);
     }
 
     return 0;

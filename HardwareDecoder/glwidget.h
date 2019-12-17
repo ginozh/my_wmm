@@ -8,9 +8,9 @@
 #include <QMatrix4x4>
 #include "logo.h"
 #include "videoframe.h"
+#include "hwdecoder.h"
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
-
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
@@ -31,6 +31,8 @@ public slots:
     void setZRotation(int angle);
     void cleanup();
     void setFrame(VideoFramePtr frame);
+    //VideoFrame* createHWVideoFrame(const AVFrame *frame);
+    void* createHWVideoFrame(const void *frame);
 
 signals:
     void xRotationChanged(int angle);
