@@ -1,4 +1,5 @@
-QT += quick concurrent gui
+QT += quick concurrent gui widgets
+QT += opengl
 CONFIG += c++11
 
 # The following define makes your compiler emit warnings if you use
@@ -12,6 +13,17 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+########Release 模式下可以调试#############
+QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CFLAGS_RELEASE_WITH_DEBUGINFO
+QMAKE_LFLAGS_RELEASE = $$QMAKE_LFLAGS_RELEASE_WITH_DEBUGINFO
+CONFIG(debug, debug|release) {
+    #QMAKE_CFLAGS += -DQT_NO_DEBUG_OUTPUT
+    #QMAKE_CXXFLAGS += -DQT_NO_DEBUG_OUTPUT
+}else{
+    QMAKE_CFLAGS += -DQT_NO_DEBUG_OUTPUT
+    QMAKE_CXXFLAGS += -DQT_NO_DEBUG_OUTPUT
+}
+
 SOURCES += main.cpp \
     hwdecoder.cpp \
     hwdecoderfactory.cpp \
@@ -22,7 +34,11 @@ SOURCES += main.cpp \
     surface.cpp \
     yuv2rgb.cpp \
     openglinterop.cpp \
-    fileprocessor.cpp
+    fileprocessor.cpp \
+    glwidget.cpp \
+    mainwindow.cpp \
+    logo.cpp \
+
 
 win32: SOURCES += d3d9decoder.cpp \
                   d3d9interop.cpp \
@@ -54,7 +70,11 @@ HEADERS += \
     surface.h \
     yuv2rgb.h \
     openglinterop.h \
-    fileprocessor.h
+    fileprocessor.h \
+    glwidget.h \
+    mainwindow.h \
+    logo.h \
+
 
 win32: HEADERS += d3d9decoder.h \
                   d3d9interop.h \

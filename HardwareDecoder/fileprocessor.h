@@ -6,17 +6,18 @@
 
 #include "videosource.h"
 #include "hwdecoderfactory.h"
-
+class GLWidget;
 class FileProcessor : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(VideoSource* source READ getSource WRITE setSource NOTIFY sourceChanged)
     Q_PROPERTY(bool processing READ processing WRITE setProcessing NOTIFY processingChanged)
 public:
-    explicit FileProcessor(QObject *parent = nullptr);
+    explicit FileProcessor(QObject *parent = nullptr, GLWidget *glwidget=nullptr);
     ~FileProcessor();
 
     Q_INVOKABLE void processMedia(const QUrl & input);
+    Q_INVOKABLE void processMedia(const QString & input);
     Q_INVOKABLE void stopProcess();
 
     VideoSource *getSource() const;
@@ -39,6 +40,8 @@ private:
 
     bool m_processing;
     QMutex m_mutex;
+
+    GLWidget* m_glWidget=NULL;
 };
 
 static QObject *FileProcessorInstance(QQmlEngine *engine, QJSEngine *scriptEngine)

@@ -1,16 +1,21 @@
 #include "fileprocessor.h"
+#include "glwidget.h"
 #include <QMutexLocker>
 #include <QtConcurrent>
 
-FileProcessor::FileProcessor(QObject *parent)
+FileProcessor::FileProcessor(QObject *parent, GLWidget *glwidget)
     : QObject(parent),
       m_decoder(nullptr),
       m_source(nullptr),
+      m_glWidget(glwidget),
       m_processing(false)
+
 {
     m_source = new VideoSource(this);
     m_decoder = HWDecoderFactory::createDecoder(this);
-    connect(m_decoder, &HWDecoder::frameDecoded, m_source, &VideoSource::setFrame);
+    //connect(m_decoder, &HWDecoder::frameDecoded, m_source, &VideoSource::setFrame);
+    if(m_glWidget)
+        connect(m_decoder, &HWDecoder::frameDecoded, m_glWidget, &GLWidget::setFrame);
 }
 
 FileProcessor::~FileProcessor()
@@ -67,10 +72,12 @@ void FileProcessor::decodeFile(const QString &input)
     AVCodecParameters* codecParameters = inputCtx->streams[video_stream]->codecpar;
 
     if (!m_decoder->init(codecParameters)) {
+        qInfo()<<"FileProcessor::decodeFile m_decoder->init error";
         return;
     }
 
     if (!m_decoder->open()) {
+        qInfo()<<"FileProcessor::decodeFile m_decoder->open error";
         return;
     }
 
@@ -115,7 +122,20 @@ void FileProcessor::processMedia(const QUrl &input)
     }
 
     //Call processFile in another thread
+    qDebug()<<"FileProcessor::processMedia url: "<<input<<" input.toLocalFile: "<<input.toLocalFile();
     QtConcurrent::run(this, &FileProcessor::processFile, input.toLocalFile());
+}
+
+void FileProcessor::processMedia(const QString &input)
+{
+    if (processing()) {
+        qWarning() << "File Processor is Busy!!";
+        return;
+    }
+
+    //Call processFile in another thread
+    qDebug()<<"FileProcessor::processMedia url: "<<input;
+    QtConcurrent::run(this, &FileProcessor::processFile, input);
 }
 
 void FileProcessor::stopProcess()

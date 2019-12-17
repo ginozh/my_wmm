@@ -1,4 +1,4 @@
-﻿#include "surfacevaapi.h"
+#include "surfacevaapi.h"
 #include <QtPlatformHeaders/QGLXNativeContext>
 
 const int pixmap_config[] = {
