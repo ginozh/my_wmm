@@ -228,6 +228,9 @@ void GLWidget::paintGL()
 {
     static int count=0;
     qDebug()<<"GLWidget::paintGL count: "<<(++count);
+#ifdef OUTPUT_WASTE
+    QTime startTime = QTime::currentTime();
+#endif
     glDepthMask(GL_TRUE);
 
     glClearColor(0.f, 0.f, 0.f, 1.0f);
@@ -240,6 +243,10 @@ void GLWidget::paintGL()
 
     if (!m_frame.isNull())
         m_frame->map(m_texture);
+#ifdef OUTPUT_WASTE
+    int64_t wasteTime = startTime.msecsTo(QTime::currentTime());
+    qInfo()<< "GLWidget::createHWVideoFrame waste: " << wasteTime;
+#endif
 
     GLuint texture = m_texture;
 #if defined(Q_OS_WIN)
@@ -273,6 +280,10 @@ void GLWidget::paintGL()
 
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
+#ifdef OUTPUT_WASTE
+    int64_t wasteTimeAll = startTime.msecsTo(QTime::currentTime());
+    qInfo()<< "GLWidget::paintGL waste_map: " << wasteTime<<" waste_all: "<<wasteTimeAll;
+#endif
 }
 
 void GLWidget::resizeGL(int w, int h)

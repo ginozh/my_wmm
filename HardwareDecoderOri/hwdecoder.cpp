@@ -1,18 +1,14 @@
 #include "hwdecoder.h"
-#include "glwidget.h"
-#include <QTime>
 #include <QDebug>
 
-#define OUTPUT_WASTE
 AVPixelFormat HWDecoder::m_hwPixFmt = AV_PIX_FMT_NONE;
 
-HWDecoder::HWDecoder(QObject * parent, GLWidget* glwidget)
+HWDecoder::HWDecoder(QObject * parent)
     : QObject(parent),
       m_type(AV_HWDEVICE_TYPE_NONE),
       m_hwDeviceCtx(nullptr),
       m_decoder(nullptr),
-      m_decoderCtx(nullptr),
-      m_glwidget(glwidget)
+      m_decoderCtx(nullptr)
 {
     av_register_all();
 }
@@ -151,31 +147,13 @@ int HWDecoder::decode(AVPacket *packet)
         }
 
         VideoFrame* videoFrame;
-        void* videoframe;
         if (frame->format == m_hwPixFmt) {
-            ///videoFrame = createHWVideoFrame(frame.data());
-            if(m_glwidget)
-            {
-#ifdef OUTPUT_WASTE
-                QTime startTime = QTime::currentTime();
-#endif
-                void* avframe = (void*)frame.data();
-                QMetaObject::invokeMethod(m_glwidget,
-                        "createHWVideoFrame",
-                        Qt::BlockingQueuedConnection,
-                        Q_RETURN_ARG(void*, videoframe),
-                        Q_ARG(const void*,   avframe)
-                        );
-#ifdef OUTPUT_WASTE
-                int64_t wasteTime = startTime.msecsTo(QTime::currentTime());
-                qInfo()<< "HWDecoder::decode waste: " << wasteTime;
-#endif
-            }
+            videoFrame = createHWVideoFrame(frame.data());
         } else {
             videoFrame = createSWVideoFrame(frame.data());
         }
 
-        sendFrame((VideoFrame*)videoframe);
+        sendFrame(videoFrame);
     }
 
     return 0;
