@@ -1,0 +1,5 @@
+C:/qtproject/d3dgl/CMakeFiles/d3dtest.dir
+C:/qtproject/d3dgl/CMakeFiles/mojoshader.dir
+C:/qtproject/d3dgl/CMakeFiles/d3d9.dir
+C:/qtproject/d3dgl/CMakeFiles/ALL_BUILD.dir
+C:/qtproject/d3dgl/CMakeFiles/ZERO_CHECK.dir
