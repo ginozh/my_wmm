@@ -1,7 +1,10 @@
-﻿#include "mainwindow.h"
-#include <QVBoxLayout>
+﻿#include <QVBoxLayout>
 #include <QLabel>
 #include <QWidget>
+#include <QPushButton>
+#include <QHBoxLayout>
+#include "mainwindow.h"
+#include "RecordDialog.hpp"
 
 MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     : QMainWindow(parent, flags)
@@ -13,6 +16,20 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     QVBoxLayout* mainLayout = new QVBoxLayout;
 
     QLabel* lbl=NULL;
+    {
+        QHBoxLayout* hbox = new QHBoxLayout;
+        mainLayout->addLayout(hbox);
+        {
+            QPushButton* record = new QPushButton("record");
+            hbox->addWidget(record);
+            connect(record, &QAbstractButton::clicked, [=]() {
+                    if(!recordDialog)
+                        recordDialog = new RecordDialog(this);
+                    recordDialog->setAttribute(Qt::WA_DeleteOnClose, true);
+                    recordDialog->show();
+                    });
+        }
+    }
 
     centralWidget->setLayout(mainLayout);
 }

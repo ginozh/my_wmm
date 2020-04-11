@@ -31,8 +31,17 @@ LIBS += ../../build/rundir/DEBUG/bin/libobs.0.dylib
 
 SOURCES += main.cpp \
     mainwindow.cpp \
+    RecordDialog.cpp \
+    qt-display.cpp \
+    qt-wrappers.cpp \
+
 
 HEADERS  += \
     mainwindow.h \
+    platform.hpp \
+    RecordDialog.hpp \
+    display-helpers.hpp \
+    qt-display.hpp \
+    qt-wrappers.hpp \
 
 

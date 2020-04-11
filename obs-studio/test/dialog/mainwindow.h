@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 #include <QMainWindow>
 #include <QApplication>
-
+class RecordDialog;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -15,6 +15,7 @@ protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
 private:
     // OBSBasicPreview *preview;
+    RecordDialog* recordDialog=nullptr;
 private:
 };
 
