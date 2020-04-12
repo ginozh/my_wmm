@@ -34,6 +34,14 @@ SOURCES += main.cpp \
     RecordDialog.cpp \
     qt-display.cpp \
     qt-wrappers.cpp \
+    window-basic-main-outputs.cpp \
+    audio-encoders.cpp \
+    double-slider.cpp \
+    slider-ignorewheel.cpp \
+    spinbox-ignorewheel.cpp \
+    combobox-ignorewheel.cpp \
+    properties-view.cpp \
+    vertical-scroll-area.cpp \
 
 
 HEADERS  += \
@@ -43,5 +51,14 @@ HEADERS  += \
     display-helpers.hpp \
     qt-display.hpp \
     qt-wrappers.hpp \
+    window-basic-main-outputs.hpp \
+    audio-encoders.hpp \
+    double-slider.hpp \
+    slider-ignorewheel.hpp \
+    spinbox-ignorewheel.hpp \
+    combobox-ignorewheel.hpp \
+    properties-view.hpp \
+    properties-view.moc.hpp \
+    vertical-scroll-area.hpp \
 
 
