@@ -48,6 +48,12 @@ public:
     ~RecordDialog();
 private:
 	void InitPrimitives();
+	static void SourceRemoved(void *data, calldata_t *params);
+	static void SourceRenamed(void *data, calldata_t *params);
+	static void UpdateVideoProperties(void *data, calldata_t *params);
+	static void UpdateAudioProperties(void *data, calldata_t *params);
+	static void DrawPreview(void *data, uint32_t cx, uint32_t cy);
+	//static void DrawTransitionPreview(void *data, uint32_t cx, uint32_t cy);
 private:
 	QPointer<OBSQTDisplay> preview;
 	QSplitter *windowSplitter;

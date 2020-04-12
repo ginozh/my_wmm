@@ -26,6 +26,7 @@
 #include "util/platform.h"
 #include "window-basic-main-outputs.hpp"
 #include "properties-view.hpp"
+#include "display-helpers.hpp"
 
 using namespace std;
 
@@ -148,25 +149,8 @@ RecordDialog::RecordDialog(QWidget *parent)
         char savePath[512]="./Untitled.json"; // "/Users/user/Library/Application Support/obs-studio/basic/scenes/Untitled.json"
 		//Load(savePath);
     }
-    //2, 初始化界面
-	preview->setMinimumSize(20, 150);
-	preview->setSizePolicy(
-		QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-	// Create a QSplitter to keep a unified workflow here.
-	windowSplitter = new QSplitter(Qt::Orientation::Vertical, this);
-	windowSplitter->addWidget(preview);
-	////windowSplitter->addWidget(view);
-	windowSplitter->setChildrenCollapsible(false);
-	//windowSplitter->setSizes(QList<int>({ 16777216, 150 }));
-	windowSplitter->setStretchFactor(0, 3);
-	windowSplitter->setStretchFactor(1, 1);
-
-	setLayout(new QVBoxLayout(this));
-	layout()->addWidget(windowSplitter);
-
-	setWindowTitle(QT_UTF8("Record video"));
     //
-    //3, 获取摄像头源(Video Capture Device)、麦克风源(Audio Input Capture)
+    //2, 获取摄像头源(Video Capture Device)、麦克风源(Audio Input Capture)
 	size_t idx = 0;
 	const char *unversioned_type;
 	const char *type;
@@ -207,6 +191,125 @@ RecordDialog::RecordDialog(QWidget *parent)
 		}
 		foundValues = true;
     }
+    if(videosource)
+    {
+        videoremovedSignal=OBSSignal(obs_source_get_signal_handler(videosource), "remove",
+                RecordDialog::SourceRemoved, this);
+        videorenamedSignal=OBSSignal(obs_source_get_signal_handler(videosource), "rename",
+                RecordDialog::SourceRenamed, this);
+        videooldSettings=obs_data_create();
+    }
+    if(audiosource)
+    {
+        audioremovedSignal=OBSSignal(obs_source_get_signal_handler(audiosource), "remove",
+                RecordDialog::SourceRemoved, this);
+        audiorenamedSignal=OBSSignal(obs_source_get_signal_handler(audiosource), "rename",
+                RecordDialog::SourceRenamed, this);
+        audiooldSettings=obs_data_create();
+    }
+    //3, 初始化界面
+	int cx = 0;//// (int)config_get_int(App()->GlobalConfig(), "PropertiesWindow", "cx");
+	int cy = 0;//(int)config_get_int(App()->GlobalConfig(), "PropertiesWindow", "cy");
+	enum obs_source_type videotype = obs_source_get_type(videosource);
+	enum obs_source_type audiotype = obs_source_get_type(audiosource);
+
+	// buttonBox->setObjectName(QStringLiteral("buttonBox")); // tmp
+	if (cx > 400 && cy > 400)
+		resize(cx, cy);
+	else
+		resize(720, 580);
+
+	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+	/* The OBSData constructor increments the reference once */
+	obs_data_release(videooldSettings);
+	obs_data_release(audiooldSettings);
+
+	OBSData videosettings = obs_source_get_settings(videosource);
+	obs_data_apply(videooldSettings, videosettings);
+	obs_data_release(videosettings);
+
+	OBSData audiosettings = obs_source_get_settings(audiosource);
+	obs_data_apply(audiooldSettings, audiosettings);
+	obs_data_release(audiosettings);
+
+	videoview = new OBSPropertiesView(
+		videosettings, videosource,
+		(PropertiesReloadCallback)obs_source_properties,
+		(PropertiesUpdateCallback)obs_source_update);
+	videoview->setMinimumHeight(150);
+
+	audioview = new OBSPropertiesView(
+		audiosettings, audiosource,
+		(PropertiesReloadCallback)obs_source_properties,
+		(PropertiesUpdateCallback)obs_source_update);
+	audioview->setMinimumHeight(150);
+
+	preview->setMinimumSize(20, 150);
+	preview->setSizePolicy(
+		QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+	// Create a QSplitter to keep a unified workflow here.
+	windowSplitter = new QSplitter(Qt::Orientation::Vertical, this);
+	windowSplitter->addWidget(preview);
+	windowSplitter->addWidget(videoview);
+	windowSplitter->addWidget(audioview);
+	windowSplitter->setChildrenCollapsible(false);
+	//windowSplitter->setSizes(QList<int>({ 16777216, 150 }));
+	windowSplitter->setStretchFactor(0, 3);
+	windowSplitter->setStretchFactor(1, 1);
+
+	setLayout(new QVBoxLayout(this));
+	layout()->addWidget(windowSplitter);
+#if 0
+	if (videotype == OBS_SOURCE_TYPE_TRANSITION) {
+		AddPreviewButton();
+		connect(videoview, SIGNAL(PropertiesRefreshed()), this,
+			SLOT(AddPreviewButton()));
+	}
+	if (audiotype == OBS_SOURCE_TYPE_TRANSITION) {
+		AddPreviewButton();
+		connect(audioview, SIGNAL(PropertiesRefreshed()), this,
+			SLOT(AddPreviewButton()));
+	}
+#endif
+	//layout()->addWidget(buttonBox);
+	//layout()->setAlignment(buttonBox, Qt::AlignBottom);
+
+	videoview->show();
+	audioview->show();
+	//installEventFilter(CreateShortcutFilter());
+
+	setWindowTitle(QT_UTF8("Record video"));
+
+	obs_source_inc_showing(videosource);
+	obs_source_inc_showing(audiosource);
+
+	videoupdatePropertiesSignal.Connect(obs_source_get_signal_handler(videosource),
+				       "update_properties",
+				       RecordDialog::UpdateVideoProperties,
+				       this);
+	audioupdatePropertiesSignal.Connect(obs_source_get_signal_handler(audiosource),
+				       "update_properties",
+				       RecordDialog::UpdateAudioProperties,
+				       this);
+
+	auto addDrawCallback = [this]() {
+		obs_display_add_draw_callback(preview->GetDisplay(),
+					      RecordDialog::DrawPreview,
+					      this);
+	};
+	uint32_t videocaps = obs_source_get_output_flags(videosource);
+	bool drawable_type = videotype == OBS_SOURCE_TYPE_INPUT ||
+			     videotype == OBS_SOURCE_TYPE_SCENE;
+	bool drawable_preview = (videocaps & OBS_SOURCE_VIDEO) != 0;
+
+	if (drawable_preview && drawable_type) {
+		preview->show();
+		connect(preview.data(), &OBSQTDisplay::DisplayCreated,
+			addDrawCallback);
+    } else {
+		preview->hide();
+	}
+
 }
 RecordDialog::~RecordDialog()
 {
@@ -272,4 +375,64 @@ string GenerateSpecifiedFilename(const char *extension, bool noSpace,
 	remuxAfterRecord = autoRemux;
 
 	return string(filename);
+}
+void RecordDialog::SourceRemoved(void *data, calldata_t *params)
+{
+	//QMetaObject::invokeMethod(static_cast<RecordDialog *>(data),
+//				  "close");
+
+	UNUSED_PARAMETER(params);
+}
+
+void RecordDialog::SourceRenamed(void *data, calldata_t *params)
+{
+	const char *name = calldata_string(params, "new_name");
+	QString title = QTStr("Basic.PropertiesWindow").arg(QT_UTF8(name));
+
+	//QMetaObject::invokeMethod(static_cast<RecordDialog *>(data),
+	//			  "setWindowTitle", Q_ARG(QString, title));
+}
+
+void RecordDialog::UpdateVideoProperties(void *data, calldata_t *)
+{
+	QMetaObject::invokeMethod(static_cast<RecordDialog *>(data)->videoview,
+				  "ReloadProperties");
+}
+
+void RecordDialog::UpdateAudioProperties(void *data, calldata_t *)
+{
+	QMetaObject::invokeMethod(static_cast<RecordDialog *>(data)->audioview,
+				  "ReloadProperties");
+}
+
+void RecordDialog::DrawPreview(void *data, uint32_t cx, uint32_t cy)
+{
+#if 1
+	RecordDialog *window = static_cast<RecordDialog *>(data);
+
+	if (!window->videosource)
+		return;
+
+	uint32_t sourceCX = max(obs_source_get_width(window->videosource), 1u);
+	uint32_t sourceCY = max(obs_source_get_height(window->videosource), 1u);
+
+	int x, y;
+	int newCX, newCY;
+	float scale;
+
+	GetScaleAndCenterPos(sourceCX, sourceCY, cx, cy, x, y, scale);
+
+	newCX = int(scale * float(sourceCX));
+	newCY = int(scale * float(sourceCY));
+
+	gs_viewport_push();
+	gs_projection_push();
+	gs_ortho(0.0f, float(sourceCX), 0.0f, float(sourceCY), -100.0f, 100.0f);
+	gs_set_viewport(x, y, newCX, newCY);
+
+	obs_source_video_render(window->videosource);
+
+	gs_projection_pop();
+	gs_viewport_pop();
+#endif
 }
