@@ -210,7 +210,8 @@ public:
     QPushButton *exitButton;
     QSpacerItem *expVSpacer;
 
-    void setupUi(QMainWindow *OBSBasic)
+    void setupUi(QMainWindow *OBSBasic);
+#if 0
     {
         if (OBSBasic->objectName().isEmpty())
             OBSBasic->setObjectName(QString::fromUtf8("OBSBasic"));
@@ -749,10 +750,10 @@ public:
         transitionsDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
         dockWidgetContents_5 = new QWidget();
         dockWidgetContents_5->setObjectName(QString::fromUtf8("dockWidgetContents_5"));
-        verticalLayout_3 = new QVBoxLayout(dockWidgetContents_5);
+        // verticalLayout_3 = new QVBoxLayout(dockWidgetContents_5);
         verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
         verticalLayout_3->setContentsMargins(4, 4, 4, 4);
-        transitionsContainer = new QWidget(dockWidgetContents_5);
+        // transitionsContainer = new QWidget(dockWidgetContents_5);
         transitionsContainer->setObjectName(QString::fromUtf8("transitionsContainer"));
         verticalLayout_2 = new QVBoxLayout(transitionsContainer);
         verticalLayout_2->setSpacing(4);
@@ -1040,8 +1041,10 @@ public:
 
         QMetaObject::connectSlotsByName(OBSBasic);
     } // setupUi
+#endif
 
-    void retranslateUi(QMainWindow *OBSBasic)
+    void retranslateUi(QMainWindow *OBSBasic);
+#if 0
     {
         OBSBasic->setWindowTitle(QCoreApplication::translate("OBSBasic", ".MainWindow", nullptr));
         actionAddScene->setText(QCoreApplication::translate("OBSBasic", "Add", nullptr));
@@ -1229,6 +1232,7 @@ public:
         settingsButton->setText(QCoreApplication::translate("OBSBasic", "Settings", nullptr));
         exitButton->setText(QCoreApplication::translate("OBSBasic", "Exit", nullptr));
     } // retranslateUi
+#endif
 
 };
 

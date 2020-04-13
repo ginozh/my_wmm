@@ -423,12 +423,12 @@ void OBSBasic::SetTransition(OBSSource transition)
 		obs_source_release(oldTransition);
 
 	bool fixed = transition ? obs_transition_fixed(transition) : false;
-	ui->transitionDurationLabel->setVisible(!fixed);
+	//ui->transitionDurationLabel->setVisible(!fixed);
 	ui->transitionDuration->setVisible(!fixed);
 
 	bool configurable = obs_source_configurable(transition);
-	ui->transitionRemove->setEnabled(configurable);
-	ui->transitionProps->setEnabled(configurable);
+	///ui->transitionRemove->setEnabled(configurable);
+	///ui->transitionProps->setEnabled(configurable);
 
 	if (api)
 		api->on_event(OBS_FRONTEND_EVENT_TRANSITION_CHANGED);

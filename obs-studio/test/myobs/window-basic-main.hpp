@@ -214,7 +214,7 @@ private:
 
 	OBSService service;
 	std::unique_ptr<BasicOutputHandler> outputHandler;
-	bool streamingStopping = false;
+	//bool streamingStopping = false;
 	bool recordingStopping = false;
 	bool replayBufferStopping = false;
 
@@ -242,7 +242,7 @@ private:
 	QPointer<QWidget> extraBrowsers;
 	QPointer<QWidget> importer;
 
-	QPointer<QMenu> startStreamMenu;
+	//QPointer<QMenu> startStreamMenu;
 
 	QPointer<QPushButton> transitionButton;
 	QPointer<QPushButton> replayBufferButton;
@@ -251,7 +251,7 @@ private:
 	QScopedPointer<QPushButton> replay;
 
 	QScopedPointer<QSystemTrayIcon> trayIcon;
-	QPointer<QAction> sysTrayStream;
+	//QPointer<QAction> sysTrayStream;
 	QPointer<QAction> sysTrayRecord;
 	QPointer<QAction> sysTrayReplayBuffer;
 	QPointer<QAction> showHide;
@@ -334,8 +334,8 @@ private:
 	void ChangeSceneIndex(bool relative, int idx, int invalidIdx);
 
 	void TempFileOutput(const char *path, int vBitrate, int aBitrate);
-	void TempStreamOutput(const char *url, const char *key, int vBitrate,
-			      int aBitrate);
+	//void TempStreamOutput(const char *url, const char *key, int vBitrate,
+//			      int aBitrate);
 
 	void CloseDialogs();
 	void ClearSceneData();
@@ -519,7 +519,7 @@ private:
 public slots:
 	void DeferSaveBegin();
 	void DeferSaveEnd();
-
+#if 0
 	void StartStreaming();
 	void StopStreaming();
 	void ForceStopStreaming();
@@ -530,7 +530,7 @@ public slots:
 	void StreamingStart();
 	void StreamStopping();
 	void StreamingStop(int errorcode, QString last_error);
-
+#endif
 	void StartRecording();
 	void StopRecording();
 
@@ -726,7 +726,7 @@ public:
 		return os_atomic_load_bool(&previewProgramMode);
 	}
 
-	bool StreamingActive() const;
+	//bool StreamingActive() const;
 	bool Active() const;
 
 	void ResetUI();
@@ -871,7 +871,7 @@ private slots:
 	void on_actionScaleCanvas_triggered();
 	void on_actionScaleOutput_triggered();
 
-	void on_streamButton_clicked();
+	//void on_streamButton_clicked();
 	void on_recordButton_clicked();
 	void on_settingsButton_clicked();
 
@@ -969,7 +969,7 @@ private slots:
 public slots:
 	void on_actionResetTransform_triggered();
 
-	bool StreamingActive();
+	//bool StreamingActive();
 	bool RecordingActive();
 	bool ReplayBufferActive();
 
