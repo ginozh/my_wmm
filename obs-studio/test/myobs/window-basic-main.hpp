@@ -174,6 +174,7 @@ class OBSBasic : public OBSMainWindow {
 	};
 
 private:
+    int iTransitionDuration = 300; // storm
 	obs_frontend_callbacks *api = nullptr;
 
 	std::shared_ptr<Auth> auth;

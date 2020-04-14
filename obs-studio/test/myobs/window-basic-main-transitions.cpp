@@ -350,7 +350,7 @@ void OBSBasic::TransitionToScene(OBSSource source, bool force,
 		if (api)
 			api->on_event(OBS_FRONTEND_EVENT_SCENE_CHANGED);
 	} else {
-		int duration = ui->transitionDuration->value();
+		int duration = iTransitionDuration;// ui->transitionDuration->value(); //storm
 
 		/* check for scene override */
 		OBSSource trOverride = GetOverrideTransition(source);
@@ -424,7 +424,7 @@ void OBSBasic::SetTransition(OBSSource transition)
 
 	bool fixed = transition ? obs_transition_fixed(transition) : false;
 	//ui->transitionDurationLabel->setVisible(!fixed);
-	ui->transitionDuration->setVisible(!fixed);
+	// ui->transitionDuration->setVisible(!fixed);
 
 	bool configurable = obs_source_configurable(transition);
 	///ui->transitionRemove->setEnabled(configurable);

@@ -298,12 +298,12 @@ OBSBasic::OBSBasic(QWidget *parent)
 	diskFullTimer = new QTimer(this);
 	connect(diskFullTimer, SIGNAL(timeout()), this,
 		SLOT(CheckDiskSpaceRemaining()));
-
+#if 0
 	QAction *renameScene = new QAction(ui->scenesDock);
 	renameScene->setShortcutContext(Qt::WidgetWithChildrenShortcut);
 	connect(renameScene, SIGNAL(triggered()), this, SLOT(EditSceneName()));
 	ui->scenesDock->addAction(renameScene);
-
+#endif
 	QAction *renameSource = new QAction(ui->sourcesDock);
 	renameSource->setShortcutContext(Qt::WidgetWithChildrenShortcut);
 	connect(renameSource, SIGNAL(triggered()), this,
@@ -311,7 +311,7 @@ OBSBasic::OBSBasic(QWidget *parent)
 	ui->sourcesDock->addAction(renameSource);
 
 #ifdef __APPLE__
-	renameScene->setShortcut({Qt::Key_Return});
+	// renameScene->setShortcut({Qt::Key_Return});
 	renameSource->setShortcut({Qt::Key_Return});
 
 	ui->actionRemoveSource->setShortcuts({Qt::Key_Backspace});
@@ -320,7 +320,7 @@ OBSBasic::OBSBasic(QWidget *parent)
 	ui->action_Settings->setMenuRole(QAction::PreferencesRole);
 	ui->actionE_xit->setMenuRole(QAction::QuitRole);
 #else
-	renameScene->setShortcut({Qt::Key_F2});
+	// renameScene->setShortcut({Qt::Key_F2});
 	renameSource->setShortcut({Qt::Key_F2});
 #endif
 
@@ -337,7 +337,7 @@ OBSBasic::OBSBasic(QWidget *parent)
 	addNudge(Qt::Key_Left, SLOT(NudgeLeft()));
 	addNudge(Qt::Key_Right, SLOT(NudgeRight()));
 
-	assignDockToggle(ui->scenesDock, ui->toggleScenes);
+	// assignDockToggle(ui->scenesDock, ui->toggleScenes);
 	assignDockToggle(ui->sourcesDock, ui->toggleSources);
 	assignDockToggle(ui->mixerDock, ui->toggleMixer);
 	//assignDockToggle(ui->transitionsDock, ui->toggleTransitions);
@@ -627,7 +627,7 @@ void OBSBasic::Save(const char *file)
 	obs_data_array_t *quickTrData = SaveQuickTransitions();
 	obs_data_array_t *savedProjectorList = SaveProjectors();
 	obs_data_t *saveData = GenerateSaveData(
-		sceneOrder, quickTrData, ui->transitionDuration->value(),
+		sceneOrder, quickTrData, iTransitionDuration/*ui->transitionDuration->value()*/,
 		transitions, scene, curProgramScene, savedProjectorList);
 
 	obs_data_set_bool(saveData, "preview_locked", ui->preview->Locked());
@@ -723,7 +723,8 @@ void OBSBasic::CreateDefaultScene(bool firstStart)
 	ClearSceneData();
 	InitDefaultTransitions();
 	CreateDefaultQuickTransitions();
-	ui->transitionDuration->setValue(300);
+	// ui->transitionDuration->setValue(300);
+    iTransitionDuration = 300;
 	SetTransition(fadeTransition);
 
 	obs_scene_t *scene = obs_scene_create(Str("Basic.Scene"));
@@ -940,7 +941,8 @@ void OBSBasic::Load(const char *file)
 	if (!curTransition)
 		curTransition = fadeTransition;
 
-	ui->transitionDuration->setValue(newDuration);
+	// ui->transitionDuration->setValue(newDuration);
+    iTransitionDuration=newDuration;
 	SetTransition(curTransition);
 
 retryScene:
@@ -3573,7 +3575,7 @@ void OBSBasic::SetService(obs_service_t *newService)
 
 int OBSBasic::GetTransitionDuration()
 {
-	return ui->transitionDuration->value();
+	return iTransitionDuration;// ui->transitionDuration->value();
 }
 #if 0
 bool OBSBasic::StreamingActive() const
@@ -6920,13 +6922,13 @@ void OBSBasic::on_resetUI_triggered()
 
 	int mixerSize = cx - (cx22_5 * 2 + cx5 * 2);
 
-	QList<QDockWidget *> docks{ui->scenesDock, ui->sourcesDock,
+	QList<QDockWidget *> docks{/*ui->scenesDock,*/ ui->sourcesDock,
 				   ui->mixerDock, /*ui->transitionsDock,*/
 				   ui->controlsDock};
 
 	QList<int> sizes{cx22_5, cx22_5, mixerSize, cx5, cx5};
 
-	ui->scenesDock->setVisible(true);
+	//ui->scenesDock->setVisible(true);
 	ui->sourcesDock->setVisible(true);
 	ui->mixerDock->setVisible(true);
 	// ui->transitionsDock->setVisible(true);
@@ -6948,7 +6950,7 @@ void OBSBasic::on_lockUI_toggled(bool lock)
 	QDockWidget::DockWidgetFeatures mainFeatures = features;
 	mainFeatures &= ~QDockWidget::QDockWidget::DockWidgetClosable;
 
-	ui->scenesDock->setFeatures(mainFeatures);
+	//ui->scenesDock->setFeatures(mainFeatures);
 	ui->sourcesDock->setFeatures(mainFeatures);
 	ui->mixerDock->setFeatures(mainFeatures);
 	// ui->transitionsDock->setFeatures(mainFeatures);
@@ -8300,9 +8302,11 @@ void Ui_OBSBasic::setupUi(QMainWindow *OBSBasic)
     statusbar = new OBSBasicStatusBar(OBSBasic);
     statusbar->setObjectName(QString::fromUtf8("statusbar"));
     OBSBasic->setStatusBar(statusbar);
+#if 0
     scenesDock = new OBSDock(OBSBasic);
     scenesDock->setObjectName(QString::fromUtf8("scenesDock"));
     scenesDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
+#endif
     dockWidgetContents_2 = new QWidget();
     dockWidgetContents_2->setObjectName(QString::fromUtf8("dockWidgetContents_2"));
     verticalLayout_6 = new QVBoxLayout(dockWidgetContents_2);
@@ -8350,9 +8354,10 @@ void Ui_OBSBasic::setupUi(QMainWindow *OBSBasic)
 
 
     verticalLayout_6->addWidget(scenesFrame);
-
+#if 0
     scenesDock->setWidget(dockWidgetContents_2);
     OBSBasic->addDockWidget(Qt::BottomDockWidgetArea, scenesDock);
+#endif
     sourcesDock = new OBSDock(OBSBasic);
     sourcesDock->setObjectName(QString::fromUtf8("sourcesDock"));
     sourcesDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
@@ -8547,14 +8552,12 @@ void Ui_OBSBasic::setupUi(QMainWindow *OBSBasic)
 
     horizontalLayout_3->addWidget(transitionDurationLabel);
     transitionDuration = new QSpinBox(transitionsContainer);
-#endif
-    transitionDuration = new QSpinBox();
+    // transitionDuration = new QSpinBox();
     transitionDuration->setObjectName(QString::fromUtf8("transitionDuration"));
     transitionDuration->setMinimum(2);
     transitionDuration->setMaximum(10000);
     transitionDuration->setSingleStep(50);
     transitionDuration->setValue(300);
-#if 0
     horizontalLayout_3->addWidget(transitionDuration);
 
 
@@ -8763,7 +8766,7 @@ void Ui_OBSBasic::setupUi(QMainWindow *OBSBasic)
 
     retranslateUi(OBSBasic);
     QObject::connect(actionE_xit, SIGNAL(triggered()), OBSBasic, SLOT(close()));
-    QObject::connect(exitButton, SIGNAL(clicked()), OBSBasic, SLOT(close()));
+    // QObject::connect(exitButton, SIGNAL(clicked()), OBSBasic, SLOT(close()));
 
     QMetaObject::connectSlotsByName(OBSBasic);
 }
@@ -8919,7 +8922,7 @@ void Ui_OBSBasic::retranslateUi(QMainWindow *OBSBasic)
     viewMenuToolbars->setTitle(QCoreApplication::translate("OBSBasic", "Basic.MainMenu.View.Toolbars", nullptr));
     viewMenuDocks->setTitle(QCoreApplication::translate("OBSBasic", "Basic.MainMenu.View.Docks", nullptr));
     menuTools->setTitle(QCoreApplication::translate("OBSBasic", "Basic.MainMenu.Tools", nullptr));
-    scenesDock->setWindowTitle(QCoreApplication::translate("OBSBasic", "Basic.Main.Scenes", nullptr));
+    // scenesDock->setWindowTitle(QCoreApplication::translate("OBSBasic", "Basic.Main.Scenes", nullptr));
     sourcesDock->setWindowTitle(QCoreApplication::translate("OBSBasic", "Basic.Main.Sources", nullptr));
     mixerDock->setWindowTitle(QCoreApplication::translate("OBSBasic", "Mixer", nullptr));
     // transitionsDock->setWindowTitle(QCoreApplication::translate("OBSBasic", "Basic.SceneTransitions", nullptr));
