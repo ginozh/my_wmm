@@ -1370,14 +1370,17 @@ bool OBSApp::OBSInit()
 	blog(LOG_INFO, "Portable mode: %s", portable_mode ? "true" : "false");
 
 	setQuitOnLastWindowClosed(false);
-
+#if 0
 	mainWindow = new OBSBasic();
 
 	mainWindow->setAttribute(Qt::WA_DeleteOnClose, true);
 	connect(mainWindow, SIGNAL(destroyed()), this, SLOT(quit()));
 
 	mainWindow->OBSInit();
-
+#else
+	mainWindow = new MainWindow();
+    mainWindow->showMaximized();
+#endif
 	connect(this, &QGuiApplication::applicationStateChanged,
 		[this](Qt::ApplicationState state) {
 			ResetHotkeyState(state == Qt::ApplicationActive);

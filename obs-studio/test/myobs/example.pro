@@ -120,6 +120,7 @@ SOURCES += \
 	obs-frontend-api/obs-frontend-api.cpp \
 	../../deps/libff/libff/ff-util.c \
 	../../deps/json11/json11.cpp \
+    mainwindow.cpp \
 
 
 HEADERS  += \
@@ -184,5 +185,6 @@ HEADERS  += \
 	obs-frontend-api/obs-frontend-internal.hpp \
 	../../deps/libff/libff/ff-util.h \
 	../../deps/json11/json11.hpp \
+    mainwindow.h \
 
 

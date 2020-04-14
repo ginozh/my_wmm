@@ -217,13 +217,14 @@ OBSBasic::OBSBasic(QWidget *parent)
 	ui->setupUi(this);
 	ui->previewDisabledWidget->setVisible(false);
 
-	startingDockLayout = saveState();
+	// startingDockLayout = saveState();
 
 	statsDock = new OBSDock();
 	statsDock->setObjectName(QStringLiteral("statsDock"));
 	statsDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
 	statsDock->setWindowTitle(QTStr("Basic.Stats"));
-	addDockWidget(Qt::BottomDockWidgetArea, statsDock);
+	//addDockWidget(Qt::BottomDockWidgetArea, statsDock);
+	AddDockWidget(statsDock);
 	statsDock->setVisible(false);
 	statsDock->setFloating(true);
 	statsDock->resize(700, 200);
@@ -1663,6 +1664,7 @@ void OBSBasic::OBSInit()
 		ProfileScope("OBSBasic::Load");
 		disableSaving--;
 		Load(savePath);
+        AddSourceProperties();// storm
 		disableSaving++;
 	}
 
@@ -1746,8 +1748,8 @@ void OBSBasic::OBSInit()
 	} else {
 		QByteArray dockState =
 			QByteArray::fromBase64(QByteArray(dockStateStr));
-		if (!restoreState(dockState))
-			on_resetUI_triggered();
+		//if (!restoreState(dockState))
+	//		on_resetUI_triggered();
 	}
 
 	bool pre23Defaults = config_get_bool(App()->GlobalConfig(), "General",
@@ -3983,8 +3985,8 @@ void OBSBasic::closeEvent(QCloseEvent *event)
 
 	delete extraBrowsers;
 
-	config_set_string(App()->GlobalConfig(), "BasicWindow", "DockState",
-			  saveState().toBase64().constData());
+	// config_set_string(App()->GlobalConfig(), "BasicWindow", "DockState",
+//			  saveState().toBase64().constData());
 
 #ifdef BROWSER_AVAILABLE
 	SaveExtraBrowserDocks();
@@ -4901,150 +4903,7 @@ static void MyAddSource(void *_data, obs_scene_t *scene)
 
 void OBSBasic::on_actionAddSource_triggered()
 {
-	//AddSourcePopupMenu(QCursor::pos());
-    // storm
-    //QLabel* lbl = new QLabel("test");
-    //ui->verticalLayout->addWidget(lbl);
-    bool visible = true;
-	OBSBasic *main = reinterpret_cast<OBSBasic *>(App()->GetMainWindow());
-	OBSScene scene = main->GetCurrentScene();
-	bool success = false;
-	if (!scene)
-    {
-        // qInfo()<<"error";
-		return ;
-    }
-
-	size_t idx = 0;
-	const char *unversioned_type;
-	const char *type;
-	bool foundDeprecated = false;
-	bool foundValues = false;
-
-	while (obs_enum_input_types2(idx++, &type, &unversioned_type)) {
-		const char *name = obs_source_get_display_name(type);
-		uint32_t caps = obs_get_source_output_flags(type);
-
-		if ((caps & OBS_SOURCE_CAP_DISABLED) != 0)
-			continue;
-		blog(LOG_DEBUG, "device name: %s type: %s", name, type);
-
-		if ((caps & OBS_SOURCE_DEPRECATED) == 0) {
-			// addSource(popup, unversioned_type, name);
-            if(astrcmpi(name, "Video Capture Device") == 0 
-                    || astrcmpi(name, "Audio Input Capture") == 0)
-            {
-                const char *id = type;
-                obs_source_t *source = obs_get_source_by_name(name);
-                if(!source)
-                {
-                    const char *v_id = obs_get_latest_input_type_id(id);
-                    source = obs_source_create(v_id, name, NULL, nullptr);
-                    if (source) {
-                        AddSourceData data;
-                        data.source = source;
-                        data.visible = visible;
-
-                        obs_enter_graphics();
-                        obs_scene_atomic_update(scene, MyAddSource, &data);
-                        obs_leave_graphics();
-
-                        // newSource = source;
-
-                        /* set monitoring if source monitors by default */
-                        uint32_t flags = obs_source_get_output_flags(source);
-                        if ((flags & OBS_SOURCE_MONITOR_BY_DEFAULT) != 0) {
-                            obs_source_set_monitoring_type(
-                                    source,
-                                    OBS_MONITORING_TYPE_MONITOR_ONLY);
-                        }
-
-                        success = true;
-                    }
-                }
-                if(astrcmpi(name, "Video Capture Device") == 0 )
-                {
-                    videosource = source;
-                }
-                else if( astrcmpi(name, "Audio Input Capture") == 0)
-                {
-                    audiosource = source;
-                }
-                obs_source_release(source);
-            }
-		} else {
-			// addSource(deprecated, unversioned_type, name);
-			foundDeprecated = true;
-		}
-		foundValues = true;
-    }
-    if(videosource)
-    {
-        videoremovedSignal=OBSSignal(obs_source_get_signal_handler(videosource), "remove",
-                OBSBasic::SourceRemoved, this);
-        videorenamedSignal=OBSSignal(obs_source_get_signal_handler(videosource), "rename",
-                OBSBasic::SourceRenamed, this);
-        videooldSettings=obs_data_create();
-    }
-    if(audiosource)
-    {
-        audioremovedSignal=OBSSignal(obs_source_get_signal_handler(audiosource), "remove",
-                OBSBasic::SourceRemoved, this);
-        audiorenamedSignal=OBSSignal(obs_source_get_signal_handler(audiosource), "rename",
-                OBSBasic::SourceRenamed, this);
-        audiooldSettings=obs_data_create();
-    }
-	int cx = 0;//// (int)config_get_int(App()->GlobalConfig(), "PropertiesWindow", "cx");
-	int cy = 0;//(int)config_get_int(App()->GlobalConfig(), "PropertiesWindow", "cy");
-	enum obs_source_type videotype = obs_source_get_type(videosource);
-	enum obs_source_type audiotype = obs_source_get_type(audiosource);
-
-	// buttonBox->setObjectName(QStringLiteral("buttonBox")); // tmp
-	if (cx > 400 && cy > 400)
-		resize(cx, cy);
-	else
-		resize(720, 580);
-
-	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-	/* The OBSData constructor increments the reference once */
-	obs_data_release(videooldSettings);
-	obs_data_release(audiooldSettings);
-
-	OBSData videosettings = obs_source_get_settings(videosource);
-	obs_data_apply(videooldSettings, videosettings);
-	obs_data_release(videosettings);
-
-	OBSData audiosettings = obs_source_get_settings(audiosource);
-	obs_data_apply(audiooldSettings, audiosettings);
-	obs_data_release(audiosettings);
-
-	videoview = new OBSPropertiesView(
-		videosettings, videosource,
-		(PropertiesReloadCallback)obs_source_properties,
-		(PropertiesUpdateCallback)obs_source_update);
-	videoview->setMinimumHeight(150);
-
-	audioview = new OBSPropertiesView(
-		audiosettings, audiosource,
-		(PropertiesReloadCallback)obs_source_properties,
-		(PropertiesUpdateCallback)obs_source_update);
-	audioview->setMinimumHeight(150);
-
-    ui->verticalLayout->addWidget(videoview);
-	ui->verticalLayout->addWidget(audioview);
-	videoview->show();
-	audioview->show();
-	obs_source_inc_showing(videosource);
-	obs_source_inc_showing(audiosource);
-
-	videoupdatePropertiesSignal.Connect(obs_source_get_signal_handler(videosource),
-				       "update_properties",
-				       OBSBasic::UpdateVideoProperties,
-				       this);
-	audioupdatePropertiesSignal.Connect(obs_source_get_signal_handler(audiosource),
-				       "update_properties",
-				       OBSBasic::UpdateAudioProperties,
-				       this);
+	AddSourcePopupMenu(QCursor::pos());
 }
 
 static bool remove_items(obs_scene_t *, obs_sceneitem_t *item, void *param)
@@ -7061,7 +6920,7 @@ void OBSBasic::on_resetUI_triggered()
 		}
 	}
 
-	restoreState(startingDockLayout);
+	// restoreState(startingDockLayout);
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
 	int cx = width();
@@ -7088,8 +6947,8 @@ void OBSBasic::on_resetUI_triggered()
 	statsDock->setVisible(false);
 	statsDock->setFloating(true);
 
-	resizeDocks(docks, {cy, cy, cy, cy, cy}, Qt::Vertical);
-	resizeDocks(docks, sizes, Qt::Horizontal);
+	// resizeDocks(docks, {cy, cy, cy, cy, cy}, Qt::Vertical);
+	// resizeDocks(docks, sizes, Qt::Horizontal);
 #endif
 }
 
@@ -8080,7 +7939,7 @@ void OBSBasic::on_customContextMenuRequested(const QPoint &pos)
 }
 
 
-void Ui_OBSBasic::setupUi(QMainWindow *OBSBasic)
+void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
 {
     if (OBSBasic->objectName().isEmpty())
         OBSBasic->setObjectName(QString::fromUtf8("OBSBasic"));
@@ -8095,7 +7954,7 @@ void Ui_OBSBasic::setupUi(QMainWindow *OBSBasic)
     icon.addFile(QString::fromUtf8(":/res/images/obs.png"), QSize(), QIcon::Normal, QIcon::Off);
     OBSBasic->setWindowIcon(icon);
     OBSBasic->setStyleSheet(QString::fromUtf8(""));
-    OBSBasic->setDockOptions(QMainWindow::AllowNestedDocks|QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks);
+    // OBSBasic->setDockOptions(QDialog::AllowNestedDocks|QDialog::AllowTabbedDocks|QDialog::AnimatedDocks);
     actionAddScene = new QAction(OBSBasic);
     actionAddScene->setObjectName(QString::fromUtf8("actionAddScene"));
     QIcon icon1;
@@ -8406,7 +8265,10 @@ void Ui_OBSBasic::setupUi(QMainWindow *OBSBasic)
 
     verticalLayout->addLayout(horizontalLayout_2);
 
-    OBSBasic->setCentralWidget(centralwidget);
+    // OBSBasic->setCentralWidget(centralwidget);
+	OBSBasic->setLayout(new QVBoxLayout(OBSBasic));
+	OBSBasic->layout()->addWidget(centralwidget);
+
     menubar = new QMenuBar(OBSBasic);
     menubar->setObjectName(QString::fromUtf8("menubar"));
     menubar->setGeometry(QRect(0, 0, 1079, 22));
@@ -8450,10 +8312,10 @@ void Ui_OBSBasic::setupUi(QMainWindow *OBSBasic)
     viewMenuDocks->setObjectName(QString::fromUtf8("viewMenuDocks"));
     menuTools = new QMenu(menubar);
     menuTools->setObjectName(QString::fromUtf8("menuTools"));
-    OBSBasic->setMenuBar(menubar);
+    //OBSBasic->setMenuBar(menubar);
     statusbar = new OBSBasicStatusBar(OBSBasic);
     statusbar->setObjectName(QString::fromUtf8("statusbar"));
-    OBSBasic->setStatusBar(statusbar);
+    //OBSBasic->setStatusBar(statusbar);
 #if 0
     scenesDock = new OBSDock(OBSBasic);
     scenesDock->setObjectName(QString::fromUtf8("scenesDock"));
@@ -8559,7 +8421,8 @@ void Ui_OBSBasic::setupUi(QMainWindow *OBSBasic)
     verticalLayout_5->addWidget(sourcesFrame);
 
     sourcesDock->setWidget(dockWidgetContents_6);
-    OBSBasic->addDockWidget(Qt::BottomDockWidgetArea, sourcesDock);
+    //OBSBasic->addDockWidget(Qt::BottomDockWidgetArea, sourcesDock);
+    OBSBasic->AddDockWidget(sourcesDock);
     mixerDock = new OBSDock(OBSBasic);
     mixerDock->setObjectName(QString::fromUtf8("mixerDock"));
     mixerDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
@@ -8619,7 +8482,8 @@ void Ui_OBSBasic::setupUi(QMainWindow *OBSBasic)
     verticalLayout_4->addWidget(stackedMixerArea);
 
     mixerDock->setWidget(dockWidgetContents_7);
-    OBSBasic->addDockWidget(Qt::BottomDockWidgetArea, mixerDock);
+    //OBSBasic->addDockWidget(Qt::BottomDockWidgetArea, mixerDock);
+    OBSBasic->AddDockWidget(mixerDock);
 #if 0
     transitionsDock = new OBSDock(OBSBasic);
     transitionsDock->setObjectName(QString::fromUtf8("transitionsDock"));
@@ -8723,7 +8587,8 @@ void Ui_OBSBasic::setupUi(QMainWindow *OBSBasic)
     verticalLayout_3->addWidget(transitionsContainer);
 
     transitionsDock->setWidget(dockWidgetContents_5);
-    OBSBasic->addDockWidget(Qt::BottomDockWidgetArea, transitionsDock);
+    //OBSBasic->addDockWidget(Qt::BottomDockWidgetArea, transitionsDock);
+    OBSBasic->AddDockWidget(transitionsDock);
 #endif
     controlsDock = new OBSDock(OBSBasic);
     controlsDock->setObjectName(QString::fromUtf8("controlsDock"));
@@ -8791,7 +8656,8 @@ void Ui_OBSBasic::setupUi(QMainWindow *OBSBasic)
     buttonsVLayout->addItem(expVSpacer);
 
     controlsDock->setWidget(controlsDockContents);
-    OBSBasic->addDockWidget(Qt::BottomDockWidgetArea, controlsDock);
+    //OBSBasic->addDockWidget(Qt::BottomDockWidgetArea, controlsDock);
+    OBSBasic->AddDockWidget( controlsDock);
 #if QT_CONFIG(shortcut)
     //transitionDurationLabel->setBuddy(transitionDuration);
 #endif // QT_CONFIG(shortcut)
@@ -8923,7 +8789,7 @@ void Ui_OBSBasic::setupUi(QMainWindow *OBSBasic)
     QMetaObject::connectSlotsByName(OBSBasic);
 }
 
-void Ui_OBSBasic::retranslateUi(QMainWindow *OBSBasic)
+void Ui_OBSBasic::retranslateUi(OBSBasic *OBSBasic)
 {
     OBSBasic->setWindowTitle(QCoreApplication::translate("OBSBasic", ".MainWindow", nullptr));
     actionAddScene->setText(QCoreApplication::translate("OBSBasic", "Add", nullptr));
@@ -9124,4 +8990,150 @@ void OBSBasic::UpdateAudioProperties(void *data, calldata_t *)
 {
 	QMetaObject::invokeMethod(static_cast<OBSBasic *>(data)->audioview,
 				  "ReloadProperties");
+}
+void OBSBasic::AddSourceProperties()
+{
+    // storm
+    //QLabel* lbl = new QLabel("test");
+    //ui->verticalLayout->addWidget(lbl);
+    bool visible = true;
+	OBSBasic *main = reinterpret_cast<OBSBasic *>(App()->GetMainWindow());
+	OBSScene scene = main->GetCurrentScene();
+	bool success = false;
+	if (!scene)
+    {
+        // qInfo()<<"error";
+		return ;
+    }
+
+	size_t idx = 0;
+	const char *unversioned_type;
+	const char *type;
+	bool foundDeprecated = false;
+	bool foundValues = false;
+
+	while (obs_enum_input_types2(idx++, &type, &unversioned_type)) {
+		const char *name = obs_source_get_display_name(type);
+		uint32_t caps = obs_get_source_output_flags(type);
+
+		if ((caps & OBS_SOURCE_CAP_DISABLED) != 0)
+			continue;
+		blog(LOG_DEBUG, "device name: %s type: %s", name, type);
+
+		if ((caps & OBS_SOURCE_DEPRECATED) == 0) {
+			// addSource(popup, unversioned_type, name);
+            if(astrcmpi(name, "Video Capture Device") == 0 
+                    || astrcmpi(name, "Audio Input Capture") == 0)
+            {
+                const char *id = type;
+                obs_source_t *source = obs_get_source_by_name(name);
+                if(!source)
+                {
+                    const char *v_id = obs_get_latest_input_type_id(id);
+                    source = obs_source_create(v_id, name, NULL, nullptr);
+                    if (source) {
+                        AddSourceData data;
+                        data.source = source;
+                        data.visible = visible;
+
+                        obs_enter_graphics();
+                        obs_scene_atomic_update(scene, MyAddSource, &data);
+                        obs_leave_graphics();
+
+                        // newSource = source;
+
+                        /* set monitoring if source monitors by default */
+                        uint32_t flags = obs_source_get_output_flags(source);
+                        if ((flags & OBS_SOURCE_MONITOR_BY_DEFAULT) != 0) {
+                            obs_source_set_monitoring_type(
+                                    source,
+                                    OBS_MONITORING_TYPE_MONITOR_ONLY);
+                        }
+
+                        success = true;
+                    }
+                }
+                if(astrcmpi(name, "Video Capture Device") == 0 )
+                {
+                    videosource = source;
+                }
+                else if( astrcmpi(name, "Audio Input Capture") == 0)
+                {
+                    audiosource = source;
+                }
+                obs_source_release(source);
+            }
+		} else {
+			// addSource(deprecated, unversioned_type, name);
+			foundDeprecated = true;
+		}
+		foundValues = true;
+    }
+    if(videosource)
+    {
+        videoremovedSignal=OBSSignal(obs_source_get_signal_handler(videosource), "remove",
+                OBSBasic::SourceRemoved, this);
+        videorenamedSignal=OBSSignal(obs_source_get_signal_handler(videosource), "rename",
+                OBSBasic::SourceRenamed, this);
+        videooldSettings=obs_data_create();
+    }
+    if(audiosource)
+    {
+        audioremovedSignal=OBSSignal(obs_source_get_signal_handler(audiosource), "remove",
+                OBSBasic::SourceRemoved, this);
+        audiorenamedSignal=OBSSignal(obs_source_get_signal_handler(audiosource), "rename",
+                OBSBasic::SourceRenamed, this);
+        audiooldSettings=obs_data_create();
+    }
+	int cx = 0;//// (int)config_get_int(App()->GlobalConfig(), "PropertiesWindow", "cx");
+	int cy = 0;//(int)config_get_int(App()->GlobalConfig(), "PropertiesWindow", "cy");
+	enum obs_source_type videotype = obs_source_get_type(videosource);
+	enum obs_source_type audiotype = obs_source_get_type(audiosource);
+#if 0
+	// buttonBox->setObjectName(QStringLiteral("buttonBox")); // tmp
+	if (cx > 400 && cy > 400)
+		resize(cx, cy);
+	else
+		resize(720, 580);
+	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+#endif
+	/* The OBSData constructor increments the reference once */
+	obs_data_release(videooldSettings);
+	obs_data_release(audiooldSettings);
+
+	OBSData videosettings = obs_source_get_settings(videosource);
+	obs_data_apply(videooldSettings, videosettings);
+	obs_data_release(videosettings);
+
+	OBSData audiosettings = obs_source_get_settings(audiosource);
+	obs_data_apply(audiooldSettings, audiosettings);
+	obs_data_release(audiosettings);
+
+	videoview = new OBSPropertiesView(
+		videosettings, videosource,
+		(PropertiesReloadCallback)obs_source_properties,
+		(PropertiesUpdateCallback)obs_source_update);
+	videoview->setMinimumHeight(150);
+
+	audioview = new OBSPropertiesView(
+		audiosettings, audiosource,
+		(PropertiesReloadCallback)obs_source_properties,
+		(PropertiesUpdateCallback)obs_source_update);
+	audioview->setMinimumHeight(150);
+
+    ui->verticalLayout->addWidget(videoview);
+	ui->verticalLayout->addWidget(audioview);
+	videoview->show();
+	audioview->show();
+	obs_source_inc_showing(videosource);
+	obs_source_inc_showing(audiosource);
+
+	videoupdatePropertiesSignal.Connect(obs_source_get_signal_handler(videosource),
+				       "update_properties",
+				       OBSBasic::UpdateVideoProperties,
+				       this);
+	audioupdatePropertiesSignal.Connect(obs_source_get_signal_handler(audiosource),
+				       "update_properties",
+				       OBSBasic::UpdateAudioProperties,
+				       this);
 }

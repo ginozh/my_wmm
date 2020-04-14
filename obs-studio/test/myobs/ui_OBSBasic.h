@@ -17,7 +17,8 @@
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QMainWindow>
+//#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QDialog>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
@@ -42,6 +43,7 @@ QT_BEGIN_NAMESPACE
 class OBSSignal;
 //class OBSData;
 class OBSPropertiesView;
+class OBSBasic;
 
 class Ui_OBSBasic
 {
@@ -231,7 +233,7 @@ public:
     QPushButton *exitButton;
     QSpacerItem *expVSpacer;
 
-    void setupUi(QMainWindow *OBSBasic);
+    void setupUi(OBSBasic *OBSBasic);
 #if 0
     {
         if (OBSBasic->objectName().isEmpty())
@@ -247,7 +249,7 @@ public:
         icon.addFile(QString::fromUtf8(":/res/images/obs.png"), QSize(), QIcon::Normal, QIcon::Off);
         OBSBasic->setWindowIcon(icon);
         OBSBasic->setStyleSheet(QString::fromUtf8(""));
-        OBSBasic->setDockOptions(QMainWindow::AllowNestedDocks|QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks);
+        OBSBasic->setDockOptions(QDialog::AllowNestedDocks|QDialog::AllowTabbedDocks|QDialog::AnimatedDocks);
         actionAddScene = new QAction(OBSBasic);
         actionAddScene->setObjectName(QString::fromUtf8("actionAddScene"));
         QIcon icon1;
@@ -1064,7 +1066,7 @@ public:
     } // setupUi
 #endif
 
-    void retranslateUi(QMainWindow *OBSBasic);
+    void retranslateUi(OBSBasic *OBSBasic);
 #if 0
     {
         OBSBasic->setWindowTitle(QCoreApplication::translate("OBSBasic", ".MainWindow", nullptr));

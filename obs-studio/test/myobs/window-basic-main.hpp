@@ -989,6 +989,7 @@ public:
 private:
 	static void UpdateVideoProperties(void *data, calldata_t *params); //storm
 	static void UpdateAudioProperties(void *data, calldata_t *params);
+    void AddSourceProperties(); //storm
 public:
     // video
     OBSSource videosource; //storm
