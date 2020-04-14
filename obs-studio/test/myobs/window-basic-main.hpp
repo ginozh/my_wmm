@@ -986,7 +986,24 @@ public:
 				   const char *file) const override;
 
 	static void InitBrowserPanelSafeBlock();
-
+private:
+	static void UpdateVideoProperties(void *data, calldata_t *params); //storm
+	static void UpdateAudioProperties(void *data, calldata_t *params);
+public:
+    // video
+    OBSSource videosource; //storm
+	OBSSignal videoremovedSignal;
+	OBSSignal videorenamedSignal;
+	OBSSignal videoupdatePropertiesSignal;
+	OBSData videooldSettings;
+	OBSPropertiesView *videoview;
+    //audio
+    OBSSource audiosource;
+	OBSSignal audioremovedSignal;
+	OBSSignal audiorenamedSignal;
+	OBSSignal audioupdatePropertiesSignal;
+	OBSData audiooldSettings;
+	OBSPropertiesView *audioview;
 private:
 	std::unique_ptr<Ui::OBSBasic> ui;
 };

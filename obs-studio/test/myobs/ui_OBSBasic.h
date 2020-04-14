@@ -38,9 +38,30 @@
 
 QT_BEGIN_NAMESPACE
 
+// class OBSSource;
+class OBSSignal;
+//class OBSData;
+class OBSPropertiesView;
+
 class Ui_OBSBasic
 {
 public:
+#if 0
+    // video
+    OBSSource videosource; //storm
+	OBSSignal videoremovedSignal;
+	OBSSignal videorenamedSignal;
+	OBSSignal videoupdatePropertiesSignal;
+	OBSData videooldSettings;
+	OBSPropertiesView *videoview;
+    //audio
+    OBSSource audiosource;
+	OBSSignal audioremovedSignal;
+	OBSSignal audiorenamedSignal;
+	OBSSignal audioupdatePropertiesSignal;
+	OBSData audiooldSettings;
+	OBSPropertiesView *audioview;
+#endif
     QAction *actionAddScene;
     QAction *actionAddSource;
     QAction *actionRemoveScene;

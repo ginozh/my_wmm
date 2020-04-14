@@ -20,12 +20,12 @@
 #include "window-basic-source-select.hpp"
 #include "qt-wrappers.hpp"
 #include "obs-app.hpp"
-
-struct AddSourceData {
+#if 0
+struct AddSourceData { //storm
 	obs_source_t *source;
 	bool visible;
 };
-
+#endif
 bool OBSBasicSourceSelect::EnumSources(void *data, obs_source_t *source)
 {
 	OBSBasicSourceSelect *window =

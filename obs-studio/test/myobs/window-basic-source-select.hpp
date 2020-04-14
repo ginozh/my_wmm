@@ -23,6 +23,10 @@
 #include "ui_OBSBasicSourceSelect.h"
 
 class OBSBasic;
+struct AddSourceData { // storm
+	obs_source_t *source;
+	bool visible;
+};
 
 class OBSBasicSourceSelect : public QDialog {
 	Q_OBJECT
