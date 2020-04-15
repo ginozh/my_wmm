@@ -217,13 +217,13 @@ OBSBasic::OBSBasic(QWidget *parent)
 	ui->setupUi(this);
 	ui->previewDisabledWidget->setVisible(false);
 
-	startingDockLayout = saveState();
+	// startingDockLayout = saveState();
 
 	statsDock = new OBSDock();
 	statsDock->setObjectName(QStringLiteral("statsDock"));
 	statsDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
 	statsDock->setWindowTitle(QTStr("Basic.Stats"));
-	addDockWidget(Qt::BottomDockWidgetArea, statsDock);
+	// addDockWidget(Qt::BottomDockWidgetArea, statsDock);
 	statsDock->setVisible(false);
 	statsDock->setFloating(true);
 	statsDock->resize(700, 200);
@@ -1748,8 +1748,8 @@ void OBSBasic::OBSInit()
 	} else {
 		QByteArray dockState =
 			QByteArray::fromBase64(QByteArray(dockStateStr));
-		if (!restoreState(dockState))
-			on_resetUI_triggered();
+		//if (!restoreState(dockState))
+		//	on_resetUI_triggered();
 	}
 
 	bool pre23Defaults = config_get_bool(App()->GlobalConfig(), "General",
@@ -3990,8 +3990,8 @@ void OBSBasic::closeEvent(QCloseEvent *event)
 
 	delete extraBrowsers;
 
-	config_set_string(App()->GlobalConfig(), "BasicWindow", "DockState",
-			  saveState().toBase64().constData());
+	//config_set_string(App()->GlobalConfig(), "BasicWindow", "DockState",
+	//		  saveState().toBase64().constData());
 
 #ifdef BROWSER_AVAILABLE
 	SaveExtraBrowserDocks();
@@ -6942,7 +6942,7 @@ void OBSBasic::on_resetUI_triggered()
 		}
 	}
 
-	restoreState(startingDockLayout);
+	// restoreState(startingDockLayout);
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
 	int cx = width();
@@ -6969,8 +6969,8 @@ void OBSBasic::on_resetUI_triggered()
 	statsDock->setVisible(false);
 	statsDock->setFloating(true);
 
-	resizeDocks(docks, {cy, cy, cy, cy, cy}, Qt::Vertical);
-	resizeDocks(docks, sizes, Qt::Horizontal);
+	// resizeDocks(docks, {cy, cy, cy, cy, cy}, Qt::Vertical);
+	// resizeDocks(docks, sizes, Qt::Horizontal);
 #endif
 }
 
@@ -7976,7 +7976,7 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
     icon.addFile(QString::fromUtf8(":/res/images/obs.png"), QSize(), QIcon::Normal, QIcon::Off);
     OBSBasic->setWindowIcon(icon);
     OBSBasic->setStyleSheet(QString::fromUtf8(""));
-    OBSBasic->setDockOptions(QMainWindow::AllowNestedDocks|QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks);
+    // OBSBasic->setDockOptions(QMainWindow::AllowNestedDocks|QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks);
     actionAddScene = new QAction(OBSBasic);
     actionAddScene->setObjectName(QString::fromUtf8("actionAddScene"));
     QIcon icon1;
@@ -8287,7 +8287,10 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
 
     verticalLayout->addLayout(horizontalLayout_2);
 
-    OBSBasic->setCentralWidget(centralwidget);
+    // OBSBasic->setCentralWidget(centralwidget);
+	OBSBasic->setLayout(new QVBoxLayout(OBSBasic));
+	OBSBasic->layout()->addWidget(centralwidget);
+
     menubar = new QMenuBar(OBSBasic);
     menubar->setObjectName(QString::fromUtf8("menubar"));
     menubar->setGeometry(QRect(0, 0, 1079, 22));
@@ -8331,8 +8334,8 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
     viewMenuDocks->setObjectName(QString::fromUtf8("viewMenuDocks"));
     menuTools = new QMenu(menubar);
     menuTools->setObjectName(QString::fromUtf8("menuTools"));
-    OBSBasic->setMenuBar(menubar);
 #if 0
+    OBSBasic->setMenuBar(menubar);
     statusbar = new OBSBasicStatusBar(OBSBasic);
     statusbar->setObjectName(QString::fromUtf8("statusbar"));
     OBSBasic->setStatusBar(statusbar);

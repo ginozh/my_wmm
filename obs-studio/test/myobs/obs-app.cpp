@@ -1370,7 +1370,7 @@ bool OBSApp::OBSInit()
 	blog(LOG_INFO, "Portable mode: %s", portable_mode ? "true" : "false");
 
 	setQuitOnLastWindowClosed(false);
-#if 1
+#if 0
 	mainWindow = new OBSBasic();
 
 	mainWindow->setAttribute(Qt::WA_DeleteOnClose, true);

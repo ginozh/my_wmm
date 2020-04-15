@@ -1,6 +1,6 @@
 #pragma once
 
-#if 1
+#if 0
 #include <QMainWindow>
 #else
 #include <QDialog>
@@ -8,7 +8,7 @@
 
 #include <util/config-file.h>
 
-#if 1
+#if 0
 class OBSMainWindow : public QMainWindow 
 #else
 class OBSMainWindow : public QDialog
@@ -17,7 +17,7 @@ class OBSMainWindow : public QDialog
 	Q_OBJECT
 
 public:
-#if 1
+#if 0
 	inline OBSMainWindow(QWidget *parent) : QMainWindow(parent) {}
 #else
 	inline OBSMainWindow(QWidget *parent) : QDialog(parent) {}

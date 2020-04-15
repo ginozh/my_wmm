@@ -32,7 +32,7 @@
 #include <vector>
 #include <deque>
 
-#if 1
+#if 0
 #include "window-main.hpp"
 #else
 #include "mainwindow.h"
@@ -77,7 +77,7 @@ private:
 	ConfigFile globalConfig;
 	TextLookup textLookup;
 	OBSContext obsContext;
-#if 1
+#if 0
 	QPointer<OBSMainWindow> mainWindow;
 #else
 	QPointer<MainWindow> mainWindow;
@@ -121,7 +121,7 @@ public:
 	{
 		return enableHotkeysInFocus;
 	}
-#if 1
+#if 0
 	inline QMainWindow *GetMainWindow() const { return mainWindow.data(); }
 #else
 	inline QDialog *GetMainWindow() const { return mainWindow.data()->mainDialog.data(); }
