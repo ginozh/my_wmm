@@ -211,6 +211,7 @@ bool OBSBasic::AddSceneCollection(bool create_new, const QString &qname)
 
 void OBSBasic::RefreshSceneCollections()
 {
+#if 0
 	QList<QAction *> menuActions = ui->sceneCollectionMenu->actions();
 	int count = 0;
 
@@ -261,6 +262,7 @@ void OBSBasic::RefreshSceneCollections()
 	main->ui->actionPasteFilters->setEnabled(false);
 	main->ui->actionPasteRef->setEnabled(false);
 	main->ui->actionPasteDup->setEnabled(false);
+#endif
 }
 
 void OBSBasic::on_actionNewSceneCollection_triggered()

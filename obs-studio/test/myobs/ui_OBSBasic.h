@@ -64,6 +64,8 @@ public:
 	OBSData audiooldSettings;
 	OBSPropertiesView *audioview;
 #endif
+
+#if 0
     QAction *actionAddScene;
     QAction *actionAddSource;
     QAction *actionRemoveScene;
@@ -144,6 +146,7 @@ public:
     QAction *toggleStats;
     QAction *actionShowAbout;
     QAction *toggleSourceIcons;
+#endif
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout_2;
@@ -160,6 +163,7 @@ public:
     QVBoxLayout *previewTextLayout;
     QLabel *previewLabel;
     OBSBasicPreview *preview;
+#if 0
     QMenuBar *menubar;
     QMenu *menu_File;
     QMenu *menuBasic_MainMenu_Help;
@@ -182,6 +186,7 @@ public:
     QMenu *menuTools;
     OBSBasicStatusBar *statusbar;
     OBSDock *scenesDock;
+#endif
     QWidget *dockWidgetContents_2;
     QVBoxLayout *verticalLayout_6;
     QFrame *scenesFrame;

@@ -172,6 +172,7 @@ struct OBSStudioAPI : obs_frontend_callbacks {
 	void obs_frontend_set_current_scene_collection(
 		const char *collection) override
 	{
+#if 0
 		QList<QAction *> menuActions =
 			main->ui->sceneCollectionMenu->actions();
 		QString qstrCollection = QT_UTF8(collection);
@@ -187,6 +188,7 @@ struct OBSStudioAPI : obs_frontend_callbacks {
 				}
 			}
 		}
+#endif
 	}
 
 	bool obs_frontend_add_scene_collection(const char *name) override
@@ -220,6 +222,7 @@ struct OBSStudioAPI : obs_frontend_callbacks {
 
 	void obs_frontend_set_current_profile(const char *profile) override
 	{
+#if 0
 		QList<QAction *> menuActions = main->ui->profileMenu->actions();
 		QString qstrProfile = QT_UTF8(profile);
 
@@ -234,6 +237,7 @@ struct OBSStudioAPI : obs_frontend_callbacks {
 				}
 			}
 		}
+#endif
 	}
 
 	void obs_frontend_streaming_start(void) override
@@ -294,19 +298,20 @@ struct OBSStudioAPI : obs_frontend_callbacks {
 
 	bool obs_frontend_replay_buffer_active(void) override
 	{
-		return os_atomic_load_bool(&replaybuf_active);
+		return false;//os_atomic_load_bool(&replaybuf_active);
 	}
 
 	void *obs_frontend_add_tools_menu_qaction(const char *name) override
 	{
-		main->ui->menuTools->setEnabled(true);
-		return (void *)main->ui->menuTools->addAction(QT_UTF8(name));
+		// main->ui->menuTools->setEnabled(true);
+		return nullptr;//(void *)main->ui->menuTools->addAction(QT_UTF8(name));
 	}
 
 	void obs_frontend_add_tools_menu_item(const char *name,
 					      obs_frontend_cb callback,
 					      void *private_data) override
 	{
+#if 0
 		main->ui->menuTools->setEnabled(true);
 
 		auto func = [private_data, callback]() {
@@ -315,6 +320,7 @@ struct OBSStudioAPI : obs_frontend_callbacks {
 
 		QAction *action = main->ui->menuTools->addAction(QT_UTF8(name));
 		QObject::connect(action, &QAction::triggered, func);
+#endif
 	}
 
 	void *obs_frontend_add_dock(void *dock) override
