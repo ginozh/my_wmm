@@ -217,14 +217,13 @@ OBSBasic::OBSBasic(QWidget *parent)
 	ui->setupUi(this);
 	ui->previewDisabledWidget->setVisible(false);
 
-	// startingDockLayout = saveState();
+	startingDockLayout = saveState();
 
 	statsDock = new OBSDock();
 	statsDock->setObjectName(QStringLiteral("statsDock"));
 	statsDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
 	statsDock->setWindowTitle(QTStr("Basic.Stats"));
-	//addDockWidget(Qt::BottomDockWidgetArea, statsDock);
-	AddDockWidget(statsDock);
+	addDockWidget(Qt::BottomDockWidgetArea, statsDock);
 	statsDock->setVisible(false);
 	statsDock->setFloating(true);
 	statsDock->resize(700, 200);
@@ -290,30 +289,31 @@ OBSBasic::OBSBasic(QWidget *parent)
 		SLOT(SceneNameEdited(QWidget *,
 				     QAbstractItemDelegate::EndEditHint)));
 
+#if 0
 	cpuUsageInfo = os_cpu_usage_info_start();
 	cpuUsageTimer = new QTimer(this);
 	connect(cpuUsageTimer.data(), SIGNAL(timeout()), ui->statusbar,
 		SLOT(UpdateCPUUsage()));
 	cpuUsageTimer->start(3000);
-
 	diskFullTimer = new QTimer(this);
 	connect(diskFullTimer, SIGNAL(timeout()), this,
 		SLOT(CheckDiskSpaceRemaining()));
+#endif
 #if 0
 	QAction *renameScene = new QAction(ui->scenesDock);
 	renameScene->setShortcutContext(Qt::WidgetWithChildrenShortcut);
 	connect(renameScene, SIGNAL(triggered()), this, SLOT(EditSceneName()));
 	ui->scenesDock->addAction(renameScene);
-#endif
 	QAction *renameSource = new QAction(ui->sourcesDock);
 	renameSource->setShortcutContext(Qt::WidgetWithChildrenShortcut);
 	connect(renameSource, SIGNAL(triggered()), this,
 		SLOT(EditSceneItemName()));
 	ui->sourcesDock->addAction(renameSource);
+#endif
 
 #ifdef __APPLE__
 	// renameScene->setShortcut({Qt::Key_Return});
-	renameSource->setShortcut({Qt::Key_Return});
+	//renameSource->setShortcut({Qt::Key_Return});
 
 	ui->actionRemoveSource->setShortcuts({Qt::Key_Backspace});
 	ui->actionRemoveScene->setShortcuts({Qt::Key_Backspace});
@@ -322,7 +322,7 @@ OBSBasic::OBSBasic(QWidget *parent)
 	ui->actionE_xit->setMenuRole(QAction::QuitRole);
 #else
 	// renameScene->setShortcut({Qt::Key_F2});
-	renameSource->setShortcut({Qt::Key_F2});
+	//renameSource->setShortcut({Qt::Key_F2});
 #endif
 
 	auto addNudge = [this](const QKeySequence &seq, const char *s) {
@@ -339,10 +339,10 @@ OBSBasic::OBSBasic(QWidget *parent)
 	addNudge(Qt::Key_Right, SLOT(NudgeRight()));
 
 	// assignDockToggle(ui->scenesDock, ui->toggleScenes);
-	assignDockToggle(ui->sourcesDock, ui->toggleSources);
-	assignDockToggle(ui->mixerDock, ui->toggleMixer);
+	//assignDockToggle(ui->sourcesDock, ui->toggleSources);
+	//assignDockToggle(ui->mixerDock, ui->toggleMixer);
 	//assignDockToggle(ui->transitionsDock, ui->toggleTransitions);
-	assignDockToggle(ui->controlsDock, ui->toggleControls);
+	//assignDockToggle(ui->controlsDock, ui->toggleControls);
 	assignDockToggle(statsDock, ui->toggleStats);
 
 	//hide all docking panes
@@ -1748,8 +1748,8 @@ void OBSBasic::OBSInit()
 	} else {
 		QByteArray dockState =
 			QByteArray::fromBase64(QByteArray(dockStateStr));
-		//if (!restoreState(dockState))
-	//		on_resetUI_triggered();
+		if (!restoreState(dockState))
+			on_resetUI_triggered();
 	}
 
 	bool pre23Defaults = config_get_bool(App()->GlobalConfig(), "General",
@@ -2330,8 +2330,8 @@ OBSBasic::~OBSBasic()
 	 * can be freed, and we have no control over the destruction order of
 	 * the Qt UI stuff, so we have to manually clear any references to
 	 * libobs. */
-	delete cpuUsageTimer;
-	os_cpu_usage_info_destroy(cpuUsageInfo);
+	// delete cpuUsageTimer;
+	// os_cpu_usage_info_destroy(cpuUsageInfo);
 
 	obs_hotkey_set_callback_routing_func(nullptr, nullptr);
 	ClearHotkeys();
@@ -3050,6 +3050,7 @@ void OBSBasic::StackedMixerAreaContextMenuRequested()
 
 void OBSBasic::ToggleMixerLayout(bool vertical)
 {
+#if 0
 	if (vertical) {
 		ui->stackedMixerArea->setMinimumSize(180, 220);
 		ui->stackedMixerArea->setCurrentIndex(1);
@@ -3057,6 +3058,7 @@ void OBSBasic::ToggleMixerLayout(bool vertical)
 		ui->stackedMixerArea->setMinimumSize(220, 0);
 		ui->stackedMixerArea->setCurrentIndex(0);
 	}
+#endif
 }
 
 void OBSBasic::ToggleVolControlLayout()
@@ -3124,10 +3126,13 @@ void OBSBasic::ActivateAudioSource(OBSSource source)
 	InsertQObjectByName(volumes, vol);
 
 	for (auto volume : volumes) {
+        //ui->verticalLayout->addWidget(volume); //storm
+#if 1
 		if (vertical)
 			ui->vVolControlLayout->addWidget(volume);
 		else
 			ui->hVolControlLayout->addWidget(volume);
+#endif
 	}
 }
 
@@ -3985,8 +3990,8 @@ void OBSBasic::closeEvent(QCloseEvent *event)
 
 	delete extraBrowsers;
 
-	// config_set_string(App()->GlobalConfig(), "BasicWindow", "DockState",
-//			  saveState().toBase64().constData());
+	config_set_string(App()->GlobalConfig(), "BasicWindow", "DockState",
+			  saveState().toBase64().constData());
 
 #ifdef BROWSER_AVAILABLE
 	SaveExtraBrowserDocks();
@@ -5507,9 +5512,9 @@ void OBSBasic::StreamingStop(int code, QString last_error)
 			    QT_TO_UTF8(last_error));
 	else
 		dstr_copy(errorMessage, errorDescription);
-
+#if 0
 	ui->statusbar->StreamStopped();
-
+#endif
 	ui->streamButton->setText(QTStr("Basic.Main.StartStreaming"));
 	ui->streamButton->setEnabled(true);
 	ui->streamButton->setChecked(false);
@@ -5644,7 +5649,15 @@ void OBSBasic::StopRecording()
 
 void OBSBasic::RecordingStart()
 {
-	ui->statusbar->RecordingStarted(outputHandler->fileOutput);
+	//ui->statusbar->RecordingStarted(outputHandler->fileOutput);
+	if (!active) {
+		refreshTimer = new QTimer(this);
+		//connect(refreshTimer, SIGNAL(timeout()), this, SLOT(UpdateStatusBar()));
+		connect(refreshTimer, SIGNAL(timeout()), this, SLOT(UpdateRecordTime()));
+		totalRecordSeconds = 0;
+		refreshTimer->start(1000);
+		active = true;
+    }
 	ui->recordButton->setText(QTStr("Basic.Main.StopRecording"));
 	ui->recordButton->setChecked(true);
 
@@ -5654,10 +5667,10 @@ void OBSBasic::RecordingStart()
 	recordingStopping = false;
 	if (api)
 		api->on_event(OBS_FRONTEND_EVENT_RECORDING_STARTED);
-
+#if 0
 	if (!diskFullTimer->isActive())
 		diskFullTimer->start(1000);
-
+#endif
 	OnActivate();
 	UpdatePause();
 
@@ -5666,7 +5679,16 @@ void OBSBasic::RecordingStart()
 
 void OBSBasic::RecordingStop(int code, QString last_error)
 {
-	ui->statusbar->RecordingStopped();
+	// ui->statusbar->RecordingStopped();
+    {
+        recordTime->setText(QString("REC: 00:00:00"));
+        totalRecordSeconds = 0;
+        if (!outputHandler || !outputHandler->Active()) {
+            if(refreshTimer)
+                delete refreshTimer;
+            active = false;
+        }
+    }
 	ui->recordButton->setText(QTStr("Basic.Main.StartRecording"));
 	ui->recordButton->setChecked(false);
 
@@ -5721,10 +5743,10 @@ void OBSBasic::RecordingStop(int code, QString last_error)
 
 	if (api)
 		api->on_event(OBS_FRONTEND_EVENT_RECORDING_STOPPED);
-
+#if 0
 	if (diskFullTimer->isActive())
 		diskFullTimer->stop();
-
+#endif
 	if (remuxAfterRecord)
 		AutoRemux();
 
@@ -6920,7 +6942,7 @@ void OBSBasic::on_resetUI_triggered()
 		}
 	}
 
-	// restoreState(startingDockLayout);
+	restoreState(startingDockLayout);
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
 	int cx = width();
@@ -6933,22 +6955,22 @@ void OBSBasic::on_resetUI_triggered()
 
 	int mixerSize = cx - (cx22_5 * 2 + cx5 * 2);
 
-	QList<QDockWidget *> docks{/*ui->scenesDock,*/ ui->sourcesDock,
-				   ui->mixerDock, /*ui->transitionsDock,*/
-				   ui->controlsDock};
+	QList<QDockWidget *> docks{/*ui->scenesDock, ui->sourcesDock,
+				   ui->mixerDock, ui->transitionsDock,
+				   ui->controlsDock*/};
 
 	QList<int> sizes{cx22_5, cx22_5, mixerSize, cx5, cx5};
 
 	//ui->scenesDock->setVisible(true);
-	ui->sourcesDock->setVisible(true);
-	ui->mixerDock->setVisible(true);
+	//ui->sourcesDock->setVisible(true);
+	//ui->mixerDock->setVisible(true);
 	// ui->transitionsDock->setVisible(true);
-	ui->controlsDock->setVisible(true);
+	//ui->controlsDock->setVisible(true);
 	statsDock->setVisible(false);
 	statsDock->setFloating(true);
 
-	// resizeDocks(docks, {cy, cy, cy, cy, cy}, Qt::Vertical);
-	// resizeDocks(docks, sizes, Qt::Horizontal);
+	resizeDocks(docks, {cy, cy, cy, cy, cy}, Qt::Vertical);
+	resizeDocks(docks, sizes, Qt::Horizontal);
 #endif
 }
 
@@ -6962,10 +6984,10 @@ void OBSBasic::on_lockUI_toggled(bool lock)
 	mainFeatures &= ~QDockWidget::QDockWidget::DockWidgetClosable;
 
 	//ui->scenesDock->setFeatures(mainFeatures);
-	ui->sourcesDock->setFeatures(mainFeatures);
-	ui->mixerDock->setFeatures(mainFeatures);
+	//ui->sourcesDock->setFeatures(mainFeatures);
+	//ui->mixerDock->setFeatures(mainFeatures);
 	// ui->transitionsDock->setFeatures(mainFeatures);
-	ui->controlsDock->setFeatures(mainFeatures);
+	//ui->controlsDock->setFeatures(mainFeatures);
 	statsDock->setFeatures(features);
 
 	for (int i = extraDocks.size() - 1; i >= 0; i--) {
@@ -6988,7 +7010,7 @@ void OBSBasic::on_toggleListboxToolbars_toggled(bool visible)
 
 void OBSBasic::on_toggleStatusBar_toggled(bool visible)
 {
-	ui->statusbar->setVisible(visible);
+	// ui->statusbar->setVisible(visible);
 
 	config_set_bool(App()->GlobalConfig(), "BasicWindow", "ShowStatusBar",
 			visible);
@@ -7954,7 +7976,7 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
     icon.addFile(QString::fromUtf8(":/res/images/obs.png"), QSize(), QIcon::Normal, QIcon::Off);
     OBSBasic->setWindowIcon(icon);
     OBSBasic->setStyleSheet(QString::fromUtf8(""));
-    // OBSBasic->setDockOptions(QDialog::AllowNestedDocks|QDialog::AllowTabbedDocks|QDialog::AnimatedDocks);
+    OBSBasic->setDockOptions(QMainWindow::AllowNestedDocks|QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks);
     actionAddScene = new QAction(OBSBasic);
     actionAddScene->setObjectName(QString::fromUtf8("actionAddScene"));
     QIcon icon1;
@@ -8265,10 +8287,7 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
 
     verticalLayout->addLayout(horizontalLayout_2);
 
-    // OBSBasic->setCentralWidget(centralwidget);
-	OBSBasic->setLayout(new QVBoxLayout(OBSBasic));
-	OBSBasic->layout()->addWidget(centralwidget);
-
+    OBSBasic->setCentralWidget(centralwidget);
     menubar = new QMenuBar(OBSBasic);
     menubar->setObjectName(QString::fromUtf8("menubar"));
     menubar->setGeometry(QRect(0, 0, 1079, 22));
@@ -8312,10 +8331,18 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
     viewMenuDocks->setObjectName(QString::fromUtf8("viewMenuDocks"));
     menuTools = new QMenu(menubar);
     menuTools->setObjectName(QString::fromUtf8("menuTools"));
-    //OBSBasic->setMenuBar(menubar);
+    OBSBasic->setMenuBar(menubar);
+#if 0
     statusbar = new OBSBasicStatusBar(OBSBasic);
     statusbar->setObjectName(QString::fromUtf8("statusbar"));
-    //OBSBasic->setStatusBar(statusbar);
+    OBSBasic->setStatusBar(statusbar);
+#endif
+    OBSBasic->recordTime = new QLabel();
+    OBSBasic->recordTime->setText(QString("REC: 00:00:00"));
+    verticalLayout->addWidget(OBSBasic->recordTime);
+	OBSBasic->recordTime->setAlignment(Qt::AlignRight);
+	OBSBasic->recordTime->setAlignment(Qt::AlignVCenter);
+	OBSBasic->recordTime->setIndent(20);
 #if 0
     scenesDock = new OBSDock(OBSBasic);
     scenesDock->setObjectName(QString::fromUtf8("scenesDock"));
@@ -8372,9 +8399,11 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
     scenesDock->setWidget(dockWidgetContents_2);
     OBSBasic->addDockWidget(Qt::BottomDockWidgetArea, scenesDock);
 #endif
+#if 0
     sourcesDock = new OBSDock(OBSBasic);
     sourcesDock->setObjectName(QString::fromUtf8("sourcesDock"));
     sourcesDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
+#endif
     dockWidgetContents_6 = new QWidget();
     dockWidgetContents_6->setObjectName(QString::fromUtf8("dockWidgetContents_6"));
     verticalLayout_5 = new QVBoxLayout(dockWidgetContents_6);
@@ -8405,6 +8434,7 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
     sources->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     verticalLayout_17->addWidget(sources);
+    //verticalLayout->addWidget(sources);
 
     sourcesToolbar = new QToolBar(sourcesFrame);
     sourcesToolbar->setObjectName(QString::fromUtf8("sourcesToolbar"));
@@ -8419,10 +8449,9 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
 
 
     verticalLayout_5->addWidget(sourcesFrame);
-
+#if 0
     sourcesDock->setWidget(dockWidgetContents_6);
-    //OBSBasic->addDockWidget(Qt::BottomDockWidgetArea, sourcesDock);
-    OBSBasic->AddDockWidget(sourcesDock);
+    OBSBasic->addDockWidget(Qt::BottomDockWidgetArea, sourcesDock);
     mixerDock = new OBSDock(OBSBasic);
     mixerDock->setObjectName(QString::fromUtf8("mixerDock"));
     mixerDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
@@ -8434,6 +8463,7 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
     verticalLayout_4->setContentsMargins(0, 0, 0, 0);
     stackedMixerArea = new QStackedWidget(dockWidgetContents_7);
     stackedMixerArea->setObjectName(QString::fromUtf8("stackedMixerArea"));
+#endif
     hMixerScrollArea = new VScrollArea();
     hMixerScrollArea->setObjectName(QString::fromUtf8("hMixerScrollArea"));
     hMixerScrollArea->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -8455,7 +8485,8 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
     hVolControlLayout->setObjectName(QString::fromUtf8("hVolControlLayout"));
     hVolControlLayout->setContentsMargins(0, 0, 0, 0);
     hMixerScrollArea->setWidget(hVolumeWidgets);
-    stackedMixerArea->addWidget(hMixerScrollArea);
+    //stackedMixerArea->addWidget(hMixerScrollArea);
+    verticalLayout->addWidget(hMixerScrollArea); //storm
     vMixerScrollArea = new HScrollArea();
     vMixerScrollArea->setObjectName(QString::fromUtf8("vMixerScrollArea"));
     vMixerScrollArea->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -8477,14 +8508,14 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
     vVolControlLayout->setObjectName(QString::fromUtf8("vVolControlLayout"));
     vVolControlLayout->setContentsMargins(0, 0, 0, 0);
     vMixerScrollArea->setWidget(vVolumeWidgets);
-    stackedMixerArea->addWidget(vMixerScrollArea);
+    //stackedMixerArea->addWidget(vMixerScrollArea);
+    // verticalLayout->addWidget(vMixerScrollArea); // tmp storm 先取消掉
 
-    verticalLayout_4->addWidget(stackedMixerArea);
+    //verticalLayout_4->addWidget(stackedMixerArea);
 
-    mixerDock->setWidget(dockWidgetContents_7);
-    //OBSBasic->addDockWidget(Qt::BottomDockWidgetArea, mixerDock);
-    OBSBasic->AddDockWidget(mixerDock);
 #if 0
+    mixerDock->setWidget(dockWidgetContents_7);
+    OBSBasic->addDockWidget(Qt::BottomDockWidgetArea, mixerDock);
     transitionsDock = new OBSDock(OBSBasic);
     transitionsDock->setObjectName(QString::fromUtf8("transitionsDock"));
     transitionsDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
@@ -8587,9 +8618,7 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
     verticalLayout_3->addWidget(transitionsContainer);
 
     transitionsDock->setWidget(dockWidgetContents_5);
-    //OBSBasic->addDockWidget(Qt::BottomDockWidgetArea, transitionsDock);
-    OBSBasic->AddDockWidget(transitionsDock);
-#endif
+    OBSBasic->addDockWidget(Qt::BottomDockWidgetArea, transitionsDock);
     controlsDock = new OBSDock(OBSBasic);
     controlsDock->setObjectName(QString::fromUtf8("controlsDock"));
     controlsDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
@@ -8599,10 +8628,12 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
     buttonsVLayout->setSpacing(2);
     buttonsVLayout->setObjectName(QString::fromUtf8("buttonsVLayout"));
     buttonsVLayout->setContentsMargins(4, 4, 4, 4);
-#if 0
     streamButton = new QPushButton(controlsDockContents);
     streamButton->setObjectName(QString::fromUtf8("streamButton"));
     streamButton->setEnabled(true);
+#else
+    controlsDockContents = new QWidget();
+    controlsDockContents->setObjectName(QString::fromUtf8("controlsDockContents"));
 #endif
     QSizePolicy sizePolicy7(QSizePolicy::Preferred, QSizePolicy::Fixed);
     sizePolicy7.setHorizontalStretch(0);
@@ -8619,6 +8650,7 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
     recordingLayout->setObjectName(QString::fromUtf8("recordingLayout"));
     recordingLayout->setContentsMargins(0, 0, 0, 0);
     recordButton = new RecordButton(controlsDockContents);
+    //recordButton = new RecordButton();
     recordButton->setObjectName(QString::fromUtf8("recordButton"));
     recordButton->setEnabled(true);
     sizePolicy7.setHeightForWidth(recordButton->sizePolicy().hasHeightForWidth());
@@ -8629,7 +8661,8 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
     recordingLayout->addWidget(recordButton);
 
 
-    buttonsVLayout->addLayout(recordingLayout);
+    // buttonsVLayout->addLayout(recordingLayout); // storm
+    verticalLayout->addLayout(recordingLayout); // storm
 #if 0
     modeSwitch = new QPushButton(controlsDockContents);
     modeSwitch->setObjectName(QString::fromUtf8("modeSwitch"));
@@ -8649,15 +8682,14 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
     exitButton->setSizePolicy(sizePolicy7);
 
     buttonsVLayout->addWidget(exitButton);
-#endif
 
     expVSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
     buttonsVLayout->addItem(expVSpacer);
+#endif
 
-    controlsDock->setWidget(controlsDockContents);
+    //controlsDock->setWidget(controlsDockContents);
     //OBSBasic->addDockWidget(Qt::BottomDockWidgetArea, controlsDock);
-    OBSBasic->AddDockWidget( controlsDock);
 #if QT_CONFIG(shortcut)
     //transitionDurationLabel->setBuddy(transitionDuration);
 #endif // QT_CONFIG(shortcut)
@@ -8882,7 +8914,7 @@ void Ui_OBSBasic::retranslateUi(OBSBasic *OBSBasic)
     actionShowProfileFolder->setText(QCoreApplication::translate("OBSBasic", "Basic.MainMenu.File.ShowProfileFolder", nullptr));
     actionAlwaysOnTop->setText(QCoreApplication::translate("OBSBasic", "Basic.MainMenu.AlwaysOnTop", nullptr));
     toggleListboxToolbars->setText(QCoreApplication::translate("OBSBasic", "Basic.MainMenu.View.Toolbars.Listboxes", nullptr));
-    toggleStatusBar->setText(QCoreApplication::translate("OBSBasic", "Basic.MainMenu.View.StatusBar", nullptr));
+    // toggleStatusBar->setText(QCoreApplication::translate("OBSBasic", "Basic.MainMenu.View.StatusBar", nullptr));
     actionLockPreview->setText(QCoreApplication::translate("OBSBasic", "Basic.MainMenu.Edit.LockPreview", nullptr));
     actionScaleWindow->setText(QCoreApplication::translate("OBSBasic", "Basic.MainMenu.Edit.Scale.Window", nullptr));
     actionScaleCanvas->setText(QCoreApplication::translate("OBSBasic", "Basic.MainMenu.Edit.Scale.Canvas", nullptr));
@@ -8941,8 +8973,8 @@ void Ui_OBSBasic::retranslateUi(OBSBasic *OBSBasic)
     viewMenuDocks->setTitle(QCoreApplication::translate("OBSBasic", "Basic.MainMenu.View.Docks", nullptr));
     menuTools->setTitle(QCoreApplication::translate("OBSBasic", "Basic.MainMenu.Tools", nullptr));
     // scenesDock->setWindowTitle(QCoreApplication::translate("OBSBasic", "Basic.Main.Scenes", nullptr));
-    sourcesDock->setWindowTitle(QCoreApplication::translate("OBSBasic", "Basic.Main.Sources", nullptr));
-    mixerDock->setWindowTitle(QCoreApplication::translate("OBSBasic", "Mixer", nullptr));
+    //sourcesDock->setWindowTitle(QCoreApplication::translate("OBSBasic", "Basic.Main.Sources", nullptr));
+    //mixerDock->setWindowTitle(QCoreApplication::translate("OBSBasic", "Mixer", nullptr));
     // transitionsDock->setWindowTitle(QCoreApplication::translate("OBSBasic", "Basic.SceneTransitions", nullptr));
 #if QT_CONFIG(accessibility)
     transitions->setAccessibleName(QCoreApplication::translate("OBSBasic", "Transition", nullptr));
@@ -8972,7 +9004,7 @@ void Ui_OBSBasic::retranslateUi(OBSBasic *OBSBasic)
 #endif // QT_CONFIG(accessibility)
     transitionDuration->setSuffix(QCoreApplication::translate("OBSBasic", " ms", nullptr));
 #endif
-    controlsDock->setWindowTitle(QCoreApplication::translate("OBSBasic", "Basic.Main.Controls", nullptr));
+    //controlsDock->setWindowTitle(QCoreApplication::translate("OBSBasic", "Basic.Main.Controls", nullptr));
     // streamButton->setText(QCoreApplication::translate("OBSBasic", "Basic.Main.StartStreaming", nullptr));
     recordButton->setText(QCoreApplication::translate("OBSBasic", "Basic.Main.StartRecording", nullptr));
     // modeSwitch->setText(QCoreApplication::translate("OBSBasic", "Basic.TogglePreviewProgramMode", nullptr));
@@ -9136,4 +9168,28 @@ void OBSBasic::AddSourceProperties()
 				       "update_properties",
 				       OBSBasic::UpdateAudioProperties,
 				       this);
+}
+
+extern volatile bool recording_paused;
+void OBSBasic::UpdateRecordTime()
+{
+	bool paused = os_atomic_load_bool(&recording_paused);
+	if (!paused)
+		totalRecordSeconds++;
+	QString text;
+
+	if (paused) {
+		text = QStringLiteral("REC: PAUSED");
+	} else {
+		int seconds = totalRecordSeconds % 60;
+		int totalMinutes = totalRecordSeconds / 60;
+		int minutes = totalMinutes % 60;
+		int hours = totalMinutes / 60;
+
+		text = QString::asprintf("REC: %02d:%02d:%02d", hours, minutes,
+					 seconds);
+	}
+
+	recordTime->setText(text);
+	recordTime->setMinimumWidth(recordTime->width());
 }

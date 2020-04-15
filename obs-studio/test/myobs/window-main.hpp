@@ -1,18 +1,27 @@
 #pragma once
 
-// #include <QMainWindow>
+#if 1
+#include <QMainWindow>
+#else
 #include <QDialog>
+#endif
 
 #include <util/config-file.h>
 
-// class OBSMainWindow : public QMainWindow 
+#if 1
+class OBSMainWindow : public QMainWindow 
+#else
 class OBSMainWindow : public QDialog
+#endif
 {
 	Q_OBJECT
 
 public:
-	//inline OBSMainWindow(QWidget *parent) : QMainWindow(parent) {}
+#if 1
+	inline OBSMainWindow(QWidget *parent) : QMainWindow(parent) {}
+#else
 	inline OBSMainWindow(QWidget *parent) : QDialog(parent) {}
+#endif
 
 	virtual config_t *Config() const = 0;
 	virtual void OBSInit() = 0;

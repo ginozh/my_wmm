@@ -25,6 +25,7 @@
 #include <obs.hpp>
 #include <vector>
 #include <memory>
+#include <QTimer>
 #include "window-main.hpp"
 #include "window-basic-interaction.hpp"
 #include "window-basic-properties.hpp"
@@ -667,6 +668,7 @@ private slots:
 
 	void LockVolumeControl(bool lock);
 
+	void UpdateRecordTime(); // storm refreshTimer
 private:
 	/* OBS Callbacks */
 	static void SceneReordered(void *data, calldata_t *params);
@@ -1005,6 +1007,11 @@ public:
 	OBSSignal audioupdatePropertiesSignal;
 	OBSData audiooldSettings;
 	OBSPropertiesView *audioview;
+
+	QLabel *recordTime;
+	QPointer<QTimer> refreshTimer;
+	bool active = false;
+	int totalRecordSeconds = 0;
 private:
 	std::unique_ptr<Ui::OBSBasic> ui;
 };

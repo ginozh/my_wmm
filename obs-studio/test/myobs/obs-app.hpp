@@ -32,8 +32,11 @@
 #include <vector>
 #include <deque>
 
-// #include "window-main.hpp"
+#if 1
+#include "window-main.hpp"
+#else
 #include "mainwindow.h"
+#endif
 
 std::string CurrentTimeString();
 std::string CurrentDateTimeString();
@@ -74,7 +77,7 @@ private:
 	ConfigFile globalConfig;
 	TextLookup textLookup;
 	OBSContext obsContext;
-#if 0
+#if 1
 	QPointer<OBSMainWindow> mainWindow;
 #else
 	QPointer<MainWindow> mainWindow;
@@ -118,9 +121,11 @@ public:
 	{
 		return enableHotkeysInFocus;
 	}
-
-	//inline QMainWindow *GetMainWindow() const { return mainWindow.data(); }
+#if 1
+	inline QMainWindow *GetMainWindow() const { return mainWindow.data(); }
+#else
 	inline QDialog *GetMainWindow() const { return mainWindow.data()->mainDialog.data(); }
+#endif
 
 	inline config_t *GlobalConfig() const { return globalConfig; }
 
