@@ -17,7 +17,7 @@ SceneTree::SceneTree(QWidget *parent_) : QListWidget(parent_)
 void SceneTree::SetGridMode(bool grid)
 {
 	config_set_bool(App()->GlobalConfig(), "BasicWindow", "gridMode", grid);
-	parent()->setProperty("gridMode", grid);
+	// parent()->setProperty("gridMode", grid); //storm
 	gridMode = grid;
 
 	if (gridMode) {
@@ -182,7 +182,7 @@ void SceneTree::dragMoveEvent(QDragMoveEvent *event)
 
 void SceneTree::rowsInserted(const QModelIndex &parent, int start, int end)
 {
-	QListWidget::rowsInserted(parent, start, end);
+	// QListWidget::rowsInserted(parent, start, end); //storm
 
 	QResizeEvent event(size(), size());
 	SceneTree::resizeEvent(&event);

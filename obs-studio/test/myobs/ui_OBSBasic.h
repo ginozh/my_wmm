@@ -28,6 +28,7 @@
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QGroupBox>
 #include "horizontal-scroll-area.hpp"
 #include "record-button.hpp"
 #include "scene-tree.hpp"
@@ -147,7 +148,58 @@ public:
     QAction *actionShowAbout;
     QAction *toggleSourceIcons;
 #endif
-    QWidget *centralwidget;
+#if 1
+    // QWidget *centralwidget; // centralwidget
+    QHBoxLayout *centralHorizontalLayout;
+        QVBoxLayout *leftVerticalLayout;
+            OBSBasicPreview *preview; // preview
+            //QWidget *preview; // preview
+            VScrollArea *hMixerScrollArea;// hMixerScrollArea;
+                QWidget *hVolumeWidgets;
+                QVBoxLayout *hVolControlLayout;
+                HScrollArea *vMixerScrollArea;
+                QWidget *vVolumeWidgets;
+                QHBoxLayout *vVolControlLayout;
+            //QWidget *hMixerScrollArea;// hMixerScrollArea;
+            RecordButton *recordButton; // recordButton;
+            //QPushButton *recordButton; // recordButton;
+            QHBoxLayout *recordingLayout;
+            QLabel *recordTime; // recordTime
+            // NullWidget;
+        QVBoxLayout *rightVerticalLayout;
+            QGroupBox* captureSettingGBox;
+                 QVBoxLayout *captureSettingVLayout;
+                 QLabel* vcdLabel;
+                 QComboBox* vcdComboBox;
+                 QVBoxLayout *vcdSettingVLayout;
+                    QVBoxLayout* vcdDeviceVLayout;
+                    QVBoxLayout* resolutionVLayout;
+                        QLabel* resolutionLabel;
+                        QComboBox* resolutionComboBox;
+                    QVBoxLayout* fpsVLayout;
+                        QLabel* fpsLabel;
+                        QComboBox* fpsComboBox;
+                 QVBoxLayout *acdVLayout;
+                     QLabel* acdLabel;
+                     QComboBox* acdComboBox;
+            QGroupBox* saveSettingGBox;
+                 QVBoxLayout *saveSettingVLayout;
+                 QLabel* savefileLabel;
+                 QHBoxLayout *browseHLayout;
+                     QComboBox* directoryComboBox;
+                     QPushButton* browseButton;
+                 QPushButton *viewfileButton;
+#endif
+
+    QWidget *previewDisabledWidget;
+    QPushButton *enablePreviewButton;
+    QHBoxLayout *previewLayout;
+    SceneTree *scenes;
+    SourceTree *sources;
+    QComboBox *transitions;
+    QSpinBox *transitionDuration;
+#if 0
+    // old layout
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout_2;
     QHBoxLayout *previewLayout;
@@ -191,7 +243,7 @@ public:
     QVBoxLayout *verticalLayout_6;
     QFrame *scenesFrame;
     QVBoxLayout *verticalLayout_12;
-    SceneTree *scenes;
+    //SceneTree *scenes;
     QToolBar *scenesToolbar;
     QSpacerItem *scenesFixedSizeHSpacer;
     OBSDock *sourcesDock;
@@ -217,7 +269,7 @@ public:
     QVBoxLayout *verticalLayout_3;
     QWidget *transitionsContainer;
     QVBoxLayout *verticalLayout_2;
-    QComboBox *transitions;
+    //QComboBox *transitions;
     QHBoxLayout *horizontalLayout_4;
     QSpacerItem *horizontalSpacer;
     QPushButton *transitionAdd;
@@ -225,7 +277,7 @@ public:
     QPushButton *transitionProps;
     QHBoxLayout *horizontalLayout_3;
     QLabel *transitionDurationLabel;
-    QSpinBox *transitionDuration;
+    //QSpinBox *transitionDuration;
     QSpacerItem *verticalSpacer;
     OBSDock *controlsDock;
     QWidget *controlsDockContents;
@@ -237,7 +289,7 @@ public:
     QPushButton *settingsButton;
     QPushButton *exitButton;
     QSpacerItem *expVSpacer;
-
+#endif
     void setupUi(OBSBasic *OBSBasic);
 #if 0
     {

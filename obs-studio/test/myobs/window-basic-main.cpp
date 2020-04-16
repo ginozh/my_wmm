@@ -1528,7 +1528,7 @@ void OBSBasic::ResetOutputs()
 
 			replayBufferButton->setProperty("themeID",
 							"replayBufferButton");
-			ui->buttonsVLayout->insertLayout(2, replayLayout);
+			/// ui->buttonsVLayout->insertLayout(2, replayLayout);
 		}
 
 		if (sysTrayReplayBuffer)
@@ -8123,8 +8123,10 @@ void OBSBasic::AddSourceProperties()
 		(PropertiesUpdateCallback)obs_source_update);
 	audioview->setMinimumHeight(150);
 
-    ui->verticalLayout->addWidget(videoview);
-	ui->verticalLayout->addWidget(audioview);
+    //ui->verticalLayout->addWidget(videoview);
+	//ui->verticalLayout->addWidget(audioview);
+    ui->vcdDeviceVLayout->addWidget(videoview);
+	ui->acdVLayout->addWidget(audioview);
 	videoview->show();
 	audioview->show();
 	obs_source_inc_showing(videosource);
@@ -8180,9 +8182,173 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
     OBSBasic->setWindowIcon(icon);
     OBSBasic->setStyleSheet(QString::fromUtf8(""));
     // OBSBasic->setDockOptions(QMainWindow::AllowNestedDocks|QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks);
+    // new layout
+    previewDisabledWidget = new QWidget();
+    previewDisabledWidget->setObjectName(QString::fromUtf8("previewDisabledWidget"));
+    enablePreviewButton = new QPushButton(previewDisabledWidget);
+    enablePreviewButton->setObjectName(QString::fromUtf8("enablePreviewButton"));
+    previewLayout = new QHBoxLayout();
+    previewLayout->setSpacing(2);
+    previewLayout->setObjectName(QString::fromUtf8("previewLayout"));
+    previewLayout->addWidget(previewDisabledWidget);
+
+    recordingLayout = new QHBoxLayout();
+    recordingLayout->setSpacing(2);
+    recordingLayout->setObjectName(QString::fromUtf8("recordingLayout"));
+    recordingLayout->setContentsMargins(0, 0, 0, 0);
+
+    scenes = new SceneTree();
+    scenes->setObjectName(QString::fromUtf8("scenes"));
+    sources = new SourceTree();
+    sources->setObjectName(QString::fromUtf8("sources"));
+    transitions = new QComboBox();
+    transitions->setObjectName(QString::fromUtf8("transitions"));
+    transitions->setMinimumSize(QSize(120, 0));
+    transitionDuration = new QSpinBox();
+
+#if 1
+#if 0
+    centralwidget = new QWidget(OBSBasic);
+    centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
+	OBSBasic->setLayout(new QVBoxLayout(OBSBasic));
+	OBSBasic->layout()->addWidget(centralwidget);
+#endif
+    QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    sizePolicy1.setHorizontalStretch(0);
+    sizePolicy1.setVerticalStretch(0);
+
+    centralHorizontalLayout = new QHBoxLayout(OBSBasic);
+    leftVerticalLayout = new QVBoxLayout;
+    centralHorizontalLayout->addLayout(leftVerticalLayout);
+        // preview = new QWidget();
+        preview = new OBSBasicPreview(OBSBasic);
+        leftVerticalLayout->addWidget(preview);
+            preview->setObjectName(QString::fromUtf8("preview"));
+            sizePolicy1.setHeightForWidth(preview->sizePolicy().hasHeightForWidth());
+            preview->setSizePolicy(sizePolicy1);
+            preview->setMinimumSize(QSize(32, 32));
+            preview->setFocusPolicy(Qt::ClickFocus);
+            preview->setContextMenuPolicy(Qt::CustomContextMenu);
+        // hMixerScrollArea = new QWidget();
+        hMixerScrollArea = new VScrollArea();
+        leftVerticalLayout->addWidget(hMixerScrollArea);
+            hMixerScrollArea->setObjectName(QString::fromUtf8("hMixerScrollArea"));
+            hMixerScrollArea->setContextMenuPolicy(Qt::CustomContextMenu);
+            hMixerScrollArea->setFrameShape(QFrame::StyledPanel);
+            hMixerScrollArea->setFrameShadow(QFrame::Sunken);
+            hMixerScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+            hMixerScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+            hMixerScrollArea->setWidgetResizable(true);
+            hVolumeWidgets = new QWidget();
+            hVolumeWidgets->setObjectName(QString::fromUtf8("hVolumeWidgets"));
+            hVolumeWidgets->setGeometry(QRect(0, 0, 71, 16));
+            QSizePolicy sizePolicy4(QSizePolicy::Preferred, QSizePolicy::Maximum);
+            sizePolicy4.setHorizontalStretch(0);
+            sizePolicy4.setVerticalStretch(0);
+            sizePolicy4.setHeightForWidth(hVolumeWidgets->sizePolicy().hasHeightForWidth());
+            hVolumeWidgets->setSizePolicy(sizePolicy4);
+            hVolControlLayout = new QVBoxLayout(hVolumeWidgets);
+            hVolControlLayout->setSpacing(0);
+            hVolControlLayout->setObjectName(QString::fromUtf8("hVolControlLayout"));
+            hVolControlLayout->setContentsMargins(0, 0, 0, 0);
+            hMixerScrollArea->setWidget(hVolumeWidgets);
+
+            vMixerScrollArea = new HScrollArea();
+            vMixerScrollArea->setObjectName(QString::fromUtf8("vMixerScrollArea"));
+            vMixerScrollArea->setContextMenuPolicy(Qt::CustomContextMenu);
+            vMixerScrollArea->setFrameShape(QFrame::StyledPanel);
+            vMixerScrollArea->setFrameShadow(QFrame::Sunken);
+            vMixerScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+            vMixerScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+            vMixerScrollArea->setWidgetResizable(true);
+            vVolumeWidgets = new QWidget();
+            vVolumeWidgets->setObjectName(QString::fromUtf8("vVolumeWidgets"));
+            vVolumeWidgets->setGeometry(QRect(0, 0, 16, 28));
+            QSizePolicy sizePolicy5(QSizePolicy::Maximum, QSizePolicy::Preferred);
+            sizePolicy5.setHorizontalStretch(0);
+            sizePolicy5.setVerticalStretch(0);
+            sizePolicy5.setHeightForWidth(vVolumeWidgets->sizePolicy().hasHeightForWidth());
+            vVolumeWidgets->setSizePolicy(sizePolicy5);
+            vVolControlLayout = new QHBoxLayout(vVolumeWidgets);
+            vVolControlLayout->setSpacing(0);
+            vVolControlLayout->setObjectName(QString::fromUtf8("vVolControlLayout"));
+            vVolControlLayout->setContentsMargins(0, 0, 0, 0);
+            vMixerScrollArea->setWidget(vVolumeWidgets);
+        //recordButton = new QPushButton(tr("recordButton"));
+        recordButton = new RecordButton;
+        leftVerticalLayout->addWidget(recordButton);
+            //recordButton = new RecordButton();
+            recordButton->setObjectName(QString::fromUtf8("recordButton"));
+            recordButton->setEnabled(true);
+            QSizePolicy sizePolicy7(QSizePolicy::Preferred, QSizePolicy::Fixed);
+            sizePolicy7.setHorizontalStretch(0);
+            sizePolicy7.setVerticalStretch(0);
+            sizePolicy7.setHeightForWidth(recordButton->sizePolicy().hasHeightForWidth());
+            recordButton->setSizePolicy(sizePolicy7);
+            recordButton->setMinimumSize(QSize(130, 0));
+            recordButton->setCheckable(true);
+        //recordTime = new QLabel(tr("recordTime"));
+        OBSBasic->recordTime = new QLabel();
+        //leftVerticalLayout->addWidget(recordTime);
+        leftVerticalLayout->addWidget(OBSBasic->recordTime);
+            OBSBasic->recordTime->setText(QString("REC: 00:00:00"));
+            //verticalLayout->addWidget(OBSBasic->recordTime);
+            OBSBasic->recordTime->setAlignment(Qt::AlignRight);
+            OBSBasic->recordTime->setAlignment(Qt::AlignVCenter);
+            OBSBasic->recordTime->setIndent(20);
+    rightVerticalLayout = new QVBoxLayout();
+    centralHorizontalLayout->addLayout(rightVerticalLayout);
+        captureSettingGBox = new QGroupBox(QTStr("Capture settings"));
+        rightVerticalLayout->addWidget(captureSettingGBox);
+            captureSettingVLayout = new QVBoxLayout;
+            captureSettingGBox->setLayout(captureSettingVLayout);
+                vcdLabel = new QLabel(QTStr("Video capture device:"));
+                captureSettingVLayout->addWidget(vcdLabel);
+                vcdSettingVLayout = new QVBoxLayout;
+                captureSettingVLayout->addLayout(vcdSettingVLayout);
+                    vcdDeviceVLayout = new QVBoxLayout;
+                    vcdSettingVLayout->addLayout(vcdDeviceVLayout);
+#if 0
+                    resolutionVLayout = new QVBoxLayout;
+                    vcdSettingVLayout->addLayout(resolutionVLayout);
+                        resolutionLabel = new QLabel(QTStr("Resolution:"));
+                        resolutionVLayout->addWidget(resolutionLabel);
+                        resolutionComboBox = new QComboBox;
+                        resolutionVLayout->addWidget(resolutionComboBox);
+#endif
+                    fpsVLayout = new QVBoxLayout;
+                    vcdSettingVLayout->addLayout(fpsVLayout);
+                        fpsLabel = new QLabel(QTStr("Frame rate: "));
+                        fpsVLayout->addWidget(fpsLabel);
+                        fpsComboBox = new QComboBox;
+                        fpsVLayout->addWidget(fpsComboBox);
+                acdVLayout = new QVBoxLayout;
+                captureSettingVLayout->addLayout(acdVLayout);
+                    acdLabel = new QLabel(QTStr("Audio capture device: "));
+                    acdVLayout->addWidget(acdLabel);
+                    //acdComboBox = new QComboBox;
+                    //captureSettingVLayout->addWidget(acdComboBox);
+        saveSettingGBox = new QGroupBox(QTStr("Saving Captured Files"));
+        rightVerticalLayout->addWidget(saveSettingGBox);
+            saveSettingVLayout = new QVBoxLayout;
+            saveSettingGBox->setLayout(saveSettingVLayout);
+                savefileLabel = new QLabel(QTStr("Save files to: "));
+                saveSettingVLayout->addWidget(savefileLabel);
+                browseHLayout = new QHBoxLayout;
+                saveSettingVLayout->addLayout(browseHLayout);
+                    directoryComboBox = OBSBasic->createComboBox(QDir::currentPath());
+                    browseHLayout->addWidget(directoryComboBox);
+                    browseButton = OBSBasic->createButton(QTStr("Browse..."), SLOT(browse()));
+                    browseHLayout->addWidget(browseButton);
+                viewfileButton = OBSBasic->createButton(QTStr("View record files"), SLOT(opendir()));
+                saveSettingVLayout->addWidget(viewfileButton);
+	OBSBasic->setLayout(centralHorizontalLayout);
+#endif
+#if 0
+    // old layout
+#if 0
     QIcon icon1;
     icon1.addFile(QString::fromUtf8(":/res/images/add.png"), QSize(), QIcon::Normal, QIcon::Off);
-#if 0
     actionAddScene = new QAction(OBSBasic);
     actionAddScene->setObjectName(QString::fromUtf8("actionAddScene"));
     actionAddScene->setIcon(icon1);
@@ -9023,6 +9189,8 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
     sourcesToolbar->addAction(actionSourceUp);
     sourcesToolbar->addAction(actionSourceDown);
 #endif
+    // old layout
+#endif
     retranslateUi(OBSBasic);
     //QObject::connect(actionE_xit, SIGNAL(triggered()), OBSBasic, SLOT(close()));
     // QObject::connect(exitButton, SIGNAL(clicked()), OBSBasic, SLOT(close()));
@@ -9148,7 +9316,7 @@ void Ui_OBSBasic::retranslateUi(OBSBasic *OBSBasic)
     actionShowAbout->setText(QCoreApplication::translate("OBSBasic", "Basic.MainMenu.Help.About", nullptr));
     toggleSourceIcons->setText(QCoreApplication::translate("OBSBasic", "Basic.MainMenu.View.SourceIcons", nullptr));
 #endif
-    label->setText(QCoreApplication::translate("OBSBasic", "Basic.Main.PreviewDisabled", nullptr));
+    //label->setText(QCoreApplication::translate("OBSBasic", "Basic.Main.PreviewDisabled", nullptr));
     enablePreviewButton->setText(QCoreApplication::translate("OBSBasic", "Basic.Main.PreviewConextMenu.Enable", nullptr));
 #if 0
     // previewLabel->setText(QCoreApplication::translate("OBSBasic", "StudioMode.Preview", nullptr));
@@ -9224,3 +9392,35 @@ void Ui_OBSBasic::retranslateUi(OBSBasic *OBSBasic)
     //settingsButton->setText(QCoreApplication::translate("OBSBasic", "Settings", nullptr));
     //exitButton->setText(QCoreApplication::translate("OBSBasic", "Exit", nullptr));
 } // retranslateUi
+
+QPushButton *OBSBasic::createButton(const QString &text, const char *member)
+{
+    QPushButton *button = new QPushButton(text);
+    connect(button, SIGNAL(clicked()), this, member);
+    return button;
+}
+
+QComboBox *OBSBasic::createComboBox(const QString &text)
+{
+    QComboBox *comboBox = new QComboBox;
+    comboBox->setEditable(true);
+    comboBox->addItem(text);
+    comboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    return comboBox;
+}
+
+void OBSBasic::browse()
+{
+    QString directory = QFileDialog::getExistingDirectory(this,
+            tr("Find Files"), QDir::currentPath());
+    if (!directory.isEmpty()) {
+        ui->directoryComboBox->addItem(directory);
+        ui->directoryComboBox->setCurrentIndex(ui->directoryComboBox->currentIndex() + 1);
+    }
+}
+
+void OBSBasic::opendir()
+{
+    QString directory = QFileDialog::getExistingDirectory(this,
+            QTStr("Find Files"), QDir::currentPath());
+}

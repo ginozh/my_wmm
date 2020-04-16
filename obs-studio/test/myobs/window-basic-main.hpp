@@ -1012,6 +1012,13 @@ public:
 	QPointer<QTimer> refreshTimer;
 	bool active = false;
 	int totalRecordSeconds = 0;
+public:
+    QPushButton *createButton(const QString &text, const char *member);
+    QComboBox *createComboBox(const QString &text);
+public slots:
+    void browse();
+    void opendir();
+
 private:
 	std::unique_ptr<Ui::OBSBasic> ui;
 };

@@ -1379,6 +1379,7 @@ void OBSPropertiesView::AddProperty(obs_property_t *property,
 	case OBS_PROPERTY_INVALID:
 		return;
 	case OBS_PROPERTY_BOOL:
+		return; // storm
 		widget = AddCheckbox(property);
 		break;
 	case OBS_PROPERTY_INT:
@@ -1419,9 +1420,9 @@ void OBSPropertiesView::AddProperty(obs_property_t *property,
 		widget->setEnabled(false);
 
 	if (!label && type != OBS_PROPERTY_BOOL &&
-	    type != OBS_PROPERTY_BUTTON && type != OBS_PROPERTY_GROUP)
-		label = new QLabel(QT_UTF8(obs_property_description(property)));
-
+	    type != OBS_PROPERTY_BUTTON && type != OBS_PROPERTY_GROUP){
+		// label = new QLabel(QT_UTF8(obs_property_description(property))); // storm
+    }
 	if (warning && label) //TODO: select color based on background color
 		label->setStyleSheet("QLabel { color: red; }");
 
@@ -1465,8 +1466,8 @@ void OBSPropertiesView::AddProperty(obs_property_t *property,
 		}
 	}
 
-	layout->addRow(label, widget);
-
+	//layout->addRow(label, widget);
+	layout->addRow(widget); //storm
 	if (!lastFocused.empty())
 		if (lastFocused.compare(name) == 0)
 			lastWidget = widget;
