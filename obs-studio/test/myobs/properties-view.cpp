@@ -20,6 +20,7 @@
 #include <QStackedWidget>
 #include <QDir>
 #include <QGroupBox>
+#include <QRegExp> //storm
 #include "double-slider.hpp"
 #include "slider-ignorewheel.hpp"
 #include "spinbox-ignorewheel.hpp"
@@ -28,11 +29,10 @@
 #include "properties-view.hpp"
 #include "properties-view.moc.hpp"
 #include "obs-app.hpp"
-
+#include "window-basic-main.hpp" //storm
 #include <cstdlib>
 #include <initializer_list>
 #include <string>
-
 using namespace std;
 
 static inline QColor color_from_int(long long val)
@@ -173,7 +173,7 @@ void OBSPropertiesView::GetScrollPos(int &h, int &v)
 OBSPropertiesView::OBSPropertiesView(OBSData settings_, void *obj_,
 				     PropertiesReloadCallback reloadCallback,
 				     PropertiesUpdateCallback callback_,
-				     int minSize_)
+				     int minSize_, OBSBasic* maindialog)
 	: VScrollArea(nullptr),
 	  properties(nullptr, obs_properties_destroy),
 	  settings(settings_),
@@ -182,13 +182,14 @@ OBSPropertiesView::OBSPropertiesView(OBSData settings_, void *obj_,
 	  callback(callback_),
 	  minSize(minSize_)
 {
+    mainBasic=maindialog; //storm
 	setFrameShape(QFrame::NoFrame);
 	ReloadProperties();
 }
 
 OBSPropertiesView::OBSPropertiesView(OBSData settings_, const char *type_,
 				     PropertiesReloadCallback reloadCallback_,
-				     int minSize_)
+				     int minSize_, OBSBasic* maindialog)
 	: VScrollArea(nullptr),
 	  properties(nullptr, obs_properties_destroy),
 	  settings(settings_),
@@ -196,6 +197,7 @@ OBSPropertiesView::OBSPropertiesView(OBSData settings_, const char *type_,
 	  reloadCallback(reloadCallback_),
 	  minSize(minSize_)
 {
+    mainBasic=maindialog; //storm
 	setFrameShape(QFrame::NoFrame);
 	ReloadProperties();
 }
@@ -346,7 +348,7 @@ void OBSPropertiesView::AddInt(obs_property_t *prop, QFormLayout *layout,
 	spin->setToolTip(QT_UTF8(obs_property_long_description(prop)));
 	spin->setSuffix(QT_UTF8(suffix));
 
-	WidgetInfo *info = new WidgetInfo(this, prop, spin);
+	WidgetInfo *info = new WidgetInfo(this, prop, spin, mainBasic);
 	children.emplace_back(info);
 
 	if (type == OBS_NUMBER_SLIDER) {
@@ -544,7 +546,7 @@ QWidget *OBSPropertiesView::AddList(obs_property_t *prop, bool &warning)
 	warning = idx != -1 &&
 		  model->flags(model->index(idx, 0)) == Qt::NoItemFlags;
 
-	WidgetInfo *info = new WidgetInfo(this, prop, combo);
+	WidgetInfo *info = new WidgetInfo(this, prop, combo, mainBasic);
 	connect(combo, SIGNAL(currentIndexChanged(int)), info,
 		SLOT(ControlChanged()));
 	children.emplace_back(info);
@@ -594,7 +596,7 @@ void OBSPropertiesView::AddEditableList(obs_property_t *prop,
 		obs_data_release(item);
 	}
 
-	WidgetInfo *info = new WidgetInfo(this, prop, list);
+	WidgetInfo *info = new WidgetInfo(this, prop, list, mainBasic);
 
 	QVBoxLayout *sideLayout = new QVBoxLayout();
 	NewButton(sideLayout, info, "addIconSmall", &WidgetInfo::EditListAdd);
@@ -670,7 +672,7 @@ void OBSPropertiesView::AddColor(obs_property_t *prop, QFormLayout *layout,
 	subLayout->addWidget(colorLabel);
 	subLayout->addWidget(button);
 
-	WidgetInfo *info = new WidgetInfo(this, prop, colorLabel);
+	WidgetInfo *info = new WidgetInfo(this, prop, colorLabel, mainBasic);
 	connect(button, SIGNAL(clicked()), info, SLOT(ControlChanged()));
 	children.emplace_back(info);
 
@@ -746,7 +748,7 @@ void OBSPropertiesView::AddFont(obs_property_t *prop, QFormLayout *layout,
 	subLayout->addWidget(fontLabel);
 	subLayout->addWidget(button);
 
-	WidgetInfo *info = new WidgetInfo(this, prop, fontLabel);
+	WidgetInfo *info = new WidgetInfo(this, prop, fontLabel, mainBasic);
 	connect(button, SIGNAL(clicked()), info, SLOT(ControlChanged()));
 	children.emplace_back(info);
 
@@ -1251,7 +1253,7 @@ void OBSPropertiesView::AddFrameRate(obs_property_t *prop, bool &warning,
 
 	auto widget = CreateFrameRateWidget(prop, warning, option, valid_fps,
 					    fps_ranges);
-	auto info = new WidgetInfo(this, prop, widget);
+	auto info = new WidgetInfo(this, prop, widget, mainBasic);
 
 	widget->setToolTip(QT_UTF8(obs_property_long_description(prop)));
 
@@ -1355,7 +1357,7 @@ void OBSPropertiesView::AddGroup(obs_property_t *prop, QFormLayout *layout)
 			  QFormLayout::ItemRole::SpanningRole, groupBox);
 
 	// Register Group Widget
-	WidgetInfo *info = new WidgetInfo(this, prop, groupBox);
+	WidgetInfo *info = new WidgetInfo(this, prop, groupBox, mainBasic);
 	children.emplace_back(info);
 
 	// Signals
@@ -1679,6 +1681,19 @@ void WidgetInfo::ListChanged(const char *setting)
 	case OBS_COMBO_FORMAT_STRING:
 		obs_data_set_string(view->settings, setting,
 				    data.toByteArray().constData());
+        QString str=data.toString(); //storm
+        QRegExp rx("(\\d{1,5})x(\\d{1,5})");
+        if (mainBasic && astrcmpi(setting, "preset") ==0 && rx.indexIn(str) != -1)
+        {
+            int width = rx.cap(1).toInt();
+            int height = rx.cap(2).toInt();
+            config_set_uint(mainBasic->Config(), "Video", "BaseCX", width);
+            config_set_uint(mainBasic->Config(), "Video", "BaseCY", height);
+            config_set_uint(mainBasic->Config(), "Video", "OutputCX", width);
+            config_set_uint(mainBasic->Config(), "Video", "OutputCY", height);
+            mainBasic->ResetVideo();
+
+        }
 		break;
 	}
 }

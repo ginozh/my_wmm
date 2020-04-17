@@ -8114,13 +8114,13 @@ void OBSBasic::AddSourceProperties()
 	videoview = new OBSPropertiesView(
 		videosettings, videosource,
 		(PropertiesReloadCallback)obs_source_properties,
-		(PropertiesUpdateCallback)obs_source_update);
+		(PropertiesUpdateCallback)obs_source_update, 0, this);
 	videoview->setMinimumHeight(150);
 
 	audioview = new OBSPropertiesView(
 		audiosettings, audiosource,
 		(PropertiesReloadCallback)obs_source_properties,
-		(PropertiesUpdateCallback)obs_source_update);
+		(PropertiesUpdateCallback)obs_source_update, 0, this);
 	audioview->setMinimumHeight(150);
 
     //ui->verticalLayout->addWidget(videoview);

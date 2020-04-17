@@ -8,7 +8,7 @@
 class QFormLayout;
 class OBSPropertiesView;
 class QLabel;
-
+class OBSBasic;
 typedef obs_properties_t *(*PropertiesReloadCallback)(void *obj);
 typedef void (*PropertiesUpdateCallback)(void *obj, obs_data_t *settings);
 
@@ -23,7 +23,7 @@ private:
 	OBSPropertiesView *view;
 	obs_property_t *property;
 	QWidget *widget;
-
+    OBSBasic* mainBasic=nullptr;
 	void BoolChanged(const char *setting);
 	void IntChanged(const char *setting);
 	void FloatChanged(const char *setting);
@@ -40,8 +40,8 @@ private:
 
 public:
 	inline WidgetInfo(OBSPropertiesView *view_, obs_property_t *prop,
-			  QWidget *widget_)
-		: view(view_), property(prop), widget(widget_)
+			  QWidget *widget_, OBSBasic* maindialog=nullptr)
+		: view(view_), property(prop), widget(widget_), mainBasic(maindialog)
 	{
 	}
 
@@ -127,13 +127,15 @@ signals:
 public:
 	OBSPropertiesView(OBSData settings, void *obj,
 			  PropertiesReloadCallback reloadCallback,
-			  PropertiesUpdateCallback callback, int minSize = 0);
+			  PropertiesUpdateCallback callback, int minSize = 0, OBSBasic* maindialog=nullptr); //storm
 	OBSPropertiesView(OBSData settings, const char *type,
 			  PropertiesReloadCallback reloadCallback,
-			  int minSize = 0);
+			  int minSize = 0, OBSBasic* maindialog=nullptr); //storm
 
 	inline obs_data_t *GetSettings() const { return settings; }
 
 	inline void UpdateSettings() { callback(obj, settings); }
 	inline bool DeferUpdate() const { return deferUpdate; }
+private:
+    OBSBasic* mainBasic=nullptr; //storm
 };
