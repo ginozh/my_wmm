@@ -30,7 +30,7 @@
 #include <QSizePolicy>
 #include <QScrollBar>
 #include <QTextStream>
-
+#include <QProcess>
 #include <util/dstr.h>
 #include <util/util.hpp>
 #include <util/platform.h>
@@ -218,7 +218,7 @@ OBSBasic::OBSBasic(QWidget *parent)
 	ui->previewDisabledWidget->setVisible(false);
 
 	// startingDockLayout = saveState();
-
+#if 0
 	statsDock = new OBSDock();
 	statsDock->setObjectName(QStringLiteral("statsDock"));
 	statsDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
@@ -227,7 +227,7 @@ OBSBasic::OBSBasic(QWidget *parent)
 	statsDock->setVisible(false);
 	statsDock->setFloating(true);
 	statsDock->resize(700, 200);
-
+#endif
 	copyActionsDynamicProperties();
 
 	char styleSheetPath[512];
@@ -379,13 +379,13 @@ OBSBasic::OBSBasic(QWidget *parent)
 		QSize adjSize = desktopRect.size() / 2 - size() / 2;
 		curPos = QPoint(adjSize.width(), adjSize.height());
 	}
-
+#if 0
 	QPoint curSize(width(), height());
 	QPoint statsDockSize(statsDock->width(), statsDock->height());
 	QPoint statsDockPos = curSize / 2 - statsDockSize / 2;
 	QPoint newPos = curPos + statsDockPos;
 	statsDock->move(newPos);
-
+#endif
 	// ui->previewLabel->setProperty("themeID", "previewProgramLabels");
 
 	bool labels = config_get_bool(GetGlobalConfig(), "BasicWindow",
@@ -1667,7 +1667,7 @@ void OBSBasic::OBSInit()
 		ProfileScope("OBSBasic::Load");
 		disableSaving--;
 		Load(savePath);
-        AddSourceProperties();// storm
+        SetControlProperties();// storm
 		disableSaving++;
 	}
 
@@ -1721,11 +1721,11 @@ void OBSBasic::OBSInit()
 #ifndef _WIN32
 	show();
 #endif
-
+#if 0
 	/* setup stats dock */
 	OBSBasicStats *statsDlg = new OBSBasicStats(statsDock, false);
 	statsDock->setWidget(statsDlg);
-
+#endif
 	/* ----------------------------- */
 	/* add custom browser docks      */
 
@@ -3101,7 +3101,7 @@ void OBSBasic::ActivateAudioSource(OBSSource source)
 
 	bool vertical = config_get_bool(GetGlobalConfig(), "BasicWindow",
 					"VerticalVolControl");
-	VolControl *vol = new VolControl(source, true, vertical);
+	VolControl *vol = new VolControl(source, false, vertical);
 
 	vol->EnableSlider(!SourceVolumeLocked(source));
 
@@ -3997,6 +3997,7 @@ void OBSBasic::closeEvent(QCloseEvent *event)
 
 	Auth::Save();
 	SaveProjectNow();
+	config_save_safe(basicConfig, "tmp", nullptr); //storm  window-basic-settings.cpp=> here
 	auth.reset();
 
 	delete extraBrowsers;
@@ -4018,7 +4019,7 @@ void OBSBasic::closeEvent(QCloseEvent *event)
 	 * sources, etc) so that all references are released before shutdown */
 	ClearSceneData();
 
-	App()->quit();
+	// App()->quit(); // storm
 }
 
 void OBSBasic::changeEvent(QEvent *event)
@@ -6984,8 +6985,8 @@ void OBSBasic::on_resetUI_triggered()
 	//ui->mixerDock->setVisible(true);
 	// ui->transitionsDock->setVisible(true);
 	//ui->controlsDock->setVisible(true);
-	statsDock->setVisible(false);
-	statsDock->setFloating(true);
+	//statsDock->setVisible(false);
+	//statsDock->setFloating(true);
 
 	// resizeDocks(docks, {cy, cy, cy, cy, cy}, Qt::Vertical);
 	// resizeDocks(docks, sizes, Qt::Horizontal);
@@ -7006,7 +7007,7 @@ void OBSBasic::on_lockUI_toggled(bool lock)
 	//ui->mixerDock->setFeatures(mainFeatures);
 	// ui->transitionsDock->setFeatures(mainFeatures);
 	//ui->controlsDock->setFeatures(mainFeatures);
-	statsDock->setFeatures(features);
+	//statsDock->setFeatures(features);
 
 	for (int i = extraDocks.size() - 1; i >= 0; i--) {
 		if (!extraDocks[i]) {
@@ -7993,11 +7994,13 @@ void OBSBasic::UpdateAudioProperties(void *data, calldata_t *)
 	QMetaObject::invokeMethod(static_cast<OBSBasic *>(data)->audioview,
 				  "ReloadProperties");
 }
-void OBSBasic::AddSourceProperties()
+
+void OBSBasic::SetControlProperties() // storm
 {
     // storm
     //QLabel* lbl = new QLabel("test");
     //ui->verticalLayout->addWidget(lbl);
+    // 1, source properties
     bool visible = true;
 	OBSBasic *main = reinterpret_cast<OBSBasic *>(App()->GetMainWindow());
 	OBSScene scene = main->GetCurrentScene();
@@ -8125,8 +8128,8 @@ void OBSBasic::AddSourceProperties()
 
     //ui->verticalLayout->addWidget(videoview);
 	//ui->verticalLayout->addWidget(audioview);
-    ui->vcdDeviceVLayout->addWidget(videoview);
-	ui->acdVLayout->addWidget(audioview);
+    ui->vcdDeviceVLayout->addWidget(videoview); // storm
+	ui->acdVLayout->addWidget(audioview); // storm
 	videoview->show();
 	audioview->show();
 	obs_source_inc_showing(videosource);
@@ -8140,6 +8143,21 @@ void OBSBasic::AddSourceProperties()
 				       "update_properties",
 				       OBSBasic::UpdateAudioProperties,
 				       this);
+
+
+    //2. video setting properties
+	const char *val =
+		config_get_string(Config(), "Video", "FPSCommon");
+
+	int idxFPS = ui->fpsCommon->findText(val);
+	if (idxFPS == -1)
+		idxFPS = 4;
+	ui->fpsCommon->setCurrentIndex(idxFPS);
+
+    // 3, outputpath
+	const char *path =
+		config_get_string(Config(), "SimpleOutput", "FilePath");
+	ui->simpleOutputPath->setText(path);
 }
 
 extern volatile bool recording_paused;
@@ -8170,7 +8188,7 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
 {
     if (OBSBasic->objectName().isEmpty())
         OBSBasic->setObjectName(QString::fromUtf8("OBSBasic"));
-    OBSBasic->resize(1079, 730);
+    // OBSBasic->resize(1079, 730);
     QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     sizePolicy.setHorizontalStretch(0);
     sizePolicy.setVerticalStretch(0);
@@ -8319,9 +8337,22 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
                     fpsVLayout = new QVBoxLayout;
                     vcdSettingVLayout->addLayout(fpsVLayout);
                         fpsLabel = new QLabel(QTStr("Frame rate: "));
-                        fpsVLayout->addWidget(fpsLabel);
-                        fpsComboBox = new QComboBox;
-                        fpsVLayout->addWidget(fpsComboBox);
+                        //fpsVLayout->addWidget(fpsLabel); //tmp storm
+                        fpsCommon = new QComboBox;
+                        //fpsVLayout->addWidget(fpsCommon);
+                            fpsCommon->addItem(QString::fromUtf8("10"));
+                            fpsCommon->addItem(QString::fromUtf8("20"));
+                            // fpsCommon->addItem(QString());
+                            // fpsCommon->addItem(QString());
+                            fpsCommon->addItem(QString::fromUtf8("29.97"));
+                            fpsCommon->addItem(QString::fromUtf8("30"));
+                            fpsCommon->addItem(QString::fromUtf8("48"));
+                            // fpsCommon->addItem(QString());
+                            fpsCommon->addItem(QString::fromUtf8("59.94"));
+                            fpsCommon->addItem(QString::fromUtf8("60"));
+                            fpsCommon->setObjectName(QString::fromUtf8("fpsCommon"));
+                            fpsCommon->setCurrentText(QString::fromUtf8("30"));
+                            OBSBasic->connect(fpsCommon, SIGNAL(currentIndexChanged(int)), OBSBasic, SLOT(changeFPS()));
                 acdVLayout = new QVBoxLayout;
                 captureSettingVLayout->addLayout(acdVLayout);
                     acdLabel = new QLabel(QTStr("Audio capture device: "));
@@ -8336,12 +8367,23 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
                 saveSettingVLayout->addWidget(savefileLabel);
                 browseHLayout = new QHBoxLayout;
                 saveSettingVLayout->addLayout(browseHLayout);
-                    directoryComboBox = OBSBasic->createComboBox(QDir::currentPath());
-                    browseHLayout->addWidget(directoryComboBox);
-                    browseButton = OBSBasic->createButton(QTStr("Browse..."), SLOT(browse()));
-                    browseHLayout->addWidget(browseButton);
-                viewfileButton = OBSBasic->createButton(QTStr("View record files"), SLOT(opendir()));
+                    simpleOutputPath = new QLineEdit;
+                    simpleOutputPath->setObjectName(QString::fromUtf8("simpleOutputPath"));
+                    simpleOutputPath->setEnabled(true);
+                    simpleOutputPath->setReadOnly(true);
+                    browseHLayout->addWidget(simpleOutputPath);
+                    // directoryComboBox = OBSBasic->createComboBox(QDir::currentPath());
+                    //browseHLayout->addWidget(directoryComboBox);
+                    //browseButton = OBSBasic->createButton(QTStr("Browse..."), SLOT(browse()));
+                    //browseHLayout->addWidget(browseButton);
+                    simpleOutputBrowse = new QPushButton();
+                    browseHLayout->addWidget(simpleOutputBrowse);
+                    simpleOutputBrowse->setObjectName(QString::fromUtf8("simpleOutputBrowse"));
+                    simpleOutputBrowse->setEnabled(true);
+                //viewfileButton = OBSBasic->createButton(QTStr("View record files"), SLOT(opendir()));
+                viewfileButton = new QPushButton(QTStr("View record files"));
                 saveSettingVLayout->addWidget(viewfileButton);
+                viewfileButton->setObjectName(QString::fromUtf8("viewfileButton"));
 	OBSBasic->setLayout(centralHorizontalLayout);
 #endif
 #if 0
@@ -9201,6 +9243,7 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
 void Ui_OBSBasic::retranslateUi(OBSBasic *OBSBasic)
 {
     OBSBasic->setWindowTitle(QCoreApplication::translate("OBSBasic", ".MainWindow", nullptr));
+    simpleOutputBrowse->setText(QCoreApplication::translate("OBSBasicSettings", "Browse", nullptr));
 #if 0
     //actionAddScene->setText(QCoreApplication::translate("OBSBasic", "Add", nullptr));
     actionAddSource->setText(QCoreApplication::translate("OBSBasic", "Add", nullptr));
@@ -9411,12 +9454,14 @@ QComboBox *OBSBasic::createComboBox(const QString &text)
 
 void OBSBasic::browse()
 {
+#if 0
     QString directory = QFileDialog::getExistingDirectory(this,
             tr("Find Files"), QDir::currentPath());
     if (!directory.isEmpty()) {
         ui->directoryComboBox->addItem(directory);
         ui->directoryComboBox->setCurrentIndex(ui->directoryComboBox->currentIndex() + 1);
     }
+#endif
 }
 
 void OBSBasic::opendir()
@@ -9424,3 +9469,65 @@ void OBSBasic::opendir()
     QString directory = QFileDialog::getExistingDirectory(this,
             QTStr("Find Files"), QDir::currentPath());
 }
+
+void OBSBasic::changeFPS()
+{
+    config_set_string(basicConfig, "Video", "FPSCommon",
+            QT_TO_UTF8(ui->fpsCommon->currentText()));
+    ResetVideo();
+}
+
+void OBSBasic::on_simpleOutputBrowse_clicked()
+{
+	QString dir = QFileDialog::getExistingDirectory(
+		this, QTStr("Basic.Settings.Output.SelectDirectory"),
+		ui->simpleOutputPath->text(),
+		QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+	if (dir.isEmpty())
+		return;
+
+	ui->simpleOutputPath->setText(dir);
+	// update SaveEdit(ui->simpleOutputPath, "SimpleOutput", "FilePath");
+    config_set_string(basicConfig, "SimpleOutput", "FilePath",
+            QT_TO_UTF8(ui->simpleOutputPath->text()));
+}
+
+void OBSBasic::on_viewfileButton_clicked()
+{
+    QString filePath;
+    if(vsFilePaths.count()>0)
+    {
+        filePath=vsFilePaths.back();
+    }
+    else
+    {
+        filePath=ui->simpleOutputPath->text();
+    }
+    const QFileInfo fileInfo(filePath);
+#ifdef __UBUNTU__
+#elif TARGET_OS_MAC
+    {
+        QStringList scriptArgs;
+        scriptArgs << QLatin1String("-e")
+                   << QString::fromLatin1("tell application \"Finder\" to reveal POSIX file \"%1\"")
+                          .arg(fileInfo.canonicalFilePath());
+        QProcess::execute(QLatin1String("/usr/bin/osascript"), scriptArgs);
+        scriptArgs.clear();
+        scriptArgs << QLatin1String("-e")
+                   << QLatin1String("tell application \"Finder\" to activate");
+        QProcess::execute(QLatin1String("/usr/bin/osascript"), scriptArgs);
+    }
+#else
+    {
+        QStringList param;
+        if (!fileInfo.isDir())
+        {
+            param << QLatin1String("/select,");
+        }
+        param << QDir::toNativeSeparators(fileInfo.canonicalFilePath());
+        // MProcess::startDetached("explorer.exe", param);
+        QProcess::startDetached("explorer.exe", param);
+    }
+#endif
+}
+

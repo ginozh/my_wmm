@@ -178,7 +178,7 @@ public:
                         QComboBox* resolutionComboBox;
                     QVBoxLayout* fpsVLayout;
                         QLabel* fpsLabel;
-                        QComboBox* fpsComboBox;
+                        QComboBox* fpsCommon;
                  QVBoxLayout *acdVLayout;
                      QLabel* acdLabel;
                      QComboBox* acdComboBox;
@@ -186,8 +186,8 @@ public:
                  QVBoxLayout *saveSettingVLayout;
                  QLabel* savefileLabel;
                  QHBoxLayout *browseHLayout;
-                     QComboBox* directoryComboBox;
-                     QPushButton* browseButton;
+                     QLineEdit *simpleOutputPath;// QComboBox* directoryComboBox;
+                     QPushButton *simpleOutputBrowse;// browseButton;
                  QPushButton *viewfileButton;
 #endif
 

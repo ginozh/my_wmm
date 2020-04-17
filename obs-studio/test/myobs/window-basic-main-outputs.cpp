@@ -961,8 +961,8 @@ bool SimpleOutput::ConfigureRecording(bool updateReplayBuffer)
 		obs_data_set_int(settings, "max_size_mb",
 				 usingRecordingPreset ? rbSize : 0);
 	} else {
-		obs_data_set_string(settings, ffmpegOutput ? "url" : "path",
-				    strPath.c_str());
+		obs_data_set_string(settings, ffmpegOutput ? "url" : "path", strPath.c_str());
+        main->vsFilePaths.push_back(QT_UTF8(strPath.c_str()));
 	}
 
 	obs_data_set_string(settings, "muxer_settings", mux);

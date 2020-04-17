@@ -26,6 +26,7 @@
 #include <vector>
 #include <memory>
 #include <QTimer>
+#include <QVector>
 #include "window-main.hpp"
 #include "window-basic-interaction.hpp"
 #include "window-basic-properties.hpp"
@@ -35,7 +36,6 @@
 #include "window-projector.hpp"
 #include "window-basic-about.hpp"
 #include "auth-base.hpp"
-
 #include <obs-frontend-internal.hpp>
 
 #include <util/platform.h>
@@ -206,7 +206,7 @@ private:
 	QPointer<OBSBasicTransform> transformWindow;
 	QPointer<OBSBasicAdvAudio> advAudioWindow;
 	QPointer<OBSBasicFilters> filters;
-	QPointer<QDockWidget> statsDock;
+	// QPointer<QDockWidget> statsDock;
 	QPointer<OBSAbout> about;
 
 	QPointer<QTimer> cpuUsageTimer;
@@ -668,7 +668,10 @@ private slots:
 
 	void LockVolumeControl(bool lock);
 
+    // storm 
 	void UpdateRecordTime(); // storm refreshTimer
+	void on_simpleOutputBrowse_clicked(); // with setObjectName
+	void on_viewfileButton_clicked();
 private:
 	/* OBS Callbacks */
 	static void SceneReordered(void *data, calldata_t *params);
@@ -991,7 +994,7 @@ public:
 private:
 	static void UpdateVideoProperties(void *data, calldata_t *params); //storm
 	static void UpdateAudioProperties(void *data, calldata_t *params);
-    void AddSourceProperties(); //storm
+    void SetControlProperties(); //storm
 public:
     // video
     OBSSource videosource; //storm
@@ -1012,12 +1015,14 @@ public:
 	QPointer<QTimer> refreshTimer;
 	bool active = false;
 	int totalRecordSeconds = 0;
+    QVector<QString> vsFilePaths; //storm
 public:
     QPushButton *createButton(const QString &text, const char *member);
     QComboBox *createComboBox(const QString &text);
 public slots:
     void browse();
     void opendir();
+    void changeFPS();
 
 private:
 	std::unique_ptr<Ui::OBSBasic> ui;
