@@ -517,7 +517,7 @@ QWidget *OBSPropertiesView::AddList(obs_property_t *prop, bool &warning)
 	obs_combo_type type = obs_property_list_type(prop);
 	obs_combo_format format = obs_property_list_format(prop);
 	size_t count = obs_property_list_item_count(prop);
-	int idx = -1;
+	int idx = -1, idxautoselect=-1; // storm
 
 	for (size_t i = 0; i < count; i++)
 		AddComboItem(combo, prop, format, i);
@@ -549,10 +549,10 @@ QWidget *OBSPropertiesView::AddList(obs_property_t *prop, bool &warning)
 	if (obs_data_has_autoselect_value(settings, name)) {
 		string autoselect =
 			from_obs_data_autoselect(settings, name, format);
-		int id = combo->findData(QT_UTF8(autoselect.c_str()));
+		idxautoselect = combo->findData(QT_UTF8(autoselect.c_str()));
 
-		if (id != -1 && id != idx) {
-			QString actual = combo->itemText(id);
+		if (idxautoselect != -1 && idxautoselect != idx) {
+			QString actual = combo->itemText(idxautoselect);
 			QString selected = combo->itemText(idx);
 			QString combined = QTStr(
 				"Basic.PropertiesWindow.AutoSelectFormat");
@@ -577,6 +577,10 @@ QWidget *OBSPropertiesView::AddList(obs_property_t *prop, bool &warning)
     {
         combo->setCurrentIndex(1); // storm
         bFirstSet=false;
+    }
+    else if (idxautoselect != -1 && idxautoselect != idx)  // storm 条件同上
+    {
+        combo->setCurrentIndex(idxautoselect); // storm
     }
 
 	return combo;

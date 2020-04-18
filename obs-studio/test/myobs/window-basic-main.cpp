@@ -33,6 +33,7 @@
 #include <QProcess>
 #include <QStandardItemModel>
 #include <QStandardItem>
+#include <QDirIterator>
 #include <util/dstr.h>
 #include <util/util.hpp>
 #include <util/platform.h>
@@ -3016,17 +3017,17 @@ void OBSBasic::VolControlContextMenu()
 	popup.addAction(&advPropAction);
 	popup.exec(QCursor::pos());
 }
-
+#if 1
 void OBSBasic::on_hMixerScrollArea_customContextMenuRequested()
 {
-	StackedMixerAreaContextMenuRequested();
+	//StackedMixerAreaContextMenuRequested(); // storm cancel audio right menu
 }
 
 void OBSBasic::on_vMixerScrollArea_customContextMenuRequested()
 {
-	StackedMixerAreaContextMenuRequested();
+	//StackedMixerAreaContextMenuRequested();
 }
-
+#endif
 void OBSBasic::StackedMixerAreaContextMenuRequested()
 {
 	QAction unhideAllAction(QTStr("UnhideAll"), this);
@@ -3131,13 +3132,13 @@ void OBSBasic::ActivateAudioSource(OBSSource source)
 
 	vol->setPeakMeterType(peakMeterType);
 
+#if 0
 	vol->setContextMenuPolicy(Qt::CustomContextMenu);
-
 	connect(vol, &QWidget::customContextMenuRequested, this,
-		&OBSBasic::VolControlContextMenu);
+		&OBSBasic::VolControlContextMenu); // storm close menu
 	connect(vol, &VolControl::ConfigClicked, this,
 		&OBSBasic::VolControlContextMenu);
-
+#endif
 	InsertQObjectByName(volumes, vol);
 
 	for (auto volume : volumes) {
@@ -6889,6 +6890,7 @@ void OBSBasic::on_actionFullscreenInterface_triggered()
 
 void OBSBasic::UpdateTitleBar()
 {
+#if 0
 	stringstream name;
 
 	const char *profile =
@@ -6908,6 +6910,7 @@ void OBSBasic::UpdateTitleBar()
 	name << " - " << Str("TitleBar.Scenes") << ": " << sceneCollection;
 
 	setWindowTitle(QT_UTF8(name.str().c_str()));
+#endif
 }
 
 int OBSBasic::GetProfilePath(char *path, size_t size, const char *file) const
@@ -8070,8 +8073,8 @@ void OBSBasic::SetControlProperties() // storm
 
 		if ((caps & OBS_SOURCE_DEPRECATED) == 0) {
 			// addSource(popup, unversioned_type, name);
-            if(astrcmpi(name, "Video Capture Device") == 0 
-                    || astrcmpi(name, "Audio Input Capture") == 0)
+            //if(astrcmpi(name, "Video Capture Device") == 0 || astrcmpi(name, "Audio Input Capture") == 0) // not suitable to multi lanuage 
+            if(astrcmpi(type, "av_capture_input") == 0 || astrcmpi(type, "coreaudio_input_capture") == 0)
             {
                 const char *id = type;
                 obs_source_t *source = obs_get_source_by_name(name);
@@ -8101,12 +8104,16 @@ void OBSBasic::SetControlProperties() // storm
                         success = true;
                     }
                 }
-                if(astrcmpi(name, "Video Capture Device") == 0 )
+                //if(astrcmpi(name, "Video Capture Device") == 0 )
+                if(astrcmpi(type, "av_capture_input") == 0 )
                 {
+                    ui->vcdLabel->setText(QT_UTF8(name));
                     videosource = source;
                 }
-                else if( astrcmpi(name, "Audio Input Capture") == 0)
+                //else if( astrcmpi(name, "Audio Input Capture") == 0)
+                else if( astrcmpi(type, "coreaudio_input_capture") == 0)
                 {
+                    ui->acdLabel->setText(QT_UTF8(name));
                     audiosource = source;
                 }
                 obs_source_release(source);
@@ -8215,6 +8222,10 @@ void OBSBasic::SetControlProperties() // storm
 	const char *path =
 		config_get_string(Config(), "SimpleOutput", "FilePath");
 	ui->simpleOutputPath->setText(path);
+
+    // 4, language, theme
+	LoadLanguageList();
+	LoadThemeList();
 }
 
 extern volatile bool recording_paused;
@@ -8292,6 +8303,7 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
     QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Expanding);
     sizePolicy1.setHorizontalStretch(0);
     sizePolicy1.setVerticalStretch(0);
+    QWidget* nullWidget;
 
     centralHorizontalLayout = new QHBoxLayout(OBSBasic);
     leftVerticalLayout = new QVBoxLayout;
@@ -8309,7 +8321,7 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
         hMixerScrollArea = new VScrollArea();
         leftVerticalLayout->addWidget(hMixerScrollArea);
             hMixerScrollArea->setObjectName(QString::fromUtf8("hMixerScrollArea"));
-            hMixerScrollArea->setContextMenuPolicy(Qt::CustomContextMenu);
+            // hMixerScrollArea->setContextMenuPolicy(Qt::CustomContextMenu);
             hMixerScrollArea->setFrameShape(QFrame::StyledPanel);
             hMixerScrollArea->setFrameShadow(QFrame::Sunken);
             hMixerScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -8331,7 +8343,7 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
 
             vMixerScrollArea = new HScrollArea();
             vMixerScrollArea->setObjectName(QString::fromUtf8("vMixerScrollArea"));
-            vMixerScrollArea->setContextMenuPolicy(Qt::CustomContextMenu);
+            // vMixerScrollArea->setContextMenuPolicy(Qt::CustomContextMenu);
             vMixerScrollArea->setFrameShape(QFrame::StyledPanel);
             vMixerScrollArea->setFrameShadow(QFrame::Sunken);
             vMixerScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -8363,22 +8375,58 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
             recordButton->setSizePolicy(sizePolicy7);
             recordButton->setMinimumSize(QSize(130, 0));
             recordButton->setCheckable(true);
-        //recordTime = new QLabel(tr("recordTime"));
-        recordTime = new QLabel();
-        //leftVerticalLayout->addWidget(recordTime);
-        leftVerticalLayout->addWidget(recordTime);
-            recordTime->setText(QString("REC: 00:00:00"));
-            //verticalLayout->addWidget(OBSBasic->recordTime);
-            recordTime->setAlignment(Qt::AlignHCenter);
-            recordTime->setAlignment(Qt::AlignVCenter);
-            //recordTime->setIndent(20);
+        recordTimeHLayout = new QHBoxLayout();
+        leftVerticalLayout->addLayout(recordTimeHLayout);
+            nullWidget = new QWidget;
+            nullWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Ignored);
+            recordTimeHLayout->addWidget(nullWidget);
+            //recordTime = new QLabel(tr("recordTime"));
+            recordTime = new QLabel();
+            //leftVerticalLayout->addWidget(recordTime);
+            recordTimeHLayout->addWidget(recordTime);
+                recordTime->setText(QString("REC: 00:00:00"));
+                //verticalLayout->addWidget(OBSBasic->recordTime);
+                recordTime->setAlignment(Qt::AlignHCenter);
+                recordTime->setAlignment(Qt::AlignVCenter);
+                //recordTime->setIndent(20);
+            nullWidget = new QWidget;
+            nullWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Ignored);
+            recordTimeHLayout->addWidget(nullWidget);
+#if 1
+        // tmp
+        settingHLayout = new QHBoxLayout();
+        leftVerticalLayout->addLayout(settingHLayout);
+            //languageLabel = new QLabel(QTStr("Language"));
+            languageLabel = new QLabel();
+            settingHLayout->addWidget(languageLabel);
+            languageLabel->setObjectName(QString::fromUtf8("languageLabel"));
+
+            languageComboBox = new QComboBox();
+            settingHLayout->addWidget(languageComboBox);
+            languageComboBox->setObjectName(QString::fromUtf8("languageComboBox"));
+
+            //themeLabel = new QLabel(QTStr("Theme"));
+            themeLabel = new QLabel();
+            themeLabel->setObjectName(QString::fromUtf8("themeLabel"));
+            settingHLayout->addWidget(themeLabel);
+
+            themeComboBox = new QComboBox();
+            settingHLayout->addWidget(themeComboBox);
+            themeComboBox->setObjectName(QString::fromUtf8("themeComboBox"));
+
+            nullWidget = new QWidget;
+            nullWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Ignored);
+            settingHLayout->addWidget(nullWidget);
+#endif
     rightVerticalLayout = new QVBoxLayout();
     centralHorizontalLayout->addLayout(rightVerticalLayout);
-        captureSettingGBox = new QGroupBox(QTStr("Capture settings"));
+        //captureSettingGBox = new QGroupBox(QTStr("Capture settings"));
+        captureSettingGBox = new QGroupBox();
         rightVerticalLayout->addWidget(captureSettingGBox);
             captureSettingVLayout = new QVBoxLayout;
             captureSettingGBox->setLayout(captureSettingVLayout);
-                vcdLabel = new QLabel(QTStr("Video capture device:"));
+                //vcdLabel = new QLabel(QTStr("Video capture device:"));
+                vcdLabel = new QLabel();
                 captureSettingVLayout->addWidget(vcdLabel);
                 vcdComboBox = new QComboBox;
                 captureSettingVLayout->addWidget(vcdComboBox);
@@ -8392,15 +8440,19 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
 #if 1
                     resolutionVLayout = new QVBoxLayout;
                     vcdSettingHLayout->addLayout(resolutionVLayout);
-                        resolutionLabel = new QLabel(QTStr("Resolution:"));
+                        //resolutionLabel = new QLabel(QTStr("Resolution:"));
+                        resolutionLabel = new QLabel();
+                        resolutionLabel->setObjectName(QString::fromUtf8("resolutionLabel"));
                         resolutionVLayout->addWidget(resolutionLabel);
                         resolutionComboBox = new QComboBox;
                         resolutionVLayout->addWidget(resolutionComboBox);
 #endif
                     fpsVLayout = new QVBoxLayout;
                     vcdSettingHLayout->addLayout(fpsVLayout);
-                        fpsLabel = new QLabel(QTStr("Frame rate: "));
-                        fpsVLayout->addWidget(fpsLabel); //tmp storm
+                        //fpsType = new QLabel(QTStr("Frame rate: "));
+                        fpsType = new QLabel();
+                        fpsType->setObjectName(QString::fromUtf8("fpsType"));
+                        fpsVLayout->addWidget(fpsType); //tmp storm
                         fpsCommon = new QComboBox;
                         fpsVLayout->addWidget(fpsCommon);
                             fpsCommon->addItem(QString::fromUtf8("10"));
@@ -8418,7 +8470,9 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
                             OBSBasic->connect(fpsCommon, SIGNAL(currentIndexChanged(int)), OBSBasic, SLOT(changeFPS()));
                 acdVLayout = new QVBoxLayout;
                 captureSettingVLayout->addLayout(acdVLayout);
-                    acdLabel = new QLabel(QTStr("Audio capture device: "));
+                    // acdLabel = new QLabel(QTStr("Audio capture device: "));
+                    acdLabel = new QLabel();
+                    acdLabel->setObjectName(QString::fromUtf8("acdLabel"));
                     acdVLayout->addWidget(acdLabel);
                     acdComboBox = new QComboBox;
                     acdVLayout->addWidget(acdComboBox);
@@ -8426,7 +8480,9 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
         rightVerticalLayout->addWidget(saveSettingGBox);
             saveSettingVLayout = new QVBoxLayout;
             saveSettingGBox->setLayout(saveSettingVLayout);
-                savefileLabel = new QLabel(QTStr("Save files to: "));
+                //savefileLabel = new QLabel(QTStr("Save files to: "));
+                savefileLabel = new QLabel();
+                savefileLabel->setObjectName(QString::fromUtf8("savefileLabel"));
                 saveSettingVLayout->addWidget(savefileLabel);
                 browseHLayout = new QHBoxLayout;
                 saveSettingVLayout->addLayout(browseHLayout);
@@ -8443,11 +8499,11 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
                     browseHLayout->addWidget(simpleOutputBrowse);
                     simpleOutputBrowse->setObjectName(QString::fromUtf8("simpleOutputBrowse"));
                     simpleOutputBrowse->setEnabled(true);
-                //viewfileButton = OBSBasic->createButton(QTStr("View record files"), SLOT(opendir()));
-                viewfileButton = new QPushButton(QTStr("View record files"));
+                // viewfileButton = new QPushButton(QTStr("View record files"));
+                viewfileButton = new QPushButton();
                 saveSettingVLayout->addWidget(viewfileButton);
                 viewfileButton->setObjectName(QString::fromUtf8("viewfileButton"));
-        QWidget* nullWidget = new QWidget;
+        nullWidget = new QWidget;
         nullWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Expanding);
         rightVerticalLayout->addWidget(nullWidget);
 	OBSBasic->setLayout(centralHorizontalLayout);
@@ -8950,7 +9006,7 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
 #endif
     hMixerScrollArea = new VScrollArea();
     hMixerScrollArea->setObjectName(QString::fromUtf8("hMixerScrollArea"));
-    hMixerScrollArea->setContextMenuPolicy(Qt::CustomContextMenu);
+    ///hMixerScrollArea->setContextMenuPolicy(Qt::CustomContextMenu);
     hMixerScrollArea->setFrameShape(QFrame::StyledPanel);
     hMixerScrollArea->setFrameShadow(QFrame::Sunken);
     hMixerScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -9309,8 +9365,19 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
 
 void Ui_OBSBasic::retranslateUi(OBSBasic *OBSBasic)
 {
-    OBSBasic->setWindowTitle(QCoreApplication::translate("OBSBasic", ".MainWindow", nullptr));
+    //OBSBasic->setWindowTitle(QCoreApplication::translate("OBSBasic", ".MainWindow", nullptr));
+    OBSBasic->setWindowTitle(QCoreApplication::translate("OBSBasic", "Basic.Title", nullptr));
+    captureSettingGBox->setTitle(QCoreApplication::translate("OBSBasicSettings", "Basic.Settings.Capture", nullptr));
     simpleOutputBrowse->setText(QCoreApplication::translate("OBSBasicSettings", "Browse", nullptr));
+    languageLabel->setText(QCoreApplication::translate("OBSBasicSettings", "Basic.Settings.General.Language", nullptr));
+    themeLabel->setText(QCoreApplication::translate("OBSBasicSettings", "Basic.Settings.General.Theme", nullptr));
+    vcdLabel->setText(QCoreApplication::translate("OBSBasicSettings", "Basic.Settings.Video.Device", nullptr));
+    resolutionLabel->setText(QCoreApplication::translate("OBSBasicSettings", "Basic.Settings.Video.ScaledResolution", nullptr));
+    fpsType->setText(QCoreApplication::translate("OBSBasicSettings", "Basic.Settings.Video.FPS", nullptr));
+    acdLabel->setText(QCoreApplication::translate("OBSBasicSettings", "Basic.Settings.Video.Device", nullptr));
+    saveSettingGBox->setTitle(QCoreApplication::translate("OBSBasicSettings", "Basic.Settings.Save", nullptr));
+    savefileLabel->setText(QCoreApplication::translate("OBSBasicSettings", "Basic.Settings.Output.Simple.SavePath", nullptr));
+    viewfileButton->setText(QCoreApplication::translate("OBSBasic", "Basic.MainMenu.File.ShowRecordings", nullptr));
 #if 0
     //actionAddScene->setText(QCoreApplication::translate("OBSBasic", "Add", nullptr));
     actionAddSource->setText(QCoreApplication::translate("OBSBasic", "Add", nullptr));
@@ -9597,6 +9664,37 @@ void OBSBasic::on_viewfileButton_clicked()
     }
 #endif
 }
+void OBSBasic::on_languageComboBox_currentIndexChanged(int idx)
+{
+	int languageIndex = ui->languageComboBox->currentIndex();
+	QVariant langData = ui->languageComboBox->itemData(languageIndex);
+	string language = langData.toString().toStdString();
+
+	//if (WidgetChanged(ui->languageComboBox))
+		config_set_string(GetGlobalConfig(), "General", "Language",
+				  language.c_str());
+}
+
+void OBSBasic::on_themeComboBox_currentIndexChanged(int idx)
+{
+	int themeIndex = ui->themeComboBox->currentIndex();
+	QString themeData = ui->themeComboBox->itemText(themeIndex);
+	QString defaultTheme;
+	defaultTheme += DEFAULT_THEME;
+	defaultTheme += " ";
+	defaultTheme += QTStr("Default");
+
+	if (themeData == defaultTheme)
+		themeData = DEFAULT_THEME;
+
+	//if (WidgetChanged(ui->themeComboBox)) 
+    {
+		config_set_string(GetGlobalConfig(), "General", "CurrentTheme2",
+				  QT_TO_UTF8(themeData));
+
+		App()->SetTheme(themeData.toUtf8().constData());
+	}
+}
 
 #if 0
 static void AddComboItem(QComboBox *combo, obs_property_t *prop,
@@ -9764,3 +9862,76 @@ void OBSBasic::ControlChanged()
 	}
 }
 #endif
+void OBSBasic::LoadLanguageList()
+{
+	const char *currentLang = App()->GetLocale();
+
+	ui->languageComboBox->clear();
+
+	for (const auto &locale : GetLocaleNames()) {
+		int idx = ui->languageComboBox->count();
+
+		ui->languageComboBox->addItem(QT_UTF8(locale.second.c_str()),
+				      QT_UTF8(locale.first.c_str()));
+
+		if (locale.first == currentLang)
+			ui->languageComboBox->setCurrentIndex(idx);
+	}
+
+	ui->languageComboBox->model()->sort(0);
+}
+
+void OBSBasic::LoadThemeList()
+{
+	/* Save theme if user presses Cancel */
+	std::string savedTheme;
+	savedTheme = string(App()->GetTheme());
+
+	ui->themeComboBox->clear();
+	QSet<QString> uniqueSet;
+	string themeDir;
+	char userThemeDir[512];
+	int ret = GetConfigPath(userThemeDir, sizeof(userThemeDir),
+				"obs-studio/themes/");
+	GetDataFilePath("themes/", themeDir);
+
+	/* Check user dir first. */
+	if (ret > 0) {
+		QDirIterator it(QString(userThemeDir), QStringList() << "*.qss",
+				QDir::Files);
+		while (it.hasNext()) {
+			it.next();
+			QString name = it.fileName().section(".", 0, 0);
+			ui->themeComboBox->addItem(name);
+			uniqueSet.insert(name);
+		}
+	}
+
+	QString defaultTheme;
+	defaultTheme += DEFAULT_THEME;
+	defaultTheme += " ";
+	defaultTheme += QTStr("Default");
+
+	/* Check shipped themes. */
+	QDirIterator uIt(QString(themeDir.c_str()), QStringList() << "*.qss",
+			 QDir::Files);
+	while (uIt.hasNext()) {
+		uIt.next();
+		QString name = uIt.fileName().section(".", 0, 0);
+
+		if (name == DEFAULT_THEME)
+			name = defaultTheme;
+
+		if (!uniqueSet.contains(name) && name != "Default")
+			ui->themeComboBox->addItem(name);
+	}
+
+	std::string themeName = App()->GetTheme();
+
+	if (themeName == DEFAULT_THEME)
+		themeName = QT_TO_UTF8(defaultTheme);
+
+	int idx = ui->themeComboBox->findText(themeName.c_str());
+	if (idx != -1)
+		ui->themeComboBox->setCurrentIndex(idx);
+}

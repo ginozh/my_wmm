@@ -161,11 +161,19 @@ public:
                 QWidget *vVolumeWidgets;
                 QHBoxLayout *vVolControlLayout;
             //QWidget *hMixerScrollArea;// hMixerScrollArea;
-            RecordButton *recordButton; // recordButton;
-            //QPushButton *recordButton; // recordButton;
-            //QHBoxLayout *recordingLayout;
-            QLabel *recordTime; // recordTime
-            // NullWidget;
+            QHBoxLayout *recordHLayout;
+                // NullWidget;
+                RecordButton *recordButton; // QPushButton *recordButton;
+                // NullWidget;
+            QHBoxLayout *recordTimeHLayout;
+                // NullWidget;
+                QLabel *recordTime; // recordTime
+                // NullWidget;
+            QHBoxLayout* settingHLayout;
+                QLabel *languageLabel;
+                QComboBox *languageComboBox;
+                QLabel *themeLabel;
+                QComboBox *themeComboBox;
         QVBoxLayout *rightVerticalLayout;
             QGroupBox* captureSettingGBox;
                  QVBoxLayout *captureSettingVLayout;
@@ -177,7 +185,7 @@ public:
                         QLabel* resolutionLabel;
                         QComboBox* resolutionComboBox;
                     QVBoxLayout* fpsVLayout;
-                        QLabel* fpsLabel;
+                        QLabel* fpsType;
                         QComboBox* fpsCommon;
                  QVBoxLayout *acdVLayout;
                      QLabel* acdLabel;

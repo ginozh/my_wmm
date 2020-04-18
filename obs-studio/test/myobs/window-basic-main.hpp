@@ -672,6 +672,8 @@ private slots:
 	void UpdateRecordTime(); // storm refreshTimer
 	void on_simpleOutputBrowse_clicked(); // with setObjectName
 	void on_viewfileButton_clicked();
+	void on_languageComboBox_currentIndexChanged(int);
+	void on_themeComboBox_currentIndexChanged(int);
 private:
 	/* OBS Callbacks */
 	static void SceneReordered(void *data, calldata_t *params);
@@ -995,6 +997,8 @@ private:
 	static void UpdateVideoProperties(void *data, calldata_t *params); //storm
 	static void UpdateAudioProperties(void *data, calldata_t *params);
     void SetControlProperties(); //storm
+	void LoadLanguageList(); //storm
+	void LoadThemeList(); //storm
 public:
 	using properties_delete_t = decltype(&obs_properties_destroy);
 	using properties_t =
