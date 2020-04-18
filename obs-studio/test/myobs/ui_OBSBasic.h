@@ -163,7 +163,7 @@ public:
             //QWidget *hMixerScrollArea;// hMixerScrollArea;
             RecordButton *recordButton; // recordButton;
             //QPushButton *recordButton; // recordButton;
-            QHBoxLayout *recordingLayout;
+            //QHBoxLayout *recordingLayout;
             QLabel *recordTime; // recordTime
             // NullWidget;
         QVBoxLayout *rightVerticalLayout;
@@ -171,8 +171,8 @@ public:
                  QVBoxLayout *captureSettingVLayout;
                  QLabel* vcdLabel;
                  QComboBox* vcdComboBox;
-                 QVBoxLayout *vcdSettingVLayout;
-                    QVBoxLayout* vcdDeviceVLayout;
+                 QHBoxLayout *vcdSettingHLayout;
+                    // QVBoxLayout* vcdDeviceVLayout;
                     QVBoxLayout* resolutionVLayout;
                         QLabel* resolutionLabel;
                         QComboBox* resolutionComboBox;
@@ -190,10 +190,11 @@ public:
                      QPushButton *simpleOutputBrowse;// browseButton;
                  QPushButton *viewfileButton;
 #endif
-
+#if 0
     QWidget *previewDisabledWidget;
     QPushButton *enablePreviewButton;
     QHBoxLayout *previewLayout;
+#endif
     SceneTree *scenes;
     SourceTree *sources;
     QComboBox *transitions;

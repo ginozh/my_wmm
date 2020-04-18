@@ -1367,12 +1367,12 @@ void OBSBasic::SetPreviewProgramMode(bool enabled)
 		programLabel->setHidden(!labels);
 
 		programWidget->setLayout(programLayout);
-
+#if 0
 		ui->previewLayout->addWidget(programOptions);
 		ui->previewLayout->addWidget(programWidget);
 		ui->previewLayout->setAlignment(programOptions,
 						Qt::AlignCenter);
-
+#endif
 		if (api)
 			api->on_event(OBS_FRONTEND_EVENT_STUDIO_MODE_ENABLED);
 

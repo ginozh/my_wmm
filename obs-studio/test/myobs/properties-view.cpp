@@ -20,6 +20,7 @@
 #include <QStackedWidget>
 #include <QDir>
 #include <QGroupBox>
+#include <QMap> // storm
 #include <QRegExp> //storm
 #include "double-slider.hpp"
 #include "slider-ignorewheel.hpp"
@@ -34,7 +35,6 @@
 #include <initializer_list>
 #include <string>
 using namespace std;
-
 static inline QColor color_from_int(long long val)
 {
 	return QColor(val & 0xff, (val >> 8) & 0xff, (val >> 16) & 0xff,
@@ -173,7 +173,7 @@ void OBSPropertiesView::GetScrollPos(int &h, int &v)
 OBSPropertiesView::OBSPropertiesView(OBSData settings_, void *obj_,
 				     PropertiesReloadCallback reloadCallback,
 				     PropertiesUpdateCallback callback_,
-				     int minSize_, OBSBasic* maindialog)
+				     int minSize_, OBSBasic* maindialog, bool tmpbvideosource)
 	: VScrollArea(nullptr),
 	  properties(nullptr, obs_properties_destroy),
 	  settings(settings_),
@@ -181,23 +181,25 @@ OBSPropertiesView::OBSPropertiesView(OBSData settings_, void *obj_,
 	  reloadCallback(reloadCallback),
 	  callback(callback_),
 	  minSize(minSize_)
+      , bVideoSource(tmpbvideosource) // storm
+    , mainBasic(maindialog)
 {
-    mainBasic=maindialog; //storm
 	setFrameShape(QFrame::NoFrame);
 	ReloadProperties();
 }
 
 OBSPropertiesView::OBSPropertiesView(OBSData settings_, const char *type_,
 				     PropertiesReloadCallback reloadCallback_,
-				     int minSize_, OBSBasic* maindialog)
+				     int minSize_, OBSBasic* maindialog, bool tmpbvideosource )
 	: VScrollArea(nullptr),
 	  properties(nullptr, obs_properties_destroy),
 	  settings(settings_),
 	  type(type_),
 	  reloadCallback(reloadCallback_),
 	  minSize(minSize_)
+      , bVideoSource(tmpbvideosource) // storm
+    , mainBasic(maindialog)
 {
-    mainBasic=maindialog; //storm
 	setFrameShape(QFrame::NoFrame);
 	ReloadProperties();
 }
@@ -441,6 +443,8 @@ static void AddComboItem(QComboBox *combo, obs_property_t *prop,
 		var = QByteArray(obs_property_list_item_string(prop, idx));
 	}
 
+	// if(combo->findText(QT_UTF8(name))>=0)
+    //    return; // storm
 	combo->addItem(QT_UTF8(name), var);
 
 	if (!obs_property_list_item_disabled(prop, idx))
@@ -496,7 +500,20 @@ static string from_obs_data_autoselect(obs_data_t *data, const char *name,
 QWidget *OBSPropertiesView::AddList(obs_property_t *prop, bool &warning)
 {
 	const char *name = obs_property_name(prop);
-	QComboBox *combo = new ComboBoxIgnoreScroll();
+	QComboBox *combo; // storm
+    if (mainBasic && bVideoSource && mainBasic->mapVideoPropertyComboBox.contains(name)>0)
+    {
+        combo = mainBasic->mapVideoPropertyComboBox[name];
+    }
+    else if (mainBasic && !bVideoSource && mainBasic->mapAudioPropertyComboBox.contains(name)>0)
+    {
+        combo = mainBasic->mapAudioPropertyComboBox[name];
+    }
+    else
+    {
+        combo = new ComboBoxIgnoreScroll(); // storm
+    }
+    combo->clear(); //storm
 	obs_combo_type type = obs_property_list_type(prop);
 	obs_combo_format format = obs_property_list_format(prop);
 	size_t count = obs_property_list_item_count(prop);
@@ -524,8 +541,10 @@ QWidget *OBSPropertiesView::AddList(obs_property_t *prop, bool &warning)
 		return NewWidget(prop, combo,
 				 SIGNAL(editTextChanged(const QString &)));
 
-	if (idx != -1)
-		combo->setCurrentIndex(idx);
+	if (idx != -1) 
+    {
+        combo->setCurrentIndex(idx);
+    }
 
 	if (obs_data_has_autoselect_value(settings, name)) {
 		string autoselect =
@@ -554,6 +573,11 @@ QWidget *OBSPropertiesView::AddList(obs_property_t *prop, bool &warning)
 	/* trigger a settings update if the index was not found */
 	if (idx == -1)
 		info->ControlChanged();
+    else if(bFirstSet && value.length()==0 && count>=2)
+    {
+        combo->setCurrentIndex(1); // storm
+        bFirstSet=false;
+    }
 
 	return combo;
 }
@@ -1376,6 +1400,11 @@ void OBSPropertiesView::AddProperty(obs_property_t *property,
 	QLabel *label = nullptr;
 	QWidget *widget = nullptr;
 	bool warning = false;
+    bool bnewwidget = true; // storm
+    if (mainBasic && ( ( bVideoSource && mainBasic->mapVideoPropertyComboBox.contains(name)>0) || ( !bVideoSource && mainBasic->mapAudioPropertyComboBox.contains(name)>0) ) ) 
+    {
+        bnewwidget = false;
+    }
 
 	switch (type) {
 	case OBS_PROPERTY_INVALID:
@@ -1423,7 +1452,8 @@ void OBSPropertiesView::AddProperty(obs_property_t *property,
 
 	if (!label && type != OBS_PROPERTY_BOOL &&
 	    type != OBS_PROPERTY_BUTTON && type != OBS_PROPERTY_GROUP){
-		// label = new QLabel(QT_UTF8(obs_property_description(property))); // storm
+        if(bnewwidget) // storm
+            label = new QLabel(QT_UTF8(obs_property_description(property))); // storm
     }
 	if (warning && label) //TODO: select color based on background color
 		label->setStyleSheet("QLabel { color: red; }");
@@ -1468,8 +1498,10 @@ void OBSPropertiesView::AddProperty(obs_property_t *property,
 		}
 	}
 
-	//layout->addRow(label, widget);
-	layout->addRow(widget); //storm
+    if (bnewwidget)
+    {
+        layout->addRow(label, widget); //  storm
+    }
 	if (!lastFocused.empty())
 		if (lastFocused.compare(name) == 0)
 			lastWidget = widget;

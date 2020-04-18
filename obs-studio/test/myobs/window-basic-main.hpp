@@ -996,8 +996,14 @@ private:
 	static void UpdateAudioProperties(void *data, calldata_t *params);
     void SetControlProperties(); //storm
 public:
+	using properties_delete_t = decltype(&obs_properties_destroy);
+	using properties_t =
+		std::unique_ptr<obs_properties_t, properties_delete_t>;
     // video
     OBSSource videosource; //storm
+    QMap<QString, QComboBox*> mapVideoPropertyComboBox;
+	properties_t videoproperties;
+	bool videodeferUpdate;
 	OBSSignal videoremovedSignal;
 	OBSSignal videorenamedSignal;
 	OBSSignal videoupdatePropertiesSignal;
@@ -1005,13 +1011,15 @@ public:
 	OBSPropertiesView *videoview;
     //audio
     OBSSource audiosource;
+    QMap<QString, QComboBox*> mapAudioPropertyComboBox;
+	properties_t audioproperties;
 	OBSSignal audioremovedSignal;
 	OBSSignal audiorenamedSignal;
 	OBSSignal audioupdatePropertiesSignal;
 	OBSData audiooldSettings;
 	OBSPropertiesView *audioview;
 
-	QLabel *recordTime;
+	// QLabel *recordTime;
 	QPointer<QTimer> refreshTimer;
 	bool active = false;
 	int totalRecordSeconds = 0;
@@ -1019,10 +1027,12 @@ public:
 public:
     QPushButton *createButton(const QString &text, const char *member);
     QComboBox *createComboBox(const QString &text);
+    // QWidget *AddList(obs_property_t *prop, QComboBox *combo, bool &warning);
 public slots:
     void browse();
     void opendir();
     void changeFPS();
+	// void ControlChanged();
 
 private:
 	std::unique_ptr<Ui::OBSBasic> ui;

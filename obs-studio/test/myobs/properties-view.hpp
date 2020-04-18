@@ -4,14 +4,13 @@
 #include <obs.hpp>
 #include <vector>
 #include <memory>
-
+class QComboBox; // storm
 class QFormLayout;
 class OBSPropertiesView;
 class QLabel;
 class OBSBasic;
 typedef obs_properties_t *(*PropertiesReloadCallback)(void *obj);
 typedef void (*PropertiesUpdateCallback)(void *obj, obs_data_t *settings);
-
 /* ------------------------------------------------------------------------- */
 
 class WidgetInfo : public QObject {
@@ -127,10 +126,10 @@ signals:
 public:
 	OBSPropertiesView(OBSData settings, void *obj,
 			  PropertiesReloadCallback reloadCallback,
-			  PropertiesUpdateCallback callback, int minSize = 0, OBSBasic* maindialog=nullptr); //storm
+			  PropertiesUpdateCallback callback, int minSize = 0, OBSBasic* maindialog=nullptr, bool tmpbvideosource=true ); //storm
 	OBSPropertiesView(OBSData settings, const char *type,
 			  PropertiesReloadCallback reloadCallback,
-			  int minSize = 0, OBSBasic* maindialog=nullptr); //storm
+			  int minSize = 0, OBSBasic* maindialog=nullptr, bool tmpbvideosource=true ); //storm
 
 	inline obs_data_t *GetSettings() const { return settings; }
 
@@ -138,4 +137,6 @@ public:
 	inline bool DeferUpdate() const { return deferUpdate; }
 private:
     OBSBasic* mainBasic=nullptr; //storm
+    bool bVideoSource=true;
+    bool bFirstSet=true;
 };

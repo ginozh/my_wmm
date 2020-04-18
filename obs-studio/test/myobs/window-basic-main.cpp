@@ -31,6 +31,8 @@
 #include <QScrollBar>
 #include <QTextStream>
 #include <QProcess>
+#include <QStandardItemModel>
+#include <QStandardItem>
 #include <util/dstr.h>
 #include <util/util.hpp>
 #include <util/platform.h>
@@ -190,6 +192,8 @@ extern void RegisterRestreamAuth();
 
 OBSBasic::OBSBasic(QWidget *parent)
 	: OBSMainWindow(parent), ui(new Ui::OBSBasic)
+	  , videoproperties(nullptr, obs_properties_destroy)
+	  , audioproperties(nullptr, obs_properties_destroy)
 {
 	qRegisterMetaTypeStreamOperators<SignalContainer<OBSScene>>(
 		"SignalContainer<OBSScene>");
@@ -215,7 +219,7 @@ OBSBasic::OBSBasic(QWidget *parent)
 	api = InitializeAPIInterface(this);
 
 	ui->setupUi(this);
-	ui->previewDisabledWidget->setVisible(false);
+	//ui->previewDisabledWidget->setVisible(false);
 
 	// startingDockLayout = saveState();
 #if 0
@@ -395,13 +399,13 @@ OBSBasic::OBSBasic(QWidget *parent)
 		ui->previewLabel->setHidden(true);
 	else
 		ui->previewLabel->setHidden(!labels);
-#endif
 	ui->previewDisabledWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui->previewDisabledWidget,
 		SIGNAL(customContextMenuRequested(const QPoint &)), this,
 		SLOT(PreviewDisabledMenu(const QPoint &)));
 	connect(ui->enablePreviewButton, SIGNAL(clicked()), this,
 		SLOT(TogglePreview()));
+#endif
 
 	connect(ui->scenes->model(),
 		SIGNAL(rowsMoved(QModelIndex, int, int, QModelIndex, int)),
@@ -3532,7 +3536,7 @@ void OBSBasic::RenderMain(void *data, uint32_t cx, uint32_t cy)
 	gs_ortho(-window->previewX, right, -window->previewY, bottom, -100.0f,
 		 100.0f);
 
-	window->ui->preview->DrawOverflow();
+	// window->ui->preview->DrawOverflow(); // storm
 
 	/* --------------------------------------- */
 
@@ -3560,7 +3564,7 @@ void OBSBasic::RenderMain(void *data, uint32_t cx, uint32_t cy)
 		 100.0f);
 	gs_reset_viewport();
 
-	window->ui->preview->DrawSceneEditing();
+	// window->ui->preview->DrawSceneEditing(); // tmp
 
 	/* --------------------------------------- */
 
@@ -3663,12 +3667,11 @@ void OBSBasic::ResetUI()
 
 	bool labels = config_get_bool(GetGlobalConfig(), "BasicWindow",
 				      "StudioModeLabels");
-
+#if 0
 	if (studioPortraitLayout)
 		ui->previewLayout->setDirection(QBoxLayout::TopToBottom);
 	else
 		ui->previewLayout->setDirection(QBoxLayout::LeftToRight);
-#if 0
 	if (previewProgramMode)
 		ui->previewLabel->setHidden(!labels);
 #endif
@@ -5700,7 +5703,7 @@ void OBSBasic::RecordingStop(int code, QString last_error)
 {
 	// ui->statusbar->RecordingStopped();
     {
-        recordTime->setText(QString("REC: 00:00:00"));
+        ui->recordTime->setText(QString("REC: 00:00:00"));
         totalRecordSeconds = 0;
         if (!outputHandler || !outputHandler->Active()) {
             if(refreshTimer)
@@ -6620,7 +6623,7 @@ void OBSBasic::EnablePreviewDisplay(bool enable)
 {
 	obs_display_set_enabled(ui->preview->GetDisplay(), enable);
 	ui->preview->setVisible(enable);
-	ui->previewDisabledWidget->setVisible(!enable);
+	//ui->previewDisabledWidget->setVisible(!enable);
 }
 
 void OBSBasic::TogglePreview()
@@ -7851,7 +7854,7 @@ void OBSBasic::UpdatePause(bool activate)
 				   QVariant(QStringLiteral("pauseIconSmall")));
 		connect(pause.data(), &QAbstractButton::clicked, this,
 			&OBSBasic::PauseToggled);
-		ui->recordingLayout->addWidget(pause.data());
+		// ui->recordingLayout->addWidget(pause.data());
 	} else {
 		pause.reset();
 	}
@@ -7985,8 +7988,48 @@ void OBSBasic::on_customContextMenuRequested(const QPoint &pos)
 
 void OBSBasic::UpdateVideoProperties(void *data, calldata_t *)
 {
+#if 1
 	QMetaObject::invokeMethod(static_cast<OBSBasic *>(data)->videoview,
 				  "ReloadProperties");
+#else
+    OBSBasic* mainBasic = static_cast<OBSBasic *>(data);
+    mainBasic->videoproperties.reset(obs_source_properties(mainBasic->videosource));
+	uint32_t flags = obs_properties_get_flags(mainBasic->videoproperties.get());
+	mainBasic->videodeferUpdate = (flags & OBS_PROPERTIES_DEFER_UPDATE) != 0;
+	obs_property_t *property = obs_properties_first(mainBasic->videoproperties.get());
+	bool hasNoProperties = !property;
+	while (property) {
+		//AddProperty(property, layout);
+        {
+        const char *name = obs_property_name(property);
+        obs_property_type type = obs_property_get_type(property);
+        if (obs_property_visible(property))
+        {
+            switch (type) {
+            case OBS_PROPERTY_LIST:
+                const char *name = obs_property_name(property);
+                if(astrcmpi(name, "device")==0)
+                {
+                // widget = AddList(property, mainBasic->ui->vcdComboBox, warning);
+                    connect(combo, SIGNAL(currentIndexChanged(int)), info,
+                            SLOT(ControlChanged()));
+                }
+                else(astrcmpi(name, "use_preset")==0)
+                {
+                // widget = AddList(property, mainBasic->ui->resolutionComboBox, warning);
+                }
+                break;
+            default:
+                break;
+            }
+            if (widget && !obs_property_enabled(property))
+                widget->setEnabled(false);
+        }
+        }
+		obs_property_next(&property);
+	}
+	// emit PropertiesRefreshed();
+#endif
 }
 
 void OBSBasic::UpdateAudioProperties(void *data, calldata_t *)
@@ -8114,24 +8157,38 @@ void OBSBasic::SetControlProperties() // storm
 	obs_data_apply(audiooldSettings, audiosettings);
 	obs_data_release(audiosettings);
 
+#if 1
+#if 1
+    mapVideoPropertyComboBox.insert("device", ui->vcdComboBox);
+    mapVideoPropertyComboBox.insert("device_id", ui->vcdComboBox);
+    mapVideoPropertyComboBox.insert("preset", ui->resolutionComboBox);
+#endif
 	videoview = new OBSPropertiesView(
 		videosettings, videosource,
 		(PropertiesReloadCallback)obs_source_properties,
-		(PropertiesUpdateCallback)obs_source_update, 0, this);
-	videoview->setMinimumHeight(150);
+		(PropertiesUpdateCallback)obs_source_update, 0, this, true);
+	// videoview->setMinimumHeight(30);
 
+#if 1
+    mapAudioPropertyComboBox.insert("device", ui->acdComboBox);
+    mapAudioPropertyComboBox.insert("device_id", ui->acdComboBox);
+#endif
 	audioview = new OBSPropertiesView(
 		audiosettings, audiosource,
 		(PropertiesReloadCallback)obs_source_properties,
-		(PropertiesUpdateCallback)obs_source_update, 0, this);
-	audioview->setMinimumHeight(150);
+		(PropertiesUpdateCallback)obs_source_update, 0, this, false);
+	// audioview->setMinimumHeight(30);
 
     //ui->verticalLayout->addWidget(videoview);
 	//ui->verticalLayout->addWidget(audioview);
+#if 0
     ui->vcdDeviceVLayout->addWidget(videoview); // storm
 	ui->acdVLayout->addWidget(audioview); // storm
 	videoview->show();
 	audioview->show();
+#endif
+
+#endif
 	obs_source_inc_showing(videosource);
 	obs_source_inc_showing(audiosource);
 
@@ -8143,7 +8200,7 @@ void OBSBasic::SetControlProperties() // storm
 				       "update_properties",
 				       OBSBasic::UpdateAudioProperties,
 				       this);
-
+    // 1, source properties
 
     //2. video setting properties
 	const char *val =
@@ -8151,7 +8208,7 @@ void OBSBasic::SetControlProperties() // storm
 
 	int idxFPS = ui->fpsCommon->findText(val);
 	if (idxFPS == -1)
-		idxFPS = 4;
+		idxFPS = 3;
 	ui->fpsCommon->setCurrentIndex(idxFPS);
 
     // 3, outputpath
@@ -8180,8 +8237,8 @@ void OBSBasic::UpdateRecordTime()
 					 seconds);
 	}
 
-	recordTime->setText(text);
-	recordTime->setMinimumWidth(recordTime->width());
+	ui->recordTime->setText(text);
+	// ui->recordTime->setMinimumWidth(ui->recordTime->width());
 }
 
 void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
@@ -8195,12 +8252,13 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
     sizePolicy.setHeightForWidth(OBSBasic->sizePolicy().hasHeightForWidth());
     OBSBasic->setSizePolicy(sizePolicy);
     OBSBasic->setMinimumSize(QSize(0, 0));
-    QIcon icon;
-    icon.addFile(QString::fromUtf8(":/res/images/obs.png"), QSize(), QIcon::Normal, QIcon::Off);
-    OBSBasic->setWindowIcon(icon);
+    //QIcon icon;
+    //icon.addFile(QString::fromUtf8(":/res/images/obs.png"), QSize(), QIcon::Normal, QIcon::Off);
+    //OBSBasic->setWindowIcon(icon);
     OBSBasic->setStyleSheet(QString::fromUtf8(""));
     // OBSBasic->setDockOptions(QMainWindow::AllowNestedDocks|QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks);
     // new layout
+#if 0
     previewDisabledWidget = new QWidget();
     previewDisabledWidget->setObjectName(QString::fromUtf8("previewDisabledWidget"));
     enablePreviewButton = new QPushButton(previewDisabledWidget);
@@ -8209,11 +8267,11 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
     previewLayout->setSpacing(2);
     previewLayout->setObjectName(QString::fromUtf8("previewLayout"));
     previewLayout->addWidget(previewDisabledWidget);
-
     recordingLayout = new QHBoxLayout();
     recordingLayout->setSpacing(2);
     recordingLayout->setObjectName(QString::fromUtf8("recordingLayout"));
     recordingLayout->setContentsMargins(0, 0, 0, 0);
+#endif
 
     scenes = new SceneTree();
     scenes->setObjectName(QString::fromUtf8("scenes"));
@@ -8244,7 +8302,7 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
             preview->setObjectName(QString::fromUtf8("preview"));
             sizePolicy1.setHeightForWidth(preview->sizePolicy().hasHeightForWidth());
             preview->setSizePolicy(sizePolicy1);
-            preview->setMinimumSize(QSize(32, 32));
+            preview->setMinimumSize(QSize(640, 360));
             preview->setFocusPolicy(Qt::ClickFocus);
             preview->setContextMenuPolicy(Qt::CustomContextMenu);
         // hMixerScrollArea = new QWidget();
@@ -8306,14 +8364,14 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
             recordButton->setMinimumSize(QSize(130, 0));
             recordButton->setCheckable(true);
         //recordTime = new QLabel(tr("recordTime"));
-        OBSBasic->recordTime = new QLabel();
+        recordTime = new QLabel();
         //leftVerticalLayout->addWidget(recordTime);
-        leftVerticalLayout->addWidget(OBSBasic->recordTime);
-            OBSBasic->recordTime->setText(QString("REC: 00:00:00"));
+        leftVerticalLayout->addWidget(recordTime);
+            recordTime->setText(QString("REC: 00:00:00"));
             //verticalLayout->addWidget(OBSBasic->recordTime);
-            OBSBasic->recordTime->setAlignment(Qt::AlignRight);
-            OBSBasic->recordTime->setAlignment(Qt::AlignVCenter);
-            OBSBasic->recordTime->setIndent(20);
+            recordTime->setAlignment(Qt::AlignHCenter);
+            recordTime->setAlignment(Qt::AlignVCenter);
+            //recordTime->setIndent(20);
     rightVerticalLayout = new QVBoxLayout();
     centralHorizontalLayout->addLayout(rightVerticalLayout);
         captureSettingGBox = new QGroupBox(QTStr("Capture settings"));
@@ -8322,24 +8380,29 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
             captureSettingGBox->setLayout(captureSettingVLayout);
                 vcdLabel = new QLabel(QTStr("Video capture device:"));
                 captureSettingVLayout->addWidget(vcdLabel);
-                vcdSettingVLayout = new QVBoxLayout;
-                captureSettingVLayout->addLayout(vcdSettingVLayout);
-                    vcdDeviceVLayout = new QVBoxLayout;
-                    vcdSettingVLayout->addLayout(vcdDeviceVLayout);
+                vcdComboBox = new QComboBox;
+                captureSettingVLayout->addWidget(vcdComboBox);
+
+                vcdSettingHLayout = new QHBoxLayout;
+                captureSettingVLayout->addLayout(vcdSettingHLayout);
 #if 0
+                    vcdDeviceVLayout = new QVBoxLayout;
+                    captureSettingVLayout->addLayout(vcdDeviceVLayout);
+#endif
+#if 1
                     resolutionVLayout = new QVBoxLayout;
-                    vcdSettingVLayout->addLayout(resolutionVLayout);
+                    vcdSettingHLayout->addLayout(resolutionVLayout);
                         resolutionLabel = new QLabel(QTStr("Resolution:"));
                         resolutionVLayout->addWidget(resolutionLabel);
                         resolutionComboBox = new QComboBox;
                         resolutionVLayout->addWidget(resolutionComboBox);
 #endif
                     fpsVLayout = new QVBoxLayout;
-                    vcdSettingVLayout->addLayout(fpsVLayout);
+                    vcdSettingHLayout->addLayout(fpsVLayout);
                         fpsLabel = new QLabel(QTStr("Frame rate: "));
-                        //fpsVLayout->addWidget(fpsLabel); //tmp storm
+                        fpsVLayout->addWidget(fpsLabel); //tmp storm
                         fpsCommon = new QComboBox;
-                        //fpsVLayout->addWidget(fpsCommon);
+                        fpsVLayout->addWidget(fpsCommon);
                             fpsCommon->addItem(QString::fromUtf8("10"));
                             fpsCommon->addItem(QString::fromUtf8("20"));
                             // fpsCommon->addItem(QString());
@@ -8357,8 +8420,8 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
                 captureSettingVLayout->addLayout(acdVLayout);
                     acdLabel = new QLabel(QTStr("Audio capture device: "));
                     acdVLayout->addWidget(acdLabel);
-                    //acdComboBox = new QComboBox;
-                    //captureSettingVLayout->addWidget(acdComboBox);
+                    acdComboBox = new QComboBox;
+                    acdVLayout->addWidget(acdComboBox);
         saveSettingGBox = new QGroupBox(QTStr("Saving Captured Files"));
         rightVerticalLayout->addWidget(saveSettingGBox);
             saveSettingVLayout = new QVBoxLayout;
@@ -8384,8 +8447,12 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
                 viewfileButton = new QPushButton(QTStr("View record files"));
                 saveSettingVLayout->addWidget(viewfileButton);
                 viewfileButton->setObjectName(QString::fromUtf8("viewfileButton"));
+        QWidget* nullWidget = new QWidget;
+        nullWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Expanding);
+        rightVerticalLayout->addWidget(nullWidget);
 	OBSBasic->setLayout(centralHorizontalLayout);
 #endif
+    // end new layout
 #if 0
     // old layout
 #if 0
@@ -9360,7 +9427,7 @@ void Ui_OBSBasic::retranslateUi(OBSBasic *OBSBasic)
     toggleSourceIcons->setText(QCoreApplication::translate("OBSBasic", "Basic.MainMenu.View.SourceIcons", nullptr));
 #endif
     //label->setText(QCoreApplication::translate("OBSBasic", "Basic.Main.PreviewDisabled", nullptr));
-    enablePreviewButton->setText(QCoreApplication::translate("OBSBasic", "Basic.Main.PreviewConextMenu.Enable", nullptr));
+    // enablePreviewButton->setText(QCoreApplication::translate("OBSBasic", "Basic.Main.PreviewConextMenu.Enable", nullptr));
 #if 0
     // previewLabel->setText(QCoreApplication::translate("OBSBasic", "StudioMode.Preview", nullptr));
     menu_File->setTitle(QCoreApplication::translate("OBSBasic", "Basic.MainMenu.File", nullptr));
@@ -9531,3 +9598,169 @@ void OBSBasic::on_viewfileButton_clicked()
 #endif
 }
 
+#if 0
+static void AddComboItem(QComboBox *combo, obs_property_t *prop,
+			 obs_combo_format format, size_t idx)
+{
+	const char *name = obs_property_list_item_name(prop, idx);
+	QVariant var;
+
+	if (format == OBS_COMBO_FORMAT_INT) {
+		long long val = obs_property_list_item_int(prop, idx);
+		var = QVariant::fromValue<long long>(val);
+
+	} else if (format == OBS_COMBO_FORMAT_FLOAT) {
+		double val = obs_property_list_item_float(prop, idx);
+		var = QVariant::fromValue<double>(val);
+
+	} else if (format == OBS_COMBO_FORMAT_STRING) {
+		var = QByteArray(obs_property_list_item_string(prop, idx));
+	}
+
+	combo->addItem(QT_UTF8(name), var);
+
+	if (!obs_property_list_item_disabled(prop, idx))
+		return;
+
+	int index = combo->findText(QT_UTF8(name));
+	if (index < 0)
+		return;
+
+	QStandardItemModel *model =
+		dynamic_cast<QStandardItemModel *>(combo->model());
+	if (!model)
+		return;
+
+	QStandardItem *item = model->item(index);
+	item->setFlags(Qt::NoItemFlags);
+}
+QWidget *OBSBasic::AddList(obs_property_t *prop, QComboBox *combo, bool &warning)
+{
+	const char *name = obs_property_name(prop);
+	// QComboBox *combo = new ComboBoxIgnoreScroll();
+	obs_combo_type type = obs_property_list_type(prop);
+	obs_combo_format format = obs_property_list_format(prop);
+	size_t count = obs_property_list_item_count(prop);
+	int idx = -1;
+
+	for (size_t i = 0; i < count; i++)
+		AddComboItem(combo, prop, format, i);
+
+	if (type == OBS_COMBO_TYPE_EDITABLE)
+		combo->setEditable(true);
+
+	combo->setMaxVisibleItems(40);
+	combo->setToolTip(QT_UTF8(obs_property_long_description(prop)));
+
+	string value = from_obs_data(settings, name, format);
+
+	if (format == OBS_COMBO_FORMAT_STRING &&
+	    type == OBS_COMBO_TYPE_EDITABLE) {
+		combo->lineEdit()->setText(QT_UTF8(value.c_str()));
+	} else {
+		idx = combo->findData(QByteArray(value.c_str()));
+	}
+
+	if (type == OBS_COMBO_TYPE_EDITABLE)
+		return NewWidget(prop, combo,
+				 SIGNAL(editTextChanged(const QString &)));
+
+	if (idx != -1)
+		combo->setCurrentIndex(idx);
+
+	if (obs_data_has_autoselect_value(settings, name)) {
+		string autoselect =
+			from_obs_data_autoselect(settings, name, format);
+		int id = combo->findData(QT_UTF8(autoselect.c_str()));
+
+		if (id != -1 && id != idx) {
+			QString actual = combo->itemText(id);
+			QString selected = combo->itemText(idx);
+			QString combined = QTStr(
+				"Basic.PropertiesWindow.AutoSelectFormat");
+			combo->setItemText(idx,
+					   combined.arg(selected).arg(actual));
+		}
+	}
+
+	QAbstractItemModel *model = combo->model();
+	warning = idx != -1 &&
+		  model->flags(model->index(idx, 0)) == Qt::NoItemFlags;
+#if 0
+	WidgetInfo *info = new WidgetInfo(this, prop, combo, mainBasic);
+	connect(combo, SIGNAL(currentIndexChanged(int)), info,
+		SLOT(ControlChanged()));
+	children.emplace_back(info);
+#else
+#endif
+	/* trigger a settings update if the index was not found */
+	if (idx == -1)
+		info->ControlChanged();
+
+	return combo;
+}
+void OBSBasic::ControlChanged()
+{
+	const char *setting = obs_property_name(property);
+	obs_property_type type = obs_property_get_type(property);
+
+	switch (type) {
+	case OBS_PROPERTY_LIST:
+		ListChanged(setting);
+		break;
+    default:
+        break;
+#if 0
+	case OBS_PROPERTY_INVALID:
+		return;
+	case OBS_PROPERTY_BOOL:
+		BoolChanged(setting);
+		break;
+	case OBS_PROPERTY_INT:
+		IntChanged(setting);
+		break;
+	case OBS_PROPERTY_FLOAT:
+		FloatChanged(setting);
+		break;
+	case OBS_PROPERTY_TEXT:
+		TextChanged(setting);
+		break;
+	case OBS_PROPERTY_BUTTON:
+		ButtonClicked();
+		return;
+	case OBS_PROPERTY_COLOR:
+		if (!ColorChanged(setting))
+			return;
+		break;
+	case OBS_PROPERTY_FONT:
+		if (!FontChanged(setting))
+			return;
+		break;
+	case OBS_PROPERTY_PATH:
+		if (!PathChanged(setting))
+			return;
+		break;
+	case OBS_PROPERTY_EDITABLE_LIST:
+		break;
+	case OBS_PROPERTY_FRAME_RATE:
+		if (!FrameRateChanged(widget, setting, view->settings))
+			return;
+		break;
+	case OBS_PROPERTY_GROUP:
+		GroupChanged(setting);
+		break;
+#endif
+	}
+
+	if (view->callback && !view->deferUpdate)
+		view->callback(view->obj, view->settings);
+
+	view->SignalChanged();
+
+	if (obs_property_modified(property, view->settings)) {
+		view->lastFocused = setting;
+		QMetaObject::invokeMethod(view, "RefreshProperties",
+					  Qt::QueuedConnection);
+	}
+}
+#endif
