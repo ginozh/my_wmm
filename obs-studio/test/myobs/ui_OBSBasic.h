@@ -179,7 +179,6 @@ public:
                  QVBoxLayout *captureSettingVLayout;
                  QLabel* vcdLabel;
                  QComboBox* vcdComboBox;
-#if 1
                  QHBoxLayout *vcdSettingHLayout;
                     // QVBoxLayout* vcdDeviceVLayout;
                     QVBoxLayout* resolutionVLayout;
@@ -188,12 +187,6 @@ public:
                     QVBoxLayout* fpsVLayout;
                         QLabel* fpsType;
                         QComboBox* fpsCommon;
-#else
-                    QLabel* resolutionLabel;
-                    QComboBox* resolutionComboBox;
-                    QLabel* fpsType;
-                    QComboBox* fpsCommon;
-#endif
                  QVBoxLayout *acdVLayout;
                      QLabel* acdLabel;
                      QComboBox* acdComboBox;
