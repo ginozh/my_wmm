@@ -2312,7 +2312,7 @@ void OBSBasic::ClearHotkeys()
 OBSBasic::~OBSBasic()
 {
 	/* clear out UI event queue */
-	QApplication::sendPostedEvents(App());
+	QApplication::sendPostedEvents(App()); //storm
 
 	if (updateCheckThread && updateCheckThread->isRunning())
 		updateCheckThread->wait();
@@ -2367,6 +2367,13 @@ OBSBasic::~OBSBasic()
 
 	if (about)
 		delete about;
+
+    // storm
+	if (videoview)
+		delete videoview;
+	if (audioview)
+		delete audioview;
+    // end storm
 
 	obs_display_remove_draw_callback(ui->preview->GetDisplay(),
 					 OBSBasic::RenderMain, this);
@@ -3980,7 +3987,8 @@ void OBSBasic::closeEvent(QCloseEvent *event)
 		}
 	}
 
-	QWidget::closeEvent(event);
+	//QWidget::closeEvent(event);
+	QDialog::closeEvent(event); //storm
 	if (!event->isAccepted())
 		return;
 
@@ -4600,6 +4608,8 @@ ColorSelect::ColorSelect(QWidget *parent)
 
 void OBSBasic::CreateSourcePopupMenu(int idx, bool preview)
 {
+#if 0
+    // remove menu // storm
 	QMenu popup(this);
 	delete previewProjectorSource;
 	delete sourceProjector;
@@ -4771,6 +4781,7 @@ void OBSBasic::CreateSourcePopupMenu(int idx, bool preview)
 	}
 
 	popup.exec(QCursor::pos());
+#endif
 }
 
 void OBSBasic::on_sources_customContextMenuRequested(const QPoint &pos)
@@ -4903,6 +4914,7 @@ void OBSBasic::AddSourceFromAction()
 
 void OBSBasic::AddSourcePopupMenu(const QPoint &pos)
 {
+#if 0
 	if (!GetCurrentScene()) {
 		// Tell the user he needs a scene first (help beginners).
 		OBSMessageBox::information(
@@ -4914,9 +4926,10 @@ void OBSBasic::AddSourcePopupMenu(const QPoint &pos)
 	QScopedPointer<QMenu> popup(CreateAddSourcePopupMenu());
 	if (popup)
 		popup->exec(pos);
+#endif
 }
 
-static void MyAddSource(void *_data, obs_scene_t *scene)
+static void MyAddSource(void *_data, obs_scene_t *scene) // storm
 {
 	AddSourceData *data = (AddSourceData *)_data;
 	obs_sceneitem_t *sceneitem;
@@ -8189,10 +8202,10 @@ void OBSBasic::SetControlProperties() // storm
     //ui->verticalLayout->addWidget(videoview);
 	//ui->verticalLayout->addWidget(audioview);
 #if 0
-    ui->vcdDeviceVLayout->addWidget(videoview); // storm
+    ui->captureSettingVLayout->addWidget(videoview); // storm
 	ui->acdVLayout->addWidget(audioview); // storm
-	videoview->show();
-	audioview->show();
+	//videoview->show();
+	//audioview->show();
 #endif
 
 #endif
@@ -8428,16 +8441,39 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
                 //vcdLabel = new QLabel(QTStr("Video capture device:"));
                 vcdLabel = new QLabel();
                 captureSettingVLayout->addWidget(vcdLabel);
+
                 vcdComboBox = new QComboBox;
                 captureSettingVLayout->addWidget(vcdComboBox);
+#if 0
 
+                resolutionLabel = new QLabel();
+                resolutionLabel->setObjectName(QString::fromUtf8("resolutionLabel"));
+                captureSettingVLayout->addWidget(resolutionLabel);
+                resolutionComboBox = new QComboBox;
+                captureSettingVLayout->addWidget(resolutionComboBox);
+
+                //fpsType = new QLabel(QTStr("Frame rate: "));
+                fpsType = new QLabel();
+                fpsType->setObjectName(QString::fromUtf8("fpsType"));
+                captureSettingVLayout->addWidget(fpsType);
+                fpsCommon = new QComboBox;
+                captureSettingVLayout->addWidget(fpsCommon);
+                    fpsCommon->addItem(QString::fromUtf8("10"));
+                    fpsCommon->addItem(QString::fromUtf8("20"));
+                    // fpsCommon->addItem(QString());
+                    // fpsCommon->addItem(QString());
+                    fpsCommon->addItem(QString::fromUtf8("29.97"));
+                    fpsCommon->addItem(QString::fromUtf8("30"));
+                    fpsCommon->addItem(QString::fromUtf8("48"));
+                    // fpsCommon->addItem(QString());
+                    fpsCommon->addItem(QString::fromUtf8("59.94"));
+                    fpsCommon->addItem(QString::fromUtf8("60"));
+                    fpsCommon->setObjectName(QString::fromUtf8("fpsCommon"));
+                    fpsCommon->setCurrentText(QString::fromUtf8("30"));
+                    OBSBasic->connect(fpsCommon, SIGNAL(currentIndexChanged(int)), OBSBasic, SLOT(changeFPS()));
+#else
                 vcdSettingHLayout = new QHBoxLayout;
                 captureSettingVLayout->addLayout(vcdSettingHLayout);
-#if 0
-                    vcdDeviceVLayout = new QVBoxLayout;
-                    captureSettingVLayout->addLayout(vcdDeviceVLayout);
-#endif
-#if 1
                     resolutionVLayout = new QVBoxLayout;
                     vcdSettingHLayout->addLayout(resolutionVLayout);
                         //resolutionLabel = new QLabel(QTStr("Resolution:"));
@@ -8446,7 +8482,6 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
                         resolutionVLayout->addWidget(resolutionLabel);
                         resolutionComboBox = new QComboBox;
                         resolutionVLayout->addWidget(resolutionComboBox);
-#endif
                     fpsVLayout = new QVBoxLayout;
                     vcdSettingHLayout->addLayout(fpsVLayout);
                         //fpsType = new QLabel(QTStr("Frame rate: "));
@@ -8468,6 +8503,7 @@ void Ui_OBSBasic::setupUi(OBSBasic *OBSBasic)
                             fpsCommon->setObjectName(QString::fromUtf8("fpsCommon"));
                             fpsCommon->setCurrentText(QString::fromUtf8("30"));
                             OBSBasic->connect(fpsCommon, SIGNAL(currentIndexChanged(int)), OBSBasic, SLOT(changeFPS()));
+#endif
                 acdVLayout = new QVBoxLayout;
                 captureSettingVLayout->addLayout(acdVLayout);
                     // acdLabel = new QLabel(QTStr("Audio capture device: "));

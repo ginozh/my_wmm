@@ -1012,7 +1012,7 @@ public:
 	OBSSignal videorenamedSignal;
 	OBSSignal videoupdatePropertiesSignal;
 	OBSData videooldSettings;
-	OBSPropertiesView *videoview;
+	OBSPropertiesView *videoview=nullptr;
     //audio
     OBSSource audiosource;
     QMap<QString, QComboBox*> mapAudioPropertyComboBox;
@@ -1021,7 +1021,7 @@ public:
 	OBSSignal audiorenamedSignal;
 	OBSSignal audioupdatePropertiesSignal;
 	OBSData audiooldSettings;
-	OBSPropertiesView *audioview;
+	OBSPropertiesView *audioview=nullptr;
 
 	// QLabel *recordTime;
 	QPointer<QTimer> refreshTimer;
