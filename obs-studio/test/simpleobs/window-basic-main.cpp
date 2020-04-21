@@ -408,12 +408,12 @@ OBSBasic::OBSBasic(QWidget *parent)
 	QPoint statsDockPos = curSize / 2 - statsDockSize / 2;
 	QPoint newPos = curPos + statsDockPos;
 	statsDock->move(newPos);
-#endif
+
 	// ui->previewLabel->setProperty("themeID", "previewProgramLabels");
 
 	bool labels = config_get_bool(GetGlobalConfig(), "BasicWindow",
 				      "StudioModeLabels");
-#if 0
+
 	if (!previewProgramMode)
 		ui->previewLabel->setHidden(true);
 	else
