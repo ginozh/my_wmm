@@ -377,7 +377,7 @@ void OBSBasic::ResetProfileData()
 	     device_name, device_id);
 #endif
 }
-
+#if 0
 void OBSBasic::on_actionNewProfile_triggered()
 {
 	AddProfile(true, Str("AddProfile.Title"), Str("AddProfile.Text"));
@@ -585,7 +585,7 @@ void OBSBasic::on_actionExportProfile_triggered()
 			    outputDir + "/recordEncoder.json");
 	}
 }
-
+#endif
 void OBSBasic::ChangeProfile()
 {
 	QAction *action = reinterpret_cast<QAction *>(sender());

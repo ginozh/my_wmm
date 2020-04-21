@@ -1,6 +1,18 @@
-﻿#include <QVBoxLayout>
+/***********************************************************************
+ * File : mainwindow.cpp
+ * Brief: 
+ * 
+ * History
+ * ---------------------------------------------------------------------
+ * 2020-04-22     storm   1.0    created
+ * 
+ ***********************************************************************
+ */
+
+#include <QVBoxLayout>
 #include <QLabel>
 #include <QWidget>
+#include <QDebug>
 #include <QPushButton>
 #include <QHBoxLayout>
 #include "mainwindow.h"
@@ -30,12 +42,23 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
                     recordDialog->setAttribute(Qt::WA_DeleteOnClose, true);
                     recordDialog->show();
 #endif
+#if 0
                     mainDialog = new OBSBasic();
 
                     mainDialog->setAttribute(Qt::WA_DeleteOnClose, true);
                     connect(mainDialog, SIGNAL(destroyed()), this, SLOT(quit()));
 
                     mainDialog->OBSInit();
+#endif
+#if 1
+                    OBSBasic mainDialog;
+
+                    mainDialog.exec();
+                    for (int i = 0; i < mainDialog.vsFilePaths.size(); ++i) {
+                        qDebug() << "file:  " << mainDialog.vsFilePaths[i];
+                    }
+#endif
+
                     });
         }
     }

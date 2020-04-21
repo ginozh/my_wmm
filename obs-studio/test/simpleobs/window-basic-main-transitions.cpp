@@ -439,13 +439,13 @@ OBSSource OBSBasic::GetCurrentTransition()
 {
 	return ui->transitions->currentData().value<OBSSource>();
 }
-
+#if 0
 void OBSBasic::on_transitions_currentIndexChanged(int)
 {
 	OBSSource transition = GetCurrentTransition();
 	SetTransition(transition);
 }
-
+#endif
 void OBSBasic::AddTransition()
 {
 	QAction *action = reinterpret_cast<QAction *>(sender());
@@ -504,7 +504,7 @@ void OBSBasic::AddTransition()
 	}
 #endif
 }
-
+#if 0
 void OBSBasic::on_transitionAdd_clicked()
 {
 	bool foundConfigurableTransitions = false;
@@ -560,7 +560,7 @@ void OBSBasic::on_transitionRemove_clicked()
 	ClearQuickTransitionWidgets();
 	RefreshQuickTransitions();
 }
-
+#endif
 void OBSBasic::RenameTransition()
 {
 	QAction *action = reinterpret_cast<QAction *>(sender());
@@ -610,7 +610,7 @@ void OBSBasic::RenameTransition()
 	}
 #endif
 }
-
+#if 0
 void OBSBasic::on_transitionProps_clicked()
 {
 	OBSSource source = GetCurrentTransition();
@@ -642,7 +642,7 @@ void OBSBasic::on_transitionDuration_valueChanged(int value)
 
 	UNUSED_PARAMETER(value);
 }
-
+#endif
 QuickTransition *OBSBasic::GetQuickTransition(int id)
 {
 	for (QuickTransition &qt : quickTransitions) {
@@ -722,8 +722,8 @@ void OBSBasic::CreateProgramDisplay()
 	program = new OBSQTDisplay();
 
 	program->setContextMenuPolicy(Qt::CustomContextMenu);
-	connect(program.data(), &QWidget::customContextMenuRequested, this,
-		&OBSBasic::on_program_customContextMenuRequested);
+//	connect(program.data(), &QWidget::customContextMenuRequested, this,
+//		&OBSBasic::on_program_customContextMenuRequested);
 
 	auto displayResize = [this]() {
 		struct obs_video_info ovi;
@@ -944,12 +944,12 @@ void OBSBasic::TBarChanged(int value)
 	obs_transition_set_manual_time(transition,
 				       (float)value / T_BAR_PRECISION_F);
 }
-
+#if 0
 void OBSBasic::on_modeSwitch_clicked()
 {
 	SetPreviewProgramMode(!IsPreviewProgramMode());
 }
-
+#endif
 static inline void ResetQuickTransitionText(QuickTransition *qt)
 {
 	qt->button->setText(MakeQuickTransitionText(qt));

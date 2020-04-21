@@ -24,8 +24,12 @@ public:
 #endif
 
 	virtual config_t *Config() const = 0;
-	virtual void OBSInit() = 0;
 
 	virtual int GetProfilePath(char *path, size_t size,
 				   const char *file) const = 0;
+#if 1
+    virtual void OBSInit() = 0;
+#endif
+public slots:
+	virtual int exec() =0;
 };

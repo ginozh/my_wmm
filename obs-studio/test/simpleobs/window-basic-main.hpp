@@ -618,9 +618,13 @@ private slots:
 
 	void MixerRenameSource();
 
-	void on_vMixerScrollArea_customContextMenuRequested();
 	void on_hMixerScrollArea_customContextMenuRequested();
+	void ColorChange();
 
+	SourceTreeItem *GetItemWidgetFromSceneItem(obs_sceneitem_t *sceneItem);
+
+#if 0
+	void on_vMixerScrollArea_customContextMenuRequested();
 	void on_actionCopySource_triggered();
 	void on_actionPasteRef_triggered();
 	void on_actionPasteDup_triggered();
@@ -628,12 +632,8 @@ private slots:
 	void on_actionCopyFilters_triggered();
 	void on_actionPasteFilters_triggered();
 
-	void ColorChange();
-
-	SourceTreeItem *GetItemWidgetFromSceneItem(obs_sceneitem_t *sceneItem);
-
-	//void on_actionShowAbout_triggered();
-
+	void on_actionShowAbout_triggered();
+#endif
 	void AudioMixerCopyFilters();
 	void AudioMixerPasteFilters();
 
@@ -821,16 +821,16 @@ protected:
 	virtual void changeEvent(QEvent *event) override;
 
 private slots:
+	void on_customContextMenuRequested(const QPoint &pos);
+#if 0
 	void on_actionFullscreenInterface_triggered();
 
 	void on_actionShow_Recordings_triggered();
-#if 0
 	void on_actionRemux_triggered();
 	void on_action_Settings_triggered();
 	void on_actionAdvAudioProperties_triggered();
 	void on_advAudioProps_clicked();
 	void on_advAudioProps_destroyed();
-#endif
 	void on_actionShowLogs_triggered();
 	void on_actionUploadCurrentLog_triggered();
 	void on_actionUploadLastLog_triggered();
@@ -854,7 +854,6 @@ private slots:
 	void on_actionVerticalCenter_triggered();
 	void on_actionHorizontalCenter_triggered();
 
-	void on_customContextMenuRequested(const QPoint &pos);
 
 	void on_scenes_currentItemChanged(QListWidgetItem *current,
 					  QListWidgetItem *prev);
@@ -884,19 +883,21 @@ private slots:
 	void on_actionScaleWindow_triggered();
 	void on_actionScaleCanvas_triggered();
 	void on_actionScaleOutput_triggered();
+#endif
 
 	//void on_streamButton_clicked();
 	void on_recordButton_clicked();
 	//void on_settingsButton_clicked();
-
+#if 0
 	void on_actionHelpPortal_triggered();
 	void on_actionWebsite_triggered();
 	void on_actionDiscord_triggered();
+#endif
 
 	void on_preview_customContextMenuRequested(const QPoint &pos);
-	void on_program_customContextMenuRequested(const QPoint &pos);
+	//void on_program_customContextMenuRequested(const QPoint &pos);
 	void PreviewDisabledMenu(const QPoint &pos);
-
+#if 0
 	void on_actionNewSceneCollection_triggered();
 	void on_actionDupSceneCollection_triggered();
 	void on_actionRenameSceneCollection_triggered();
@@ -919,7 +920,6 @@ private slots:
 	void on_toggleListboxToolbars_toggled(bool visible);
 	//void on_toggleStatusBar_toggled(bool visible);
 	void on_toggleSourceIcons_toggled(bool visible);
-
 	void on_transitions_currentIndexChanged(int index);
 	void on_transitionAdd_clicked();
 	void on_transitionRemove_clicked();
@@ -933,6 +933,7 @@ private slots:
 
 	void on_resetUI_triggered();
 	void on_lockUI_toggled(bool lock);
+#endif
 
 	void PauseToggled();
 
@@ -981,17 +982,18 @@ private slots:
 	void ResizeOutputSizeOfSource();
 
 public slots:
-	void on_actionResetTransform_triggered();
+	//void on_actionResetTransform_triggered();
 
 	//bool StreamingActive();
 	bool RecordingActive();
 	bool ReplayBufferActive();
+	int exec() override;
 
 public:
 	explicit OBSBasic(QWidget *parent = 0);
 	virtual ~OBSBasic();
 
-	virtual void OBSInit() override;
+    virtual void OBSInit() override;
 
 	virtual config_t *Config() const override;
 
