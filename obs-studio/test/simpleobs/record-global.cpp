@@ -16,7 +16,13 @@
 #include "util/platform.h"
 #include "util/dstr.h"
 #include "util/profiler.hpp"
+#ifdef TARGET_OS_MAC
 #include "moc_predefs.h"
+#else
+#define DL_D3D11 ""
+#define DL_D3D9 ""
+#define DL_OPENGL "libobs-opengl.so"
+#endif
 #include "qt-wrappers.hpp"
 #include "window-basic-main.hpp"
 

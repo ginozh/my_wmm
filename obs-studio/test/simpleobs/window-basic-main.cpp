@@ -40,7 +40,11 @@
 #include <util/platform.h>
 #include <util/profiler.hpp>
 #include <util/dstr.hpp>
+#ifdef TARGET_OS_MAC
 #include "moc_predefs.h" // storm
+#else
+#define DL_OPENGL "libobs-opengl.so"
+#endif
 //#include "obs-app.hpp"
 #include "record-global.hpp"
 #include "platform.hpp"
@@ -66,7 +70,7 @@
 #include <sstream>
 
 #ifdef _WIN32
-#include "win-update/win-update.hpp"
+//#include "win-update/win-update.hpp"
 #include "windows.h"
 #endif
 
@@ -79,9 +83,9 @@
 #include <QScreen>
 #include <QWindow>
 
-#include <json11.hpp>
+//#include <json11.hpp>
 
-using namespace json11;
+//using namespace json11;
 using namespace std;
 #if 0
 bool portable_mode = false;
@@ -3269,12 +3273,13 @@ void OBSBasic::CheckForUpdates(bool manualUpdate)
 	trigger_sparkle_update();
 #elif _WIN32
 	// ui->actionCheckForUpdates->setEnabled(false);
-
+#if 0
 	if (updateCheckThread && updateCheckThread->isRunning())
 		return;
 
 	updateCheckThread.reset(new AutoUpdateThread(manualUpdate));
 	updateCheckThread->start();
+#endif
 #endif
 
 	UNUSED_PARAMETER(manualUpdate);

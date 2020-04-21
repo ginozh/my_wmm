@@ -8,8 +8,8 @@ CONFIG += c++11
 INCLUDEPATH += .
 INCLUDEPATH += ./obs-frontend-api
 INCLUDEPATH += ../../libobs 
-INCLUDEPATH += ../../deps/libff
-INCLUDEPATH += ../../deps/json11
+#INCLUDEPATH += ../../deps/libff
+#INCLUDEPATH += ../../deps/json11
 INCLUDEPATH += /usr/local/include
 
 
@@ -32,14 +32,9 @@ win32 {
 #	include_directories(${BLAKE2_INCLUDE_DIR})
 SOURCES +=  \
     platform-windows.cpp \
-    win-update/update-window.cpp \
-    win-update/win-update.cpp \
-    win-update/win-update-helpers.cpp \
 
 HEADERS  += \
-    win-update/update-window.hpp \
-    win-update/win-update.hpp \
-    win-update/win-update-helpers.hpp \
+
 
 LIBS += -lcrypt32 -lblake2
 # OBS_JANSSON_IMPORT
@@ -96,8 +91,6 @@ SOURCES += \
 	audio-encoders.cpp \
 	qt-wrappers.cpp \
 	obs-frontend-api/obs-frontend-api.cpp \
-	../../deps/libff/libff/ff-util.c \
-	../../deps/json11/json11.cpp \
     mainwindow.cpp \
 
 
@@ -138,8 +131,6 @@ HEADERS  += \
 	qt-wrappers.hpp \
 	obs-frontend-api/obs-frontend-api.h \
 	obs-frontend-api/obs-frontend-internal.hpp \
-	../../deps/libff/libff/ff-util.h \
-	../../deps/json11/json11.hpp \
     mainwindow.h \
 
 
