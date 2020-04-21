@@ -25,7 +25,13 @@ CONFIG(debug, debug|release) {
     QMAKE_CXXFLAGS += -DQT_NO_DEBUG_OUTPUT
 }
 
-LIBS += ../../build/rundir/DEBUG/bin/libobs.0.dylib -L/usr//local/lib/ -lavformat -lavutil -lswscale -lswresample -lavcodec
+macx:{
+LIBS += ../../build/rundir/DEBUG/bin/libobs.0.dylib
+}
+win32 {
+LIBS += ../../build/libobs/Debug/obs.lib
+}
+#LIBS += -L/usr//local/lib/ -lavformat -lavutil -lswscale -lswresample -lavcodec
 
 win32 {
 #	include_directories(${OBS_JANSSON_INCLUDE_DIRS})
@@ -36,7 +42,7 @@ SOURCES +=  \
 HEADERS  += \
 
 
-LIBS += -lcrypt32 -lblake2
+#LIBS += -lcrypt32 -lblake2
 # OBS_JANSSON_IMPORT
 #if(CMAKE_SIZEOF_VOID_P EQUAL 4)
 # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LARGEADDRESSAWARE")
