@@ -10,7 +10,7 @@ project(obs-studio)
 option(BUILD_CAPTIONS "Build captions" FALSE)
 
 if(WIN32)
-	cmake_minimum_required(VERSION 3.16)
+    #cmake_minimum_required(VERSION 3.15)
 
 	# Check for Win SDK version 10.0.18362 or above
 	if(MSVC AND MSVC_VERSION LESS 1920)
@@ -24,7 +24,8 @@ if(WIN32)
 		set(WINAPI_COMPATIBLE FALSE)
 		if(WINAPI_VER_MAJOR EQUAL 10)
 			if (WINAPI_VER_MINOR EQUAL 0)
-				if (WINAPI_VER_BUILD GREATER_EQUAL 18362)
+                #if (WINAPI_VER_BUILD GREATER_EQUAL 18362)
+				if (WINAPI_VER_BUILD GREATER_EQUAL 17700)
 					set(WINAPI_COMPATIBLE TRUE)
 				endif()
 			else()

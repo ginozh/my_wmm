@@ -267,7 +267,7 @@ void OBSBasic::RefreshSceneCollections()
 	main->ui->actionPasteDup->setEnabled(false);
 #endif
 }
-
+#if 0
 void OBSBasic::on_actionNewSceneCollection_triggered()
 {
 	AddSceneCollection(true);
@@ -434,7 +434,7 @@ void OBSBasic::on_actionExportSceneCollection_triggered()
 		QFile::copy(path + currentFile + ".json", exportFile);
 	}
 }
-
+#endif
 void OBSBasic::ChangeSceneCollection()
 {
 	QAction *action = reinterpret_cast<QAction *>(sender());

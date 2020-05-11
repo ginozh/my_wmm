@@ -576,6 +576,7 @@ QWidget *OBSPropertiesView::AddList(obs_property_t *prop, bool &warning)
 	/* trigger a settings update if the index was not found */
 	if (idx == -1)
 		info->ControlChanged();
+#if 0
     else if(bFirstSet && value.length()==0 && count>=2)
     {
         combo->setCurrentIndex(1); // storm
@@ -584,8 +585,22 @@ QWidget *OBSPropertiesView::AddList(obs_property_t *prop, bool &warning)
     else if (idxautoselect != -1 && idxautoselect != idx)  // storm 条件同上
     {
         combo->setCurrentIndex(idxautoselect); // storm
-    }
-
+	}
+#endif
+	bool bset=false;
+	if(bFirstSet)
+	{
+		bFirstSet=false;
+		if( value.length()==0 && count>=2)
+		{
+			combo->setCurrentIndex(1); // storm
+			bset=true;
+		}
+	}
+	if(!bset && idxautoselect != -1 && idxautoselect != idx)// storm 条件同上
+	{
+		combo->setCurrentIndex(idxautoselect); // storm
+	}
 	return combo;
 }
 
