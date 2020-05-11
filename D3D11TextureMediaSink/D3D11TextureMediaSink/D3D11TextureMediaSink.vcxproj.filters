@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Utilities">
+      <UniqueIdentifier>{5c733c5c-d42f-4593-bab7-04d28a896d55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TextureMediaSink">
+      <UniqueIdentifier>{2e584adf-e1f5-4620-9418-f745e513939d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AsyncCallback.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoLock.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="CriticalSection.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="ComPtrListEx.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadSafeComPtrQueue.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadSafePtrQueue.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="MFAttributesImpl.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="PtrList.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="IMarker.h">
+      <Filter>TextureMediaSink</Filter>
+    </ClInclude>
+    <ClInclude Include="Marker.h">
+      <Filter>TextureMediaSink</Filter>
+    </ClInclude>
+    <ClInclude Include="Presenter.h">
+      <Filter>TextureMediaSink</Filter>
+    </ClInclude>
+    <ClInclude Include="SampleAllocator.h">
+      <Filter>TextureMediaSink</Filter>
+    </ClInclude>
+    <ClInclude Include="Scheduler.h">
+      <Filter>TextureMediaSink</Filter>
+    </ClInclude>
+    <ClInclude Include="StreamSink.h">
+      <Filter>TextureMediaSink</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureMediaSink.h">
+      <Filter>TextureMediaSink</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11TextureMediaSink.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Marker.cpp">
+      <Filter>TextureMediaSink</Filter>
+    </ClCompile>
+    <ClCompile Include="Presenter.cpp">
+      <Filter>TextureMediaSink</Filter>
+    </ClCompile>
+    <ClCompile Include="SampleAllocator.cpp">
+      <Filter>TextureMediaSink</Filter>
+    </ClCompile>
+    <ClCompile Include="Scheduler.cpp">
+      <Filter>TextureMediaSink</Filter>
+    </ClCompile>
+    <ClCompile Include="StreamSink.cpp">
+      <Filter>TextureMediaSink</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureMediaSink.cpp">
+      <Filter>TextureMediaSink</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="dllmodules.def" />
+  </ItemGroup>
+</Project>
