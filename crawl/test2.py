@@ -37,8 +37,8 @@ for day in day_array:
     # <h5 class="card-title"><a class="d-block" href="/video/free-luts-for-premiere-pro.html">73 Best Free Luts for Premiere Pro to Make Cinematic Videos</a>\n                                    </h5>
     # <p class="card-text"><a class="d-block" href="/video/free-luts-for-premiere-pro.html">Do you want to find free luts for Premiere Pro? In this article, we will let you know 75 free to use cinematic lut for Premiere. Check it out!</a></p>
     results = browser.find_elements_by_css_selector("h3>a")
-        for i, result in results.iteritems():
-          print("#{}: {} ({})".format(i, result.text, result.get_property("href")))
+    for i, result in results.iteritems():
+      print("#{}: {} ({})".format(i, result.text, result.get_property("href")))
 '''
     # this is a hack that initiates a "TextResponse" object (taken from the Scrapy module)
     resp_for_scrapy=TextResponse('none',200,{},html_str,[],None)
