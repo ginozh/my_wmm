@@ -1,42 +1,44 @@
 package com.example.vpn
 
-import android.content.Context
+import android.app.Activity
 import android.content.Intent
-import android.os.AsyncTask
-import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.beust.klaxon.Klaxon
-import com.beust.klaxon.KlaxonException
-import org.jsoup.Jsoup
-import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-
+/*
 interface OnEventListener<T> {
     fun onSuccess(tobject: T)
     fun onFailure(e: Exception?)
 }
+*/
+data class LoginInfo(val error: Int, val message: String, val expire_date: String = "", val status: Int = 0, val payment_date: String = "", val free: Int = 0)
+
 class VpnLoginActivity : AppCompatActivity() {
     private lateinit var et_user_name: EditText
-    data class LoginInfo(val error: Int, val message: String, val expire_date: String = "", val status: Int = 0, val payment_date: String = "", val free: Int = 0)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_vpn_login)
+        /*
+        CoroutineScope( Dispatchers.Main ).launch{
+            println("current_thread: ${Thread.currentThread().name}")
+            //val bitmap = suspendingGetImage("1")
+            val bitmap = suspendingGetLoginInfo("", "")
+            println("bitmap: $bitmap")
+        }*/
+
+
+        /*
+        // it is ok
         val someTask = SomeTask(
             applicationContext,
             object : OnEventListener<String?> {
-                /*
-                override fun onSuccess(result: String) {
-                    Toast.makeText(applicationContext, "SUCCESS: $result", Toast.LENGTH_LONG)
-                        .show()
-                }*/
 
                 override fun onFailure(e: java.lang.Exception?) {
                     Toast.makeText(
@@ -55,28 +57,50 @@ class VpnLoginActivity : AppCompatActivity() {
 
             })
         someTask.execute()
-        return
+        */
+        //return
         // get reference to all views
         et_user_name = findViewById(R.id.et_user_name) as EditText
         var et_password = findViewById(R.id.et_password) as EditText
         //var btn_register = findViewById(R.id.btn_register) as Button
         var btn_register = findViewById(R.id.btn_register) as TextView
-        var btn_forget_passwd = findViewById(R.id.btn_forget_passwd) as Button
+        //var btn_forget_passwd = findViewById(R.id.btn_forget_passwd) as Button
         var btn_login = findViewById(R.id.btn_login) as Button
 
+        et_user_name.setText(intent.getStringExtra(EXTRA_USER))
+        et_password.setText(intent.getStringExtra(EXTRA_PASSWD))
         //btn_register?.setPaintFlags(btn_register.getPaintFlags() or Paint.UNDERLINE_TEXT_FLAG)
-        btn_register?.setOnClickListener {
+        btn_register.setOnClickListener {
             val intent = Intent(this, VpnRegisterActivity::class.java).apply {
             }
             startActivity(intent)
         }
         btn_login?.setOnClickListener {
-            WebScratch().execute()
+            // WebScratch().execute()
             // TODO 回调处理: https://stackoverflow.com/questions/9963691/android-asynctask-sending-callbacks-to-ui
             // TODO 成功返回主界面
             //      onBackPressed()
+            if (et_user_name.text.isNotEmpty() && et_password.text.isNotEmpty()){
+                CoroutineScope( Dispatchers.Main ).launch{
+                    val userContent = suspendingGetLoginInfo(et_user_name.text, et_password.text)// as String
+                    val r = Klaxon().parse<LoginInfo>(userContent) as LoginInfo
+                    if (r.error == 0) {
+                        val intent = Intent().apply{
+                            putExtra(EXTRA_USER, et_user_name.text.toString())
+                            putExtra(EXTRA_PASSWD, et_password.text.toString())
+                            putExtra(EXTRA_EXPIRE, r.expire_date)
+                        }
+                        println("VpnLoginActivity user: ${et_user_name.text} passwd: ${et_password.text} expire: ${r.expire_date}")
+                        setResult(Activity.RESULT_OK, intent)
+                        finish()
+                    }else{
+                        // TODO show tips
+                    }
+                }
+            }
         }
     }
+    /*
     fun getLoginInfo(): LoginInfo{
         var r = LoginInfo(0, "")
         val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
@@ -167,4 +191,5 @@ class VpnLoginActivity : AppCompatActivity() {
             mContext = context
         }
     }
+    */
 }

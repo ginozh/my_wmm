@@ -29,19 +29,20 @@ class VpnRegisterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_vpn_register)
         var et_user_name = findViewById(R.id.re_user_name) as EditText
         var et_password = findViewById(R.id.re_password) as EditText
-        var et_again_password = findViewById(R.id.re_again_password) as EditText
+        //var et_again_password = findViewById(R.id.re_again_password) as EditText
         var btn_re_login = findViewById(R.id.re_login) as TextView
         var btn_register = findViewById(R.id.re_btn_register) as Button
-        btn_re_login?.setOnClickListener {
+        btn_re_login.setOnClickListener {
             val intent = Intent(this, VpnLoginActivity::class.java).apply {
             }
             startActivity(intent)
         }
-        btn_register?.setOnClickListener {
+        btn_register.setOnClickListener {
             var username = et_user_name.text.toString()
             var et_password = et_password.text.toString()
         }
     }
+    /*
     inner class WebScratch : AsyncTask<Void, Void, Void>() {
         private lateinit var words: String
 
@@ -61,4 +62,5 @@ class VpnRegisterActivity : AppCompatActivity() {
             return null
         }
     }
+    */
 }
