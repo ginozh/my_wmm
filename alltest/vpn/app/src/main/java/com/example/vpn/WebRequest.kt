@@ -18,10 +18,10 @@ suspend fun suspendingGetImage(id: String) = withContext(Dispatchers.IO){
 suspend fun suspendingGetCountry() = withContext(Dispatchers.IO){
     var document:String = ""
     try {
-        val uniqueID: String = UUID.randomUUID().toString()
-        println("WebRequest::getLoginInfo uniqueID: $uniqueID")
+        //val uniqueID: String = UUID.randomUUID().toString()
+        //println("WebRequest::suspendingGetCountry uniqueID: $uniqueID")
         document =
-            Jsoup.connect("https://backend.mediaflyer.org/get_ip/")
+            Jsoup.connect("https://backend.mediaflyer.org/get_ip/") // TODO backend2
                 .header("Identity", "solid_vpn_request")
                 .ignoreContentType(true)
                 .timeout(160000).validateTLSCertificates(false)
@@ -32,13 +32,13 @@ suspend fun suspendingGetCountry() = withContext(Dispatchers.IO){
     return@withContext document
 }
 
-suspend fun suspendingGetLoginInfo(email: Editable, password: Editable)= withContext(Dispatchers.IO){
+suspend fun suspendingGetLoginInfo(email: String, password: String, country: String)= withContext(Dispatchers.IO){
     var document:String = ""
     val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
     try {
         //currentTime=$(date +"%Y-%m-%d %H:%M:%S");curl -k   https://backend.mediaflyer.org/vpnserver/loginvpn/ -H "identity:solid_vpn_request"   -H "vpntoken: 1234567890" -H "machineid:keykeykey" -H "localtime:$currentTime" -H "address:127.0.0.1" -H "country:US" -H "os:Win" -H "email: hqzhang1983@gmail.com" -H "password: a1234567890"
-        val uniqueID: String = UUID.randomUUID().toString()
-        println("WebRequest::getLoginInfo uniqueID: $uniqueID")
+        //val uniqueID: String = UUID.randomUUID().toString()
+        //println("WebRequest::getLoginInfo uniqueID: $uniqueID")
         document =
             Jsoup.connect("https://backend.mediaflyer.org/vpnserver/loginvpn/")
                 .header("Identity", "solid_vpn_request")
@@ -47,10 +47,12 @@ suspend fun suspendingGetLoginInfo(email: Editable, password: Editable)= withCon
                 //.header("localtime", "2020-10-19 10:35:36")
                 .header("localtime", dateTimeFormat.toString())
                 .header("address", "127.0.0.1")
-                .header("country", "US")
+                .header("country", country)
                 .header("os", "Android")
-                .header("email", "hqzhang1983@gmail.com")
-                .header("password", "a1234567890")
+                //.header("email", "hqzhang1983@gmail.com")
+                .header("email", email)
+                //.header("password", "a1234567890")
+                .header("password", password)
                 .ignoreContentType(true)
                 .timeout(160000).validateTLSCertificates(false)
                 .execute().body()
@@ -60,13 +62,37 @@ suspend fun suspendingGetLoginInfo(email: Editable, password: Editable)= withCon
     return@withContext document
 }
 
-suspend fun suspendingRegister(email: String, password: String)= withContext(Dispatchers.IO){
+suspend fun suspendingForgetPassword(email: String, country: String)= withContext(Dispatchers.IO){
+    var document:String = ""
+    val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    try {
+        //currentTime=$(date +"%Y-%m-%d %H:%M:%S");curl -k   https://backend.mediaflyer.org/vpnserver/findpwd/ -H "identity:solid_vpn_request"   -H "vpntoken: 1234567890" -H "machineid:keykeykey" -H "localtime:$currentTime" -H "address:127.0.0.1" -H "country:US" -H "os:Win" -H "email: hqzhang1983@gmail.com" 
+        document =
+            Jsoup.connect("https://backend.mediaflyer.org/vpnserver/findpwd/")
+                .header("Identity", "solid_vpn_request")
+                .header("vpntoken", "1234567890")
+                .header("machineid", "keykeykey")
+                .header("localtime", dateTimeFormat.toString())
+                .header("address", "127.0.0.1")
+                .header("country", country)
+                .header("os", "Android")
+                .header("email", email)
+                .ignoreContentType(true)
+                .timeout(160000).validateTLSCertificates(false)
+                .execute().body()
+    } catch (e: IOException) {
+        e.printStackTrace()
+    }
+    return@withContext document
+}
+
+suspend fun suspendingRegister(email: String, password: String, country: String)= withContext(Dispatchers.IO){
     var document:String = ""
     val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
     try {
         //currentTime=$(date +"%Y-%m-%d %H:%M:%S");curl -k   https://backend.mediaflyer.org/vpnserver/registervpn/ -H "identity:solid_vpn_request"   -H "vpntoken: 1234567890" -H "machineid:keykeykey" -H "localtime:$currentTime" -H "address:127.0.0.1" -H "country:US" -H "os:Win" -H "email: hqzhang1983@gmail.com" -H "password: a1234567890"
-        val uniqueID: String = UUID.randomUUID().toString()
-        println("WebRequest::getLoginInfo uniqueID: $uniqueID")
+        //val uniqueID: String = UUID.randomUUID().toString()
+        //println("WebRequest::getLoginInfo uniqueID: $uniqueID")
         document =
             Jsoup.connect("https://backend.mediaflyer.org/vpnserver/registervpn/")
                 .header("Identity", "solid_vpn_request")
@@ -74,10 +100,10 @@ suspend fun suspendingRegister(email: String, password: String)= withContext(Dis
                 .header("machineid", "keykeykey")
                 .header("localtime", dateTimeFormat.toString())
                 .header("address", "127.0.0.1")
-                .header("country", "US")
+                .header("country", country)
                 .header("os", "Android")
-                .header("email", "hqzhang1983@gmail.com")
-                .header("password", "a1234567890")
+                .header("email", email)
+                .header("password", password)
                 .ignoreContentType(true)
                 .timeout(160000).validateTLSCertificates(false)
                 .execute().body()
@@ -91,7 +117,7 @@ suspend fun suspendingGetVpnServers()= withContext(Dispatchers.IO){
     var document:String = ""
     try {
         document =
-            Jsoup.connect("https://ips.mediaflyer.org:4430/centerserver")
+            Jsoup.connect("https://ips.mediaflyer.org:4430/servers") // TODO https://backend.mediaflyer.org/vpnserver/ips/
             .header("Identity", "vpn.com")
             .ignoreContentType(true)
             .timeout(160000).validateTLSCertificates(false)

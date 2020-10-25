@@ -23,6 +23,9 @@
     <string name="title_activity_login_vpn">LoginActivity</string>
     <string name="title_activity_register_vpn">RegisterActivity</string>
     <string name="text_register_activity_login_vpn"><u><b>Register</b></u></string>
+    <string name="text_forgetpasswd_activity_login_vpn"><u><b>Forget Password</b></u></string>
     <string name="text_login_activity_register_vpn"><u><b>Login</b></u></string>
     <string name="text_login_activity_main_vpn"><u><b>Please login</b></u></string>
+    <string name="text_register_activity_main_vpn"><u><b>Register</b></u></string>
+    <string name="text_logout_activity_main_vpn"><u><b>Logout</b></u></string>
 </resources>

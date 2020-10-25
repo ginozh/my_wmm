@@ -24,26 +24,34 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-const val EXTRA_USER = "com.example.vpn.user"
-const val EXTRA_PASSWD = "com.example.vpn.passwd"
-const val EXTRA_EXPIRE = "com.example.vpn.expire"
+const val EXTRA_USER = "com.example.vpn.extraUser"
+const val EXTRA_PASSWD = "com.example.vpn.extraPasswd"
+const val EXTRA_EXPIRE = "com.example.vpn.extraExpire"
+const val EXTRA_COUNTRY = "com.example.vpn.extraCountry"
+
+data class VPNServer(val Ip: String="", val Name: String="", val Country: String="", val Ovpn: String="")
+data class Server(val Servers: Array<VPNServer> = emptyArray())
 
 open class VpnMainActivity : AppCompatActivity() {
-    data class VPNServer(val Ip: String="", val Name: String="", val Country: String="", val Ovpn: String="")
-    data class Server(val Servers: Array<VPNServer> = emptyArray())
     data class UserInfo(var email: String="", var password: String="", var expire_date: String="")
     data class VpnInfo(var vpnName: String="", var vpnCountry: String="", var lastdata: String="")
     private var userInfo=UserInfo()
     private var selectedVpnInfo=VpnInfo()
     private var vpnServers=Server()
+    private var localCountry=""
 
     private val LOGIN_ACTIVITY_REQUEST_CODE = 0
+    private val REGISTER_ACTIVITY_REQUEST_CODE = 1
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        println("VpnMainActivity onCreate")
         setContentView(R.layout.activity_vpn_main)
+        //FileSecurity.testDec()
         //val btnOne = findViewById<Button>(R.id.btnLogin)
         val tvLogin = findViewById<TextView>(R.id.main_tv_login) as TextView
+        val tvRegister = findViewById<TextView>(R.id.main_tv_register) as TextView
+        val tvLogout = findViewById<TextView>(R.id.main_tv_logout) as TextView
         val layoutConnect = findViewById<RelativeLayout>(R.id.main_layout_connect) as RelativeLayout
         val ivConnect = findViewById<ImageView>(R.id.main_iv_connect) as ImageView
         val tvConnect = findViewById<TextView>(R.id.main_tv_connect) as TextView
@@ -56,13 +64,12 @@ open class VpnMainActivity : AppCompatActivity() {
         // 1.1, 如果是直接退出
         CoroutineScope( Dispatchers.Main ).launch{
             println("VpnMainActivity current_thread: ${Thread.currentThread().name}")
-            val country = suspendingGetCountry().trim() as String
-            if (country.equals("CN",true)){
+            localCountry = suspendingGetCountry().trim() as String
+            if (localCountry.equals("CN",true)){
                 println("VpnMainActivity exit") // TODO
             }
         }
         println("Environment getDataDirectory: " + Environment.getDataDirectory())
-        //val fileDeal = FileSecurity()
         // 1, 读取本地用户名、密码数据
         // {"email": "111@gmail.com", "password": "a123456", "expire_date": "2020-10-23 05:14:59"}
         val userContent = FileSecurity.readData(applicationContext, g_user_director,  g_user_file) as String
@@ -71,12 +78,14 @@ open class VpnMainActivity : AppCompatActivity() {
             println("userContent: $userContent")
             try {
                 userInfo = Klaxon().parse<UserInfo>(userContent) as UserInfo
-                tvLogin.text = Html.fromHtml("<b><u>${userInfo.email}</u></b>")
-                tvExpire.text = userInfo.expire_date
                 //tvLogin.setPaintFlags(tvLogin.paintFlags | Paint.UNDERLINE_TEXT_FLAG)
             }catch (e: KlaxonException) {
                 e.printStackTrace()
             }
+        }
+        if (userInfo.email.isNotEmpty() && userInfo.password.isNotEmpty() && userInfo.expire_date.isNotEmpty()){
+            tvLogin.text = Html.fromHtml("<b><u>${userInfo.email}</u></b>")
+            tvExpire.text = userInfo.expire_date
         }else{
             // 1.2, 如果没有用户名
             tvLogin.text = Html.fromHtml("<b><u>Please login</u></b>")
@@ -143,9 +152,26 @@ open class VpnMainActivity : AppCompatActivity() {
             val intent = Intent(this, VpnLoginActivity::class.java).apply{
                 putExtra(EXTRA_USER, userInfo.email)
                 putExtra(EXTRA_PASSWD, userInfo.password)
+                putExtra(EXTRA_COUNTRY, localCountry)
             }
             //startActivity(intent)
             startActivityForResult(intent, LOGIN_ACTIVITY_REQUEST_CODE);
+        }
+        tvRegister.setOnClickListener {
+            //val intent = Intent(this, LoginActivity::class.java).apply
+            val intent = Intent(this, VpnRegisterActivity::class.java).apply{
+                putExtra(EXTRA_USER, userInfo.email)
+                putExtra(EXTRA_PASSWD, userInfo.password)
+                putExtra(EXTRA_COUNTRY, localCountry)
+            }
+            //startActivity(intent)
+            startActivityForResult(intent, REGISTER_ACTIVITY_REQUEST_CODE);
+        }
+        tvLogout.setOnClickListener {
+            tvLogin.text = Html.fromHtml("<b><u>Please Login</u></b>")
+            tvExpire.text = ""
+            userInfo=UserInfo()
+            FileSecurity.writeData(applicationContext, g_user_director, g_user_file, Klaxon().toJsonString(userInfo));
         }
         layoutConnect.setOnClickListener {
             println("connect")
@@ -177,25 +203,28 @@ open class VpnMainActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
-    override  fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onResume() {
+        super.onResume()
+        println("VpnMainActivity onResume")
+    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
+        println("VpnMainActivity onActivityResult")
         // check that it is the SecondActivity with an OK result
-        if (requestCode == LOGIN_ACTIVITY_REQUEST_CODE) {
+        if (requestCode == LOGIN_ACTIVITY_REQUEST_CODE || requestCode == REGISTER_ACTIVITY_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 // get String data from Intent
                 val email = data?.getStringExtra(EXTRA_USER).toString()
                 val password = data?.getStringExtra(EXTRA_PASSWD).toString()// as String
-                val expire_date = data?.getStringExtra(EXTRA_EXPIRE).toString()// as String
-                if (userInfo.email != email || userInfo.password != password || userInfo.expire_date != expire_date){
+                val expireDate = data?.getStringExtra(EXTRA_EXPIRE).toString()// as String
+                if (userInfo.email != email || userInfo.password != password || userInfo.expire_date != expireDate){
                     userInfo.email = email
                     userInfo.password = password
-                    userInfo.expire_date = expire_date
+                    userInfo.expire_date = expireDate
                     val tvLogin = findViewById<TextView>(R.id.main_tv_login) as TextView
                     val tvExpire = findViewById<TextView>(R.id.main_tv_expire) as TextView
                     tvLogin.text = Html.fromHtml("<b><u>${userInfo.email}</u></b>")
                     tvExpire.text = userInfo.expire_date
-                    //val fileDeal = FileSecurity()
                     FileSecurity.writeData(applicationContext, g_user_director, g_user_file, Klaxon().toJsonString(userInfo));
                 }
                 println("login user: ${userInfo.email} passwd: ${userInfo.password} expire: ${userInfo.expire_date}")

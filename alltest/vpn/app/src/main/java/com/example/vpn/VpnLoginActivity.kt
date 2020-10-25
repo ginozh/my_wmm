@@ -1,13 +1,16 @@
 package com.example.vpn
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.beust.klaxon.Klaxon
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,9 +22,10 @@ interface OnEventListener<T> {
 }
 */
 data class LoginInfo(val error: Int, val message: String, val expire_date: String = "", val status: Int = 0, val payment_date: String = "", val free: Int = 0)
+data class ForgetPasswdInfo(val error: Int, val message: String)
 
 class VpnLoginActivity : AppCompatActivity() {
-    private lateinit var et_user_name: EditText
+    private lateinit var etUserName: EditText
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_vpn_login)
@@ -58,48 +62,101 @@ class VpnLoginActivity : AppCompatActivity() {
             })
         someTask.execute()
         */
+        /*val callback = object : OnBackPressedCallback(
+            true // default to enabled
+        ) {
+            override fun handleOnBackPressed() {
+//your custom logic for back handling goes here
+                println("VpnLoginActivity handleOnBackPressed")
+            }
+        }
+        onBackPressedDispatcher.addCallback(
+            this, // LifecycleOwner
+            callback
+        )*/
         //return
         // get reference to all views
-        et_user_name = findViewById(R.id.et_user_name) as EditText
-        var et_password = findViewById(R.id.et_password) as EditText
-        //var btn_register = findViewById(R.id.btn_register) as Button
-        var btn_register = findViewById(R.id.btn_register) as TextView
-        //var btn_forget_passwd = findViewById(R.id.btn_forget_passwd) as Button
-        var btn_login = findViewById(R.id.btn_login) as Button
+        etUserName = findViewById<EditText>(R.id.login_et_user_name)
+        var etPassword = findViewById<EditText>(R.id.login_et_password)
+        //var tvRegister = findViewById<TextView>(R.id.login_tv_register)
+        var tvForgetPassword = findViewById<TextView>(R.id.login_tv_forget_passwd)
+        var btnLogin = findViewById<Button>(R.id.login_btn_login)
 
-        et_user_name.setText(intent.getStringExtra(EXTRA_USER))
-        et_password.setText(intent.getStringExtra(EXTRA_PASSWD))
-        //btn_register?.setPaintFlags(btn_register.getPaintFlags() or Paint.UNDERLINE_TEXT_FLAG)
-        btn_register.setOnClickListener {
+        etUserName.setText(intent.getStringExtra(EXTRA_USER))
+        etPassword.setText(intent.getStringExtra(EXTRA_PASSWD))
+        val country = intent.getStringExtra(EXTRA_COUNTRY).toString()
+        //tvRegister?.setPaintFlags(tvRegister.getPaintFlags() or Paint.UNDERLINE_TEXT_FLAG)
+        /*tvRegister.setOnClickListener {
             val intent = Intent(this, VpnRegisterActivity::class.java).apply {
             }
             startActivity(intent)
+        }*/
+        tvForgetPassword.setOnClickListener {
+            val imm  = it.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(it.windowToken, 0)
+
+            tvForgetPassword.isClickable = false
+            Snackbar.make(it, "Wait a minute...", Snackbar.LENGTH_LONG).setAction("Action", null).show()
+            CoroutineScope( Dispatchers.Main ).launch{
+                println("VpnMainActivity current_thread: ${Thread.currentThread().name}")
+                // {"error": 0, "message": "sucess."}
+                // {"error": -120, "message": "no user."}
+                val forgetPasswordContent = suspendingForgetPassword(etUserName.text.toString(), country)
+                val r = Klaxon().parse<ForgetPasswdInfo>(forgetPasswordContent) as ForgetPasswdInfo
+                if (r.error == 0) {
+                    Snackbar.make(it, "Change password link is sent to your email address", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show()
+                }else{
+                    Snackbar.make(it, "Sorry, This user does not exist", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show()
+                }
+                tvForgetPassword.isClickable = true
+            }
         }
-        btn_login?.setOnClickListener {
+        btnLogin.setOnClickListener {
             // WebScratch().execute()
             // TODO 回调处理: https://stackoverflow.com/questions/9963691/android-asynctask-sending-callbacks-to-ui
             // TODO 成功返回主界面
             //      onBackPressed()
-            if (et_user_name.text.isNotEmpty() && et_password.text.isNotEmpty()){
+            val imm  = it.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(it.windowToken, 0)
+            if (etUserName.text.isNotEmpty() && etPassword.text.isNotEmpty()){
+                btnLogin.isClickable = false
+                Snackbar.make(it, "Wait a minute...", Snackbar.LENGTH_LONG).setAction("Action", null).show()
                 CoroutineScope( Dispatchers.Main ).launch{
-                    val userContent = suspendingGetLoginInfo(et_user_name.text, et_password.text)// as String
+                    val userContent = suspendingGetLoginInfo(etUserName.text.toString(), etPassword.text.toString(), country)// as String
                     val r = Klaxon().parse<LoginInfo>(userContent) as LoginInfo
                     if (r.error == 0) {
                         val intent = Intent().apply{
-                            putExtra(EXTRA_USER, et_user_name.text.toString())
-                            putExtra(EXTRA_PASSWD, et_password.text.toString())
+                            putExtra(EXTRA_USER, etUserName.text.toString())
+                            putExtra(EXTRA_PASSWD, etPassword.text.toString())
                             putExtra(EXTRA_EXPIRE, r.expire_date)
                         }
-                        println("VpnLoginActivity user: ${et_user_name.text} passwd: ${et_password.text} expire: ${r.expire_date}")
+                        println("VpnLoginActivity user: ${etUserName.text} passwd: ${etPassword.text} expire: ${r.expire_date}")
                         setResult(Activity.RESULT_OK, intent)
                         finish()
                     }else{
                         // TODO show tips
+                        Snackbar.make(it, "Incorrect password or user does not exist", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show()
                     }
+                    btnLogin.isClickable = true
                 }
             }
+
         }
     }
+    /*override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id: Int = item.itemId
+        println("VpnLoginActivity $id home: ${android.R.id.home}")
+        if (id == android.R.id.home) {
+            //NavUtils.navigateUpFromSameTask(this);
+            val intent = Intent().apply{}
+            setResult(Activity.RESULT_OK, intent)
+            finish()
+        }
+        return super.onOptionsItemSelected(item)
+    }*/
     /*
     fun getLoginInfo(): LoginInfo{
         var r = LoginInfo(0, "")
@@ -154,7 +211,7 @@ class VpnLoginActivity : AppCompatActivity() {
         }
         override fun onPostExecute(aVoid: Void?) {
             super.onPostExecute(aVoid)
-            et_user_name.setText(words)
+            etUserName.setText(words)
         }
     }
     inner class SomeTask(context: Context, callback: OnEventListener<*>?) : AsyncTask<Void?, Void?, String?>() {

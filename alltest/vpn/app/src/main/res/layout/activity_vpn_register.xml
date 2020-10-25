@@ -14,45 +14,37 @@
       <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="25dp"
-        android:textColor="#6dffbf"
         android:padding="30dp"
         android:text="New registered user is eliglible for a one-day free trial"/>
       <EditText
-        android:id="@+id/re_user_name"
+        android:id="@+id/register_et_user"
         android:hint="Type email. Same as your payment email."
-        android:textColor="#6bfff7"
-        android:textColorHint="#52afaa"
         android:textAlignment="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
       <EditText
-        android:id="@+id/re_password"
+        android:id="@+id/register_et_password"
         android:hint="Type password. Length is greater than 5"
-        android:textColor="#6bfff7"
-        android:textColorHint="#52afaa"
         android:textAlignment="center"
         android:inputType="textPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
       <EditText
-        android:id="@+id/re_again_password"
+        android:id="@+id/register_et_re_password"
         android:hint="Type password again"
-        android:textColor="#6bfff7"
-        android:textColorHint="#52afaa"
         android:textAlignment="center"
         android:inputType="textPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
-      <TextView
-        android:id="@+id/re_login"
+      <!--TextView
+        android:id="@+id/register_tv_re_login"
         android:text="@string/text_login_activity_register_vpn"
         android:clickable="true"
         android:textAllCaps="false"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content" /-->
       <Button
-        android:id="@+id/re_btn_register"
+        android:id="@+id/register_btn_register"
         android:text="Register"
         android:textAllCaps="false"
         android:layout_width="wrap_content"

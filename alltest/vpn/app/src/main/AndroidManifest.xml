@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".VpnMainActivity">
+        <activity android:name=".VpnMainActivity"
+            android:launchMode= "singleInstance" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -37,6 +38,7 @@
         <activity
             android:name=".VpnLoginActivity"
             android:label="@string/title_activity_login_vpn"
+            android:windowSoftInputMode="adjustResize"
             android:parentActivityName=".VpnMainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -44,6 +46,7 @@
         </activity>
         <activity android:name=".VpnRegisterActivity"
             android:label="@string/title_activity_register_vpn"
+            android:windowSoftInputMode="adjustResize"
             android:parentActivityName=".VpnMainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

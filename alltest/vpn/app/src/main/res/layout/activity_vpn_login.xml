@@ -20,7 +20,7 @@
       android:padding="30dp"
       android:text="Login"/>
     <EditText
-      android:id="@+id/et_user_name"
+      android:id="@+id/login_et_user_name"
       android:hint="User Name"
       android:textColor="#6bfff7"
       android:textColorHint="#52afaa"
@@ -28,7 +28,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"/>
     <EditText
-      android:id="@+id/et_password"
+      android:id="@+id/login_et_password"
       android:hint="Password"
       android:textColor="#6bfff7"
       android:textColorHint="#52afaa"
@@ -36,28 +36,36 @@
       android:inputType="textPassword"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"/>
-    <LinearLayout
+    <!--LinearLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:gravity="center"
       android:padding="25dp"
       android:orientation="horizontal">
       <TextView
-        android:id="@+id/btn_register"
+        android:id="@+id/login_tv_register"
         android:text="@string/text_register_activity_login_vpn"
         android:clickable="true"
         android:textAllCaps="false"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-      <Button
-        android:id="@+id/btn_forget_passwd"
-        android:text="Forget Password"
+      <TextView
+        android:id="@+id/login_tv_forget_passwd"
+        android:text="@string/text_forgetpasswd_activity_login_vpn"
+        android:clickable="true"
         android:textAllCaps="false"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-    </LinearLayout>
+    </LinearLayout-->
+    <TextView
+      android:id="@+id/login_tv_forget_passwd"
+      android:text="@string/text_forgetpasswd_activity_login_vpn"
+      android:clickable="true"
+      android:textAllCaps="false"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content" />
     <Button
-      android:id="@+id/btn_login"
+      android:id="@+id/login_btn_login"
       android:text="Login"
       android:textAllCaps="false"
       android:layout_width="wrap_content"

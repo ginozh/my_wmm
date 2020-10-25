@@ -1,45 +1,109 @@
 package com.example.vpn
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
+import android.util.Patterns
+import android.view.View
+import android.view.View.OnFocusChangeListener
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
-import android.os.AsyncTask
-import android.os.Build
-import android.os.Bundle
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-
 import com.beust.klaxon.Klaxon
-import com.beust.klaxon.JsonReader
-import com.beust.klaxon.JsonObject
-import java.io.IOException
-import java.io.StringReader
-import java.util.Base64
-import javax.crypto.Cipher
-import javax.crypto.spec.IvParameterSpec
-import javax.crypto.spec.SecretKeySpec
-import org.jsoup.Jsoup
-import org.jsoup.Connection
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+/*
+class MyFocusChangeListener : OnFocusChangeListener {
+    override fun onFocusChange(v: View, hasFocus: Boolean) {
+        val imm  = v.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        //if (v.id === R.id.register_et_user && !hasFocus)
+        if (!hasFocus){
+            imm.hideSoftInputFromWindow(v.windowToken, 0)
+        }else{
+            imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT)
+        }
+    }
+}
+*/
 
 class VpnRegisterActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_vpn_register)
-        var et_user_name = findViewById(R.id.re_user_name) as EditText
-        var et_password = findViewById(R.id.re_password) as EditText
-        //var et_again_password = findViewById(R.id.re_again_password) as EditText
-        var btn_re_login = findViewById(R.id.re_login) as TextView
-        var btn_register = findViewById(R.id.re_btn_register) as Button
-        btn_re_login.setOnClickListener {
+        var etUserName = findViewById<EditText>(R.id.register_et_user)
+        var etPassword = findViewById<EditText>(R.id.register_et_password)
+        var etAgainPassword = findViewById<EditText>(R.id.register_et_re_password)
+        //var btn_re_login = findViewById(R.id.re_login) as TextView
+        var btnRegister = findViewById<Button>(R.id.register_btn_register)
+
+        etUserName.setText(intent.getStringExtra(EXTRA_USER))
+        etPassword.setText(intent.getStringExtra(EXTRA_PASSWD))
+        val country = intent.getStringExtra(EXTRA_COUNTRY).toString()
+        /*
+        val ofcListener: OnFocusChangeListener = MyFocusChangeListener()
+        etUserName.onFocusChangeListener = ofcListener
+        etPassword.onFocusChangeListener = ofcListener
+        etAgainPassword.onFocusChangeListener = ofcListener
+        */
+        /*btn_re_login.setOnClickListener {
             val intent = Intent(this, VpnLoginActivity::class.java).apply {
             }
             startActivity(intent)
-        }
-        btn_register.setOnClickListener {
-            var username = et_user_name.text.toString()
-            var et_password = et_password.text.toString()
+        }*/
+        btnRegister.setOnClickListener {
+            /*etUserName.clearFocus()
+            etPassword.clearFocus()
+            etAgainPassword.clearFocus()*/
+            val imm  = it.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(it.windowToken, 0)
+
+            var userName = etUserName.text.toString()
+            var password = etPassword.text.toString()
+            var againPassword = etAgainPassword.text.toString()
+            if (userName.contains('@') && Patterns.EMAIL_ADDRESS.matcher(userName).matches()
+                && password.length > 5 && password == againPassword) {
+                it.isClickable = false
+                Snackbar.make(it, "Wait a minute...", Snackbar.LENGTH_LONG) .setAction("Action", null).show()
+                CoroutineScope(Dispatchers.Main).launch {
+                    println("VpnMainActivity current_thread: ${Thread.currentThread().name}")
+                    data class RegisterInfo(val error: Int, val message: String, val email: String, val expire_date: String = "", val payment_date: String = "", val free: Int = 0)
+                    // {"error": 0, "email": "hqzhang1982@gmail.com", "message": "save successfully.", "expire_date": "2020-10-25 08:50:38", "payment_date": "None", "free": 1}
+                    // {"error": -110, "message": "email was registered."}
+                    val registerContent = suspendingRegister(userName, password, country)
+                    val r = Klaxon().parse<RegisterInfo>(registerContent) as RegisterInfo
+                    if (r.error == 0) {
+                        val intent = Intent().apply{
+                            putExtra(EXTRA_USER, etUserName.text.toString())
+                            putExtra(EXTRA_PASSWD, etPassword.text.toString())
+                            putExtra(EXTRA_EXPIRE, r.expire_date)
+                        }
+                        println("VpnRegisterActivity user: ${etUserName.text} passwd: ${etPassword.text} expire: ${r.expire_date}")
+                        setResult(Activity.RESULT_OK, intent)
+                        finish()
+                    } else {
+                        Snackbar.make( it, "This email was registered,please login with it ", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show()
+                    }
+                    it.isClickable = true
+                }
+            }else{
+                if (!userName.contains('@') || !Patterns.EMAIL_ADDRESS.matcher(userName).matches()){
+                    Snackbar.make( it, "This email is wrong", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show()
+                }else if(password.length <= 5){
+                    Snackbar.make( it, "This password isn't great 5", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show()
+                }else if(password != againPassword) {
+                    Snackbar.make( it, "Sorry, passwords do not match.", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show()
+                }
+            }
         }
     }
     /*
